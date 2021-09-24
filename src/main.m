@@ -12,13 +12,14 @@ Nz = length(Z);
 
 % get smoothed initialisation field
 rng(15);
-a = randn(Nz,Nx);
+rp = randn(Nz,Nx);
 for i = 1:round(smth)
-    a(2:end-1,2:end-1) = a(2:end-1,2:end-1) + diff(a(:,2:end-1),2,1)./8 + diff(a(2:end-1,:),2,2)./8;
-    a([1 end],:) = a([end-1 2],:);
-    a(:,[1 end]) = a(:,[2 end-1]);
+    rp(2:end-1,2:end-1) = rp(2:end-1,2:end-1) + diff(rp(:,2:end-1),2,1)./8 + diff(rp(2:end-1,:),2,2)./8;
+    rp([1 end],:) = rp([2 end-1],:);
+    rp(:,[1 end]) = rp(:,[2 end-1]);
 end
-a = a./max(abs(a(:)));
+rp = rp./max(abs(rp(:)));
+rp = rp - mean(mean(rp(2:end-1,2:end-1)));
 
 % get mapping arrays
 NP =  Nz   * Nx   ;
@@ -29,9 +30,9 @@ MapW = reshape(1:NW,Nz-1,Nx  );
 MapU = reshape(1:NU,Nz  ,Nx-1) + NW;
 
 % set initial solution fields
-T   =  T0   + a.*T1;  To   = T;  cool = 0.*T;
-c   =  c0 + a.*c1;  co = c;
-v   =  v0 + a.*v1;  vo = v;
+T   =  T0 + (T1-T0) .* (1+erf(50*(ZZ/D-zlay)))/2 + dT.*rp;  meanT0 = mean(mean(T(2:end-1,2:end-1)));
+c   =  c0 + (c1-c0) .* (1+erf(50*(ZZ/D-zlay)))/2 + dc.*rp;  meanc0 = mean(mean(c(2:end-1,2:end-1)));
+v   =  v0 + (v1-v0) .* (1+erf(50*(ZZ/D-zlay)))/2 + dv.*rp;  meanv0 = mean(mean(v(2:end-1,2:end-1))); 
 x   =  0.*c + 1e-16;
 f   =  0.*c + 1e-16;
 U   =  zeros(size((XX(:,1:end-1)+XX(:,2:end))));  Ui = U;  res_U = 0.*U;
@@ -62,10 +63,11 @@ while res > tol
     rho  = mu.*rhom + chi.*rhox + phi.*rhof;
     res  = (norm(chi(:)-chii(:),2) + norm(phi(:)-phii(:),2))./sqrt(2*length(chi(:)));
 end
-
+rhoo = rho;
+  
 % get bulk enthalpy, silica, volatile content densities
-Cprhob = mu*rhom*Cpm + chi*rhox*Cpx + phi*rhof*Cpf;
-H = Cprhob.*T + chi.*rhox.*DLx + phi.*rhof.*DLf;
+rhoCp = mu*rhom*Cpm + chi*rhox*Cpx + phi*rhof*Cpf;
+H = rhoCp.*T + chi.*rhox.*DLx + phi.*rhof.*DLf;
 C = mu.*rhom.*cm + chi.*rhox.*cx;
 V = mu.*rhom.*vm + phi.*rhof.*vf;
 
@@ -73,14 +75,14 @@ V = mu.*rhom.*vm + phi.*rhof.*vf;
 Gx = 0.*x;  Gf = 0.*f;
 
 % initialise auxiliary variables 
-dHdt   =  0.*T;  diff_T = 0.*T; 
-dCdt   =  0.*c;  diff_c = 0.*c;  
-dVdt   =  0.*v;  diff_v = 0.*v;  
-% dfdt   =  0.*f;  diff_f = 0.*f;  
-% dxdt   =  0.*x;  diff_x = 0.*x; 
+dHdt   =  0.*T;  advn_H = 0.*H;  diff_T = 0.*T; 
+dCdt   =  0.*c;  advn_C = 0.*C;  diff_c = 0.*c;  
+dVdt   =  0.*v;  advn_V = 0.*V;  diff_v = 0.*v;  
+dfdt   =  0.*f;  diff_f = 0.*f;  
+dxdt   =  0.*x;  diff_x = 0.*x; 
 
 eIIref =  1e-6;  
-Div_V  =  0.*P;  Div_mVm = 0.*P;  Div_xVx = 0.*P;  Div_fVf = 0.*P; dwfdz = 0.*P;  dwxdz = 0.*P;
+Div_V  =  0.*P;  Div_mVm = 0.*P;  Div_xVx = 0.*P;  Div_fVf = 0.*P; dwfdz = 0.*P;  dwxdz = 0.*P;  dWmdz = 0.*P;
 exx    =  0.*P;  ezz = 0.*P;  exz = zeros(size(f)-1);  eII = 0.*P;  
 txx    =  0.*P;  tzz = 0.*P;  txz = zeros(size(f)-1);  tII = 0.*P; 
 
@@ -96,7 +98,7 @@ if restart
     elseif restart > 0  % restart from specified continuation frame
         name = ['../out/',runID,'/',runID,'_',num2str(restart)];
     end
-    load(name,'U','W','P','Pt','f','x','phi','chi','T','c','v','cm','cx','vm','vf','dTdt','dcdt','dvdt','dfdt','dxdt','Gf','Gx','rho','eta','Div_V','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step');
+    load(name,'U','W','P','Pt','f','x','phi','chi','mu','H','C','V','T','c','v','cm','cx','vm','vf','dHdt','dCdt','dVdt','dfdt','dxdt','Gf','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step');
     name = ['../out/',runID,'/',runID,'_par'];
     load(name);
     
@@ -106,9 +108,8 @@ if restart
     time = time+dt;
     step = step+1;
 end
-        
-% initialise material properties and plot initial condition
-update;  output;
+
+update; fluidmech; update; output;
 
 % physical time stepping loop
 while time <= tend && step <= M
@@ -136,17 +137,19 @@ while time <= tend && step <= M
     it       = 0;
     
     % non-linear iteration loop
-    startup = 2*double(step<=0) + double(step>0);
-    while resnorm/resnorm0 >= rtol^startup && resnorm >= atol/startup && it <= maxit*startup
+    while resnorm/resnorm0 >= rtol && resnorm >= atol && it <= maxit || it < 2 
             
         % solve thermo-chemical equations
         thermochem;
         
-        % update nonlinear coefficients & auxiliary fields
+        % update non-linear parameters and auxiliary variables
         update;
         
         % solve fluid-mechanics equations
         fluidmech;
+        
+        % update non-linear parameters and auxiliary variables
+        update;
         
         % report convergence
         report;
@@ -158,7 +161,7 @@ while time <= tend && step <= M
     fprintf(1,'\n         time to solution = %4.4f sec\n\n',toc);
     
     fprintf(1,'         min T   =  %4.1f;    mean T   = %4.1f;    max T   = %4.1f;   [degC]\n' ,min(T(:)  ),mean(T(:)  ),max(T(:)  ));
-    fprintf(1,'         min c   =  %2.3f;    mean c   = %2.3f;    max c   = %2.3f;   [wt]\n'   ,min(c(:)  ),mean(c(:)  ),max(c(:)  ));
+    fprintf(1,'         min c   =  %1.4f;    mean c   = %1.4f;    max c   = %1.4f;   [wt]\n'   ,min(c(:)  ),mean(c(:)  ),max(c(:)  ));
     fprintf(1,'         min v   =  %1.4f;    mean v   = %1.4f;    max v   = %1.4f;   [wt]\n'   ,min(v(:)  ),mean(v(:)  ),max(v(:)  ));
     fprintf(1,'         min x   =  %1.4f;    mean x   = %1.4f;    max x   = %1.4f;   [wt]\n'   ,min(x(:)  ),mean(x(:)  ),max(x(:)  ));
     fprintf(1,'         min f   =  %1.4f;    mean f   = %1.4f;    max f   = %1.4f;   [wt]\n\n' ,min(f(:)  ),mean(f(:)  ),max(f(:)  ));

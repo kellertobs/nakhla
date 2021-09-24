@@ -31,16 +31,16 @@ IR = [IR; ii(:)]; RR = [RR; aa(:)];
 
 % top boundary
 ii = MapW(1,2:end-1); jj = ii;
-aa = zeros(size(ii)) + 0;
-II = [II; ii(:)]; JJ = [JJ; jj(:)];   AA = [AA; aa(:)+1];
 aa = zeros(size(ii));
+II = [II; ii(:)]; JJ = [JJ; jj(:)];   AA = [AA; aa(:)+1];
+aa = zeros(size(ii));% - mean(VolSrc(:))*D/4;
 IR = [IR; ii(:)]; RR = [RR; aa(:)];
 
 % bottom boundary
 ii = MapW(end,2:end-1); jj = ii;
 aa = zeros(size(ii));
 II = [II; ii(:)]; JJ = [JJ; jj(:)];   AA = [AA; aa(:)+1];
-aa = zeros(size(ii));
+aa = zeros(size(ii));% + mean(VolSrc(:))*D/4;
 IR = [IR; ii(:)]; RR = [RR; aa(:)];
 
 
@@ -97,14 +97,14 @@ IR = [IR; ii(:)]; RR = [RR; aa(:)];
 ii = MapU(2:end-1,1); jj = ii;
 aa = zeros(size(ii));
 II = [II; ii(:)]; JJ = [JJ; jj(:)];   AA = [AA; aa(:)+1];
-aa = zeros(size(ii));
+aa = zeros(size(ii));% - mean(VolSrc(:))*L/4;
 IR = [IR; ii(:)]; RR = [RR; aa(:)];
 
 % right side boundary
 ii = MapU(2:end-1,end); jj = ii;
 aa = zeros(size(ii));
 II = [II; ii(:)]; JJ = [JJ; jj(:)];   AA = [AA; aa(:)+1];
-aa = zeros(size(ii));
+aa = zeros(size(ii));% + mean(VolSrc(:))*L/4;
 IR = [IR; ii(:)]; RR = [RR; aa(:)];
 
 
@@ -235,7 +235,7 @@ II = [II; ii(:)]; JJ = [JJ; ii(:)];    AA = [AA; aa(:)];  % P on stencil centre
 
 
 % RHS
-rr = - dwfdz(2:end-1,2:end-1) - dwxdz(2:end-1,2:end-1);
+rr = -VolSrc(2:end-1,2:end-1) - dwxdz(2:end-1,2:end-1) - dwfdz(2:end-1,2:end-1);
 IR = [IR; ii(:)];
 RR = [RR; rr(:)];
 
@@ -251,8 +251,8 @@ RP(MapP(2,2),:) = 0;
 
 %% assemble global coefficient matrix and right-hand side vector
 Pscale = 2*eta0/h;
-LL = [-KV   Pscale.*GG  ; ...
-       Pscale.*DD   Pscale.*KP  ];
+LL = [-KV          Pscale.*GG  ; ...
+       Pscale.*DD  Pscale.*KP  ];
 
 RR = [RV; RP.*Pscale];
 
@@ -286,72 +286,4 @@ S = LL\RR;  % update solution
 W  = full(reshape(S(MapW(:))        ,(Nz-1), Nx   ));                      % matrix z-velocity
 U  = full(reshape(S(MapU(:))        , Nz   ,(Nx-1)));                      % matrix x-velocity
 P  = full(reshape(S(MapP(:)+(NW+NU)), Nz   , Nx   )).*Pscale;              % matrix dynamic pressure
-Pt = Ptop + P + rhoref .* g0 .* ZZ;                                       % total pressure
 
-
-%% get auxiliary variables
-
-% update velocity divergence
-Div_V(2:end-1,2:end-1) = ddz(W(:,2:end-1),h) ...                           % get velocity divergence
-                       + ddx(U(2:end-1,:),h);
-Div_V([1 end],:) = Div_V([2 end-1],:);                                     % apply boundary conditions
-Div_V(:,[1 end]) = Div_V(:,[2 end-1]);
-
-% update strain rates
-exx(:,2:end-1)   = diff(U,1,2)./h - Div_V(:,2:end-1)./3;                   % x-normal strain rate
-exx([1 end],:)   = exx([2 end-1],:);                                       % apply boundary conditions
-exx(:,[1 end])   = exx(:,[2 end-1]);
-ezz(2:end-1,:)   = diff(W,1,1)./h - Div_V(2:end-1,:)./3;                   % z-normal strain rate
-ezz([1 end],:)   = ezz([2 end-1],:);                                       % apply boundary conditions
-ezz(:,[1 end])   = ezz(:,[2 end-1]);
-exz              = 1/2.*(diff(U,1,1)./h+diff(W,1,2)./h);                   % shear strain rate
-
-% update stresses
-txx = eta .* exx;                                                          % x-normal stress
-tzz = eta .* ezz;                                                          % z-normal stress
-txz = etac.* exz;                                                          % xz-shear stress
-
-% update phase velocities
-Wf   = W + wf;                                                             % mvp z-velocity
-Uf   = U + 0.;                                                             % mvp x-velocity
-Wx   = W + wx;                                                             % xtl z-velocity
-Ux   = U + 0.;                                                             % xtl x-velocity
-Wm   = W;                                                                  % mlt z-velocity
-Um   = U;                                                                  % mlt x-velocity
-
-fWf  = (f(1:end-1,:)+f(2:end,:))/2.*(W + wf);                              % mvp z-velocity
-fUf  = (f(:,1:end-1)+f(:,2:end))/2.*(U + 0.);                              % mvp x-velocity
-xWx  = (x(1:end-1,:)+x(2:end,:))/2.*(W + wx);                              % xtl z-velocity
-xUx  = (x(:,1:end-1)+x(:,2:end))/2.*(U + 0.);                              % xtl x-velocity
-mUm  = (m(:,1:end-1)+m(:,2:end))/2.*(U + 0.);                              % mlt x-velocity
-mWm  = (m(1:end-1,:)+m(2:end,:))/2.*(W + 0.);                              % mlt z-velocity
-
-% WT  = W + ((f(1:end-1,:)+f(2:end,:))/2.*rhof.*Cf.*wf ...                   % heat transport z-velocity
-%         +  (x(1:end-1,:)+x(2:end,:))/2.*rhox.*Cx.*wx) ...
-%         ./((rho(1:end-1,:)+rho(2:end,:))./2.*(Cp(1:end-1,:)+Cp(2:end,:))./2);
-    
-dwfdz(2:end-1,2:end-1) = ddz((f(1:end-1,2:end-1)+f(2:end,2:end-1))/2 .* wf(:,2:end-1),h); % segregation velocity divergence
-dwfdz([1 end],:) = dwfdz([2 end-1],:);
-dwfdz(:,[1 end]) = dwfdz(:,[2 end-1]);
-
-dwxdz(2:end-1,2:end-1) = ddz((x(1:end-1,2:end-1)+x(2:end,2:end-1))/2 .* wx(:,2:end-1),h); % segregation velocity divergence
-dwxdz([1 end],:) = dwxdz([2 end-1],:);
-dwxdz(:,[1 end]) = dwxdz(:,[2 end-1]);
-
-dWmdz(2:end-1,2:end-1) = ddz((m(1:end-1,2:end-1)+m(2:end,2:end-1))/2 .* W(:,2:end-1),h); % segregation velocity divergence
-dWmdz([1 end],:) = dWmdz([2 end-1],:);
-dWmdz(:,[1 end]) = dWmdz(:,[2 end-1]);
-
-dWdz = -dwfdz-dwxdz;                                                       % melt velocity divergence
-
-Div_fVf(2:end-1,2:end-1) = ddz(fWf(:,2:end-1),h); % segregation velocity divergence
-Div_fVf([1 end],:) = Div_fVf([2 end-1],:);
-Div_fVf(:,[1 end]) = Div_fVf(:,[2 end-1]);
-
-Div_xVx(2:end-1,2:end-1) = ddz(xWx(:,2:end-1),h); % segregation velocity divergence
-Div_xVx([1 end],:) = Div_xVx([2 end-1],:);
-Div_xVx(:,[1 end]) = Div_xVx(:,[2 end-1]);
-
-Div_mVm(2:end-1,2:end-1) = ddz(mWm(:,2:end-1),h); % segregation velocity divergence
-Div_mVm([1 end],:) = Div_mVm([2 end-1],:);
-Div_mVm(:,[1 end]) = Div_mVm(:,[2 end-1]);
