@@ -30,9 +30,9 @@ MapW = reshape(1:NW,Nz-1,Nx  );
 MapU = reshape(1:NU,Nz  ,Nx-1) + NW;
 
 % set initial solution fields
-T   =  T0 + (T1-T0) .* (1+erf(50*(ZZ/D-zlay)))/2 + dT.*rp;  meanT0 = mean(mean(T(2:end-1,2:end-1)));
-c   =  c0 + (c1-c0) .* (1+erf(50*(ZZ/D-zlay)))/2 + dc.*rp;  meanc0 = mean(mean(c(2:end-1,2:end-1)));
-v   =  v0 + (v1-v0) .* (1+erf(50*(ZZ/D-zlay)))/2 + dv.*rp;  meanv0 = mean(mean(v(2:end-1,2:end-1))); 
+T   =  T0 + (T1-T0) .* (1+erf(40*(ZZ/D-zlay)))/2 + dT.*rp;  meanT0 = mean(mean(T(2:end-1,2:end-1)));
+c   =  c0 + (c1-c0) .* (1+erf(40*(ZZ/D-zlay)))/2 + dc.*rp;  meanc0 = mean(mean(c(2:end-1,2:end-1)));
+v   =  v0 + (v1-v0) .* (1+erf(40*(ZZ/D-zlay)))/2 + dv.*rp;  meanv0 = mean(mean(v(2:end-1,2:end-1))); 
 x   =  0.*c + 1e-16;
 f   =  0.*c + 1e-16;
 U   =  zeros(size((XX(:,1:end-1)+XX(:,2:end))));  Ui = U;  res_U = 0.*U;
