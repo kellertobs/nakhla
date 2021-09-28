@@ -3,8 +3,8 @@
 % update time step
 dtk = min((h/2)^2./max([kT(:)./rhoCp(:);kc;kv]));                          % diffusive time step size
 dtc = 0.001./max(abs(dwxdz(:))+abs(dwfdz(:))+1e-16);                       % compaction time step size
-dta = min(CFL*min(h/max(abs([Um(:);Wm(:);Uf(:);Wf(:);Ux(:);Wx(:)]+1e-16))/2)); % advective time step size
-dt  = min([dta,dtk,dtc]);                                                  % physical time step size
+dta = min(min(h/2/max(abs([Um(:);Wm(:);Uf(:);Wf(:);Ux(:);Wx(:)]+1e-16)))); % advective time step size
+dt  = CFL*min([dta,dtk,dtc]);                                              % physical time step size
 
 
 %% *****  THERMO-CHEMICAL EVOLUTION  **************************************
@@ -94,7 +94,7 @@ if ~isochem
 end
 
 % convert enthalpy and component densities to temperature and concentrations
-T = (H - chi.*rhox.*DLx + phi.*rhof.*DLf)./rhoCp;
+T = (H - chi.*rhox.*DLx - phi.*rhof.*DLf)./rhoCp;
 c = C./rho;
 v = V./rho;
 
@@ -107,15 +107,15 @@ v = V./rho;
 if diseq
     
     Gxi = (xq-x)./max(4.*dt,tau_r);
-    Gx  = beta.*Gx + (1-beta).*Gxi;                                    % crystallisation rate
+    Gx  = beta.*Gx + (1-beta).*Gxi;                                        % crystallisation rate
     
-    advn_x = advection(x,Ux,Wx,h,ADVN,'flx');                          % get advection term
+    advn_x = advection(x,Ux,Wx,h,ADVN,'flx');                              % get advection term
     
-    dxdt  = - advn_x + Gx;                                             % total rate of change
+    dxdt   = - advn_x + Gx;                                                % total rate of change
     
-    x = x + (theta.*dxdt + (1-theta).*dxdto).*dt;                      % explicit update of crystal fraction
-    x = min(1-f-TINY,max(TINY,x));                                   % enforce [0,1] limit
-    x([1 end],:) = x([2 end-1],:);                                     % apply boundary conditions
+    x = x + (theta.*dxdt + (1-theta).*dxdto).*dt;                          % explicit update of crystal fraction
+    x = min(1-f-TINY,max(TINY,x));                                         % enforce [0,1] limit
+    x([1 end],:) = x([2 end-1],:);                                         % apply boundary conditions
     x(:,[1 end]) = x(:,[2 end-1]);
     
     cx  = cxq;
@@ -124,10 +124,10 @@ if diseq
     
 else
     
-    x  = xq;                                                           % enforce local phase equilibrium
+    x  = xq;                                                               % enforce local phase equilibrium
     cx = cxq;
     cm = cmq;
-%     Gx = beta*Gx + (1-beta)*((x-xo)./dt + advection(x,Ux,Wx,h,ADVN,'flx')); % reconstruct crystallisation rate
+    Gx = (x-xo)./dt + advection(x,Ux,Wx,h,ADVN,'flx');                     % reconstruct crystallisation rate
     
 end
 
@@ -137,13 +137,13 @@ if diseq
     Gfi = (fq-f)./max(4.*dt,tau_r);
     Gf  = beta.*Gf + (1-beta).*Gfi;
     
-    advn_f = advection(f,Uf,Wf,h,ADVN,'flx');                          % get advection term
+    advn_f = advection(f,Uf,Wf,h,ADVN,'flx');                              % get advection term
     
-    dfdt  = - advn_f + Gf;                                             % total rate of change
+    dfdt   = - advn_f + Gf;                                                % total rate of change
     
-    f = fo + (theta.*dfdt + (1-theta).*dfdto).*dt;                     % explicit update of bubble fraction
-    f = min(1-x-TINY,max(TINY,f));                                     % enforce [0,1-x] limit
-    f([1 end],:) = f([2 end-1],:);                                     % apply boundary conditions
+    f = fo + (theta.*dfdt + (1-theta).*dfdto).*dt;                         % explicit update of bubble fraction
+    f = min(1-x-TINY,max(TINY,f));                                         % enforce [0,1-x] limit
+    f([1 end],:) = f([2 end-1],:);                                         % apply boundary conditions
     f(:,[1 end]) = f(:,[2 end-1]);
     
     vf  = vfq;
@@ -155,7 +155,7 @@ else
     f  = fq;
     vf = vfq;
     vm = vmq;
-%     Gf = beta*Gf + (1-beta)*((f-fo)./dt + advection(f,Uf,Wf,h,ADVN,'flx'));% reconstruct exsolution rate
+    Gf = (f-fo)./dt + advection(f,Uf,Wf,h,ADVN,'flx');                     % reconstruct exsolution rate
     
 end
 
