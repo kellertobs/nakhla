@@ -2,9 +2,10 @@
 
 % update time step
 dtk = min((h/2)^2./max([kT(:)./rhoCp(:);kc;kv]));                          % diffusive time step size
-dtc = 0.001./max(abs(dwxdz(:))+abs(dwfdz(:))+1e-16);                       % compaction time step size
-dta = min(min(h/2/max(abs([Um(:);Wm(:);Uf(:);Wf(:);Ux(:);Wx(:)]+1e-16)))); % advective time step size
-dt  = CFL*min([dta,dtk,dtc]);                                              % physical time step size
+dth = 1e32;%1./max(abs((dHdt(:)./rhoCp(:)))+1e-16);                        % compaction time step size
+% dth = 0.01./max(abs(x(:)-xo(:))+1e-16);                                  % compaction time step size
+dta = min(min(h/2/max(abs([UBG(:);WBG(:);Um(:);Wm(:);Uf(:);Wf(:);Ux(:);Wx(:)]+1e-16)))); % advective time step size
+dt  = min(2*dto,CFL*min([dtk,dth,dta]));                                   % physical time step size
 
 
 %% *****  THERMO-CHEMICAL EVOLUTION  **************************************
@@ -38,14 +39,14 @@ if ~isotherm
     coolshape = min(1,coolshape);
     cool = rhoCp .* (Twall-T)./tau_T .* coolshape;
         
-    VolCorr = VolErr.*mean(mean(H(2:end-1,2:end-1)));
-
-    dHdt   = - advn_H + diff_T + cool + VolCorr;                           % total rate of change
+    dHdt   = - advn_H + diff_T + cool;                                     % total rate of change
     
-    H = Ho + (theta.*dHdt + (1-theta).*dHdto).*dt;                         % explicit update of enthalpy
+    if step>0; H = Ho + (theta.*dHdt + (1-theta).*dHdto).*dt; end          % explicit update of enthalpy
     H([1 end],:) = H([2 end-1],:);                                         % apply boundary conditions
     H(:,[1 end]) = H(:,[2 end-1]);    
+    
 end
+
 
 % update composition
 if ~isochem
@@ -62,47 +63,50 @@ if ~isochem
     assim = zeros(size(c));
     if ~isnan(ctop); assim = assim + rhob .* (ctop-c)./tau_c.* exp((-ZZ)/dw); end % impose top assimilation rate
     
-    VolCorr = VolErr.*mean(mean(C(2:end-1,2:end-1)));
+    dCdt = - advn_C + diff_c + assim;                                      % total rate of change
     
-    dCdt = - advn_C + diff_c + assim + VolCorr;                            % total rate of change
-    
-    C = Co + (theta.*dCdt + (1-theta).*dCdto).*dt;                         % explicit update of major component density
-    C = min(rhom.*cmq,max(rhox.*cxq, C ));
+    if step>0; C = Co + (theta.*dCdt + (1-theta).*dCdto).*dt; end          % explicit update of major component density
+    C = min(rho.*cphs1-TINY,max(rho.*cphs0+TINY, C ));
     C([1 end],:) = C([2 end-1],:);                                         % apply boundary conditions
     C(:,[1 end]) = C(:,[2 end-1]);  
     
     % update volatile component
     advn_V = advection(rhom.*mu .*vm,Um,Wm,h,ADVN,'flx') ...
-           + advection(rhof.*phi.*vf,Ux,Wx,h,ADVN,'flx');
+           + advection(rhof.*phi.*vf,Uf,Wf,h,ADVN,'flx');
         
-    qvz   = - kv.*rhom.*(mu(1:end-1,:)+mu(2:end,:))/2 .* ddz(vm,h);        % volatile component diffusion z-flux
-    qvx   = - kv.*rhom.*(mu(:,1:end-1)+mu(:,2:end))/2 .* ddx(vm,h);        % volatile component diffusion x-flux
+    qvz   = - kc.*rhom.*(mu(1:end-1,:)+mu(2:end,:))/2 .* ddz(vm,h);        % volatile component diffusion z-flux
+    qvx   = - kc.*rhom.*(mu(:,1:end-1)+mu(:,2:end))/2 .* ddx(vm,h);        % volatile component diffusion x-flux
     diff_v(2:end-1,2:end-1) = - ddz(qvz(:,2:end-1),h) ...                  % volatile component diffusion
                               - ddx(qvx(2:end-1,:),h);
     
     degas = zeros(size(v));
     if ~isnan(ftop); assim = assim + rhob .* (ftop-f)./tau_f.* exp((-ZZ)/dw); end % impose top degassing rate
     
-    VolCorr = VolErr.*mean(mean(V(2:end-1,2:end-1)));
-
-    dVdt = - advn_V + diff_v + degas + VolCorr;                            % total rate of change
+    dVdt = - advn_V + diff_v + degas;                                      % total rate of change
     
-    V = Vo + (theta.*dVdt + (1-theta).*dVdto).*dt;                         % explicit update of volatile component density
-    V = min(rhof,max(0, V ));
+    if step>0; V = Vo + (theta.*dVdt + (1-theta).*dVdto).*dt; end          % explicit update of volatile component density
+    V = min(rho.*1-TINY,max(rho.*0+TINY, V ));
     V([1 end],:) = V([2 end-1],:);                                         % apply boundary conditions
     V(:,[1 end]) = V(:,[2 end-1]);  
+    
 end
+
 
 % convert enthalpy and component densities to temperature and concentrations
 T = (H - chi.*rhox.*DLx - phi.*rhof.*DLf)./rhoCp;
 c = C./rho;
 v = V./rho;
 
-% update local phase equilibrium
-%     [xwtq,cxq,cmq,fwtq,vfq,vmq] = equilibrium((xwt+xwto)./2,(fwt+fwto)./2,(T+To)./2,(c+co)./2,(v+vo)./2, ...
-%                                                Pt,Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg);
-[xq,cxq,cmq,fq,vfq,vmq] = equilibrium(x,f,T,c,v,Pt,Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg);
 
+%% *****  update local phase equilibrium  *********************************
+
+[xqi,cxq,cmq,fqi,vfq,vmq] = equilibrium(x,f,(T+To)./2,(c+co)./2,(v+vo)./2,(Pt+Pto)./2,Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg);
+% [xqi,cxqi,cmqi,fqi,vfqi,vmqi] = equilibrium(x,f,T,c,v,Pt,Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg);
+
+xq  = beta.*xq + (1-beta).*xqi;
+fq  = beta.*fq + (1-beta).*fqi;
+
+    
 % update crystal fraction
 if diseq
     
@@ -113,7 +117,7 @@ if diseq
     
     dxdt   = - advn_x + Gx;                                                % total rate of change
     
-    x = x + (theta.*dxdt + (1-theta).*dxdto).*dt;                          % explicit update of crystal fraction
+    if step>0; x = x + (theta.*dxdt + (1-theta).*dxdto).*dt; end           % explicit update of crystal fraction
     x = min(1-f-TINY,max(TINY,x));                                         % enforce [0,1] limit
     x([1 end],:) = x([2 end-1],:);                                         % apply boundary conditions
     x(:,[1 end]) = x(:,[2 end-1]);
@@ -131,6 +135,7 @@ else
     
 end
 
+
 % update bubble fraction
 if diseq
     
@@ -141,7 +146,7 @@ if diseq
     
     dfdt   = - advn_f + Gf;                                                % total rate of change
     
-    f = fo + (theta.*dfdt + (1-theta).*dfdto).*dt;                         % explicit update of bubble fraction
+    if step>0; f = fo + (theta.*dfdt + (1-theta).*dfdto).*dt; end          % explicit update of bubble fraction
     f = min(1-x-TINY,max(TINY,f));                                         % enforce [0,1-x] limit
     f([1 end],:) = f([2 end-1],:);                                         % apply boundary conditions
     f(:,[1 end]) = f(:,[2 end-1]);
@@ -159,11 +164,83 @@ else
     
 end
 
+
 % update melt fraction
 m = 1-x-f;
 
 
-% if step == 1; dHdto = dHdt;  dCdto = dCdt;  dVdto = dVdt;  dxdto = dxdt;  dfdto = dfdt; end
+%% ***** Trace & isotope geochemistry  ************************************
+
+% *****  Incompatible Trace Element  **************************************
+
+% update incompatible trace element phase compositions
+itm = it./(m + x.*KIT);
+itx = it./(m./KIT + x);
+
+% update incompatible trace element composition
+advn_IT = advection(rhom.*mu .*itm,Um,Wm,h,ADVN,'flx') ...
+        + advection(rhox.*chi.*itx,Ux,Wx,h,ADVN,'flx');
+
+qz   = - kc.*rhom.*(mu(1:end-1,:)+mu(2:end,:))/2 .* ddz(itm,h);
+qx   = - kc.*rhom.*(mu(:,1:end-1)+mu(:,2:end))/2 .* ddx(itm,h);
+diff_it(2:end-1,2:end-1) = - ddz(qz(:,2:end-1),h) ...                      % diffusion in melt
+                           - ddx(qx(2:end-1,:),h);
+
+dITdt = - advn_IT + diff_it;                                               % total rate of change
+
+if step>0; IT = ITo + (theta.*dITdt + (1-theta).*dITdto).*dt; end          % explicit update
+IT = max(0+TINY, IT );
+IT([1 end],:) = IT([2 end-1],:);                                           % boundary conditions
+IT(:,[1 end]) = IT(:,[2 end-1]);
+
+it = IT./rho;
+
+
+% *****  COMPATIBLE TRACE ELEMENT  ****************************************
+
+% update compatible trace element phase compositions
+ctm = ct./(m + x.*KCT);
+ctx = ct./(m./KCT + x);
+
+% update compatible trace element composition
+advn_CT = advection(rhom.*mu .*ctm,Um,Wm,h,ADVN,'flx') ...
+        + advection(rhox.*chi.*ctx,Ux,Wx,h,ADVN,'flx');
+
+qz   = - kc.*rhom.*(mu(1:end-1,:)+mu(2:end,:))/2 .* ddz(ctm,h);
+qx   = - kc.*rhom.*(mu(:,1:end-1)+mu(:,2:end))/2 .* ddx(ctm,h);
+diff_ct(2:end-1,2:end-1) = - ddz(qz(:,2:end-1),h) ...                      % diffusion in melt
+                           - ddx(qx(2:end-1,:),h);
+
+dCTdt = - advn_CT + diff_ct;                                               % total rate of change
+
+if step>0; CT = CTo + (theta.*dCTdt + (1-theta).*dCTdto).*dt; end          % explicit update
+CT = max(0+TINY, CT );
+CT([1 end],:) = CT([2 end-1],:);                                           % boundary conditions
+CT(:,[1 end]) = CT(:,[2 end-1]);
+
+ct = CT./rho;
+
+
+% *****  STABLE ISOTOPE  **************************************************
+
+% update stable isotope composition
+advn_si = advection(mu .*si,Um,Wm,h,ADVN,'flx') ...
+        + advection(chi.*si,Ux,Wx,h,ADVN,'flx') ...
+        + advection(phi.*si,Uf,Wf,h,ADVN,'flx');
+
+qz   = - kc.*(mu(1:end-1,:)+mu(2:end,:))/2 .* ddz(si,h);
+qx   = - kc.*(mu(:,1:end-1)+mu(:,2:end))/2 .* ddx(si,h);
+diff_si(2:end-1,2:end-1) = - ddz(qz(:,2:end-1),h) ...                      % diffusion in melt
+                           - ddx(qx(2:end-1,:),h);
+
+dsidt = - advn_si + diff_si;                                               % total rate of change
+
+if step>0; si = sio + (theta.*dsidt + (1-theta).*dsidto).*dt; end          % explicit update
+si([1 end],:) = si([2 end-1],:);                                           % boundary conditions
+si(:,[1 end]) = si(:,[2 end-1]);
+
+
+% if step == 0; dHdto = dHdt;  dCdto = dCdt;  dVdto = dVdt;  dxdto = dxdt;  dfdto = dfdt;  dITdto = dITdt;  dCTdto = dCTdt;  dSIdto = dSIdt; end
 
 
 %     % update time step
