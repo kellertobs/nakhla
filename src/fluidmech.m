@@ -33,14 +33,14 @@ IR = [IR; ii(:)]; RR = [RR; aa(:)];
 ii = MapW(1,2:end-1); jj = ii;
 aa = zeros(size(ii));
 II = [II; ii(:)]; JJ = [JJ; jj(:)];   AA = [AA; aa(:)+1];
-aa = zeros(size(ii));% - mean(VolSrc(:))*D/4;
+aa = zeros(size(ii)) - WBG(1,2:end-1);
 IR = [IR; ii(:)]; RR = [RR; aa(:)];
 
 % bottom boundary
 ii = MapW(end,2:end-1); jj = ii;
 aa = zeros(size(ii));
 II = [II; ii(:)]; JJ = [JJ; jj(:)];   AA = [AA; aa(:)+1];
-aa = zeros(size(ii));% + mean(VolSrc(:))*D/4;
+aa = zeros(size(ii)) - WBG(end,2:end-1);
 IR = [IR; ii(:)]; RR = [RR; aa(:)];
 
 
@@ -97,14 +97,14 @@ IR = [IR; ii(:)]; RR = [RR; aa(:)];
 ii = MapU(2:end-1,1); jj = ii;
 aa = zeros(size(ii));
 II = [II; ii(:)]; JJ = [JJ; jj(:)];   AA = [AA; aa(:)+1];
-aa = zeros(size(ii));% - mean(VolSrc(:))*L/4;
+aa = zeros(size(ii)) - UBG(2:end-1,1);
 IR = [IR; ii(:)]; RR = [RR; aa(:)];
 
 % right side boundary
 ii = MapU(2:end-1,end); jj = ii;
 aa = zeros(size(ii));
 II = [II; ii(:)]; JJ = [JJ; jj(:)];   AA = [AA; aa(:)+1];
-aa = zeros(size(ii));% + mean(VolSrc(:))*L/4;
+aa = zeros(size(ii)) - UBG(2:end-1,end);
 IR = [IR; ii(:)]; RR = [RR; aa(:)];
 
 
@@ -235,7 +235,8 @@ II = [II; ii(:)]; JJ = [JJ; ii(:)];    AA = [AA; aa(:)];  % P on stencil centre
 
 
 % RHS
-rr = -VolSrc(2:end-1,2:end-1) - dwxdz(2:end-1,2:end-1) - dwfdz(2:end-1,2:end-1);
+% rr = (theta.*VolSrc(2:end-1,2:end-1)+(1-theta).*VolSrco(2:end-1,2:end-1));
+rr = VolSrc(2:end-1,2:end-1);
 IR = [IR; ii(:)];
 RR = [RR; rr(:)];
 
@@ -244,13 +245,14 @@ RR = [RR; rr(:)];
 KP = sparse(II,JJ,AA,NP,NP);
 RP = sparse(IR,ones(size(IR)),RR,NP,1);
 
-KP(MapP(2,2),:) = 0;
-KP(MapP(2,2),MapP(2,2)) = 1;
-RP(MapP(2,2),:) = 0;
+np = round(N-2)/2+1;
+KP(MapP(np,np),:) = 0;
+KP(MapP(np,np),MapP(np,np)) = 1;
+RP(MapP(np,np),:) = 0;
 
 
 %% assemble global coefficient matrix and right-hand side vector
-Pscale = 2*eta0/h;
+Pscale = 2*geomean(eta(:))/h;
 LL = [-KV          Pscale.*GG  ; ...
        Pscale.*DD  Pscale.*KP  ];
 
