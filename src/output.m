@@ -47,18 +47,29 @@ if plot_op
     ax(32) = axes(UN{:},'position',[axl+1*axw+1*ahs axb+1*axh+1*avs axw axh]);
     ax(33) = axes(UN{:},'position',[axl+0*axw+0*ahs axb+0*axh+0*avs axw axh]);
     ax(34) = axes(UN{:},'position',[axl+1*axw+1*ahs axb+0*axh+0*avs axw axh]);
-
+    
+    fh4 = figure(4); clf; colormap(ocean);
+    fh = axb + 1*axh + 0*avs + axt;
+    fw = axl + 3*axw + 2*ahs + axr;
+    set(fh4,UN{:},'Position',[12 12 fw fh]);
+    set(fh4,'PaperUnits','Centimeters','PaperPosition',[0 0 fw fh],'PaperSize',[fw fh]);
+    set(fh4,'Color','w','InvertHardcopy','off');
+    set(fh4,'Resize','off');
+    ax(41) = axes(UN{:},'position',[axl+0*axw+0*ahs axb+0*axh+0*avs axw axh]);
+    ax(42) = axes(UN{:},'position',[axl+1*axw+1*ahs axb+0*axh+0*avs axw axh]);
+    ax(43) = axes(UN{:},'position',[axl+2*axw+2*ahs axb+0*axh+0*avs axw axh]);
+        
     if plot_cv
-        fh4 = figure(4); clf; colormap(ocean);
+        fh5 = figure(5); clf; colormap(ocean);
         fh = axb + 1*axh + 0*avs + axt;
         fw = axl + 3*axw + 2*ahs + axr;
-        set(fh4,UN{:},'Position',[12 12 fw fh]);
-        set(fh4,'PaperUnits','Centimeters','PaperPosition',[0 0 fw fh],'PaperSize',[fw fh]);
-        set(fh4,'Color','w','InvertHardcopy','off');
-        set(fh4,'Resize','off');
-        ax(41) = axes(UN{:},'position',[axl+0*axw+0*ahs axb+0*axh+0*avs axw axh]);
-        ax(42) = axes(UN{:},'position',[axl+1*axw+1*ahs axb+0*axh+0*avs axw axh]);
-        ax(43) = axes(UN{:},'position',[axl+2*axw+2*ahs axb+0*axh+0*avs axw axh]);
+        set(fh5,UN{:},'Position',[15 15 fw fh]);
+        set(fh5,'PaperUnits','Centimeters','PaperPosition',[0 0 fw fh],'PaperSize',[fw fh]);
+        set(fh5,'Color','w','InvertHardcopy','off');
+        set(fh5,'Resize','off');
+        ax(51) = axes(UN{:},'position',[axl+0*axw+0*ahs axb+0*axh+0*avs axw axh]);
+        ax(52) = axes(UN{:},'position',[axl+1*axw+1*ahs axb+0*axh+0*avs axw axh]);
+        ax(53) = axes(UN{:},'position',[axl+2*axw+2*ahs axb+0*axh+0*avs axw axh]);
     end
     
     % plot velocity-pressure solution in Fig. 1
@@ -100,36 +111,47 @@ if plot_op
     axes(ax(32));
     imagesc(X(2:end-1),Z(2:end-1),log10(eta(2:end-1,2:end-1))); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\eta$ [log$_{10}$ Pas]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
-%     axes(ax(33));
-%     imagesc(X(2:end-1),Z(2:end-1),Gx(2:end-1,2:end-1)./rho(2:end-1,2:end-1)); axis ij equal tight; box on; cb = colorbar;
-%     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\Gamma_\chi/\bar{\rho}$ [1/s]'],TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:}); xlabel('Width [m]',TX{:},FS{:});
-%     axes(ax(34));
-%     imagesc(X(2:end-1),Z(2:end-1),Gf(2:end-1,2:end-1)./rho(2:end-1,2:end-1)); axis ij equal tight; box on; cb = colorbar;
-%     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\Gamma_\phi/\bar{\rho}$ [1/s]'],TX{:},FS{:}); xlabel('Width [m]',TX{:},FS{:}); set(gca,'YTickLabel',[]);
     axes(ax(33));
-    imagesc(X(2:end-1),Z(2:end-1),log10(eII(2:end-1,2:end-1))); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\varepsilon_{II}$ [log$_{10}$ 1/s]'],TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:}); xlabel('Width [m]',TX{:},FS{:});
+    imagesc(X(2:end-1),Z(2:end-1),Gx(2:end-1,2:end-1)./rho(2:end-1,2:end-1)); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\Gamma_\chi/\bar{\rho}$ [1/s]'],TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:}); xlabel('Width [m]',TX{:},FS{:});
     axes(ax(34));
-    imagesc(X(2:end-1),Z(2:end-1),log10(tII(2:end-1,2:end-1))); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\tau_{II}$ [log$_{10}$ Pa]'],TX{:},FS{:}); xlabel('Width [m]',TX{:},FS{:}); set(gca,'YTickLabel',[]);
-    
-    if plot_cv
+    imagesc(X(2:end-1),Z(2:end-1),Gf(2:end-1,2:end-1)./rho(2:end-1,2:end-1)); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\Gamma_\phi/\bar{\rho}$ [1/s]'],TX{:},FS{:}); xlabel('Width [m]',TX{:},FS{:}); set(gca,'YTickLabel',[]);
+%     axes(ax(33));
+%     imagesc(X(2:end-1),Z(2:end-1),log10(eII(2:end-1,2:end-1))); axis ij equal tight; box on; cb = colorbar;
+%     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\varepsilon_{II}$ [log$_{10}$ 1/s]'],TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:}); xlabel('Width [m]',TX{:},FS{:});
+%     axes(ax(34));
+%     imagesc(X(2:end-1),Z(2:end-1),log10(tII(2:end-1,2:end-1))); axis ij equal tight; box on; cb = colorbar;
+%     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\tau_{II}$ [log$_{10}$ Pa]'],TX{:},FS{:}); xlabel('Width [m]',TX{:},FS{:}); set(gca,'YTickLabel',[]);
+
+    figure(4);
+    axes(ax(41));
+    imagesc(X(2:end-1),Z(2:end-1),it(2:end-1,2:end-1)); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['incomp. trace'],TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:});
+    axes(ax(42));
+    imagesc(X(2:end-1),Z(2:end-1),ct(2:end-1,2:end-1)); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['comp. trace'],TX{:},FS{:}); set(gca,'YTickLabel',[]); xlabel('Width [m]',TX{:},FS{:});
+    axes(ax(43));
+    imagesc(X(2:end-1),Z(2:end-1),si(2:end-1,2:end-1)); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['stable isotope'],TX{:},FS{:}); set(gca,'YTickLabel',[]);
+
+    if plot_cv && iter > 0
         % plot residual fields in Fig. 4
-        figure(4);
-        axes(ax(41));
+        figure(5);
+        axes(ax(51));
         imagesc(X(2:end-1),Z(2:end-1),-res_W(:      ,2:end-1)./(1e-16+norm(RR(:),2)./N)); axis ij equal tight; box on; cb = colorbar;
-        set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['res. $W$'],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel('Depth [m]',TX{:},FS{:});
-        axes(ax(42));
+        set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['res. $W$'],TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:});
+        axes(ax(52));
         imagesc(X(2:end-1),Z(2:end-1), res_U(2:end-1,:      )./(1e-16+norm(RR(:),2)./N)); axis ij equal tight; box on; cb = colorbar;
         set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['res. $U$'],TX{:},FS{:}); set(gca,'YTickLabel',[]); xlabel('Width [m]',TX{:},FS{:});
-        axes(ax(43));
+        axes(ax(53));
         imagesc(X(2:end-1),Z(2:end-1), res_P(2:end-1,2:end-1)./(1e-16+norm(RR(:),2)./N)); axis ij equal tight; box on; cb = colorbar;
-        set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['res. $P$'],TX{:},FS{:}); set(gca,'XTickLabel',[]); 
+        set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['res. $P$'],TX{:},FS{:}); set(gca,'YTickLabel',[]); 
     end
 end
 
 % plot phase diagram
-fh5 = figure(5); clf;
+fh6 = figure(6); clf;
 TT = linspace(Tphs0,Tphs1,1e3);
 cc = [linspace(cphs1,(perCx+perCm)/2,(perT-Tphs0)./(Tphs1-Tphs0)*1e3),linspace((perCx+perCm)/2,cphs0,(perT-Tphs1)./(Tphs0-Tphs1)*1e3)];
 [~,CCx,CCm,FF,~,~] = equilibrium(0*TT,0*TT,TT,cc,0*TT,0*TT,Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg);
@@ -142,7 +164,7 @@ plot(CCm,TT,'k-','LineWidth',2);
 % plot([perCx,perCx],[Tphs0,perT],'k-','LineWidth',1.5)
 
 Tplt = T - Pt*clap + dTH2O*vm.^0.75;
-cplt = c;%./(1-fwt);
+cplt = c./(1-f);
 plot(cplt(2:end-1,2:end-1),Tplt(2:end-1,2:end-1),'k.',cx(2:end-1,2:end-1),Tplt(2:end-1,2:end-1),'b.',cm(2:end-1,2:end-1),Tplt(2:end-1,2:end-1),'r.','LineWidth',2,'MarkerSize',15);
 
 set(gca,'TickLabelInterpreter','latex','FontSize',15)
@@ -156,8 +178,8 @@ xlabel('Composition','Interpreter','latex','FontSize',18)
 ylabel('Temperature','Interpreter','latex','FontSize',18)
         
 % plot model history
-fh6 = figure(6);
-if it > 0 % don't plot before solver has run first time
+fh7 = figure(7);
+if iter > 0 % don't plot before solver has run first time
     subplot(4,1,1);
     Qcool = sum(sum(rhoCp(2:end-1,2:end-1).*cool(2:end-1,2:end-1).*h^3));
     plot(time./3600,Qcool./1e6,'bo','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
@@ -168,7 +190,8 @@ if it > 0 % don't plot before solver has run first time
     ylabel('$T$ [$^\circ$C]',TX{:},FS{:}); set(gca,'XTickLabel',[]);
     subplot(4,1,3);
     rmsV = sqrt(sum(sum(W(:,2:end-1).^2))+sum(sum(U(2:end-1,:).^2)))./sqrt((N-2)*(N-1));
-    plot(time./3600,rmsV,'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
+    maxV = max(max(max(abs(W(:,2:end-1)))),max(max(abs(U(2:end-1,:)))));
+    plot(time./3600,rmsV,'ko',time./3600,maxV,'ro','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
     ylabel('$\mathbf{V}$ [m/s]',TX{:},FS{:}); set(gca,'XTickLabel',[]);
     subplot(4,1,4);
     meanf = mean(mean(f(2:end-1,2:end-1)));
@@ -178,17 +201,25 @@ if it > 0 % don't plot before solver has run first time
     ylabel('$\phi$, $\chi$ [vol]',TX{:},FS{:});
 end
 
-fh7 = figure(7);
-subplot(3,1,1);
-plot(time./3600,mean(mean(T(2:end-1,2:end-1)))-meanT0,'bo','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
-ylabel('error $T$',TX{:},FS{:}); set(gca,'XTickLabel',[]);
-subplot(3,1,2);
-plot(time./3600,mean(mean(c(2:end-1,2:end-1)))-meanc0,'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
-ylabel('error $c$',TX{:},FS{:}); set(gca,'XTickLabel',[]);
-subplot(3,1,3);
-plot(time./3600,mean(mean(v(2:end-1,2:end-1)))-meanv0,'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
-ylabel('error $v$',TX{:},FS{:}); set(gca,'XTickLabel',[]);
-
+fh8 = figure(8);
+if iter > 0 % don't plot before solver has run first time
+    if step==0
+        Mass0 = sum(sum(rho(2:end-1,2:end-1)));
+        sumH0 = sum(sum(H(2:end-1,2:end-1)));
+        sumC0 = sum(sum(C(2:end-1,2:end-1)));
+        sumV0 = sum(sum(V(2:end-1,2:end-1)));
+    end
+    Mass = sum(sum(rho(2:end-1,2:end-1)));
+    subplot(3,1,1);
+    plot(time./3600,sum(sum(H(2:end-1,2:end-1)))./Mass-(sumH0./Mass0),'bo','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
+    ylabel('consv. $H$',TX{:},FS{:}); set(gca,'XTickLabel',[]);
+    subplot(3,1,2);
+    plot(time./3600,sum(sum(C(2:end-1,2:end-1)))./Mass-(sumC0./Mass0),'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
+    ylabel('consv. $C$',TX{:},FS{:}); set(gca,'XTickLabel',[]);
+    subplot(3,1,3);
+    plot(time./3600,sum(sum(V(2:end-1,2:end-1)))./Mass-(sumV0./Mass0),'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
+    ylabel('consv. $V$',TX{:},FS{:}); set(gca,'XTickLabel',[]);
+end
 
 drawnow
 
@@ -196,13 +227,13 @@ drawnow
 if save_op
     name = ['../out/',runID,'/',runID,'_vp_',num2str(floor(step/nop))];
     print(fh1,name,'-dpng','-r300','-opengl');
-    name = ['../out/',runID,'/',runID,'_ft_',num2str(floor(step/nop))];
+    name = ['../out/',runID,'/',runID,'_phs_',num2str(floor(step/nop))];
     print(fh2,name,'-dpng','-r300','-opengl');
-    name = ['../out/',runID,'/',runID,'_mt_',num2str(floor(step/nop))];
+    name = ['../out/',runID,'/',runID,'_mat_',num2str(floor(step/nop))];
     print(fh3,name,'-dpng','-r300','-opengl');
-    name = ['../out/',runID,'/',runID,'_phs',num2str(floor(step/nop))];
-    print(fh5,name,'-dpng','-r300','-opengl');
-    name = ['../out/',runID,'/',runID,'_hst'];
+    name = ['../out/',runID,'/',runID,'_chm',num2str(floor(step/nop))];
+    print(fh4,name,'-dpng','-r300','-opengl');
+    name = ['../out/',runID,'/',runID,'_eql',num2str(floor(step/nop))];
     print(fh6,name,'-dpng','-r300','-opengl');
     
     name = ['../out/',runID,'/',runID,'_',num2str(floor(step/nop))];
