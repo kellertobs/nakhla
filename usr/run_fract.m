@@ -1,7 +1,7 @@
 clear; close all;
 
 % set run parameters
-runID    =  'fract_upw2';        % run identifier
+runID    =  'fract_frm';        % run identifier
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  50;                  % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on (1) to live plot results
@@ -101,7 +101,7 @@ g0       =  10.;                 % gravity [m/s2]
 
 % set numerical model parameters
 CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
-ADVN     =  'FLXDIV';              % advection scheme ('UPW2', 'UPW3', or 'FRM')
+ADVN     =  'FRM';              % advection scheme ('UPW2', 'UPW3', or 'FRM')
 theta    =  0.50;                % time-stepping scheme selector (1=BE, 1/2=CN, 0=FE)
 rtol     =  1e-3;                % outer its relative tolerance
 atol     =  1e-6;                % outer its absolute tolerance
