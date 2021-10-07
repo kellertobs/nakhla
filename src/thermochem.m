@@ -80,7 +80,7 @@ if ~isochem
                               - ddx(qvx(2:end-1,:),h);
     
     degas = zeros(size(v));
-    if ~isnan(ftop); assim = assim + rhob .* (ftop-f)./tau_f.* exp((-ZZ)/dw); end % impose top degassing rate
+    if ~isnan(ftop); degas = degas + (ftop-f).*rho./tau_f.* exp((-ZZ)/dw); end % impose top degassing rate
     
     dVdt = - advn_V + diff_v + degas;                                      % total rate of change
     
