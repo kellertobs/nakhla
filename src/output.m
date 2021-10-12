@@ -77,6 +77,7 @@ if plot_op
     axes(ax(11));
     imagesc(X(2:end-1),Z(2:end-1),-W(:      ,2:end-1)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$W$ [m/s]'],TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:});
+    text(L/2,0.9*D,['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k','VerticalAlignment','middle','HorizontalAlignment','center');
     axes(ax(12));
     imagesc(X(2:end-1),Z(2:end-1), U(2:end-1,:      )); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$U$ [m/s]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
@@ -93,6 +94,7 @@ if plot_op
     axes(ax(21));
     imagesc(X(2:end-1),Z(2:end-1),chi(2:end-1,2:end-1) ); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\chi$ [vol]'],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel('Depth [m]',TX{:},FS{:});
+    text(L/2,0.9*D,['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','w','VerticalAlignment','middle','HorizontalAlignment','center');
     axes(ax(22));
     imagesc(X(2:end-1),Z(2:end-1),phi(2:end-1,2:end-1) ); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\phi$ [vol]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
@@ -108,6 +110,7 @@ if plot_op
     axes(ax(31));
     imagesc(X(2:end-1),Z(2:end-1),      rho(2:end-1,2:end-1) ); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\rho$ [kg/m$^3$]'],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel('Depth [m]',TX{:},FS{:});
+    text(L/2,0.9*D,['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','w','VerticalAlignment','middle','HorizontalAlignment','center');
     axes(ax(32));
     imagesc(X(2:end-1),Z(2:end-1),log10(eta(2:end-1,2:end-1))); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\eta$ [log$_{10}$ Pas]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
@@ -128,6 +131,7 @@ if plot_op
     axes(ax(41));
     imagesc(X(2:end-1),Z(2:end-1),it(2:end-1,2:end-1)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['incomp. trace'],TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:});
+    text(L/2,0.9*D,['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k','VerticalAlignment','middle','HorizontalAlignment','center');
     axes(ax(42));
     imagesc(X(2:end-1),Z(2:end-1),ct(2:end-1,2:end-1)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['comp. trace'],TX{:},FS{:}); set(gca,'YTickLabel',[]); xlabel('Width [m]',TX{:},FS{:});
