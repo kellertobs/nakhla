@@ -14,16 +14,17 @@ res   = 1;
 tol   = 1e-15;
 alpha = 0.50;
 
+vmq0 = (4.8e-5.*P.^0.6 + 1e-9.*P)./100;
+
 if any(v>1e-6)
     
     while res > tol && iter < maxit
         xi  = xq;  fi = fq;
                
-        vmq = (4.8e-5.*P.^0.6 + 1e-9.*P)./100;
         vfq = ones(size(v));
 
 %         vmq = min((v - fq.*vfq)./(1-fq-xq),vmq);
-        vmq = min(v./(1-xq),vmq);
+        vmq = min(v./(1-xq),vmq0);
 
         T   = max(0,min(1,(T0 - P*clap + dTv.*vmq.^0.75 -Tphs0)./(Tphs1-Tphs0)));
         
