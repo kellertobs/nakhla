@@ -56,8 +56,8 @@ tII(:,[1 end]) = tII(:,[2 end-1]);
 tII([1 end],:) = tII([2 end-1],:);
 
 % update phase segregation speeds
-if coolmode==3; sds = -1;      % no slip
-else;           sds = +1; end  % free slip
+if bndmode==3; sds = -1;      % no slip
+else;          sds = +1; end  % free slip
 
 wf = 2/9   .* (rhof-(rho(1:end-1,:)+rho(2:end,:))/2)*g0*df^2./((eta(1:end-1,:)+eta(2:end,:))/2) ...  % bubble flotation speed
    + 1/250 .* (rhof-(rho(1:end-1,:)+rho(2:end,:))/2)*g0*dx^2.*((phi(1:end-1,:)+phi(2:end,:))/2).^2./etaf; % fluid percolation speed

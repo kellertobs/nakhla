@@ -6,12 +6,12 @@ IR  = [];       % equation indeces into R
 RR  = [];       % forcing entries for R
 
 % set cooling boundaries to no slip, else to free slip
-if coolmode==3; sds = +1;      % no slip
-else;           sds = -1; end  % free slip
-if coolmode >0; top = +1;      % no slip
-else;           top = -1; end  % free slip
-if coolmode >1; bot = +1;      % no slip
-else;           bot = -1; end  % free slip
+if bndmode==3; sds = +1;      % no slip
+else;          sds = -1; end  % free slip
+if bndmode >0; top = +1;      % no slip
+else;          top = -1; end  % free slip
+if bndmode >1; bot = +1;      % no slip
+else;          bot = -1; end  % free slip
 
 % assemble coefficients of z-stress divergence
     

@@ -8,6 +8,24 @@ dt  = min(2*dto,CFL*min([dtk,dta]));                                    % physic
 
 %% *****  THERMO-CHEMICAL EVOLUTION  **************************************
 
+% get boundary shape function
+switch bndmode
+    case 0
+        bndshape = zeros(size(T));
+    case 1
+        bndshape = exp( ( -ZZ)/dw);
+    case 2
+        bndshape = exp( ( -ZZ)/dw) ...
+                 + exp(-(D-ZZ)/dw);
+    case 3
+        bndshape = exp( ( -ZZ)/dw) ...
+                 + exp(-(D-ZZ)/dw) ...
+                 + exp( ( -XX)/dw) ...
+                 + exp(-(L-XX)/dw);
+end
+bndshape = min(1,bndshape);
+
+
 % update temperature
 if ~isotherm
 
@@ -20,24 +38,10 @@ if ~isotherm
     diff_T(2:end-1,2:end-1) = (- ddz(qTz(:,2:end-1),h) ...                 % heat diffusion
                                - ddx(qTx(2:end-1,:),h));
     
-    switch coolmode
-        case 0
-            coolshape = zeros(size(T));
-        case 1
-            coolshape = exp( ( -ZZ)/dw);
-        case 2
-            coolshape = exp( ( -ZZ)/dw) ...
-                + exp(-(D-ZZ)/dw);
-        case 3
-            coolshape = exp( ( -ZZ)/dw) ...
-                + exp(-(D-ZZ)/dw) ...
-                + exp( ( -XX)/dw) ...
-                + exp(-(L-XX)/dw);
-    end
-    coolshape = min(1,coolshape);
-    cool = rhoCp .* (Twall-T)./tau_T .* coolshape;
+    cool = zeros(size(T));
+    if ~isnan(Twall); cool = cool + rhoCp .* (Twall-T)./tau_T .* bndshape; end  % impose wall cooling
         
-    dHdt   = - advn_H + diff_T + cool;                                     % total rate of change
+    dHdt = - advn_H + diff_T + cool;                                       % total rate of change
     
     if step>0; H = Ho + (theta.*dHdt + (1-theta).*dHdto).*dt; end          % explicit update of enthalpy
     H([1 end],:) = H([2 end-1],:);                                         % apply boundary conditions
@@ -59,7 +63,7 @@ if ~isochem
                               - ddx(qcx(2:end-1,:),h);
     
     assim = zeros(size(c));
-    if ~isnan(ctop); assim = assim + rhob .* (ctop-c)./tau_c.* exp((-ZZ)/dw); end % impose top assimilation rate
+    if ~isnan(cwall); assim = assim + (cwall-c).*rho./tau_c .* bndshape; end % impose wall assimilation
     
     dCdt = - advn_C + diff_c + assim;                                      % total rate of change
     
@@ -77,10 +81,13 @@ if ~isochem
     diff_v(2:end-1,2:end-1) = - ddz(qvz(:,2:end-1),h) ...                  % volatile component diffusion
                               - ddx(qvx(2:end-1,:),h);
     
-    degas = zeros(size(v));
-    if ~isnan(ftop); degas = degas + min(0,ftop-f).*rho./tau_f.* exp((-ZZ)/dw); end % impose top degassing rate
+    outgas = zeros(size(v));
+    if ~isnan(fwall); outgas = outgas + min(0,fwall-f).*rho./tau_f.* bndshape; end % impose wall outgassing
     
-    dVdt = - advn_V + diff_v + degas;                                      % total rate of change
+    assim = zeros(size(v));
+    if ~isnan(vwall); assim = assim + (vwall-v).*rho./tau_c .* bndshape; end % impose wall assimilation
+    
+    dVdt = - advn_V + diff_v + outgas + assim;                             % total rate of change
     
     if step>0; V = Vo + (theta.*dVdt + (1-theta).*dVdto).*dt; end          % explicit update of volatile component density
     V = min(rho.*1-TINY,max(rho.*0+TINY, V ));
@@ -181,7 +188,10 @@ qx   = - kc.*rhom.*(mu(:,1:end-1)+mu(:,2:end))/2 .* ddx(itm,h);
 diff_it(2:end-1,2:end-1) = - ddz(qz(:,2:end-1),h) ...                      % diffusion in melt
                            - ddx(qx(2:end-1,:),h);
 
-dITdt = - advn_IT + diff_it;                                               % total rate of change
+assim = zeros(size(it));
+if ~isnan(itwall); assim = assim + (itwall-it).*rho./tau_c .* bndshape; end % impose wall assimilation
+    
+dITdt = - advn_IT + diff_it + assim;                                       % total rate of change
 
 if step>0; IT = ITo + (theta.*dITdt + (1-theta).*dITdto).*dt; end          % explicit update
 IT = max(0+TINY, IT );
@@ -206,7 +216,10 @@ qx   = - kc.*rhom.*(mu(:,1:end-1)+mu(:,2:end))/2 .* ddx(ctm,h);
 diff_ct(2:end-1,2:end-1) = - ddz(qz(:,2:end-1),h) ...                      % diffusion in melt
                            - ddx(qx(2:end-1,:),h);
 
-dCTdt = - advn_CT + diff_ct;                                               % total rate of change
+assim = zeros(size(ct));
+if ~isnan(ctwall); assim = assim + (ctwall-ct).*rho./tau_c .* bndshape; end % impose wall assimilation
+
+dCTdt = - advn_CT + diff_ct + assim;                                       % total rate of change
 
 if step>0; CT = CTo + (theta.*dCTdt + (1-theta).*dCTdto).*dt; end          % explicit update
 CT = max(0+TINY, CT );
@@ -227,8 +240,11 @@ qz   = - kc.*(mu(1:end-1,:)+mu(2:end,:))/2 .* ddz(si,h);
 qx   = - kc.*(mu(:,1:end-1)+mu(:,2:end))/2 .* ddx(si,h);
 diff_si(2:end-1,2:end-1) = - ddz(qz(:,2:end-1),h) ...                      % diffusion in melt
                            - ddx(qx(2:end-1,:),h);
+                       
+assim = zeros(size(si));
+if ~isnan(siwall); assim = assim + (siwall-si).*rho./tau_c .* bndshape; end % impose wall assimilation
 
-dsidt = - advn_si + diff_si;                                               % total rate of change
+dsidt = - advn_si + diff_si + assim;                                       % total rate of change
 
 if step>0; si = sio + (theta.*dsidt + (1-theta).*dsidto).*dt; end          % explicit update
 si([1 end],:) = si([2 end-1],:);                                           % boundary conditions
