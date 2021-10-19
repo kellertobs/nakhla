@@ -5,6 +5,7 @@ AA  = [];       % coefficients for A
 IR  = [];       % equation indeces into R
 RR  = [];       % forcing entries for R
 
+
 % set cooling boundaries to no slip, else to free slip
 if bndmode==3; sds = +1;      % no slip
 else;          sds = -1; end  % free slip
@@ -12,6 +13,7 @@ if bndmode >0; top = +1;      % no slip
 else;          top = -1; end  % free slip
 if bndmode >1; bot = +1;      % no slip
 else;          bot = -1; end  % free slip
+
 
 % assemble coefficients of z-stress divergence
     
@@ -230,12 +232,11 @@ IR = [IR; ii(:)]; RR = [RR; aa(:)];
 ii = MapP(2:end-1,2:end-1);
 
 % coefficients multiplying matrix pressure P
-aa = gamma.*h^2./eta(2:end-1,2:end-1);
+aa = zeros(size(ii));
 II = [II; ii(:)]; JJ = [JJ; ii(:)];    AA = [AA; aa(:)];  % P on stencil centre
 
 
 % RHS
-% rr = (theta.*VolSrc(2:end-1,2:end-1)+(1-theta).*VolSrco(2:end-1,2:end-1));
 rr = VolSrc(2:end-1,2:end-1);
 IR = [IR; ii(:)];
 RR = [RR; rr(:)];
@@ -259,17 +260,8 @@ LL = [-KV          Pscale.*GG  ; ...
 RR = [RV; RP.*Pscale];
 
 
-%% Scale system of equations (diagonal preconditioning)
-% CC  =  sqrt(abs(diag(LL)));
-% CC  =  diag(sparse(1./CC));
-% 
-% LL  =  CC*LL*CC;
-% RR  =  CC*RR;
-
-
 %% get residual
 % get non-linear residual
-% FF = LL*(CC\S) - RR;
 FF      = LL*S - RR;
 resnorm = norm(FF(:),2)./norm(RR(:),2);
 
@@ -280,10 +272,8 @@ res_P  = full(reshape(FF(MapP(:)+(NW+NU)), Nz   , Nx   ));                 % dyn
         
 
 %% Solve linear system of equations for vx, vz, P
-% S = CC*(LL\RR);  % update solution
 S = LL\RR;  % update solution
 
-% Read out solution
 % map solution vector to 2D arrays
 W  = full(reshape(S(MapW(:))        ,(Nz-1), Nx   ));                      % matrix z-velocity
 U  = full(reshape(S(MapU(:))        , Nz   ,(Nx-1)));                      % matrix x-velocity
