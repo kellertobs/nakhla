@@ -1,21 +1,21 @@
 
 if plot_op
     % prepare for plotting
-    TX = {'Interpreter','Latex'}; FS = {'FontSize',16};
-    TL = {'TickLabelInterpreter','Latex'}; TS = {'FontSize',12};
+    TX = {'Interpreter','Latex'}; FS = {'FontSize',12};
+    TL = {'TickLabelInterpreter','Latex'}; TS = {'FontSize',10};
     UN = {'Units','Centimeters'};
     
     % set axis and border dimensions
-    axh = 8.00; axw = axh*L/D;
-    ahs = 0.50; avs = 0.25;
-    axb = 1.50; axt = 0.75;
-    axl = 1.50; axr = 0.75;
+    axh = 6.00; axw = axh*L/D;
+    ahs = 0.40; avs = 0.2;
+    axb = 1.20; axt = 0.4;
+    axl = 1.20; axr = 0.4;
     
     % initialize figures and axes
     fh1 = figure(1); clf; colormap(ocean);
     fh = axb + 2*axh + 1*avs + axt;
     fw = axl + 2*axw + 1*ahs + axr;
-    set(fh1,UN{:},'Position',[3 3 fw fh]);
+    set(fh1,UN{:},'Position',[1 1 fw fh]);
     set(fh1,'PaperUnits','Centimeters','PaperPosition',[0 0 fw fh],'PaperSize',[fw fh]);
     set(fh1,'Color','w','InvertHardcopy','off');
     set(fh1,'Resize','off');
@@ -27,7 +27,7 @@ if plot_op
     fh2 = figure(2); clf; colormap(ocean);
     fh = axb + 2*axh + 1*avs + axt;
     fw = axl + 2*axw + 1*ahs + axr;
-    set(fh2,UN{:},'Position',[6 6 fw fh]);
+    set(fh2,UN{:},'Position',[3 3 fw fh]);
     set(fh2,'PaperUnits','Centimeters','PaperPosition',[0 0 fw fh],'PaperSize',[fw fh]);
     set(fh2,'Color','w','InvertHardcopy','off');
     set(fh2,'Resize','off');
@@ -39,7 +39,7 @@ if plot_op
     fh3 = figure(3); clf; colormap(ocean);
     fh = axb + 2*axh + 1*avs + axt;
     fw = axl + 2*axw + 1*ahs + axr;
-    set(fh3,UN{:},'Position',[9 9 fw fh]);
+    set(fh3,UN{:},'Position',[5 5 fw fh]);
     set(fh3,'PaperUnits','Centimeters','PaperPosition',[0 0 fw fh],'PaperSize',[fw fh]);
     set(fh3,'Color','w','InvertHardcopy','off');
     set(fh3,'Resize','off');
@@ -51,7 +51,7 @@ if plot_op
     fh4 = figure(4); clf; colormap(ocean);
     fh = axb + 1*axh + 0*avs + axt;
     fw = axl + 3*axw + 2*ahs + axr;
-    set(fh4,UN{:},'Position',[12 12 fw fh]);
+    set(fh4,UN{:},'Position',[7 7 fw fh]);
     set(fh4,'PaperUnits','Centimeters','PaperPosition',[0 0 fw fh],'PaperSize',[fw fh]);
     set(fh4,'Color','w','InvertHardcopy','off');
     set(fh4,'Resize','off');
@@ -63,7 +63,7 @@ if plot_op
         fh5 = figure(5); clf; colormap(ocean);
         fh = axb + 1*axh + 0*avs + axt;
         fw = axl + 3*axw + 2*ahs + axr;
-        set(fh5,UN{:},'Position',[15 15 fw fh]);
+        set(fh5,UN{:},'Position',[9 9 fw fh]);
         set(fh5,'PaperUnits','Centimeters','PaperPosition',[0 0 fw fh],'PaperSize',[fw fh]);
         set(fh5,'Color','w','InvertHardcopy','off');
         set(fh5,'Resize','off');
@@ -186,8 +186,8 @@ fh7 = figure(7);
 if iter > 0 % don't plot before solver has run first time
     subplot(4,1,1);
     Qcool = sum(sum(rhoCp(2:end-1,2:end-1).*cool(2:end-1,2:end-1).*h^3));
-    plot(time./3600,Qcool./1e6,'bo','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
-    ylabel('$Q_{h,c}$ [MW]',TX{:},FS{:}); set(gca,'XTickLabel',[]);
+    plot(time./3600,Qcool./1e9,'bo','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
+    ylabel('$Q_c$ [GW]',TX{:},FS{:}); set(gca,'XTickLabel',[]);
     subplot(4,1,2);
     meanT = mean(mean(T(2:end-1,2:end-1)));
     plot(time./3600,meanT,'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
@@ -195,14 +195,15 @@ if iter > 0 % don't plot before solver has run first time
     subplot(4,1,3);
     rmsV = sqrt(sum(sum(W(:,2:end-1).^2))+sum(sum(U(2:end-1,:).^2)))./sqrt((N-2)*(N-1));
     maxV = max(max(max(abs(W(:,2:end-1)))),max(max(abs(U(2:end-1,:)))));
-    plot(time./3600,rmsV,'ko',time./3600,maxV,'ro','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
-    ylabel('$\mathbf{V}$ [m/s]',TX{:},FS{:}); set(gca,'XTickLabel',[]);
+    plot(time./3600,log10(rmsV),'ko',time./3600,log10(maxV),'ro','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
+    ylabel('log$_{10}$ $|\mathbf{v}|$ [m/s]',TX{:},FS{:}); set(gca,'XTickLabel',[]);
     subplot(4,1,4);
+    meanm = mean(mean(m(2:end-1,2:end-1)));
     meanf = mean(mean(f(2:end-1,2:end-1)));
     meanx = mean(mean(x(2:end-1,2:end-1)));
-    plot(time./3600,meanf,'ro',time./3600,meanx,'bo','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
+    plot(time./3600,(meanm),'ro',time./3600,(meanf),'bo',time./3600,(meanx),'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
     xlabel('Time [hr]',TX{:},FS{:});
-    ylabel('$\phi$, $\chi$ [vol]',TX{:},FS{:});
+    ylabel('$\mu$, $\phi$, $\chi$ [vol]',TX{:},FS{:});
 end
 
 fh8 = figure(8);
@@ -214,15 +215,19 @@ if iter > 0 % don't plot before solver has run first time
         sumV0 = sum(sum(V(2:end-1,2:end-1)));
     end
     Mass = sum(sum(rho(2:end-1,2:end-1)));
-    subplot(3,1,1);
-    plot(time./3600,sum(sum(H(2:end-1,2:end-1)))./Mass-(sumH0./Mass0),'bo','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
+    subplot(4,1,1);
+    plot(time./3600,1-sum(sum(H(2:end-1,2:end-1)))./Mass./(sumH0./Mass0),'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
     ylabel('consv. $H$',TX{:},FS{:}); set(gca,'XTickLabel',[]);
-    subplot(3,1,2);
-    plot(time./3600,sum(sum(C(2:end-1,2:end-1)))./Mass-(sumC0./Mass0),'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
+    subplot(4,1,2);
+    plot(time./3600,1-sum(sum(C(2:end-1,2:end-1)))./Mass./(sumC0./Mass0),'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
     ylabel('consv. $C$',TX{:},FS{:}); set(gca,'XTickLabel',[]);
-    subplot(3,1,3);
-    plot(time./3600,sum(sum(V(2:end-1,2:end-1)))./Mass-(sumV0./Mass0),'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
+    subplot(4,1,3);
+    plot(time./3600,1-sum(sum(V(2:end-1,2:end-1)))./Mass./(sumV0./Mass0),'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
     ylabel('consv. $V$',TX{:},FS{:}); set(gca,'XTickLabel',[]);
+    subplot(4,1,4);
+    plot(time./3600,1-sum(sum(rho(2:end-1,2:end-1)))./Mass0,'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
+    ylabel('consv. $M$',TX{:},FS{:});
+    xlabel('Time [hr]',TX{:},FS{:});
 end
 
 drawnow
@@ -241,9 +246,9 @@ if save_op
     print(fh6,name,'-dpng','-r300','-opengl');
     
     name = ['../out/',runID,'/',runID,'_',num2str(floor(step/nop))];
-    save(name,'U','W','P','Pt','f','x','phi','chi','mu','H','C','V','T','c','v','cm','cx','vm','vf','dHdt','dCdt','dVdt','dfdt','dxdt','Gf','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step');
+    save(name,'U','W','P','Pt','f','x','phi','chi','mu','H','C','V','T','c','v','cm','cx','vm','vf','IT','CT','it','ct','si','dHdt','dCdt','dVdt','dfdt','dxdt','Gf','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step');
     name = ['../out/',runID,'/',runID,'_cont'];
-    save(name,'U','W','P','Pt','f','x','phi','chi','mu','H','C','V','T','c','v','cm','cx','vm','vf','dHdt','dCdt','dVdt','dfdt','dxdt','Gf','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step');
+    save(name,'U','W','P','Pt','f','x','phi','chi','mu','H','C','V','T','c','v','cm','cx','vm','vf','IT','CT','it','ct','si','dHdt','dCdt','dVdt','dfdt','dxdt','Gf','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step');
     
     if step == 1
         logfile = ['../out/',runID,'/',runID,'.log'];

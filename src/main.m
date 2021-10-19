@@ -115,13 +115,12 @@ if restart
     elseif restart > 0  % restart from specified continuation frame
         name = ['../out/',runID,'/',runID,'_',num2str(restart)];
     end
-    load(name,'U','W','P','Pt','f','x','phi','chi','mu','H','C','V','T','c','v','cm','cx','vm','vf','dHdt','dCdt','dVdt','dfdt','dxdt','Gf','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step');
+    load(name,'U','W','P','Pt','f','x','phi','chi','mu','H','C','V','T','c','v','cm','cx','vm','vf','IT','CT','it','ct','si','dHdt','dCdt','dVdt','dfdt','dxdt','Gf','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step');
     name = ['../out/',runID,'/',runID,'_par'];
     load(name);
     
-    % update equilibrium
-    [xq,cxq,cmq,fq,vfq,vmq] = equilibrium(x,f,T,c,v,Pt,Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg);
-
+    xq = x;  cmq = cm;  cxq = cx; 
+    fq = f;  vmq = vm;  vfq = vf;
     time = time+dt;
     step = step+1;
 end
