@@ -1,6 +1,4 @@
-% thermochemical solver
-
-% update time step
+%% update time step
 dtk = min((h/2)^2./max([kT(:)./rhoCp(:);kc]));                          % diffusive time step size
 dta = min(min(h/2/max(abs([UBG(:);WBG(:);Um(:);Wm(:);Uf(:);Wf(:);Ux(:);Wx(:)]+1e-16)))); % advective time step size
 dt  = min(2*dto,CFL*min([dtk,dta]));                                    % physical time step size
@@ -103,17 +101,17 @@ c = C./rho;
 v = V./rho;
 
 
-%% *****  update local phase equilibrium  *********************************
+
+%% *****  UPDATE LOCAL PHASE EQUILIBRIUM  *********************************
 
 [xq,cxq,cmq,fq,vfq,vmq] = equilibrium(x,f,(T+To)./2,(c+co)./2,(v+vo)./2,(Pt+Pto)./2,Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg);
-% [xq,cxq,cmq,fq,vfq,vmq] = equilibrium(x,f,T,c,v,Pt,Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg);
 
     
 % update crystal fraction
 if diseq
     
     Gxi = (xq-x)./max(4.*dt,tau_r);
-    Gx  = beta.*Gx + (1-beta).*Gxi;                                        % crystallisation rate
+    Gx  = alpha.*Gx + (1-alpha).*Gxi;                                        % crystallisation rate
     
     advn_x = advection(x,Ux,Wx,h,ADVN,'flx');                              % get advection term
     
@@ -130,7 +128,7 @@ if diseq
     
 else
     
-    x  = beta.*x + (1-beta).*xq;
+    x  = alpha.*x + (1-alpha).*xq;
     cx = cxq;
     cm = cmq;
     Gx = (x-xo)./dt + advection(x,Ux,Wx,h,ADVN,'flx');                     % reconstruct crystallisation rate
@@ -142,7 +140,7 @@ end
 if diseq
     
     Gfi = (fq-f)./max(4.*dt,tau_r);
-    Gf  = beta.*Gf + (1-beta).*Gfi;
+    Gf  = alpha.*Gf + (1-alpha).*Gfi;
     
     advn_f = advection(f,Uf,Wf,h,ADVN,'flx');                              % get advection term
     
@@ -159,7 +157,7 @@ if diseq
     
 else
     
-    f  = beta.*f + (1-beta).*fq;
+    f  = alpha.*f + (1-alpha).*fq;
     vf = vfq;
     vm = vmq;
     Gf = (f-fo)./dt + advection(f,Uf,Wf,h,ADVN,'flx');                     % reconstruct exsolution rate
@@ -171,7 +169,8 @@ end
 m = 1-x-f;
 
 
-%% ***** Trace & isotope geochemistry  ************************************
+
+%% ***** TRACE & ISOTOPE GEOCHEMISTRY  ************************************
 
 % *****  Incompatible Trace Element  **************************************
 
