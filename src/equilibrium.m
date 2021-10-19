@@ -23,7 +23,6 @@ if any(v>1e-6)
                
         vfq = ones(size(v));
 
-%         vmq = min((v - fq.*vfq)./(1-fq-xq),vmq);
         vmq = min(v./(1-xq),vmq0);
 
         T   = max(0,min(1,(T0 - P*clap + dTv.*vmq.^0.75 -Tphs0)./(Tphs1-Tphs0)));
@@ -35,8 +34,8 @@ if any(v>1e-6)
         cxq(T>=perT) = cx1(T>=perT);
         cxq(T< perT) = cx2(T< perT);
         
-        cm1 = max(TINY,min(1-TINY,          perCm .*erf((1.0+PhDg/10).*(1-T)         ./(1-perT))./erf((1.0+PhDg/10))));
-        cm2 = max(TINY,min(1-TINY, perCm+(1-perCm).*erf((0.9+PhDg/10).*(1-T-(1-perT))./(  perT))./erf((0.9+PhDg/10))));
+        cm1 = max(TINY,min(1-TINY,          perCm .*erf((1.0+PhDg/10).*(1   -T)./(1-perT))./erf((1.0+PhDg/10))));
+        cm2 = max(TINY,min(1-TINY, perCm+(1-perCm).*erf((0.9+PhDg/10).*(perT-T)./(  perT))./erf((0.9+PhDg/10))));
         
         cmq = zeros(size(T));
         cmq(T>=perT) = cm1(T>=perT);
@@ -47,12 +46,6 @@ if any(v>1e-6)
 
         xq  = alpha.*xi + (1-alpha) .* max(TINY,min(1-fq-TINY, (c-(1-fq).*cmq)./(cxq-cmq) ));
         fq  = alpha.*fi + (1-alpha) .* max(TINY,min(1-xq-TINY, (v-(1-xq).*vmq)./(vfq-vmq) ));
-
-%         xq(T<=0) = alpha.*xi(T<=0) + (1-alpha) .* 1-fq(T<=0);
-%         xq(T>=1) = alpha.*xi(T>=1) + (1-alpha) .* 0;
-        
-%         fq  = max(TINY,min(1-xq-TINY, alpha.*fi + (1-alpha) .* (1-xq).*(v./(1-xq)-vmq)./(vfq-vmq) ));
-%         xq  = max(TINY,min(1-fq-TINY, alpha.*xi + (1-alpha) .* (1-fq).*(c./(1-fq)-cmq)./(min(c./(1-fq),cxq)-cmq) ));
         
         res = (norm(xq(:)-xi(:),2) + norm(fq(:)-fi(:),2))./sqrt(2*length(xq(:)));
         iter = iter+1;
@@ -69,8 +62,8 @@ else
     cxq(T>=perT) = cx1(T>=perT);
     cxq(T< perT) = cx2(T< perT);
     
-    cm1 = max(TINY,min(1-TINY,          perCm .*erf((1.0+PhDg/10).*(1-T)         ./(1-perT))./erf((1.0+PhDg/10))));
-    cm2 = max(TINY,min(1-TINY, perCm+(1-perCm).*erf((0.9+PhDg/10).*(1-T-(1-perT))./(  perT))./erf((0.9+PhDg/10))));
+    cm1 = max(TINY,min(1-TINY,          perCm .*erf((1.0+PhDg/10).*(1   -T)./(1-perT))./erf((1.0+PhDg/10))));
+    cm2 = max(TINY,min(1-TINY, perCm+(1-perCm).*erf((0.9+PhDg/10).*(perT-T)./(  perT))./erf((0.9+PhDg/10))));
     
     cmq = zeros(size(T));
     cmq(T>=perT) = cm1(T>=perT);
@@ -87,10 +80,6 @@ else
 
 end
 
-% cxq = min(c./(1-fq),cxq);
-% cmq = max(c./(1-fq),cmq);
-
-% vmq = vm;
 
 if size(xq,1)>1
     xq([1 end],:) = xq([2 end-1],:);
