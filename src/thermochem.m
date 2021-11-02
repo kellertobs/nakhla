@@ -1,7 +1,9 @@
 %% update time step
-dtk = min((h/2)^2./max([kT(:)./rhoCp(:);kc]));                          % diffusive time step size
+dtk = min((h/2)^2./max([kT(:)./rhoCp(:);kc]));                             % diffusive time step size
+divx = advection(x,Ux,Wx,h,ADVN,'flx');  divf = advection(f,Uf,Wf,h,ADVN,'flx');
+dtf = min(0.01./max(abs(divx(:))),0.01./max(abs(divf(:))));              % phase update time step size
 dta = min(min(h/2/max(abs([UBG(:);WBG(:);Um(:);Wm(:);Uf(:);Wf(:);Ux(:);Wx(:)]+1e-16)))); % advective time step size
-dt  = min(2*dto,CFL*min([dtk,dta]));                                    % physical time step size
+dt  = min(2*dto,CFL*min([dtk,dtf,dta]));                                   % physical time step size
 
 
 %% *****  THERMO-CHEMICAL EVOLUTION  **************************************
@@ -230,23 +232,67 @@ ct = CT./rho;
 
 % *****  STABLE ISOTOPE  **************************************************
 
-% update stable isotope composition
-advn_si = advection(mu .*si,Um,Wm,h,ADVN,'flx') ...
-        + advection(chi.*si,Ux,Wx,h,ADVN,'flx') ...
-        + advection(phi.*si,Uf,Wf,h,ADVN,'flx');
+% reactive transfer of stable isotope ratio
+trns_si = Gx.*rho.*(sim.*double(Gx<0) + six.*double(Gx>=0));
 
-qz   = - kc.*(mu(1:end-1,:)+mu(2:end,:))/2 .* ddz(si,h);
-qx   = - kc.*(mu(:,1:end-1)+mu(:,2:end))/2 .* ddx(si,h);
+% update stable isotope ratio in melt
+advn_si = advection(SIm,Um,Wm,h,ADVN,'flx');
+
+qz   = - kc.*rhom.*(mu(1:end-1,:)+mu(2:end,:))/2 .* ddz(sim,h);
+qx   = - kc.*rhom.*(mu(:,1:end-1)+mu(:,2:end))/2 .* ddx(sim,h);
 diff_si(2:end-1,2:end-1) = - ddz(qz(:,2:end-1),h) ...                      % diffusion in melt
                            - ddx(qx(2:end-1,:),h);
                        
 assim = zeros(size(si));
-if ~isnan(siwall); assim = assim + (siwall-si).*rho./tau_c .* bndshape; end % impose wall assimilation
+if ~isnan(siwall); assim = assim + (siwall-sim).*rhom.*mu./tau_c .* bndshape; end % impose wall assimilation
 
-dsidt = - advn_si + diff_si + assim;                                       % total rate of change
+dSImdt = - advn_si + diff_si + assim - trns_si;                            % total rate of change
 
-if step>0; si = sio + (theta.*dsidt + (1-theta).*dsidto).*dt; end          % explicit update
-si([1 end],:) = si([2 end-1],:);                                           % boundary conditions
-si(:,[1 end]) = si(:,[2 end-1]);
+if step>0; SIm = SImo + (theta.*dSImdt + (1-theta).*dSImdto).*dt; end      % explicit update
+SIm = min(max(si0-dsi,si1+dsi).*rhom.*mu,max(min(si0-dsi,si1+dsi).*rhom.*mu,SIm));
+SIm(mu<1e-3)   = SI(mu<1e-3);
+SIm([1 end],:) = SIm([2 end-1],:);                                         % boundary conditions
+SIm(:,[1 end]) = SIm(:,[2 end-1]);
+
+sim = SIm./rhom./max(TINY,mu);
+
+% update stable isotope ratio in xtals
+advn_si = advection(SIx,Ux,Wx,h,ADVN,'flx');
+                       
+assim = zeros(size(si));
+if ~isnan(siwall); assim = assim + (siwall-six).*rhox.*chi./tau_c .* bndshape; end % impose wall assimilation
+
+dSIxdt = - advn_si + assim + trns_si;                             % total rate of change
+
+if step>0; SIx = SIxo + (theta.*dSIxdt + (1-theta).*dSIxdto).*dt; end      % explicit update
+SIx = min(max(si0-dsi,si1+dsi).*rhox.*chi,max(min(si0-dsi,si1+dsi).*rhox.*chi,SIx));
+SIx(chi<1e-3)  = SI(chi<1e-3);
+SIx([1 end],:) = SIx([2 end-1],:);                                         % boundary conditions
+SIx(:,[1 end]) = SIx(:,[2 end-1]);
+
+six = SIx./rhox./max(1e-3,chi);
+
+SI = SIm + SIx;
+SI = min(max(si0-dsi,si1+dsi).*rho.*(1-f),max(min(si0-dsi,si1+dsi).*rho.*(1-f),SI));
+si = SI./rho./max(TINY,1-f);
+
+
+% % update stable isotope composition
+% advn_si = advection(mu .*si,Um,Wm,h,ADVN,'flx') ...
+%         + advection(chi.*si,Ux,Wx,h,ADVN,'flx');
+% 
+% qz   = - kc.*(mu(1:end-1,:)+mu(2:end,:))/2 .* ddz(si,h);
+% qx   = - kc.*(mu(:,1:end-1)+mu(:,2:end))/2 .* ddx(si,h);
+% diff_si(2:end-1,2:end-1) = - ddz(qz(:,2:end-1),h) ...                      % diffusion in melt
+%                            - ddx(qx(2:end-1,:),h);
+%                        
+% assim = zeros(size(si));
+% if ~isnan(siwall); assim = assim + (siwall-si).*rho./tau_c .* bndshape; end % impose wall assimilation
+% 
+% dsidt = - advn_si + diff_si + assim;                                       % total rate of change
+% 
+% if step>0; si = sio + (theta.*dsidt + (1-theta).*dsidto).*dt; end          % explicit update
+% si([1 end],:) = si([2 end-1],:);                                           % boundary conditions
+% si(:,[1 end]) = si(:,[2 end-1]);
 
 

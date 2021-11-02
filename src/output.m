@@ -115,11 +115,11 @@ if plot_op
     imagesc(X(2:end-1),Z(2:end-1),log10(eta(2:end-1,2:end-1))); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\eta$ [log$_{10}$ Pas]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
     axes(ax(33));
-    imagesc(X(2:end-1),Z(2:end-1),Gx(2:end-1,2:end-1)./rho(2:end-1,2:end-1)); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\Gamma_\chi/\bar{\rho}$ [1/s]'],TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:}); xlabel('Width [m]',TX{:},FS{:});
+    imagesc(X(2:end-1),Z(2:end-1),Gx(2:end-1,2:end-1)); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\Gamma_\chi$ [1/s]'],TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:}); xlabel('Width [m]',TX{:},FS{:});
     axes(ax(34));
-    imagesc(X(2:end-1),Z(2:end-1),Gf(2:end-1,2:end-1)./rho(2:end-1,2:end-1)); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\Gamma_\phi/\bar{\rho}$ [1/s]'],TX{:},FS{:}); xlabel('Width [m]',TX{:},FS{:}); set(gca,'YTickLabel',[]);
+    imagesc(X(2:end-1),Z(2:end-1),Gf(2:end-1,2:end-1)); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\Gamma_\phi$ [1/s]'],TX{:},FS{:}); xlabel('Width [m]',TX{:},FS{:}); set(gca,'YTickLabel',[]);
 %     axes(ax(33));
 %     imagesc(X(2:end-1),Z(2:end-1),log10(eII(2:end-1,2:end-1))); axis ij equal tight; box on; cb = colorbar;
 %     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\varepsilon_{II}$ [log$_{10}$ 1/s]'],TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:}); xlabel('Width [m]',TX{:},FS{:});
@@ -216,16 +216,16 @@ if iter > 0 % don't plot before solver has run first time
     end
     Mass = sum(sum(rho(2:end-1,2:end-1)));
     subplot(4,1,1);
-    plot(time./3600,1-sum(sum(H(2:end-1,2:end-1)))./Mass./(sumH0./Mass0),'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
+    plot(time./3600,sum(sum(H(2:end-1,2:end-1)))./Mass./(sumH0./Mass0)-1,'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
     ylabel('consv. $H$',TX{:},FS{:}); set(gca,'XTickLabel',[]);
     subplot(4,1,2);
-    plot(time./3600,1-sum(sum(C(2:end-1,2:end-1)))./Mass./(sumC0./Mass0),'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
+    plot(time./3600,sum(sum(C(2:end-1,2:end-1)))./Mass./(sumC0./Mass0)-1,'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
     ylabel('consv. $C$',TX{:},FS{:}); set(gca,'XTickLabel',[]);
     subplot(4,1,3);
-    plot(time./3600,1-sum(sum(V(2:end-1,2:end-1)))./Mass./(sumV0./Mass0),'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
+    plot(time./3600,sum(sum(V(2:end-1,2:end-1)))./Mass./(sumV0./Mass0)-1,'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
     ylabel('consv. $V$',TX{:},FS{:}); set(gca,'XTickLabel',[]);
     subplot(4,1,4);
-    plot(time./3600,1-sum(sum(rho(2:end-1,2:end-1)))./Mass0,'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
+    plot(time./3600,sum(sum(rho(2:end-1,2:end-1)))./Mass0-1,'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
     ylabel('consv. $M$',TX{:},FS{:});
     xlabel('Time [hr]',TX{:},FS{:});
 end
@@ -246,9 +246,9 @@ if save_op
     print(fh6,name,'-dpng','-r300','-opengl');
     
     name = ['../out/',runID,'/',runID,'_',num2str(floor(step/nop))];
-    save(name,'U','W','P','Pt','f','x','phi','chi','mu','H','C','V','T','c','v','cm','cx','vm','vf','IT','CT','it','ct','si','dHdt','dCdt','dVdt','dfdt','dxdt','Gf','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step');
+    save(name,'U','W','P','Pt','f','x','phi','chi','mu','H','C','V','T','c','v','cm','cx','vm','vf','IT','CT','SIm','SIx','it','ct','sim','six','dHdt','dCdt','dVdt','dITdt','dCTdt','dSImdt','dSIxdt','dfdt','dxdt','Gf','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step');
     name = ['../out/',runID,'/',runID,'_cont'];
-    save(name,'U','W','P','Pt','f','x','phi','chi','mu','H','C','V','T','c','v','cm','cx','vm','vf','IT','CT','it','ct','si','dHdt','dCdt','dVdt','dfdt','dxdt','Gf','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step');
+    save(name,'U','W','P','Pt','f','x','phi','chi','mu','H','C','V','T','c','v','cm','cx','vm','vf','IT','CT','SIm','SIx','it','ct','sim','six','dHdt','dCdt','dVdt','dITdt','dCTdt','dSImdt','dSIxdt','dfdt','dxdt','Gf','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step');
     
     if step == 1
         logfile = ['../out/',runID,'/',runID,'.log'];

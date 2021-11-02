@@ -32,15 +32,15 @@ MapW = reshape(1:NW,Nz-1,Nx  );
 MapU = reshape(1:NU,Nz  ,Nx-1) + NW;
 
 % set initial solution fields
-T   =  T0 + (T1-T0) .* (1+erf(40*(ZZ/D-zlay)))/2 + dT.*rp;  meanT0 = mean(mean(T(2:end-1,2:end-1)));
-c   =  c0 + (c1-c0) .* (1+erf(40*(ZZ/D-zlay)))/2 + dc.*rp;  meanc0 = mean(mean(c(2:end-1,2:end-1)));
-v   =  v0 + (v1-v0) .* (1+erf(40*(ZZ/D-zlay)))/2 + dv.*rp;  meanv0 = mean(mean(v(2:end-1,2:end-1))); 
+T   =  T0 + (T1-T0) .* (1+erf((ZZ/D-zlay)/wlay))/2 + dT.*rp;  meanT0 = mean(mean(T(2:end-1,2:end-1)));
+c   =  c0 + (c1-c0) .* (1+erf((ZZ/D-zlay)/wlay))/2 + dc.*rp;  meanc0 = mean(mean(c(2:end-1,2:end-1)));
+v   =  v0 + (v1-v0) .* (1+erf((ZZ/D-zlay)/wlay))/2 + dv.*rp;  meanv0 = mean(mean(v(2:end-1,2:end-1))); 
 x   =  0.*c + 1e-16;
 f   =  0.*c + 1e-16;
 
-si =  si0 + (si1-si0) .* (1+erf(50*(ZZ/D-zlay)))/2 + dsi.*rp;
-it =  it0 + (it1-it0) .* (1+erf(50*(ZZ/D-zlay)))/2 + dit.*rp; 
-ct =  ct0 + (ct1-ct0) .* (1+erf(50*(ZZ/D-zlay)))/2 + dct.*rp;
+si =  si0 + (si1-si0) .* (1+erf((ZZ/D-zlay)/wlay))/2 + dsi.*rp;
+it =  it0 + (it1-it0) .* (1+erf((ZZ/D-zlay)/wlay))/2 + dit.*rp; 
+ct =  ct0 + (ct1-ct0) .* (1+erf((ZZ/D-zlay)/wlay))/2 + dct.*rp;
 
 U   =  zeros(size((XX(:,1:end-1)+XX(:,2:end))));  Ui = U;  res_U = 0.*U;
 W   =  zeros(size((XX(1:end-1,:)+XX(2:end,:))));  Wi = W;  res_W = 0.*W; wf = 0.*W; wc = 0.*W;
@@ -82,9 +82,12 @@ V = mu.*rhom.*vm + phi.*rhof.*vf;                sumV0 = sum(sum(V(2:end-1,2:end
 
 itm = it./(m + x.*KIT); itx = it./(m./KIT + x);
 ctm = ct./(m + x.*KCT); ctx = ct./(m./KCT + x);
+sim = si;               six = si;
 
-IT = mu.*rhom.*itm + chi.*rhox.*itx;
-CT = mu.*rhom.*ctm + chi.*rhox.*ctx;
+IT  = mu.*rhom.*itm + chi.*rhox.*itx;
+CT  = mu.*rhom.*ctm + chi.*rhox.*ctx;
+SIm = mu.*rhom.*sim;  SIx = chi.*rhox.*six;
+SI  = SIm + SIx;
 
 % initialise reaction rates
 Gx = 0.*x;  Gf = 0.*f;
@@ -95,7 +98,7 @@ dCdt   =  0.*c;  advn_C = 0.*C;  diff_c = 0.*c;
 dVdt   =  0.*v;  advn_V = 0.*V;  diff_v = 0.*v;  
 dfdt   =  0.*f;  diff_f = 0.*f;  diff_it = 0.*it;  diff_ct = 0.*ct;
 dxdt   =  0.*x;  diff_x = 0.*x;  diff_si = 0.*si;   
-dsidt  =  0.*si; dITdt  = 0.*IT;  dCTdt = 0.*CT;
+dSImdt =  0.*si; dSIxdt = 0.*si; dITdt   = 0.*IT;  dCTdt = 0.*CT;
 
 eIIref =  1e-6;  
 Div_V  =  0.*P;  Div_rhomVm = 0.*P;  Div_rhoxVx = 0.*P;  Div_rhofVf = 0.*P;
@@ -115,17 +118,21 @@ if restart
     elseif restart > 0  % restart from specified continuation frame
         name = ['../out/',runID,'/',runID,'_',num2str(restart)];
     end
-    load(name,'U','W','P','Pt','f','x','phi','chi','mu','H','C','V','T','c','v','cm','cx','vm','vf','IT','CT','it','ct','si','dHdt','dCdt','dVdt','dfdt','dxdt','Gf','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step');
+    load(name,'U','W','P','Pt','f','x','phi','chi','mu','H','C','V','T','c','v','cm','cx','vm','vf','IT','CT','SIm','SIx','it','ct','sim','six','dHdt','dCdt','dVdt','dITdt','dCTdt','dSImdt','dSIxdt','dfdt','dxdt','Gf','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step');
     name = ['../out/',runID,'/',runID,'_par'];
     load(name);
     
     xq = x;  cmq = cm;  cxq = cx; 
     fq = f;  vmq = vm;  vfq = vf;
+    SI = SIx + SIm; si = SI./rho./max(TINY,1-f);
     time = time+dt;
     step = step+1;
-end
+    update;
+else
 
-update; output;
+    update; output;
+
+end
 
 % physical time stepping loop
 while time <= tend && step <= M
@@ -142,7 +149,8 @@ while time <= tend && step <= M
     vo      = v;
     xo      = x;
     fo      = f;
-    sio     = si;
+    SImo    = SIm;
+    SIxo    = SIx;
     ITo     = IT;
     CTo     = CT;
     rhoo    = rho;
@@ -153,8 +161,8 @@ while time <= tend && step <= M
     dfdto   = dfdt;
     dITdto  = dITdt;
     dCTdto  = dCTdt;
-    dsidto  = dsidt;
-    drhodto = drhodt;
+    dSImdto = dSImdt;
+    dSIxdto = dSIxdt;
     Pto     = Pt;
     dto     = dt;
     
@@ -164,7 +172,7 @@ while time <= tend && step <= M
     iter     = 0;
     
     % non-linear iteration loop
-    while resnorm/resnorm0 >= rtol && resnorm >= atol && iter <= maxit 
+    while resnorm/resnorm0 >= rtol && resnorm >= atol && iter <= maxit || iter <= 2
             
         % solve thermo-chemical equations
         thermochem;
