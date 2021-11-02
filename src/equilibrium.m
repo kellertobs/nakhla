@@ -2,19 +2,20 @@
 
 function [xq,cxq,cmq,fq,vfq,vmq]  =  equilibrium(xq,fq,T0,c,v,P,Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTv,PhDg)
 
-TINY  = 1e-16;
+TINY  = 1e-15;
 
 perCm = (perCm-cphs0)./(cphs1-cphs0);
 perCx = (perCx-cphs0)./(cphs1-cphs0);
 perT  = (perT -Tphs0)./(Tphs1-Tphs0);
 
 iter  = 0;
-maxit = 500;
+maxit = 1e3;
 res   = 1;
 tol   = 1e-15;
-alpha = 0.50;
+alpha = 0.95;
 
 vmq0 = (4.8e-5.*P.^0.6 + 1e-9.*P)./100;
+vmq  = min(v./(1-xq),vmq0);
 
 if any(v>1e-6)
     
@@ -23,7 +24,7 @@ if any(v>1e-6)
                
         vfq = ones(size(v));
 
-        vmq = min(v./(1-xq),vmq0);
+        vmq = alpha.*vmq + (1-alpha) .* min(v./(1-xq),vmq0);
 
         T   = max(0,min(1,(T0 - P*clap + dTv.*vmq.^0.75 -Tphs0)./(Tphs1-Tphs0)));
         
