@@ -64,7 +64,7 @@ if bndmode==3; sds = -1;      % no slip
 else;          sds = +1; end  % free slip
 
 wf = 2/9   .* (rhof-(rho(1:end-1,:)+rho(2:end,:))/2)*g0*df^2./((eta(1:end-1,:)+eta(2:end,:))/2) ...  % bubble flotation speed
-   + 1/250 .* (rhof-(rho(1:end-1,:)+rho(2:end,:))/2)*g0*dx^2.*((phi(1:end-1,:)+phi(2:end,:))/2).^2./etaf; % fluid percolation speed
+   + 1/500 .* (rhof-(rho(1:end-1,:)+rho(2:end,:))/2)*g0*dx^2.*((phi(1:end-1,:)+phi(2:end,:))/2).^2./etaf; % fluid percolation speed
 wf([1 end],:) = 0;
 wf(:,[1 end]) = sds*wf(:,[2 end-1]);
 for d = 1:delta
@@ -100,10 +100,10 @@ Wm   = W + wm;                                                             % mlt
 Um   = U + 0.;                                                             % mlt x-velocity
 
 % update volume source
-Div_rhov =  + advection(rhom.*mu ,0.*Um,wm,h,ADVN,'flx') ...
-            + advection(rhof.*phi,0.*Uf,wf,h,ADVN,'flx') ...
-            + advection(rhox.*chi,0.*Ux,wx,h,ADVN,'flx') ...
-            + advection(rho      ,U    ,W ,h,ADVN,'adv');
+Div_rhov =  + advection(rhom.*mu ,0.*U,wm,h,ADVN,'flx') ...
+            + advection(rhof.*phi,0.*U,wf,h,ADVN,'flx') ...
+            + advection(rhox.*chi,0.*U,wx,h,ADVN,'flx') ...
+            + advection(rho      ,U   ,W ,h,ADVN,'adv');
 if step>0
     VolSrci = - ((rho-rhoo)./dt + Div_rhov)./rho;
     VolSrc  = alpha.*VolSrc + (1-alpha).*VolSrci;
@@ -111,3 +111,4 @@ end
 dVoldt = mean(mean(VolSrc(2:end-1,2:end-1)));
 UBG    = - dVoldt./2 .* (L/2-XXu);
 WBG    = - dVoldt./2 .* (D/2-ZZw);
+
