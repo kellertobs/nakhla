@@ -2,7 +2,7 @@
 
 function [xq,cxq,cmq,fq,vfq,vmq]  =  equilibrium(xq,fq,T0,c,v,P,Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTv,PhDg)
 
-TINY  = 1e-15;
+TINY  = 1e-16;
 
 perCm = (perCm-cphs0)./(cphs1-cphs0);
 perCx = (perCx-cphs0)./(cphs1-cphs0);
