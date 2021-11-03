@@ -66,6 +66,9 @@ cc = [linspace(cphs1,(perCx+perCm)/2,(perT-Tphs0)./(Tphs1-Tphs0)*1e3),linspace((
 [~,CCx,CCm,FF,~,~] = equilibrium(0*TT,0*TT,TT,cc,0*TT,0*TT,Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg);
 plot(CCx,TT,'k','LineStyle',linestyle,'LineWidth',2); axis tight; hold on; box on;
 plot(CCm,TT,'k','LineStyle',linestyle,'LineWidth',2);
+plot(cxq,T-P.*clap + dTH2O*vmq.^0.75,'b','LineStyle',linestyle,'LineWidth',2);
+plot(cmq,T-P.*clap + dTH2O*vmq.^0.75,'r','LineStyle',linestyle,'LineWidth',2);
+plot(c  ,T-P.*clap + dTH2O*vmq.^0.75,'k','LineStyle',':','LineWidth',2);
 set(gca,'TickLabelInterpreter','latex','FontSize',15)
 title('Phase Diagram','Interpreter','latex','FontSize',22)
 xlabel('Major component [wt SiO$_2$]','Interpreter','latex','FontSize',18)
