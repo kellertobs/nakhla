@@ -57,8 +57,8 @@ if ~isochem
     advn_C = advection(rhom.*mu .*cm,Um,Wm,h,ADVN,'flx') ...
            + advection(rhox.*chi.*cx,Ux,Wx,h,ADVN,'flx');
                           
-    qcz   = - kc.*rhom.*(mu(1:end-1,:)+mu(2:end,:))/2 .* ddz(cm,h);        % major component diffusion z-flux
-    qcx   = - kc.*rhom.*(mu(:,1:end-1)+mu(:,2:end))/2 .* ddx(cm,h);        % major component diffusion x-flux
+    qcz   = - kc.*(rhom(1:end-1,:)+rhom(2:end,:))/2.*(mu(1:end-1,:)+mu(2:end,:))/2 .* ddz(cm,h);        % major component diffusion z-flux
+    qcx   = - kc.*(rhom(:,1:end-1)+rhom(:,2:end))/2.*(mu(:,1:end-1)+mu(:,2:end))/2 .* ddx(cm,h);        % major component diffusion x-flux
     diff_c(2:end-1,2:end-1) = - ddz(qcz(:,2:end-1),h) ...                  % major component diffusion
                               - ddx(qcx(2:end-1,:),h);
     
@@ -76,8 +76,8 @@ if ~isochem
     advn_V = advection(rhom.*mu .*vm,Um,Wm,h,ADVN,'flx') ...
            + advection(rhof.*phi.*vf,Uf,Wf,h,ADVN,'flx');
         
-    qvz   = - kc.*rhom.*(mu(1:end-1,:)+mu(2:end,:))/2 .* ddz(vm,h);        % volatile component diffusion z-flux
-    qvx   = - kc.*rhom.*(mu(:,1:end-1)+mu(:,2:end))/2 .* ddx(vm,h);        % volatile component diffusion x-flux
+    qvz   = - kc.*(rhom(1:end-1,:)+rhom(2:end,:))/2.*(mu(1:end-1,:)+mu(2:end,:))/2 .* ddz(vm,h);        % volatile component diffusion z-flux
+    qvx   = - kc.*(rhom(:,1:end-1)+rhom(:,2:end))/2.*(mu(:,1:end-1)+mu(:,2:end))/2 .* ddx(vm,h);        % volatile component diffusion x-flux
     diff_v(2:end-1,2:end-1) = - ddz(qvz(:,2:end-1),h) ...                  % volatile component diffusion
                               - ddx(qvx(2:end-1,:),h);
     
@@ -184,8 +184,8 @@ itx = it./(m./KIT + x);
 advn_IT = advection(rhom.*mu .*itm,Um,Wm,h,ADVN,'flx') ...
         + advection(rhox.*chi.*itx,Ux,Wx,h,ADVN,'flx');
 
-qz   = - kc.*rhom.*(mu(1:end-1,:)+mu(2:end,:))/2 .* ddz(itm,h);
-qx   = - kc.*rhom.*(mu(:,1:end-1)+mu(:,2:end))/2 .* ddx(itm,h);
+qz   = - kc.*(rhom(1:end-1,:)+rhom(2:end,:))/2.*(mu(1:end-1,:)+mu(2:end,:))/2 .* ddz(itm,h);
+qx   = - kc.*(rhom(:,1:end-1)+rhom(:,2:end))/2.*(mu(:,1:end-1)+mu(:,2:end))/2 .* ddx(itm,h);
 diff_it(2:end-1,2:end-1) = - ddz(qz(:,2:end-1),h) ...                      % diffusion in melt
                            - ddx(qx(2:end-1,:),h);
 
@@ -212,8 +212,8 @@ ctx = ct./(m./KCT + x);
 advn_CT = advection(rhom.*mu .*ctm,Um,Wm,h,ADVN,'flx') ...
         + advection(rhox.*chi.*ctx,Ux,Wx,h,ADVN,'flx');
 
-qz   = - kc.*rhom.*(mu(1:end-1,:)+mu(2:end,:))/2 .* ddz(ctm,h);
-qx   = - kc.*rhom.*(mu(:,1:end-1)+mu(:,2:end))/2 .* ddx(ctm,h);
+qz   = - kc.*(rhom(1:end-1,:)+rhom(2:end,:))/2.*(mu(1:end-1,:)+mu(2:end,:))/2 .* ddz(ctm,h);
+qx   = - kc.*(rhom(:,1:end-1)+rhom(:,2:end))/2.*(mu(:,1:end-1)+mu(:,2:end))/2 .* ddx(ctm,h);
 diff_ct(2:end-1,2:end-1) = - ddz(qz(:,2:end-1),h) ...                      % diffusion in melt
                            - ddx(qx(2:end-1,:),h);
 
@@ -238,8 +238,8 @@ trns_si = Gx.*rho.*(sim.*double(Gx<0) + six.*double(Gx>=0));
 % update stable isotope ratio in melt
 advn_si = advection(SIm,Um,Wm,h,ADVN,'flx');
 
-qz   = - kc.*rhom.*(mu(1:end-1,:)+mu(2:end,:))/2 .* ddz(sim,h);
-qx   = - kc.*rhom.*(mu(:,1:end-1)+mu(:,2:end))/2 .* ddx(sim,h);
+qz   = - kc.*(rhom(1:end-1,:)+rhom(2:end,:))/2.*(mu(1:end-1,:)+mu(2:end,:))/2 .* ddz(sim,h);
+qx   = - kc.*(rhom(:,1:end-1)+rhom(:,2:end))/2.*(mu(:,1:end-1)+mu(:,2:end))/2 .* ddx(sim,h);
 diff_si(2:end-1,2:end-1) = - ddz(qz(:,2:end-1),h) ...                      % diffusion in melt
                            - ddx(qx(2:end-1,:),h);
                        

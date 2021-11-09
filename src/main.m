@@ -44,7 +44,7 @@ ct =  ct0 + (ct1-ct0) .* (1+erf((ZZ/D-zlay)/wlay))/2 + dct.*rp;
 
 U   =  zeros(size((XX(:,1:end-1)+XX(:,2:end))));  Ui = U;  res_U = 0.*U;
 W   =  zeros(size((XX(1:end-1,:)+XX(2:end,:))));  Wi = W;  res_W = 0.*W; wf = 0.*W; wc = 0.*W;
-P   =  0.*c;  Pi = P;  res_P = 0.*P;  meanQ = 0; Pt = rhom.*g0.*ZZ + Ptop;
+P   =  0.*c;  Pi = P;  res_P = 0.*P;  meanQ = 0;  Pt = rhom0.*g0.*ZZ + Ptop;
 S   = [W(:);U(:);P(:)];
 
 % get initial local phase equilibrium
@@ -60,22 +60,40 @@ vf = vfq;
 
 % get volume fractions and bulk density
 chi = x;  phi = f;  mu = m;
-rho = mu.*rhom + chi.*rhox + phi.*rhof;
-res = 1;  tol = 1e-12;
+rho = mu.*rhom0 + chi.*rhox0 + phi.*rhof0;
+res = 1;  tol = 1e-15;  iter = 0;
 while res > tol
     chii = chi;  phii = phi;
+    
+    rhom = rhom0 .* (1 - aTm.*(T-Tphs0) - gCm.*(cm-cphs0));
+    rhox = rhox0 .* (1 - aTx.*(T-Tphs0) - gCx.*(cx-cphs0));
+    rhof = rhof0 .* (1 - aTf.*(T-Tphs0) + bPf.*(Pt-Ptop));
+    
     chi  = max(TINY,min(1-TINY, x.*rho./rhox ))./(chi+phi+mu);
     phi  = max(TINY,min(1-TINY, f.*rho./rhof ))./(chi+phi+mu);
     mu   = max(TINY,min(1-TINY, m.*rho./rhom ))./(chi+phi+mu);
-    rho  = mu.*rhom + chi.*rhox + phi.*rhof;
+    
+    rho     = mu.*rhom + chi.*rhox + phi.*rhof;
+    rhoref  = mean(mean(rho(2:end-1,2:end-1)));
+    Pt      = Ptop + rhoref.*g0.*ZZ;
+    
+    if ~mod(iter,2)
+        [xq,cxq,cmq,fq,vfq,vmq] = equilibrium(x,f,T,c,v,Pt,Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg);
+        mq = 1-xq-fq;
+        
+        x  = xq;  f = fq;  m = mq;
+        cm = cmq; cx = cxq;
+        vm = vmq; vf = vfq;
+    end
+    
     res  = (norm(chi(:)-chii(:),2) + norm(phi(:)-phii(:),2))./sqrt(2*length(chi(:)));
+    iter = iter+1;
 end
-rhoref  = mean(mean(rho(2:end-1,2:end-1)));
 Mass0   = sum(sum(rho(2:end-1,2:end-1)));
 rhoo    = rho;
   
 % get bulk enthalpy, silica, volatile content densities
-rhoCp = mu*rhom*Cpm + chi*rhox*Cpx + phi*rhof*Cpf;
+rhoCp = mu.*rhom.*Cpm + chi.*rhox.*Cpx + phi.*rhof.*Cpf;
 H = rhoCp.*T + chi.*rhox.*DLx + phi.*rhof.*DLf;  sumH0 = sum(sum(H(2:end-1,2:end-1)));
 C = mu.*rhom.*cm + chi.*rhox.*cx;                sumC0 = sum(sum(C(2:end-1,2:end-1)));
 V = mu.*rhom.*vm + phi.*rhof.*vf;                sumV0 = sum(sum(V(2:end-1,2:end-1)));

@@ -1,5 +1,10 @@
 %%*****  UPDATE PARAMETERS & AUXILIARY FIELDS  ****************************
 
+% update phase densities
+rhom = alpha.*rhom + (1-alpha).*rhom0 .* (1 - aTm.*(T-Tphs0) - gCm.*(cm-cphs0));
+rhox = alpha.*rhox + (1-alpha).*rhox0 .* (1 - aTx.*(T-Tphs0) - gCx.*(cx-cphs0));
+rhof = alpha.*rhof + (1-alpha).*rhof0 .* (1 - aTf.*(T-Tphs0) + bPf.*(Pt-Ptop));
+
 % convert weight to volume fraction, update bulk density
 res = 1;    tol = 1e-15;
 while res > tol
@@ -11,10 +16,10 @@ while res > tol
     res  = (norm(chi(:)-chii(:),2) + norm(phi(:)-phii(:),2))./sqrt(2*length(chi(:)));
 end
 rhoBF  = (rho(2:end-2,2:end-1)+rho(3:end-1,2:end-1))./2 - rhoref;          % relative density for bouancy force term
-Pt     = Ptop + rhoref.*g0.*ZZ + 0.*P;                                     % total pressure
+Pt     = Ptop + rhoref.*g0.*ZZ + P;                                        % total pressure
 
 % update thermal properties
-rhoCp  = mu*rhom*Cpm + chi*rhox*Cpx + phi*rhof*Cpf;                        % magma heat capacity density
+rhoCp  = mu.*rhom.*Cpm + chi.*rhox.*Cpx + phi.*rhof.*Cpf;                        % magma heat capacity density
 kT     = mu.*kTm + chi.*kTx + phi.*kTf;                                    % magma thermal conductivity
 
 % update effective viscosity
@@ -63,8 +68,8 @@ tII([1 end],:) = tII([2 end-1],:);
 if bndmode==3; sds = -1;      % no slip
 else;          sds = +1; end  % free slip
 
-wf = 2/9   .* (rhof-(rho(1:end-1,:)+rho(2:end,:))/2)*g0*df^2./((eta(1:end-1,:)+eta(2:end,:))/2) ...  % bubble flotation speed
-   + 1/500 .* (rhof-(rho(1:end-1,:)+rho(2:end,:))/2)*g0*dx^2.*((phi(1:end-1,:)+phi(2:end,:))/2).^2./etaf; % fluid percolation speed
+wf = 2/9   .* ((rhof(1:end-1,:)+rhof(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0*df^2./((eta(1:end-1,:)+eta(2:end,:))/2) ...  % bubble flotation speed
+   + 1/500 .* ((rhof(1:end-1,:)+rhof(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0*dx^2.*((phi(1:end-1,:)+phi(2:end,:))/2).^2./etaf; % fluid percolation speed
 wf([1 end],:) = 0;
 wf(:,[1 end]) = sds*wf(:,[2 end-1]);
 for d = 1:delta
@@ -73,7 +78,7 @@ for d = 1:delta
     wf(:,[1 end]) = sds*wf(:,[2 end-1]);
 end
 
-wx = 2/9 .* (rhox-(rho(1:end-1,:)+rho(2:end,:))/2)*g0*dx^2./((eta(1:end-1,:)+eta(2:end,:))/2); % crystal settling speed
+wx = 2/9 .* ((rhox(1:end-1,:)+rhox(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0*dx^2./((eta(1:end-1,:)+eta(2:end,:))/2); % crystal settling speed
 wx([1 end],:) = 0;
 wx(:,[1 end]) = sds*wx(:,[2 end-1]);
 for d = 1:delta
@@ -82,7 +87,7 @@ for d = 1:delta
     wx(:,[1 end]) = sds*wx(:,[2 end-1]);
 end
 
-wm = 1/50 .* (rhom-(rho(1:end-1,:)+rho(2:end,:))/2)*g0*dx^2.*((mu(1:end-1,:)+mu(2:end,:))/2).^2./etam; % melt percolation speed
+wm = 1/50 .* ((rhom(1:end-1,:)+rhom(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0*dx^2.*((mu(1:end-1,:)+mu(2:end,:))/2).^2./etam; % melt percolation speed
 wm([1 end],:) = 0;
 wm(:,[1 end]) = sds*wm(:,[2 end-1]);
 for d = 1:delta
@@ -104,10 +109,9 @@ Div_rhov =  + advection(rhom.*mu ,0.*U,wm,h,ADVN,'flx') ...
             + advection(rhof.*phi,0.*U,wf,h,ADVN,'flx') ...
             + advection(rhox.*chi,0.*U,wx,h,ADVN,'flx') ...
             + advection(rho      ,U   ,W ,h,ADVN,'adv');
-if step>0
-    VolSrci = - ((rho-rhoo)./dt + Div_rhov)./rho;
-    VolSrc  = alpha.*VolSrc + (1-alpha).*VolSrci;
-end
+VolSrc = -((rho-rhoo)./dt + Div_rhov)./rho;
+% VolSrc  = alpha.*VolSrc + (1-alpha).*VolSrci;
+
 dVoldt = mean(mean(VolSrc(2:end-1,2:end-1)));
 UBG    = - dVoldt./2 .* (L/2-XXu);
 WBG    = - dVoldt./2 .* (D/2-ZZw);
