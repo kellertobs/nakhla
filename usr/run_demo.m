@@ -3,9 +3,9 @@ clear; close all;
 % set run parameters
 runID    =  'demo';              % run identifier
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
-nop      =  1;                  % output frame plotted/saved every 'nop' time steps
+nop      =  10;                  % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on (1) to live plot results
-save_op  =  0;                   % switch on (1) to save output to file
+save_op  =  1;                   % switch on (1) to save output to file
 plot_cv  =  1;                   % switch on (1) to live plot iterative convergence
 isotherm =  0;                   % switch on (1) isothermal mode
 isochem  =  0;                   % switch on (1) isochemical mode
@@ -14,7 +14,7 @@ diseq    =  0;                   % disequilibrium phase evolution
 % set model domain parameters
 D        =  10;                  % chamber depth [m]
 L        =  10;                  % chamber width [m]
-N        =  100 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
+N        =  200 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
 h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
@@ -24,8 +24,9 @@ tend     =  hr*480;              % end time for simulation [s]
 dt       =  1;                   % initial time step [s]
 
 % set initial thermo-chemical state
+seed     =  15;                  % random perturbation seed
 smth     =  (N/25)^2;            % regularisation of initial random perturbation
-zlay     =  0.9;                 % layer thickness (relative to domain depth D)
+zlay     =  0.85;                % layer thickness (relative to domain depth D)
 wlay     =  0.001;               % thickness of smooth layer boundary (relative to domain depth D)
 T0       =  685;                 % temperature top layer [deg C]
 T1       =  1200;                % temperature base layer [deg C]
@@ -52,11 +53,11 @@ dsi      =  0;                   % stable isotope ratio random noise [delta]
 
 % set thermo-chemical boundary parameters
 Ptop     =  1e8;                 % top pressure [Pa]
-bndmode  =  0;                   % mode of wall cooling/outgassing/assimilation (0 = none; 1 = top only; 2 = top/bot only; 3 = all walls)
-Twall    =  nan;                 % wall temperature [degC] (nan = insulating)
+bndmode  =  1;                   % mode of wall cooling/outgassing/assimilation (0 = none; 1 = top only; 2 = top/bot only; 3 = all walls)
+Twall    =  500;                 % wall temperature [degC] (nan = insulating)
 dw       =  h;                   % boundary layer thickness for cooling/outgassing/assimilation [m]
 tau_T    =  6*hr;                % chamber wall cooling time [s]
-fwall    =  nan;                 % wall outgassing vesicularity [wt] (nan = no outgassing)
+fwall    =  0.02;                % wall outgassing vesicularity [wt] (nan = no outgassing)
 tau_f    =  1/10*hr;             % wall outgassing time [s]
 cwall    =  nan;                 % wall major component [wt SiO2] (nan = no assimilation)
 vwall    =  nan;                 % wall volatile component [wt H2O] (nan = no assimilation)
@@ -90,11 +91,19 @@ DLx      = -400e3;               % latent heat [J/kg]
 DLf      =  500e3;               % latent heat [J/kg]
 
 % set model rheology parameters
-etam     =  1e3;                 % melt viscosity [Pas]
-etaf     =  1e0;                 % fluid viscosity [Pas]
-etax     =  1e15;                % crystal viscosity [Pas]
+etam0    =  1e3;                 % melt viscosity [Pas]
+etaf0    =  1e-1;                % fluid viscosity [Pas]
+etax0    =  1e15;                % crystal viscosity [Pas]
+phic     =  0.5;                 % close packing bubble fraction [vol]
+chic     =  0.5;                 % close packing crystal fraction [vol]
 A        = -1.0;                 % bubble weakening exponent
 B        =  2.0;                 % crystal stiffening exponent
+lambda   =  30;                  % melt-weakening of crystal viscosity [1]
+Fmc      =  1e+5;                % major component weakening factor of melt viscosity [1]
+Fmv      =  0.3;                 % volatile component weakening factor of melt viscosity [1]
+Fxc      =  1e-5;                % major component weakening factor of crystal viscosity [1]
+Em       =  150e3;               % activation energy melt viscosity [J/mol]
+Ex       =  250e3;               % activation energy crystal viscosity [J/mol]
 
 % set model buoyancy parameters
 rhom0    =  3000;                % melt phase ref. density [kg/m3] (at T0,cphs0,Ptop)
@@ -119,7 +128,8 @@ atol     =  1e-6;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its
 alpha    =  0.8;                % iterative lag parameter equilibration
 delta    =  0;                   % regularisation of settling speed
-etactr   =  1e6;                 % minimum viscosity for regularisation
+etamin   =  1e2;                 % minimum viscosity for stabilisation
+etamax   =  1e8;                 % maximum viscosity for stabilisation
 TINY     =  1e-16;               % minimum cutoff phase, component fractions
 
 % create output directory

@@ -1,7 +1,7 @@
 clear; close all;
 
 % set run parameters
-runID    =  'fract';             % run identifier
+runID    =  'rchrg';             % run identifier
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  10;                  % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on (1) to live plot results
@@ -26,30 +26,30 @@ dt       =  1;                   % initial time step [s]
 % set initial thermo-chemical state
 seed     =  15;                  % random perturbation seed
 smth     =  (N/25)^2;            % regularisation of initial random perturbation
-zlay     =  0.0;                 % layer thickness (relative to domain depth D)
+zlay     =  0.85;                % layer thickness (relative to domain depth D)
 wlay     =  0.001;               % thickness of smooth layer boundary (relative to domain depth D)
-T0       =  1200;                 % temperature top layer [deg C]
+T0       =  685;                 % temperature top layer [deg C]
 T1       =  1200;                % temperature base layer [deg C]
 dT       =  2;                   % amplitude of random noise [deg C]
-c0       =  0.48;                % major component top layer [wt SiO2]
+c0       =  0.66;                % major component top layer [wt SiO2]
 c1       =  0.48;                % major component base layer [wt SiO2]
 dc       =  0.00;                % amplitude of random noise [wt SiO2]
 v0       =  0.03;                % volatile component top layer [wt H2O]
-v1       =  0.03;                % volatile component base layer [wt H2O]
+v1       =  0.02;                % volatile component base layer [wt H2O]
 dv       =  0.00;                % amplitude of random noise [wt H2O]
 
 % set model trace and isotope geochemistry parameters
-it0      =  1;                   % incompatible tracer top layer [wt ppm]
+it0      =  10;                  % incompatible tracer top layer [wt ppm]
 it1      =  1;                   % incompatible tracer base layer [wt ppm]
 dit      =  0.0;                 % incompatible tracer random noise [wt ppm]
 KIT      =  1e-2;                % incompatible tracer partition coefficient
 ct0      =  1;                   % compatible tracer top layer [wt ppm]
-ct1      =  1;                   % compatible tracer base layer [wt ppm]
+ct1      =  10;                  % compatible tracer base layer [wt ppm]
 dct      =  -0.0;                % compatible tracer random noise [wt ppm]
 KCT      =  1e2;                 % compatible tracer partition coefficient
-si0      =  0;                   % stable isotope ratio top layer [delta]
-si1      =  0;                   % stable isotope ratio base layer [delta]
-dsi      =  1;                   % stable isotope ratio random noise [delta]
+si0      =  -5;                  % stable isotope ratio top layer [delta]
+si1      =  5;                   % stable isotope ratio base layer [delta]
+dsi      =  0;                   % stable isotope ratio random noise [delta]
 
 % set thermo-chemical boundary parameters
 Ptop     =  1e8;                 % top pressure [Pa]
@@ -57,7 +57,7 @@ bndmode  =  1;                   % mode of wall cooling/outgassing/assimilation 
 Twall    =  500;                 % wall temperature [degC] (nan = insulating)
 dw       =  h;                   % boundary layer thickness for cooling/outgassing/assimilation [m]
 tau_T    =  2*hr;                % chamber wall cooling time [s]
-fwall    =  0.01;                % wall outgassing vesicularity [wt] (nan = no outgassing)
+fwall    =  0.02;                % wall outgassing vesicularity [wt] (nan = no outgassing)
 tau_f    =  1/10*hr;             % wall outgassing time [s]
 cwall    =  nan;                 % wall major component [wt SiO2] (nan = no assimilation)
 vwall    =  nan;                 % wall volatile component [wt H2O] (nan = no assimilation)

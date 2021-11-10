@@ -116,10 +116,10 @@ if plot_op
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\eta$ [log$_{10}$ Pas]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
     axes(ax(33));
     imagesc(X(2:end-1),Z(2:end-1),Gx(2:end-1,2:end-1)); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\Gamma_\chi$ [1/s]'],TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:}); xlabel('Width [m]',TX{:},FS{:});
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\Gamma_\chi$ [kg/m$^3$/s]'],TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:}); xlabel('Width [m]',TX{:},FS{:});
     axes(ax(34));
     imagesc(X(2:end-1),Z(2:end-1),Gf(2:end-1,2:end-1)); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\Gamma_\phi$ [1/s]'],TX{:},FS{:}); xlabel('Width [m]',TX{:},FS{:}); set(gca,'YTickLabel',[]);
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\Gamma_\phi$ [kg/m$^3$/s]'],TX{:},FS{:}); xlabel('Width [m]',TX{:},FS{:}); set(gca,'YTickLabel',[]);
 %     axes(ax(33));
 %     imagesc(X(2:end-1),Z(2:end-1),log10(eII(2:end-1,2:end-1))); axis ij equal tight; box on; cb = colorbar;
 %     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\varepsilon_{II}$ [log$_{10}$ 1/s]'],TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:}); xlabel('Width [m]',TX{:},FS{:});

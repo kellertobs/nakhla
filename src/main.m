@@ -13,7 +13,7 @@ Nx = length(X);
 Nz = length(Z);
 
 % get smoothed initialisation field
-rng(15);
+rng(seed);
 rp = randn(Nz,Nx);
 for i = 1:round(smth)
     rp(2:end-1,2:end-1) = rp(2:end-1,2:end-1) + diff(rp(:,2:end-1),2,1)./8 + diff(rp(2:end-1,:),2,2)./8;
@@ -119,7 +119,7 @@ dxdt   =  0.*x;  diff_x = 0.*x;  diff_si = 0.*si;
 dSImdt =  0.*si; dSIxdt = 0.*si; dITdt   = 0.*IT;  dCTdt = 0.*CT;
 
 eIIref =  1e-6;  
-Div_V  =  0.*P;  Div_rhomVm = 0.*P;  Div_rhoxVx = 0.*P;  Div_rhofVf = 0.*P;
+Div_V  =  0.*P;  Div_rhoV = 0.*P;  Div_rhoVo = Div_rhoV;
 exx    =  0.*P;  ezz = 0.*P;  exz = zeros(size(f)-1);  eII = 0.*P;  
 txx    =  0.*P;  tzz = 0.*P;  txz = zeros(size(f)-1);  tII = 0.*P; 
 dVoldt =  0;  VolSrc = 0.*P;  drhodt = 0.*P;  drhodto = 0.*P;
@@ -147,9 +147,7 @@ if restart
     step = step+1;
     update;
 else
-
     update; output;
-
 end
 
 % physical time stepping loop
@@ -181,6 +179,7 @@ while time <= tend && step <= M
     dCTdto  = dCTdt;
     dSImdto = dSImdt;
     dSIxdto = dSIxdt;
+    Div_rhoVo = Div_rhoV;
     Pto     = Pt;
     dto     = dt;
     

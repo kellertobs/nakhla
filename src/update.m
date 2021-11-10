@@ -19,17 +19,20 @@ rhoBF  = (rho(2:end-2,2:end-1)+rho(3:end-1,2:end-1))./2 - rhoref;          % rel
 Pt     = Ptop + rhoref.*g0.*ZZ + P;                                        % total pressure
 
 % update thermal properties
-rhoCp  = mu.*rhom.*Cpm + chi.*rhox.*Cpx + phi.*rhof.*Cpf;                        % magma heat capacity density
+rhoCp  = mu.*rhom.*Cpm + chi.*rhox.*Cpx + phi.*rhof.*Cpf;                  % magma heat capacity density
 kT     = mu.*kTm + chi.*kTx + phi.*kTf;                                    % magma thermal conductivity
 
 % update effective viscosity
-eta   = etam .* max(1e-6,1-min(1-TINY,phi/0.5)).^-A .* max(1e-6,1-min(1-TINY,chi/0.5)).^-B;        % bubble-crystal-dep. magma viscosity
-eta   = 1./(1./(eta + etaf) + 1./etax./exp(-30.*min(0.5,1-chi)));
-eta   = 1./(1./(eta + geomean(eta(:))./sqrt(etactr)) + 1./(geomean(eta(:)).*sqrt(etactr)));
-% for d = 1:ceil(1)
-%     dd  = delta/ceil(1);
-%     eta = eta + dd.*(diff(eta([1,1:end,end],:),2,1)./8 + diff(eta(:,[1,1:end,end]),2,2)./8);
-% end
+etam  = etam0 .* exp(Em./(8.3145.*(T+273.15))-Em./(8.3145.*((Tphs0+Tphs1)/2+273.15))) ...
+              .* Fmc.^(cm-(cphs0+cphs1)/2) .* Fmv.^(vm./0.01) ...
+              .* max(1e-6,1-min(1-TINY,phi/phic)).^-A .* max(1e-6,1-min(1-TINY,chi/chic)).^-B; % T-c-v-chi-phi-dep. melt viscosity
+etax  = etax0 .* exp(Ex./(8.3145.*(T+273.15))-Ex./(8.3145.*(Tphs0+273.15))) ...
+              .* Fxc.^(cx-(cphs0+cphs1)/2) ...
+              .* exp(-lambda.*min(chic,1-chi));                            % T-c-v-chi-phi-dep. crystal viscosity
+etaf  = etaf0.* ones(size(f));                                             % constant volatile fluid viscosity
+eta   = 1./(1./(etam + etaf) + 1./etax);                                   % effective magma viscosity
+eta   = 1./(1./(eta + etamin) + 1./etamax);                                % limit viscosity range
+
 etac  = (eta(1:end-1,1:end-1)+eta(2:end,1:end-1) ...                       % viscosity in cell corners
       +  eta(1:end-1,2:end  )+eta(2:end,2:end  ))./4;
   
@@ -69,7 +72,7 @@ if bndmode==3; sds = -1;      % no slip
 else;          sds = +1; end  % free slip
 
 wf = 2/9   .* ((rhof(1:end-1,:)+rhof(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0*df^2./((eta(1:end-1,:)+eta(2:end,:))/2) ...  % bubble flotation speed
-   + 1/500 .* ((rhof(1:end-1,:)+rhof(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0*dx^2.*((phi(1:end-1,:)+phi(2:end,:))/2).^2./etaf; % fluid percolation speed
+   + 1/500 .* ((rhof(1:end-1,:)+rhof(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0*dx^2.*((phi(1:end-1,:)+phi(2:end,:))/2).^2./((etaf(1:end-1,:)+etaf(2:end,:))/2); % fluid percolation speed
 wf([1 end],:) = 0;
 wf(:,[1 end]) = sds*wf(:,[2 end-1]);
 for d = 1:delta
@@ -87,7 +90,7 @@ for d = 1:delta
     wx(:,[1 end]) = sds*wx(:,[2 end-1]);
 end
 
-wm = 1/50 .* ((rhom(1:end-1,:)+rhom(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0*dx^2.*((mu(1:end-1,:)+mu(2:end,:))/2).^2./etam; % melt percolation speed
+wm = 1/50 .* ((rhom(1:end-1,:)+rhom(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0*dx^2.*((mu(1:end-1,:)+mu(2:end,:))/2).^2./((etam(1:end-1,:)+etam(2:end,:))/2); % melt percolation speed
 wm([1 end],:) = 0;
 wm(:,[1 end]) = sds*wm(:,[2 end-1]);
 for d = 1:delta
@@ -109,7 +112,7 @@ Div_rhov =  + advection(rhom.*mu ,0.*U,wm,h,ADVN,'flx') ...
             + advection(rhof.*phi,0.*U,wf,h,ADVN,'flx') ...
             + advection(rhox.*chi,0.*U,wx,h,ADVN,'flx') ...
             + advection(rho      ,U   ,W ,h,ADVN,'adv');
-VolSrc = -((rho-rhoo)./dt + Div_rhov)./rho;
+VolSrc = -((rho-rhoo)./dt + (Div_rhov + Div_rhoVo)/2)./rho;
 % VolSrc  = alpha.*VolSrc + (1-alpha).*VolSrci;
 
 dVoldt = mean(mean(VolSrc(2:end-1,2:end-1)));

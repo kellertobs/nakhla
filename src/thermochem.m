@@ -43,7 +43,7 @@ if ~isotherm
         
     dHdt = - advn_H + diff_T + cool;                                       % total rate of change
     
-    if step>0; H = Ho + (theta.*dHdt + (1-theta).*dHdto).*dt; end          % explicit update of enthalpy
+    H = Ho + (theta.*dHdt + (1-theta).*dHdto).*dt;          % explicit update of enthalpy
     H([1 end],:) = H([2 end-1],:);                                         % apply boundary conditions
     H(:,[1 end]) = H(:,[2 end-1]);    
     
@@ -67,7 +67,7 @@ if ~isochem
     
     dCdt = - advn_C + diff_c + assim;                                      % total rate of change
     
-    if step>0; C = Co + (theta.*dCdt + (1-theta).*dCdto).*dt; end          % explicit update of major component density
+    C = Co + (theta.*dCdt + (1-theta).*dCdto).*dt;          % explicit update of major component density
     C = min(rho.*cphs1-TINY,max(rho.*cphs0+TINY, C ));
     C([1 end],:) = C([2 end-1],:);                                         % apply boundary conditions
     C(:,[1 end]) = C(:,[2 end-1]);  
@@ -89,7 +89,7 @@ if ~isochem
     
     dVdt = - advn_V + diff_v + outgas + assim;                             % total rate of change
     
-    if step>0; V = Vo + (theta.*dVdt + (1-theta).*dVdto).*dt; end          % explicit update of volatile component density
+    V = Vo + (theta.*dVdt + (1-theta).*dVdto).*dt;          % explicit update of volatile component density
     V = min(rho.*1-TINY,max(rho.*0+TINY, V ));
     V([1 end],:) = V([2 end-1],:);                                         % apply boundary conditions
     V(:,[1 end]) = V(:,[2 end-1]);  
@@ -112,14 +112,14 @@ v = V./rho;
 % update crystal fraction
 if diseq
     
-    Gxi = (xq-x)./max(4.*dt,tau_r);
-    Gx  = alpha.*Gx + (1-alpha).*Gxi;                                        % crystallisation rate
+    Gxi = (xq-x).*rho./max(4.*dt,tau_r);
+    Gx  = alpha.*Gx + (1-alpha).*Gxi;                                      % crystallisation rate
     
-    advn_x = advection(x,Ux,Wx,h,ADVN,'flx');                              % get advection term
+    advn_x = advection(rho.*x,Ux,Wx,h,ADVN,'flx');                         % get advection term
     
     dxdt   = - advn_x + Gx;                                                % total rate of change
     
-    if step>0; x = x + (theta.*dxdt + (1-theta).*dxdto).*dt; end           % explicit update of crystal fraction
+    x = (rhoo.*xo + (theta.*dxdt + (1-theta).*dxdto).*dt)./rho;            % explicit update of crystal fraction
     x = min(1-f-TINY,max(TINY,x));                                         % enforce [0,1] limit
     x([1 end],:) = x([2 end-1],:);                                         % apply boundary conditions
     x(:,[1 end]) = x(:,[2 end-1]);
@@ -133,7 +133,7 @@ else
     x  = alpha.*x + (1-alpha).*xq;
     cx = cxq;
     cm = cmq;
-    Gx = (x-xo)./dt + advection(x,Ux,Wx,h,ADVN,'flx');                     % reconstruct crystallisation rate
+    Gx = (rho.*x-rhoo.*xo)./dt + advection(rho.*x,Ux,Wx,h,ADVN,'flx');     % reconstruct crystallisation rate
     
 end
 
@@ -141,14 +141,14 @@ end
 % update bubble fraction
 if diseq
     
-    Gfi = (fq-f)./max(4.*dt,tau_r);
+    Gfi = (fq-f).*rho./max(4.*dt,tau_r);
     Gf  = alpha.*Gf + (1-alpha).*Gfi;
     
-    advn_f = advection(f,Uf,Wf,h,ADVN,'flx');                              % get advection term
+    advn_f = advection(rho.*f,Uf,Wf,h,ADVN,'flx');                         % get advection term
     
     dfdt   = - advn_f + Gf;                                                % total rate of change
     
-    if step>0; f = fo + (theta.*dfdt + (1-theta).*dfdto).*dt; end          % explicit update of bubble fraction
+    f = (rhoo.*fo + (theta.*dfdt + (1-theta).*dfdto).*dt)./rho;            % explicit update of bubble fraction
     f = min(1-x-TINY,max(TINY,f));                                         % enforce [0,1-x] limit
     f([1 end],:) = f([2 end-1],:);                                         % apply boundary conditions
     f(:,[1 end]) = f(:,[2 end-1]);
@@ -162,7 +162,7 @@ else
     f  = alpha.*f + (1-alpha).*fq;
     vf = vfq;
     vm = vmq;
-    Gf = (f-fo)./dt + advection(f,Uf,Wf,h,ADVN,'flx');                     % reconstruct exsolution rate
+    Gf = (rho.*f-rhoo.*fo)./dt + advection(rho.*f,Uf,Wf,h,ADVN,'flx');     % reconstruct exsolution rate
     
 end
 
@@ -194,7 +194,7 @@ if ~isnan(itwall); assim = assim + (itwall-it).*rho./tau_c .* bndshape; end % im
     
 dITdt = - advn_IT + diff_it + assim;                                       % total rate of change
 
-if step>0; IT = ITo + (theta.*dITdt + (1-theta).*dITdto).*dt; end          % explicit update
+IT = ITo + (theta.*dITdt + (1-theta).*dITdto).*dt;         % explicit update
 IT = max(0+TINY, IT );
 IT([1 end],:) = IT([2 end-1],:);                                           % boundary conditions
 IT(:,[1 end]) = IT(:,[2 end-1]);
@@ -222,7 +222,7 @@ if ~isnan(ctwall); assim = assim + (ctwall-ct).*rho./tau_c .* bndshape; end % im
 
 dCTdt = - advn_CT + diff_ct + assim;                                       % total rate of change
 
-if step>0; CT = CTo + (theta.*dCTdt + (1-theta).*dCTdto).*dt; end          % explicit update
+CT = CTo + (theta.*dCTdt + (1-theta).*dCTdto).*dt;          % explicit update
 CT = max(0+TINY, CT );
 CT([1 end],:) = CT([2 end-1],:);                                           % boundary conditions
 CT(:,[1 end]) = CT(:,[2 end-1]);
@@ -233,7 +233,7 @@ ct = CT./rho;
 % *****  STABLE ISOTOPE  **************************************************
 
 % reactive transfer of stable isotope ratio
-trns_si = Gx.*rho.*(sim.*double(Gx<0) + six.*double(Gx>=0));
+trns_si = Gx.*(sim.*double(Gx<0) + six.*double(Gx>=0));
 
 % update stable isotope ratio in melt
 advn_si = advection(SIm,Um,Wm,h,ADVN,'flx');
@@ -248,9 +248,9 @@ if ~isnan(siwall); assim = assim + (siwall-sim).*rhom.*mu./tau_c .* bndshape; en
 
 dSImdt = - advn_si + diff_si + assim - trns_si;                            % total rate of change
 
-if step>0; SIm = SImo + (theta.*dSImdt + (1-theta).*dSImdto).*dt; end      % explicit update
+SIm = SImo + (theta.*dSImdt + (1-theta).*dSImdto).*dt;      % explicit update
 SIm = min(max(si0-dsi,si1+dsi).*rhom.*mu,max(min(si0-dsi,si1+dsi).*rhom.*mu,SIm));
-SIm(mu<1e-3)   = SI(mu<1e-3);
+SIm(mu<1e-3)   = 0;
 SIm([1 end],:) = SIm([2 end-1],:);                                         % boundary conditions
 SIm(:,[1 end]) = SIm(:,[2 end-1]);
 
@@ -264,9 +264,9 @@ if ~isnan(siwall); assim = assim + (siwall-six).*rhox.*chi./tau_c .* bndshape; e
 
 dSIxdt = - advn_si + assim + trns_si;                             % total rate of change
 
-if step>0; SIx = SIxo + (theta.*dSIxdt + (1-theta).*dSIxdto).*dt; end      % explicit update
+SIx = SIxo + (theta.*dSIxdt + (1-theta).*dSIxdto).*dt;      % explicit update
 SIx = min(max(si0-dsi,si1+dsi).*rhox.*chi,max(min(si0-dsi,si1+dsi).*rhox.*chi,SIx));
-SIx(chi<1e-3)  = SI(chi<1e-3);
+SIx(chi<1e-3)  = 0;
 SIx([1 end],:) = SIx([2 end-1],:);                                         % boundary conditions
 SIx(:,[1 end]) = SIx(:,[2 end-1]);
 
