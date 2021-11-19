@@ -43,7 +43,7 @@ if ~isotherm
         
     dHdt = - advn_H + diff_T + cool;                                       % total rate of change
     
-    H = Ho + (theta.*dHdt + (1-theta).*dHdto).*dt;          % explicit update of enthalpy
+    H = Ho + (dHdt + dHdto)/2.*dt;          % explicit update of enthalpy
     H([1 end],:) = H([2 end-1],:);                                         % apply boundary conditions
     H(:,[1 end]) = H(:,[2 end-1]);    
     
@@ -67,7 +67,7 @@ if ~isochem
     
     dCdt = - advn_C + diff_c + assim;                                      % total rate of change
     
-    C = Co + (theta.*dCdt + (1-theta).*dCdto).*dt;          % explicit update of major component density
+    C = Co + (dCdt + dCdto)/2.*dt;                                         % explicit update of major component density
     C = min(rho.*cphs1-TINY,max(rho.*cphs0+TINY, C ));
     C([1 end],:) = C([2 end-1],:);                                         % apply boundary conditions
     C(:,[1 end]) = C(:,[2 end-1]);  
@@ -89,7 +89,7 @@ if ~isochem
     
     dVdt = - advn_V + diff_v + outgas + assim;                             % total rate of change
     
-    V = Vo + (theta.*dVdt + (1-theta).*dVdto).*dt;          % explicit update of volatile component density
+    V = Vo + (dVdt + dVdto)/2.*dt;                                         % explicit update of volatile component density
     V = min(rho.*1-TINY,max(rho.*0+TINY, V ));
     V([1 end],:) = V([2 end-1],:);                                         % apply boundary conditions
     V(:,[1 end]) = V(:,[2 end-1]);  
@@ -106,7 +106,8 @@ v = V./rho;
 
 %% *****  UPDATE LOCAL PHASE EQUILIBRIUM  *********************************
 
-[xq,cxq,cmq,fq,vfq,vmq] = equilibrium(x,f,(T+To)./2,(c+co)./2,(v+vo)./2,(Pt+Pto)./2,Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg);
+% [xq,cxq,cmq,fq,vfq,vmq] = equilibrium(x,f,(T+To)./2,(c+co)./2,(v+vo)./2,(Pt+Pto)./2,Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg);
+[xq,cxq,cmq,fq,vfq,vmq] = equilibrium(x,f,T,c,v,Pt,Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg);
 
     
 % update crystal fraction
@@ -119,7 +120,7 @@ if diseq
     
     dxdt   = - advn_x + Gx;                                                % total rate of change
     
-    x = (rhoo.*xo + (theta.*dxdt + (1-theta).*dxdto).*dt)./rho;            % explicit update of crystal fraction
+    x = (rhoo.*xo + (dxdt + dxdto)/2.*dt)./rho;                            % explicit update of crystal fraction
     x = min(1-f-TINY,max(TINY,x));                                         % enforce [0,1] limit
     x([1 end],:) = x([2 end-1],:);                                         % apply boundary conditions
     x(:,[1 end]) = x(:,[2 end-1]);
@@ -148,7 +149,7 @@ if diseq
     
     dfdt   = - advn_f + Gf;                                                % total rate of change
     
-    f = (rhoo.*fo + (theta.*dfdt + (1-theta).*dfdto).*dt)./rho;            % explicit update of bubble fraction
+    f = (rhoo.*fo + (dfdt + dfdto)/2.*dt)./rho;                            % explicit update of bubble fraction
     f = min(1-x-TINY,max(TINY,f));                                         % enforce [0,1-x] limit
     f([1 end],:) = f([2 end-1],:);                                         % apply boundary conditions
     f(:,[1 end]) = f(:,[2 end-1]);
@@ -194,7 +195,7 @@ if ~isnan(itwall); assim = assim + (itwall-it).*rho./tau_c .* bndshape; end % im
     
 dITdt = - advn_IT + diff_it + assim;                                       % total rate of change
 
-IT = ITo + (theta.*dITdt + (1-theta).*dITdto).*dt;         % explicit update
+IT = ITo + (dITdt + dITdto)/2.*dt;                                           % explicit update
 IT = max(0+TINY, IT );
 IT([1 end],:) = IT([2 end-1],:);                                           % boundary conditions
 IT(:,[1 end]) = IT(:,[2 end-1]);
@@ -222,7 +223,7 @@ if ~isnan(ctwall); assim = assim + (ctwall-ct).*rho./tau_c .* bndshape; end % im
 
 dCTdt = - advn_CT + diff_ct + assim;                                       % total rate of change
 
-CT = CTo + (theta.*dCTdt + (1-theta).*dCTdto).*dt;          % explicit update
+CT = CTo + (dCTdt + dCTdto)/2.*dt;                                         % explicit update
 CT = max(0+TINY, CT );
 CT([1 end],:) = CT([2 end-1],:);                                           % boundary conditions
 CT(:,[1 end]) = CT(:,[2 end-1]);
@@ -248,7 +249,7 @@ if ~isnan(siwall); assim = assim + (siwall-sim).*rhom.*mu./tau_c .* bndshape; en
 
 dSImdt = - advn_si + diff_si + assim - trns_si;                            % total rate of change
 
-SIm = SImo + (theta.*dSImdt + (1-theta).*dSImdto).*dt;      % explicit update
+SIm = SImo + (dSImdt + dSImdto)/2.*dt;                % explicit update
 SIm = min(max(si0-dsi,si1+dsi).*rhom.*mu,max(min(si0-dsi,si1+dsi).*rhom.*mu,SIm));
 SIm(mu<1e-3)   = 0;
 SIm([1 end],:) = SIm([2 end-1],:);                                         % boundary conditions
@@ -262,9 +263,9 @@ advn_si = advection(SIx,Ux,Wx,h,ADVN,'flx');
 assim = zeros(size(si));
 if ~isnan(siwall); assim = assim + (siwall-six).*rhox.*chi./tau_c .* bndshape; end % impose wall assimilation
 
-dSIxdt = - advn_si + assim + trns_si;                             % total rate of change
+dSIxdt = - advn_si + assim + trns_si;                                      % total rate of change
 
-SIx = SIxo + (theta.*dSIxdt + (1-theta).*dSIxdto).*dt;      % explicit update
+SIx = SIxo + (dSIxdt + dSIxdto)/2.*dt;                                     % explicit update
 SIx = min(max(si0-dsi,si1+dsi).*rhox.*chi,max(min(si0-dsi,si1+dsi).*rhox.*chi,SIx));
 SIx(chi<1e-3)  = 0;
 SIx([1 end],:) = SIx([2 end-1],:);                                         % boundary conditions
@@ -275,24 +276,5 @@ six = SIx./rhox./max(1e-3,chi);
 SI = SIm + SIx;
 SI = min(max(si0-dsi,si1+dsi).*rho.*(1-f),max(min(si0-dsi,si1+dsi).*rho.*(1-f),SI));
 si = SI./rho./max(TINY,1-f);
-
-
-% % update stable isotope composition
-% advn_si = advection(mu .*si,Um,Wm,h,ADVN,'flx') ...
-%         + advection(chi.*si,Ux,Wx,h,ADVN,'flx');
-% 
-% qz   = - kc.*(mu(1:end-1,:)+mu(2:end,:))/2 .* ddz(si,h);
-% qx   = - kc.*(mu(:,1:end-1)+mu(:,2:end))/2 .* ddx(si,h);
-% diff_si(2:end-1,2:end-1) = - ddz(qz(:,2:end-1),h) ...                      % diffusion in melt
-%                            - ddx(qx(2:end-1,:),h);
-%                        
-% assim = zeros(size(si));
-% if ~isnan(siwall); assim = assim + (siwall-si).*rho./tau_c .* bndshape; end % impose wall assimilation
-% 
-% dsidt = - advn_si + diff_si + assim;                                       % total rate of change
-% 
-% if step>0; si = sio + (theta.*dsidt + (1-theta).*dsidto).*dt; end          % explicit update
-% si([1 end],:) = si([2 end-1],:);                                           % boundary conditions
-% si(:,[1 end]) = si(:,[2 end-1]);
 
 

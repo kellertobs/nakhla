@@ -1,9 +1,9 @@
 %%*****  UPDATE PARAMETERS & AUXILIARY FIELDS  ****************************
 
 % update phase densities
-rhom = alpha.*rhom + (1-alpha).*rhom0 .* (1 - aTm.*(T-Tphs0) - gCm.*(cm-cphs0));
-rhox = alpha.*rhox + (1-alpha).*rhox0 .* (1 - aTx.*(T-Tphs0) - gCx.*(cx-cphs0));
-rhof = alpha.*rhof + (1-alpha).*rhof0 .* (1 - aTf.*(T-Tphs0) + bPf.*(Pt-Ptop));
+rhom = rhom0 .* (1 - aTm.*(T-Tphs0) - gCm.*(cm-cphs0));
+rhox = rhox0 .* (1 - aTx.*(T-Tphs0) - gCx.*(cx-cphs0));
+rhof = rhof0 .* (1 - aTf.*(T-Tphs0) + bPf.*(Pt-Ptop));
 
 % convert weight to volume fraction, update bulk density
 res = 1;    tol = 1e-15;
@@ -15,7 +15,8 @@ while res > tol
     rho  = mu.*rhom + chi.*rhox + phi.*rhof;
     res  = (norm(chi(:)-chii(:),2) + norm(phi(:)-phii(:),2))./sqrt(2*length(chi(:)));
 end
-rhoBF  = (rho(2:end-2,2:end-1)+rho(3:end-1,2:end-1))./2 - rhoref;          % relative density for bouancy force term
+rhoBF  = ((rho(2:end-2,2:end-1)+rhoo(2:end-2,2:end-1))/2 ...
+         +(rho(3:end-1,2:end-1)+rhoo(3:end-1,2:end-1))/2)/2 - rhoref;      % relative density for bouancy force term
 Pt     = Ptop + rhoref.*g0.*ZZ + P;                                        % total pressure
 
 % update thermal properties
@@ -108,12 +109,11 @@ Wm   = W + wm;                                                             % mlt
 Um   = U + 0.;                                                             % mlt x-velocity
 
 % update volume source
-Div_rhov =  + advection(rhom.*mu ,0.*U,wm,h,ADVN,'flx') ...
+Div_rhoV =  + advection(rhom.*mu ,0.*U,wm,h,ADVN,'flx') ...
             + advection(rhof.*phi,0.*U,wf,h,ADVN,'flx') ...
             + advection(rhox.*chi,0.*U,wx,h,ADVN,'flx') ...
-            + advection(rho      ,U   ,W ,h,ADVN,'adv');
-VolSrc = -((rho-rhoo)./dt + (Div_rhov + Div_rhoVo)/2)./rho;
-% VolSrc  = alpha.*VolSrc + (1-alpha).*VolSrci;
+            + advection(rho      ,U   ,W ,h,ADVN,'flx');
+VolSrc = -((rho-rhoo)./dt + (Div_rhoV - rho.*Div_V + Div_rhoVo)/2)./(rho/2);
 
 dVoldt = mean(mean(VolSrc(2:end-1,2:end-1)));
 UBG    = - dVoldt./2 .* (L/2-XXu);
