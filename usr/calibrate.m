@@ -1,10 +1,12 @@
 % calibrate phase diagram
 clear; addpath('../src');
 
-% hold figures or plot new ones,choose line style
-holdfig   = 0;    % set to 1 to hold figures, to 0 for new figures
-linestyle = '-';
-    
+% calibration run options
+runID     = 'Krafla_074_003';    % run ID for output files; [system name_wt.% SiO2_wt.% H2O] 
+holdfig   = 0;                   % set to 1 to hold figures, to 0 for new figures
+linestyle = '-';                 % set line style for plots
+save_plot = 1;                   % turn on (1) to save output file in /out directory
+
 % set parameters
 cphs0    =  0.36;                % phase diagram lower bound composition [wt SiO2]
 cphs1    =  0.72;                % phase diagram upper bound composition [wt SiO2]
@@ -18,10 +20,10 @@ clap     =  1e-7;                % Clapeyron slope for P-dependence of melting T
 dTH2O    =  1300;                % solidus shift from water content [degC/wt^0.75]
 
 % calculate T-dependence of melting model
-T = linspace(600,1600,1e3);    % temperature [degC]
-c = 0.52   .*ones(size(T));    % major component [wt SiO2]
-v = 0.01   .*ones(size(T));    % volatile component [wt H2O]
-P = 1e8    .*ones(size(T));    % pressure [Pa]
+T = linspace(500,1600,1e3);    % temperature [degC]
+c = 0.55   .*ones(size(T));    % major component [wt SiO2]
+v = 0.02   .*ones(size(T));    % volatile component [wt H2O]
+P = 125e6  .*ones(size(T));    % pressure [Pa]
 
 % equilibrium phase fractions and compositions
 [xq,cxq,cmq,fq,vfq,vmq]  =  equilibrium(ones(size(T)).*0.5,ones(size(T)).*0.0, ...
@@ -107,3 +109,22 @@ set(gca,'TickLabelInterpreter','latex','FontSize',15)
 title('Mineral assemblage','Interpreter','latex','FontSize',22)
 xlabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',18)
 ylabel('Mineral fraction [wt]','Interpreter','latex','FontSize',18)
+
+% create output directory
+if ~isfolder(['../out/',runID])
+    mkdir(['../out/',runID]);
+end
+
+% save output to file
+if save_plot
+    name = ['../out/',runID,'/',runID,'_calibrate_phase_diagram'];
+    print(figure(1),name,'-dpng','-r300','-opengl');
+    name = ['../out/',runID,'/',runID,'_calibrate_melt_model'];
+    print(figure(2),name,'-dpng','-r300','-opengl');
+    name = ['../out/',runID,'/',runID,'_calibrate_maj_compnt'];
+    print(figure(3),name,'-dpng','-r300','-opengl');
+    name = ['../out/',runID,'/',runID,'_calibrate_vol_compnt'];
+    print(figure(4),name,'-dpng','-r300','-opengl');
+    name = ['../out/',runID,'/',runID,'_calibrate_minerals'];
+    print(figure(5),name,'-dpng','-r300','-opengl');
+end
