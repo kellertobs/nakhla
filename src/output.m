@@ -92,17 +92,17 @@ if plot_op
     % plot thermo-chemical solution in Fig. 2
     figure(2);
     axes(ax(21));
-    imagesc(X(2:end-1),Z(2:end-1),chi(2:end-1,2:end-1) ); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\chi$ [vol]'],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel('Depth [m]',TX{:},FS{:});
+    imagesc(X(2:end-1),Z(2:end-1),chi(2:end-1,2:end-1).*100 ); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\chi$ [vol\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel('Depth [m]',TX{:},FS{:});
     text(L/2,0.9*D,['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','w','VerticalAlignment','middle','HorizontalAlignment','center');
     axes(ax(22));
-    imagesc(X(2:end-1),Z(2:end-1),phi(2:end-1,2:end-1) ); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\phi$ [vol]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
+    imagesc(X(2:end-1),Z(2:end-1),phi(2:end-1,2:end-1).*100 ); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\phi$ [vol\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
     axes(ax(23));
-    imagesc(X(2:end-1),Z(2:end-1),c(2:end-1,2:end-1) ); axis ij equal tight; box on; cb = colorbar;
+    imagesc(X(2:end-1),Z(2:end-1),c(2:end-1,2:end-1).*100 ); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$c$ [wt\% SiO$_2$]'],TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:}); xlabel('Width [m]',TX{:},FS{:});
     axes(ax(24));
-    imagesc(X(2:end-1),Z(2:end-1),v(2:end-1,2:end-1)); axis ij equal tight; box on; cb = colorbar;
+    imagesc(X(2:end-1),Z(2:end-1),v(2:end-1,2:end-1).*100); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$v$ [wt\% H$_2$O]'],TX{:},FS{:}); xlabel('Width [m]',TX{:},FS{:}); set(gca,'YTickLabel',[]);
     
     % plot density and rheology fields in Fig. 3
@@ -256,4 +256,6 @@ if save_op
         diary(logfile)
     end
 end
+
+clear fh1 fh2 fh3 fh4 fh5 fh6 fh7 fh8
     
