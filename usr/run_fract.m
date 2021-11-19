@@ -3,18 +3,18 @@ clear; close all;
 % set run parameters
 runID    =  'fract';             % run identifier
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
-nop      =  10;                  % output frame plotted/saved every 'nop' time steps
+nop      =  1;                  % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on (1) to live plot results
-save_op  =  1;                   % switch on (1) to save output to file
+save_op  =  0;                   % switch on (1) to save output to file
 plot_cv  =  1;                   % switch on (1) to live plot iterative convergence
 isotherm =  0;                   % switch on (1) isothermal mode
 isochem  =  0;                   % switch on (1) isochemical mode
-diseq    =  1;                   % disequilibrium phase evolution
+diseq    =  0;                   % disequilibrium phase evolution
 
 % set model domain parameters
 D        =  10;                  % chamber depth [m]
 L        =  10;                  % chamber width [m]
-N        =  100 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
+N        =  120 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
 h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
@@ -28,8 +28,8 @@ seed     =  15;                  % random perturbation seed
 smth     =  (N/25)^2;            % regularisation of initial random perturbation
 zlay     =  0.0;                 % layer thickness (relative to domain depth D)
 wlay     =  0.001;               % thickness of smooth layer boundary (relative to domain depth D)
-T0       =  1200;                 % temperature top layer [deg C]
-T1       =  1200;                % temperature base layer [deg C]
+T0       =  1150;                % temperature top layer [deg C]
+T1       =  1150;                % temperature base layer [deg C]
 dT       =  2;                   % amplitude of random noise [deg C]
 c0       =  0.48;                % major component top layer [wt SiO2]
 c1       =  0.48;                % major component base layer [wt SiO2]
@@ -56,8 +56,8 @@ Ptop     =  1e8;                 % top pressure [Pa]
 bndmode  =  1;                   % mode of wall cooling/outgassing/assimilation (0 = none; 1 = top only; 2 = top/bot only; 3 = all walls)
 Twall    =  500;                 % wall temperature [degC] (nan = insulating)
 dw       =  h;                   % boundary layer thickness for cooling/outgassing/assimilation [m]
-tau_T    =  2*hr;                % chamber wall cooling time [s]
-fwall    =  0.01;                % wall outgassing vesicularity [wt] (nan = no outgassing)
+tau_T    =  5*hr;                % chamber wall cooling time [s]
+fwall    =  0.02;                % wall outgassing vesicularity [wt] (nan = no outgassing)
 tau_f    =  1/10*hr;             % wall outgassing time [s]
 cwall    =  nan;                 % wall major component [wt SiO2] (nan = no assimilation)
 vwall    =  nan;                 % wall volatile component [wt H2O] (nan = no assimilation)
@@ -122,11 +122,10 @@ g0       =  10.;                 % gravity [m/s2]
 % set numerical model parameters
 CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 ADVN     =  'FRM';               % advection scheme ('UPW2', 'UPW3', or 'FRM')
-theta    =  0.50;                % time-stepping scheme selector (1=BE, 1/2=CN, 0=FE)
 rtol     =  1e-3;                % outer its relative tolerance
 atol     =  1e-6;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its
-alpha    =  0.8;                % iterative lag parameter equilibration
+alpha    =  0.8;                 % iterative lag parameter equilibration
 delta    =  0;                   % regularisation of settling speed
 etamin   =  1e2;                 % minimum viscosity for stabilisation
 etamax   =  1e8;                 % maximum viscosity for stabilisation
