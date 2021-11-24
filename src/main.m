@@ -170,6 +170,7 @@ while time <= tend && step <= M
     ITo     = IT;
     CTo     = CT;
     rhoo    = rho;
+    etao    = eta;
     dHdto   = dHdt;
     dCdto   = dCdt;
     dVdto   = dVdt;

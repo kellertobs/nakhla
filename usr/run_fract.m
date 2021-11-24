@@ -53,7 +53,7 @@ dsi      =  1;                   % stable isotope ratio random noise [delta]
 
 % set thermo-chemical boundary parameters
 Ptop     =  1e8;                 % top pressure [Pa]
-bndmode  =  1;                   % mode of wall cooling/outgassing/assimilation (0 = none; 1 = top only; 2 = top/bot only; 3 = all walls)
+bndmode  =  3;                   % mode of wall cooling/outgassing/assimilation (0 = none; 1 = top only; 2 = top/bot only; 3 = all walls)
 Twall    =  500;                 % wall temperature [degC] (nan = insulating)
 dw       =  h;                   % boundary layer thickness for cooling/outgassing/assimilation [m]
 tau_T    =  5*hr;                % chamber wall cooling time [s]
@@ -98,12 +98,9 @@ phic     =  0.5;                 % close packing bubble fraction [vol]
 chic     =  0.5;                 % close packing crystal fraction [vol]
 A        = -1.0;                 % bubble weakening exponent
 B        =  2.0;                 % crystal stiffening exponent
-lambda   =  30;                  % melt-weakening of crystal viscosity [1]
 Fmc      =  1e+5;                % major component weakening factor of melt viscosity [1]
 Fmv      =  0.3;                 % volatile component weakening factor of melt viscosity [1]
-Fxc      =  1e-5;                % major component weakening factor of crystal viscosity [1]
 Em       =  150e3;               % activation energy melt viscosity [J/mol]
-Ex       =  250e3;               % activation energy crystal viscosity [J/mol]
 
 % set model buoyancy parameters
 rhom0    =  3000;                % melt phase ref. density [kg/m3] (at T0,cphs0,Ptop)
@@ -125,7 +122,7 @@ ADVN     =  'FRM';               % advection scheme ('UPW2', 'UPW3', or 'FRM')
 rtol     =  1e-3;                % outer its relative tolerance
 atol     =  1e-6;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its
-alpha    =  0.8;                 % iterative lag parameter equilibration
+alpha    =  0.75;                % iterative lag parameter equilibration
 delta    =  0;                   % regularisation of settling speed
 etamin   =  1e2;                 % minimum viscosity for stabilisation
 etamax   =  1e8;                 % maximum viscosity for stabilisation

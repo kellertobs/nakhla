@@ -15,8 +15,9 @@ while res > tol
     rho  = mu.*rhom + chi.*rhox + phi.*rhof;
     res  = (norm(chi(:)-chii(:),2) + norm(phi(:)-phii(:),2))./sqrt(2*length(chi(:)));
 end
-rhoBF  = ((rho(2:end-2,2:end-1)+rhoo(2:end-2,2:end-1))/2 ...
-         +(rho(3:end-1,2:end-1)+rhoo(3:end-1,2:end-1))/2)/2 - rhoref;      % relative density for bouancy force term
+% rhoBF  = ((rho(2:end-2,2:end-1)+rhoo(2:end-2,2:end-1))/2 ...
+%          +(rho(3:end-1,2:end-1)+rhoo(3:end-1,2:end-1))/2)/2 - rhoref;      % relative density for bouancy force term
+rhoBF  = (rho(2:end-2,2:end-1)+rho(3:end-1,2:end-1))/2 - rhoref;           % relative density for bouancy force term
 Pt     = Ptop + rhoref.*g0.*ZZ + P;                                        % total pressure
 
 % update thermal properties
@@ -26,13 +27,14 @@ kT     = mu.*kTm + chi.*kTx + phi.*kTf;                                    % mag
 % update effective viscosity
 etam  = etam0 .* exp(Em./(8.3145.*(T+273.15))-Em./(8.3145.*((Tphs0+Tphs1)/2+273.15))) ...
               .* Fmc.^(cm-(cphs0+cphs1)/2) .* Fmv.^(vm./0.01) ...
-              .* max(1e-6,1-min(1-TINY,phi/phic)).^-A .* max(1e-6,1-min(1-TINY,chi/chic)).^-B; % T-c-v-chi-phi-dep. melt viscosity
-etax  = etax0 .* exp(Ex./(8.3145.*(T+273.15))-Ex./(8.3145.*(Tphs0+273.15))) ...
-              .* Fxc.^(cx-(cphs0+cphs1)/2) ...
-              .* exp(-lambda.*min(chic,1-chi));                            % T-c-v-chi-phi-dep. crystal viscosity
+              .* max(1e-12,1-min(1-TINY,phi/phic)).^-A .* max(1e-12,1-min(1-TINY,chi/chic)).^-B; % T-c-v-chi-phi-dep. melt viscosity
+% etax  = etax0 .* exp(Ex./(8.3145.*(T+273.15))-Ex./(8.3145.*(Tphs0+273.15))) ...
+%               .* Fxc.^(cx-(cphs0+cphs1)/2) ...
+%               .* exp(-lambda.*min(chic,1-chi));                            % T-c-chi-dep. crystal viscosity
 etaf  = etaf0.* ones(size(f));                                             % constant volatile fluid viscosity
-eta   = 1./(1./(etam + etaf) + 1./etax);                                   % effective magma viscosity
+eta   = 1./(1./(etam + etaf) + 1./etax0);                                   % effective magma viscosity
 eta   = 1./(1./(eta + etamin) + 1./etamax);                                % limit viscosity range
+% if step>0; eta   = (etao + eta)/2; end
 
 etac  = (eta(1:end-1,1:end-1)+eta(2:end,1:end-1) ...                       % viscosity in cell corners
       +  eta(1:end-1,2:end  )+eta(2:end,2:end  ))./4;
@@ -116,6 +118,7 @@ Div_rhoV =  + advection(rhom.*mu ,0.*U,wm,h,ADVN,'flx') ...
 VolSrc = -((rho-rhoo)./dt + (Div_rhoV - rho.*Div_V + Div_rhoVo)/2)./(rho/2);
 
 dVoldt = mean(mean(VolSrc(2:end-1,2:end-1)));
-UBG    = - dVoldt./2 .* (L/2-XXu);
-WBG    = - dVoldt./2 .* (D/2-ZZw);
+UBG    = - 0.*dVoldt./2 .* (L/2-XXu);
+WBG    = - 0.*dVoldt./2 .* (D/2-ZZw);
 
+VolSrc = VolSrc - dVoldt;
