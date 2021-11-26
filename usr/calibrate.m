@@ -2,10 +2,10 @@
 clear; addpath('../src');
 
 % calibration run options
-runID     = 'Krafla_074_003';    % run ID for output files; [system name_wt.% SiO2_wt.% H2O] 
+runID     = 'test';    % run ID for output files; [system name_wt.% SiO2_wt.% H2O] 
 holdfig   = 0;                   % set to 1 to hold figures, to 0 for new figures
 linestyle = '-';                 % set line style for plots
-save_plot = 1;                   % turn on (1) to save output file in /out directory
+save_plot = 0;                   % turn on (1) to save output file in /out directory
 
 % set parameters
 cphs0    =  0.36;                % phase diagram lower bound composition [wt SiO2]
@@ -13,17 +13,17 @@ cphs1    =  0.72;                % phase diagram upper bound composition [wt SiO
 Tphs0    =  750;                 % phase diagram lower bound temperature [degC]
 Tphs1    =  1750;                % phase diagram upper bound temperature [degC]
 PhDg     =  4.0;                 % Phase diagram curvature factor (> 1)
-perCm    =  0.54;                % peritectic liquidus composition [wt SiO2]
-perCx    =  0.50;                % peritectic solidus  composition [wt SiO2]
+perCm    =  0.52;                % peritectic liquidus composition [wt SiO2]
+perCx    =  0.48;                % peritectic solidus  composition [wt SiO2]
 perT     =  1100;                % peritectic temperature [degC]
 clap     =  1e-7;                % Clapeyron slope for P-dependence of melting T [degC/Pa]
 dTH2O    =  1300;                % solidus shift from water content [degC/wt^0.75]
 
 % calculate T-dependence of melting model
-T = linspace(500,1600,1e3);    % temperature [degC]
-c = 0.55   .*ones(size(T));    % major component [wt SiO2]
-v = 0.02   .*ones(size(T));    % volatile component [wt H2O]
-P = 125e6  .*ones(size(T));    % pressure [Pa]
+T = linspace(1000,999,1e3);    % temperature range [degC]
+c = linspace(0.50,0.50,1e3);   % major component range [wt SiO2]
+v = linspace(0.01,0.01,1e3);   % volatile component range [wt H2O]
+P = linspace(200,50,1e3)*1e6; % pressure range [Pa]
 
 % equilibrium phase fractions and compositions
 [xq,cxq,cmq,fq,vfq,vmq]  =  equilibrium(ones(size(T)).*0.5,ones(size(T)).*0.0, ...
@@ -32,32 +32,41 @@ P = 125e6  .*ones(size(T));    % pressure [Pa]
 mq = 1-fq-xq;  
 
 % simplified mineral assemblage (ol+px+fs+qz)
-ol0 = perCx;  ol1 = cphs0; 
-px0 = (cphs0+perCx)/2; px1 = perCx;  px2 = cphs1;
-fs0 = perCx;  fs1 = cphs1;  fs2 = (1+cphs1)/2;
-qz0 = perCm;  qz1 = 1;
+olv0 = perCx;  olv1 = cphs0; 
+pxn0 = cphs0; pxn1 = perCx;  pxn2 = cphs1;
+plg0 = (cphs0+perCx)/2;  plg1 = perCm;  plg2 = (cphs1+1)/2;
+kfs0 = perCm;  kfs1 = cphs1;  kfs2 = 1;
+qtz0 = perCx;  qtz1 = 1;
 
-ol = max(0,min(1,(cxq-ol0)./(ol1-ol0))).*(cxq>=ol1 & cxq<=ol0);
-px = max(0,min(1,(cxq-px0)./(px1-px0))).*(cxq>=px0 & cxq<=px1) + max(0,min(1,(cxq-px2)./(px1-px2))).*(cxq>=px1 & cxq<=px2);
-fs = max(0,min(1,(cxq-fs0)./(fs1-fs0))).*(cxq>=fs0 & cxq<=fs1) + max(0,min(1,(cxq-fs2)./(fs1-fs2))).*(cxq>=fs1 & cxq<=fs2);
-qz = max(0,min(1,(cxq-qz0)./(qz1-qz0))).*(cxq>=qz0 & cxq<=qz1);
-ol = ol./(ol+px+fs+qz);
-px = px./(ol+px+fs+qz);
-fs = fs./(ol+px+fs+qz);
-qz = qz./(ol+px+fs+qz);
+olv = max(0,min(1,(cxq-olv0)./(olv1-olv0))).*(cxq>=olv1 & cxq<=olv0);
+pxn = max(0,min(1,(cxq-pxn0)./(pxn1-pxn0))).*(cxq>=pxn0 & cxq<=pxn1) + max(0,min(1,(cxq-pxn2)./(pxn1-pxn2))).*(cxq>=pxn1 & cxq<=pxn2);
+plg = max(0,min(1,(cxq-plg0)./(plg1-plg0))).*(cxq>=plg0 & cxq<=plg1) + max(0,min(1,(cxq-plg2)./(plg1-plg2))).*(cxq>=plg1 & cxq<=plg2);
+kfs = max(0,min(1,(cxq-kfs0)./(kfs1-kfs0))).*(cxq>=kfs0 & cxq<=kfs1) + max(0,min(1,(cxq-kfs2)./(kfs1-kfs2))).*(cxq>=kfs1 & cxq<=kfs2);
+qtz = max(0,min(1,(cxq-qtz0)./(qtz1-qtz0))).*(cxq>=qtz0 & cxq<=qtz1);
+all = olv+pxn+plg+kfs+qtz;
+olv = olv./all;
+pxn = pxn./all;
+plg = plg./all;
+kfs = kfs./all;
+qtz = qtz./all;
 
 % block out values below solidus and above liquidus
-cxq(xq<1e-12 | mq<1e-12) = nan;
-cmq(xq<1e-12 | mq<1e-12) = nan;
-vfq(xq<1e-12 | mq<1e-12) = nan;
-vmq(xq<1e-12 | mq<1e-12) = nan;
-ol (xq<1e-12 | mq<1e-12) = nan;
-px (xq<1e-12 | mq<1e-12) = nan;
-fs (xq<1e-12 | mq<1e-12) = nan;
-qz (xq<1e-12 | mq<1e-12) = nan;
-fq (xq<1e-12 | mq<1e-12) = nan;
-xq (xq<1e-12 | mq<1e-12) = nan;
-mq (mq>1-1e-12 | mq<1e-12) = nan;
+cxq(xq<1e-12 | mq<1e-12) = [];
+cmq(xq<1e-12 | mq<1e-12) = [];
+vfq(xq<1e-12 | mq<1e-12) = [];
+vmq(xq<1e-12 | mq<1e-12) = [];
+olv(xq<1e-12 | mq<1e-12) = [];
+pxn(xq<1e-12 | mq<1e-12) = [];
+plg(xq<1e-12 | mq<1e-12) = [];
+kfs(xq<1e-12 | mq<1e-12) = [];
+qtz(xq<1e-12 | mq<1e-12) = [];
+c  (xq<1e-12 | mq<1e-12) = [];
+v  (xq<1e-12 | mq<1e-12) = [];
+T  (xq<1e-12 | mq<1e-12) = [];
+P  (xq<1e-12 | mq<1e-12) = [];
+fq (xq<1e-12 | mq<1e-12) = [];
+xq (xq<1e-12 | mq<1e-12) = [];
+mq (mq>1-1e-12 | mq<1e-12) = [];
 
 % plot phase diagram
 figure(1); if ~holdfig; clf; end
@@ -103,8 +112,12 @@ ylabel('Volatile component [wt H$_2$O]','Interpreter','latex','FontSize',18)
 
 % plot simplified mineral assemblage
 figure(5); if ~holdfig; clf; end
-plot(T,ol,'g',T,px,'k',T,fs,'b',T,qz,'r','LineStyle',linestyle,'LineWidth',2); hold on; box on; axis tight;
-legend('olivine','pyroxene','feldspar','quartz','Interpreter','latex','FontSize',18,'box','off','location','west')
+patch([T,fliplr(T)],[zeros(size(T)),fliplr(olv)],[0.6,0.8,0.5],'LineWidth',2); hold on; box on; axis tight;
+patch([T,fliplr(T)],[olv,fliplr(olv+pxn)],[0.6,0.6,0.6],'LineWidth',2);
+patch([T,fliplr(T)],[olv+pxn,fliplr(olv+pxn+plg)],[0.9,0.9,0.9],'LineWidth',2);
+patch([T,fliplr(T)],[olv+pxn+plg,fliplr(olv+pxn+plg+qtz)],[0.9,0.7,1.0],'LineWidth',2);
+patch([T,fliplr(T)],[olv+pxn+plg+qtz,fliplr(olv+pxn+plg+qtz+kfs)],[1.0,0.8,0.7],'LineWidth',2);
+legend('olivine','pyroxene','plagioclase','quartz','k-feldspar','Interpreter','latex','FontSize',18,'box','off','location','best')
 set(gca,'TickLabelInterpreter','latex','FontSize',15)
 title('Mineral assemblage','Interpreter','latex','FontSize',22)
 xlabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',18)

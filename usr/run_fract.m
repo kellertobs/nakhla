@@ -3,7 +3,7 @@ clear; close all;
 % set run parameters
 runID    =  'fract';             % run identifier
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
-nop      =  1;                  % output frame plotted/saved every 'nop' time steps
+nop      =  1;                   % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on (1) to live plot results
 save_op  =  0;                   % switch on (1) to save output to file
 plot_cv  =  1;                   % switch on (1) to live plot iterative convergence
@@ -14,7 +14,7 @@ diseq    =  0;                   % disequilibrium phase evolution
 % set model domain parameters
 D        =  10;                  % chamber depth [m]
 L        =  10;                  % chamber width [m]
-N        =  120 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
+N        =  100 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
 h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
@@ -27,7 +27,7 @@ dt       =  1;                   % initial time step [s]
 seed     =  15;                  % random perturbation seed
 smth     =  (N/25)^2;            % regularisation of initial random perturbation
 zlay     =  0.0;                 % layer thickness (relative to domain depth D)
-wlay     =  0.001;               % thickness of smooth layer boundary (relative to domain depth D)
+wlay     =  1e-6;                % thickness of smooth layer boundary (relative to domain depth D)
 T0       =  1150;                % temperature top layer [deg C]
 T1       =  1150;                % temperature base layer [deg C]
 dT       =  2;                   % amplitude of random noise [deg C]
@@ -54,8 +54,8 @@ dsi      =  1;                   % stable isotope ratio random noise [delta]
 % set thermo-chemical boundary parameters
 Ptop     =  1e8;                 % top pressure [Pa]
 bndmode  =  3;                   % mode of wall cooling/outgassing/assimilation (0 = none; 1 = top only; 2 = top/bot only; 3 = all walls)
-Twall    =  500;                 % wall temperature [degC] (nan = insulating)
 dw       =  h;                   % boundary layer thickness for cooling/outgassing/assimilation [m]
+Twall    =  500;                 % wall temperature [degC] (nan = insulating)
 tau_T    =  5*hr;                % chamber wall cooling time [s]
 fwall    =  0.02;                % wall outgassing vesicularity [wt] (nan = no outgassing)
 tau_f    =  1/10*hr;             % wall outgassing time [s]
@@ -68,9 +68,9 @@ tau_c    =  48*hr;               % wall assimilation time [s]
 
 % set thermo-chemical material parameters
 kc       =  1e-8;                % chemical diffusivity [m^2/s]
-kTm      =  4;                   % melt thermal diffusivity [m2/s]
-kTx      =  1;                   % xtal thermal diffusivity [m2/s]
-kTf      =  0.02;                % mvp  thermal diffusivity [m2/s]
+kTm      =  4;                   % melt thermal conductivity [W/m/k]
+kTx      =  1;                   % xtal thermal conductivity [W/m/k]
+kTf      =  0.02;                % mvp  thermal conductivity [W/m/k]
 Cpm      =  1400;                % melt heat capacity [J/kg/K]
 Cpx      =  1000;                % xtal heat capacity [J/kg/K]
 Cpf      =  2000;                % mvp  heat capacity [J/kg/K]
