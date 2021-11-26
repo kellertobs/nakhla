@@ -16,7 +16,7 @@ while res > tol
     res  = (norm(chi(:)-chii(:),2) + norm(phi(:)-phii(:),2))./sqrt(2*length(chi(:)));
 end
 rhoBF  = (rho(2:end-2,2:end-1)+rho(3:end-1,2:end-1))/2 - rhoref;           % relative density for bouancy force term
-Pt     = Ptop + rhoref.*g0.*ZZ + P;                                        % total pressure
+Pt     = Ptop + rhoref.*g0.*ZZ;% + P;                                        % total pressure
 
 % update thermal properties
 rhoCp  = mu.*rhom.*Cpm + chi.*rhox.*Cpx + phi.*rhof.*Cpf;                  % magma heat capacity density
