@@ -10,7 +10,7 @@ save_plot = 0;                   % turn on (1) to save output file in /out direc
 % set parameters
 cphs0    =  0.36;                % phase diagram lower bound composition [wt SiO2]
 cphs1    =  0.72;                % phase diagram upper bound composition [wt SiO2]
-Tphs0    =  750;                 % phase diagram lower bound temperature [degC]
+Tphs0    =  760;                 % phase diagram lower bound temperature [degC]
 Tphs1    =  1750;                % phase diagram upper bound temperature [degC]
 PhDg     =  4.0;                 % Phase diagram curvature factor (> 1)
 perCm    =  0.52;                % peritectic liquidus composition [wt SiO2]
@@ -20,10 +20,10 @@ clap     =  1e-7;                % Clapeyron slope for P-dependence of melting T
 dTH2O    =  1300;                % solidus shift from water content [degC/wt^0.75]
 
 % calculate T-dependence of melting model
-T = linspace(1000,999,1e3);    % temperature range [degC]
+T = linspace(600,1600,1e3);    % temperature range [degC]
 c = linspace(0.50,0.50,1e3);   % major component range [wt SiO2]
-v = linspace(0.01,0.01,1e3);   % volatile component range [wt H2O]
-P = linspace(200,50,1e3)*1e6; % pressure range [Pa]
+v = linspace(0.02,0.02,1e3);   % volatile component range [wt H2O]
+P = linspace(200,200,1e3)*1e6; % pressure range [Pa]
 
 % equilibrium phase fractions and compositions
 [xq,cxq,cmq,fq,vfq,vmq]  =  equilibrium(ones(size(T)).*0.5,ones(size(T)).*0.0, ...
@@ -68,47 +68,50 @@ fq (xq<1e-12 | mq<1e-12) = [];
 xq (xq<1e-12 | mq<1e-12) = [];
 mq (mq>1-1e-12 | mq<1e-12) = [];
 
+
+if ~holdfig; close all; end
+
 % plot phase diagram
 figure(1); if ~holdfig; clf; end
 TT = linspace(Tphs0,Tphs1,1e3);
-cc = [linspace(cphs1,(perCx+perCm)/2,(perT-Tphs0)./(Tphs1-Tphs0)*1e3),linspace((perCx+perCm)/2,cphs0,(perT-Tphs1)./(Tphs0-Tphs1)*1e3)];
+cc = [linspace(cphs1,(perCx+perCm)/2,ceil((perT-Tphs0)./(Tphs1-Tphs0)*1e3)),linspace((perCx+perCm)/2,cphs0,floor((perT-Tphs1)./(Tphs0-Tphs1)*1e3))];
 [~,CCx,CCm,FF,~,~] = equilibrium(0*TT,0*TT,TT,cc,0*TT,0*TT,Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg);
 plot(CCx,TT,'k','LineStyle',linestyle,'LineWidth',2); axis tight; hold on; box on;
 plot(CCm,TT,'k','LineStyle',linestyle,'LineWidth',2);
 plot(cxq,T-P.*clap + dTH2O*vmq.^0.75,'b','LineStyle',linestyle,'LineWidth',2);
 plot(cmq,T-P.*clap + dTH2O*vmq.^0.75,'r','LineStyle',linestyle,'LineWidth',2);
 plot(c./(1-fq+1e-16),T-P.*clap + dTH2O*vmq.^0.75,'k','LineStyle',':','LineWidth',2);
-set(gca,'TickLabelInterpreter','latex','FontSize',15)
-title('Phase Diagram','Interpreter','latex','FontSize',22)
-xlabel('Major component [wt SiO$_2$]','Interpreter','latex','FontSize',18)
-ylabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',18)
+set(gca,'TickLabelInterpreter','latex','FontSize',13)
+title('Phase Diagram','Interpreter','latex','FontSize',18)
+xlabel('Major component [wt SiO$_2$]','Interpreter','latex','FontSize',15)
+ylabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',15)
 
 % plot phase fractions
 figure(2); if ~holdfig; clf; end
 plot(T,xq,'k',T,mq,'r',T,fq.*10,'b','LineStyle',linestyle,'LineWidth',2); hold on; box on; axis tight;
-legend('crystals','melt','fluid $\times10$','Interpreter','latex','FontSize',18,'box','off','location','east')
-set(gca,'TickLabelInterpreter','latex','FontSize',15)
-title('Melting model','Interpreter','latex','FontSize',22)
-xlabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',18)
-ylabel('Phase fractions [wt]','Interpreter','latex','FontSize',18)
+legend('crystals','melt','fluid $\times10$','Interpreter','latex','FontSize',15,'box','off','location','east')
+set(gca,'TickLabelInterpreter','latex','FontSize',13)
+title('Melting model','Interpreter','latex','FontSize',18)
+xlabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',15)
+ylabel('Phase fractions [wt]','Interpreter','latex','FontSize',15)
 
 % plot major phase compositions
 figure(3); if ~holdfig; clf; end
 plot(T,cxq,'b',T,cmq,'r','LineStyle',linestyle,'LineWidth',2); hold on; box on; axis tight;
-legend('crystals','melt','Interpreter','latex','FontSize',18,'box','off','location','northeast')
-set(gca,'TickLabelInterpreter','latex','FontSize',15)
-title('Phase compositions','Interpreter','latex','FontSize',22)
-xlabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',18)
-ylabel('Major component [wt SiO$_2$]','Interpreter','latex','FontSize',18)
+legend('crystals','melt','Interpreter','latex','FontSize',15,'box','off','location','northeast')
+set(gca,'TickLabelInterpreter','latex','FontSize',13)
+title('Phase compositions','Interpreter','latex','FontSize',18)
+xlabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',15)
+ylabel('Major component [wt SiO$_2$]','Interpreter','latex','FontSize',15)
 
 % plot volatile phase compositions
 figure(4); if ~holdfig; clf; end
 plot(T,vfq/10,'b',T,vmq,'r','LineStyle',linestyle,'LineWidth',2); hold on; box on; axis tight;
-legend('fluid $/10$','melt','Interpreter','latex','FontSize',18,'box','off','location','northeast')
-set(gca,'TickLabelInterpreter','latex','FontSize',15)
-title('Phase compositions','Interpreter','latex','FontSize',22)
-xlabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',18)
-ylabel('Volatile component [wt H$_2$O]','Interpreter','latex','FontSize',18)
+legend('fluid $/10$','melt','Interpreter','latex','FontSize',15,'box','off','location','northeast')
+set(gca,'TickLabelInterpreter','latex','FontSize',13)
+title('Phase compositions','Interpreter','latex','FontSize',18)
+xlabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',15)
+ylabel('Volatile component [wt H$_2$O]','Interpreter','latex','FontSize',15)
 
 % plot simplified mineral assemblage
 figure(5); if ~holdfig; clf; end
@@ -117,11 +120,11 @@ patch([T,fliplr(T)],[olv,fliplr(olv+pxn)],[0.6,0.6,0.6],'LineWidth',2);
 patch([T,fliplr(T)],[olv+pxn,fliplr(olv+pxn+plg)],[0.9,0.9,0.9],'LineWidth',2);
 patch([T,fliplr(T)],[olv+pxn+plg,fliplr(olv+pxn+plg+qtz)],[0.9,0.7,1.0],'LineWidth',2);
 patch([T,fliplr(T)],[olv+pxn+plg+qtz,fliplr(olv+pxn+plg+qtz+kfs)],[1.0,0.8,0.7],'LineWidth',2);
-legend('olivine','pyroxene','plagioclase','quartz','k-feldspar','Interpreter','latex','FontSize',18,'box','off','location','best')
-set(gca,'TickLabelInterpreter','latex','FontSize',15)
-title('Mineral assemblage','Interpreter','latex','FontSize',22)
-xlabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',18)
-ylabel('Mineral fraction [wt]','Interpreter','latex','FontSize',18)
+legend('~olivine','~pyroxene','~plagioclase','~quartz','~k-feldspar','Interpreter','latex','FontSize',15,'box','off','location','best')
+set(gca,'TickLabelInterpreter','latex','FontSize',13)
+title('Mineral assemblage','Interpreter','latex','FontSize',18)
+xlabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',15)
+ylabel('Mineral fraction [wt]','Interpreter','latex','FontSize',15)
 
 % create output directory
 if ~isfolder(['../out/',runID])
