@@ -29,7 +29,7 @@ if any(v>1e-6)
         T   = max(0,min(1,(T0 - P*clap + dTv.*vmq.^0.75 -Tphs0)./(Tphs1-Tphs0)));
         
         cx1 = max(TINY,min(1-TINY,          perCx .*erfc((2+PhDg).*(T-perT)./(1-perT))));
-        cx2 = max(TINY,min(1-TINY, perCx+(1-perCx).*erfc((1+PhDg).*(T     )./   perT) ));
+        cx2 = max(TINY,min(1-TINY, perCx+(1-perCx).*erfc((0+PhDg).*(T     )./   perT) ));
         
         cxq = zeros(size(T));
         cxq(T>=perT) = cx1(T>=perT);
@@ -57,7 +57,7 @@ else
     T   = max(0,min(1,(T0 - P*clap -Tphs0)./(Tphs1-Tphs0))) ;
     
     cx1 = max(TINY,min(1-TINY,          perCx .*erfc((2+PhDg).*(T-perT)./(1-perT))));
-    cx2 = max(TINY,min(1-TINY, perCx+(1-perCx).*erfc((1+PhDg).*(T     )./   perT) ));
+    cx2 = max(TINY,min(1-TINY, perCx+(1-perCx).*erfc((0+PhDg).*(T     )./   perT) ));
     
     cxq = zeros(size(T));
     cxq(T>=perT) = cx1(T>=perT);
