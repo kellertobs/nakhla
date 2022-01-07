@@ -38,10 +38,10 @@ if ~isotherm
     diff_T(2:end-1,2:end-1) = (- ddz(qTz(:,2:end-1),h) ...                 % heat diffusion
                                - ddx(qTx(2:end-1,:),h));
     
-    cool = zeros(size(T));
-    if ~isnan(Twall); cool = cool + rhoCp .* (Twall-T)./tau_T .* bndshape; end  % impose wall cooling
+    assim = zeros(size(T));
+    if ~isnan(Twall); assim = assim + rhoCp .* (Twall-T)./tau_T .* bndshape; end  % impose wall cooling
 
-    dHdt = - advn_H + diff_T + cool;                                       % total rate of change
+    dHdt = - advn_H + diff_T + assim;                                       % total rate of change
     
     if step>0; H = Ho + (dHdt + dHdto)/2.*dt; end                                        % explicit update of enthalpy
     H([1 end],:) = H([2 end-1],:);                                         % apply boundary conditions
@@ -95,9 +95,6 @@ end
 
 
 % convert enthalpy and component densities to temperature and concentrations
-% T = alpha.*T + (1-alpha).*H./(rhoCp + rhoDs);
-% c = alpha.*c + (1-alpha).*C./rho;
-% v = alpha.*v + (1-alpha).*V./rho;
 T = H./(rhoCp + rhoDs);
 c = C./rho;
 v = V./rho;
@@ -105,8 +102,8 @@ v = V./rho;
 
 %% *****  UPDATE LOCAL PHASE EQUILIBRIUM  *********************************
 
-[xq,cxq,cmq,fq,vfq,vmq] = equilibrium(x,f,(T+To)./2,(c+co)./2,(v+vo)./2,(Pt+Pto)./2,Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,beta);
-% [xq,cxq,cmq,fq,vfq,vmq] = equilibrium(x,f,T,c,v,Pt,Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,beta);
+% [xq,cxq,cmq,fq,vfq,vmq] = equilibrium(x,f,(T+To)./2,(c+co)./2,(v+vo)./2,(Pt+Pto)./2,Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,beta);
+[xq,cxq,cmq,fq,vfq,vmq] = equilibrium(x,f,T,c,v,Pt,Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,beta);
 
     
 % update crystal fraction
