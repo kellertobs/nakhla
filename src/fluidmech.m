@@ -7,7 +7,7 @@ RR  = [];       % forcing entries for R
 
 
 % set cooling boundaries to no slip, else to free slip
-if bndmode==3; sds = +1;      % no slip
+if bndmode==4; sds = +1;      % no slip
 else;          sds = -1; end  % free slip
 if bndmode >0; top = +1;      % no slip
 else;          top = -1; end  % free slip
@@ -253,11 +253,11 @@ RP(MapP(np,np),:) = 0;
 
 
 %% assemble global coefficient matrix and right-hand side vector
-Pscale = 2*geomean(eta(:))/h;
-LL = [-KV          Pscale.*GG  ; ...
+Pscale = geomean(eta(:))/h;
+LL = [ KV         -Pscale.*GG  ; ...
        Pscale.*DD  Pscale.*KP  ];
 
-RR = [RV; RP.*Pscale];
+RR = [-RV; Pscale.*RP];
 
 
 %% get residual
