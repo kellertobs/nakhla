@@ -155,18 +155,23 @@ end
 
 % plot phase diagram
 fh6 = figure(6); clf;
+vv = (4.8e-5.*mean(Pt(:)).^0.6 + 1e-9.*mean(Pt(:)))./100;
 TT = linspace(Tphs0,Tphs1,1e3);
-cc = [linspace(cphs1,(perCx+perCm)/2,(perT-Tphs0)./(Tphs1-Tphs0)*1e3),linspace((perCx+perCm)/2,cphs0,(perT-Tphs1)./(Tphs0-Tphs1)*1e3)];
-[~,CCx,CCm,FF,~,~] = equilibrium(0*TT,0*TT,TT,cc,0*TT,0*TT,Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg);
+cc = [linspace(cphs1,(perCx+perCm)/2,ceil((perT-Tphs0)./(Tphs1-Tphs0)*1e3)),linspace((perCx+perCm)/2,cphs0,floor((perT-Tphs1)./(Tphs0-Tphs1)*1e3))];
+[~,CCx,CCm,~,~,~] = equilibrium(0*TT,0*TT,TT,cc,0*TT,0*TT,Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,beta);
 plot(CCx,TT,'k-','LineWidth',2); axis tight; hold on; box on;
 plot(CCm,TT,'k-','LineWidth',2);
+TT = linspace(Tphs0-dTH2O*vv^0.75,Tphs1,1e3);
+[~,CCx,CCm,~,~,~] = equilibrium(0*TT,0*TT,TT,cc,0*TT,0*TT,Tphs0-dTH2O*vv^0.75,Tphs1,cphs0,cphs1,perT-dTH2O*vv^0.75,perCx,perCm,clap,dTH2O,PhDg,beta);
+plot(CCx,TT,'k--','LineWidth',2); axis tight; hold on; box on;
+plot(CCm,TT,'k--','LineWidth',2);
 
 % plot([perCx,cphs1],[Tphs0,Tphs0],'k-','LineWidth',1.5)
 % plot([cphs0,perCx],[perT,perT],'k-','LineWidth',1.5)
 % plot([perCx,perCm],[perT,perT],'k-','LineWidth',1)
 % plot([perCx,perCx],[Tphs0,perT],'k-','LineWidth',1.5)
 
-Tplt = T - Pt*clap + dTH2O*vmq.^0.75;
+Tplt = T - Pt*clap;
 cplt = c./(1-f);
 plot(cplt(2:end-1,2:end-1),Tplt(2:end-1,2:end-1),'k.',cx(2:end-1,2:end-1),Tplt(2:end-1,2:end-1),'b.',cm(2:end-1,2:end-1),Tplt(2:end-1,2:end-1),'r.','LineWidth',2,'MarkerSize',15);
 
@@ -245,9 +250,9 @@ if save_op
     print(fh6,name,'-dpng','-r300','-opengl');
     
     name = ['../out/',runID,'/',runID,'_',num2str(floor(step/nop))];
-    save(name,'U','W','P','Pt','f','x','phi','chi','mu','H','C','V','T','c','v','cm','cx','vm','vf','IT','CT','SIm','SIx','it','ct','sim','six','dHdt','dCdt','dVdt','dITdt','dCTdt','dSImdt','dSIxdt','dfdt','dxdt','Gf','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step');
+    save(name,'U','W','P','Pt','f','x','m','phi','chi','mu','H','C','V','T','c','v','cm','cx','vm','vf','IT','CT','SIm','SIx','SI','it','ct','sim','six','si','dHdt','dCdt','dVdt','dITdt','dCTdt','dSImdt','dSIxdt','dfdt','dxdt','Gf','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step');
     name = ['../out/',runID,'/',runID,'_cont'];
-    save(name,'U','W','P','Pt','f','x','phi','chi','mu','H','C','V','T','c','v','cm','cx','vm','vf','IT','CT','SIm','SIx','it','ct','sim','six','dHdt','dCdt','dVdt','dITdt','dCTdt','dSImdt','dSIxdt','dfdt','dxdt','Gf','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step');
+    save(name,'U','W','P','Pt','f','x','m','phi','chi','mu','H','C','V','T','c','v','cm','cx','vm','vf','IT','CT','SIm','SIx','SI','it','ct','sim','six','si','dHdt','dCdt','dVdt','dITdt','dCTdt','dSImdt','dSIxdt','dfdt','dxdt','Gf','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step');
     
     if step == 1
         logfile = ['../out/',runID,'/',runID,'.log'];
