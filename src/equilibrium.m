@@ -1,18 +1,17 @@
 % calculate phase equilibrium
 
-function [xq,cxq,cmq,fq,vfq,vmq]  =  equilibrium(xq,fq,T0,c,v,P,Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTv,PhDg)
+function [xq,cxq,cmq,fq,vfq,vmq]  =  equilibrium(xq,fq,T0,c,v,P,Tphs0d,Tphs1,cphs0,cphs1,perTd,perCx,perCm,clap,dTH2O,PhDg,beta)
 
 TINY  = 1e-16;
 
-perCm = (perCm-cphs0)./(cphs1-cphs0);
-perCx = (perCx-cphs0)./(cphs1-cphs0);
-perT  = (perT -Tphs0)./(Tphs1-Tphs0);
+perCm = (perCm-cphs0 )./(cphs1-cphs0 );
+perCx = (perCx-cphs0 )./(cphs1-cphs0 );
+perT  = (perTd-Tphs0d)./(Tphs1-Tphs0d);
 
 iter  = 0;
 maxit = 1e3;
 res   = 1;
 tol   = 1e-15;
-alpha = 0.95;
 
 vmq0 = (4.8e-5.*P.^0.6 + 1e-9.*P)./100;
 vmq  = min(v./(1-xq),vmq0);
@@ -24,9 +23,12 @@ if any(v>1e-6)
                
         vfq = ones(size(v));
 
-        vmq = alpha.*vmq + (1-alpha) .* min(v./(1-xq),vmq0);
+        vmq = min(v./(1-xq),vmq0);
 
-        T   = max(0,min(1,(T0 - P*clap + dTv.*vmq.^0.75 -Tphs0)./(Tphs1-Tphs0)));
+        Tphs0 = Tphs0d - dTH2O.*vmq.^0.75;
+        perT  = (perTd - dTH2O.*vmq.^0.75 -Tphs0)./(Tphs1-Tphs0);
+        
+        T   = max(0,min(1,(T0 - P*clap -Tphs0)./(Tphs1-Tphs0)));
         
         cx1 = max(TINY,min(1-TINY,          perCx .*erfc((2+PhDg).*(T-perT)./(1-perT))));
         cx2 = max(TINY,min(1-TINY, perCx+(1-perCx).*erfc((0+PhDg).*(T     )./   perT) ));
@@ -45,8 +47,8 @@ if any(v>1e-6)
         cmq = max(c./(1-fq),cphs0 + cmq.*(cphs1-cphs0));
         cxq = min(c./(1-fq),cphs0 + cxq.*(cphs1-cphs0));
 
-        xq  = alpha.*xi + (1-alpha) .* max(TINY,min(1-fq-TINY, (c-(1-fq).*cmq)./(cxq-cmq) ));
-        fq  = alpha.*fi + (1-alpha) .* max(TINY,min(1-xq-TINY, (v-(1-xq).*vmq)./(vfq-vmq) ));
+        xq  = beta.*xi + (1-beta) .* max(TINY,min(1-fq-TINY, (c-(1-fq).*cmq)./(cxq-cmq) ));
+        fq  = beta.*fi + (1-beta) .* max(TINY,min(1-xq-TINY, (v-(1-xq).*vmq)./(vfq-vmq) ));
         
         res = (norm(xq(:)-xi(:),2) + norm(fq(:)-fi(:),2))./sqrt(2*length(xq(:)));
         iter = iter+1;
@@ -54,7 +56,7 @@ if any(v>1e-6)
     
 else
     
-    T   = max(0,min(1,(T0 - P*clap -Tphs0)./(Tphs1-Tphs0))) ;
+    T   = max(0,min(1,(T0 - P*clap -Tphs0d)./(Tphs1-Tphs0d))) ;
     
     cx1 = max(TINY,min(1-TINY,          perCx .*erfc((2+PhDg).*(T-perT)./(1-perT))));
     cx2 = max(TINY,min(1-TINY, perCx+(1-perCx).*erfc((0+PhDg).*(T     )./   perT) ));
@@ -75,7 +77,7 @@ else
     
     xq  = max(TINY,min(1-TINY, (c-cmq)./(cxq-cmq) ));
     
-    fq  = 0.*xq;
+    fq  = zeros(size(v));
     vfq = ones(size(v));
     vmq = zeros(size(v));
 
