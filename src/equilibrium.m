@@ -1,12 +1,12 @@
 % calculate phase equilibrium
 
-function [xq,cxq,cmq,fq,vfq,vmq]  =  equilibrium(xq,fq,T0,c,v,P,Tphs0d,Tphs1,cphs0,cphs1,perTd,perCx,perCm,clap,dTH2O,PhDg,beta)
+function [xq,cxq,cmq,fq,vfq,vmq]  =  equilibrium(xq,fq,T0,c,v,P,Tphs0d,Tphs1d,cphs0,cphs1,perTd,perCx,perCm,clap,dTH2O,PhDg,beta)
 
 TINY  = 1e-16;
 
-perCm = (perCm-cphs0 )./(cphs1-cphs0 );
-perCx = (perCx-cphs0 )./(cphs1-cphs0 );
-perT  = (perTd-Tphs0d)./(Tphs1-Tphs0d);
+perCm = (perCm-cphs0 )./(cphs1-cphs0  );
+perCx = (perCx-cphs0 )./(cphs1-cphs0  );
+perT  = (perTd-Tphs0d)./(Tphs1d-Tphs0d);
 
 iter  = 0;
 maxit = 1e3;
@@ -25,9 +25,10 @@ if any(v>1e-6)
 
         vmq = min(v./(1-xq),vmq0);
 
-        Tphs0 = Tphs0d - dTH2O.*vmq.^0.75;
-        perT  = (perTd - dTH2O.*vmq.^0.75 -Tphs0)./(Tphs1-Tphs0);
-        
+        Tphs0 = Tphs0d - dTH2O(1).*vmq.^0.75;
+        Tphs1 = Tphs1d - dTH2O(3).*vmq.^0.75;
+        perT  = (perTd - dTH2O(2).*vmq.^0.75 -Tphs0)./(Tphs1-Tphs0);
+
         T   = max(0,min(1,(T0 - P*clap -Tphs0)./(Tphs1-Tphs0)));
         
         cx1 = max(TINY,min(1-TINY,          perCx .*erfc((2+PhDg).*(T-perT)./(1-perT))));
@@ -56,7 +57,7 @@ if any(v>1e-6)
     
 else
     
-    T   = max(0,min(1,(T0 - P*clap -Tphs0d)./(Tphs1-Tphs0d))) ;
+    T   = max(0,min(1,(T0 - P*clap -Tphs0d)./(Tphs1d-Tphs0d))) ;
     
     cx1 = max(TINY,min(1-TINY,          perCx .*erfc((2+PhDg).*(T-perT)./(1-perT))));
     cx2 = max(TINY,min(1-TINY, perCx+(1-perCx).*erfc((0+PhDg).*(T     )./   perT) ));
