@@ -17,10 +17,12 @@ while time <= tend && step <= M
     xo      = x;
     fo      = f;
     mo      = m;
-    SImo    = SIm;
-    SIxo    = SIx;
     ITo     = IT;
     CTo     = CT;
+    SImo    = SIm;
+    SIxo    = SIx;
+    RIPo    = RIP;
+    RIDo    = RID;
     rhoo    = rho;
     etao    = eta;
     dHdto   = dHdt;
@@ -32,7 +34,8 @@ while time <= tend && step <= M
     dCTdto  = dCTdt;
     dSImdto = dSImdt;
     dSIxdto = dSIxdt;
-    Div_rhoVo = Div_rhoV;
+    dRIPdto = dRIPdt;
+    dRIDdto = dRIDdt;
     Pto     = Pt;
     dto     = dt;
     
@@ -80,6 +83,9 @@ while time <= tend && step <= M
     fprintf(1,'         min W   = %1.4f;    mean W   = %1.4f;    max W   = %1.4f;   [m/s]\n'  ,min(-W(:) ),mean(-W(:) ),max(-W(:) ));
     fprintf(1,'         min P   = %2.4f;    mean P   = %2.4f;    max P   = %2.4f;  [kPa]\n\n',min(P(:)./1e3),mean(P(:)./1e3),max(P(:)./1e3));
 
+    % update mass error due to constant domain volume enforced
+    MassErr = MassErr - meanVolSrc.*dt;
+    
     % plot results
     if ~mod(step,nop); output; end
     
