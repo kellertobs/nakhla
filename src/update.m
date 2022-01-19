@@ -6,14 +6,11 @@ rhox = rhox0 .* (1 - aTx.*(T-Tphs0) - gCx.*(cx-cphs0));
 rhof = rhof0 .* (1 - aTf.*(T-Tphs0) + bPf.*(Pt-Ptop ));
 
 % convert weight to volume fraction, update bulk density
-rho    = 1./(m./rhom + x./rhox + f./rhof);
+rho    = 1./(m./rhom + x./rhox + f./rhof);  rho([1 end],:) = rho([2 end-1],:);  rho(:,[1 end]) = rho(:,[2 end-1]);
 chi    = x.*rho./rhox;
 phi    = f.*rho./rhof;
 mu     = m.*rho./rhom;
-rhoBF  = alpha.*rhoBF + (1-alpha).*(rho (2:end-2,2:end-1)+rho (3:end-1,2:end-1))/2 - rhoref;         % taken at mid-point in time
-% rhoBF  = (rho (2:end-2,2:end-1)+rho (3:end-1,2:end-1))/4 ...               % relative density for bouancy-force term
-%        + (rhoo(2:end-2,2:end-1)+rhoo(3:end-1,2:end-1))/4 - rhoref;         % taken at mid-point in time
-% Pt     = (Pto + Ptop + rhoref.*g0.*ZZ + P)/2;                              % total pressure
+rhoBF  = ((rho (2:end-2,2:end-1)+rho (3:end-1,2:end-1))/2 - rhoref);         % taken at mid-point in time
 
 % update thermal properties
 rhoCp = rho.*(m.*Cpm + x.*Cpx + f.*Cpf);
@@ -22,14 +19,38 @@ kT    = mu.*kTm + chi.*kTx + phi.*kTf;                                     % mag
 
 % update effective viscosity
 etam  = etam0 .* exp(Em./(8.3145.*(T+273.15))-Em./(8.3145.*((Tphs0+Tphs1)/2+273.15))) ...
-              .* Fmc.^(cm-(cphs0+cphs1)/2) .* Fmv.^(vm./0.01) ...
-              .* max(1e-12,1-min(1-TINY,phi/phic)).^-A .* max(1e-12,1-min(1-TINY,chi/chic)).^-B; % T-c-v-chi-phi-dep. melt viscosity
+              .* Fmc.^(cm-(cphs0+cphs1)/2) .* Fmv.^(vm./0.01); % ...
+              %.* max(1e-12,1-min(1-TINY,phi/phic)).^-A .* max(1e-12,1-min(1-TINY,chi/chic)).^-B; % T-c-v-chi-phi-dep. melt viscosity
 etaf  = etaf0.* ones(size(f));                                             % constant volatile fluid viscosity
-eta   = 1./(1./(etam + etaf  ) + 1./etax0 );                               % effective magma viscosity
+etax  = etax0.* ones(size(x));                                             % constant volatile fluid viscosity
+
+% get permission weights
+kv = permute(cat(3,etax,etam,etaf),[3,1,2]);
+Mv = permute(repmat(kv,1,1,1,3),[4,1,2,3])./permute(repmat(kv,1,1,1,3),[1,4,2,3]);
+ 
+ff = permute(cat(3,chi,mu,phi),[3,1,2]);
+FF = permute(repmat(ff,1,1,1,3),[4,1,2,3]);
+Sf = (FF./BB).^(1./CC);  Sf = Sf./sum(Sf,2);
+Xf = sum(AA.*Sf,2).*FF + (1-sum(AA.*Sf,2)).*Sf;
+
+% get momentum and volume permissions
+thtv = squeeze(prod(Mv.^Xf,2));
+
+% get momentum and volume flux and transfer coefficients
+Kv =    ff .*kv.*thtv;
+Cv = (1-ff)./[dx;dm;df].^2.*Kv;
+
+% compose effective viscosity, segregation coefficients
+% eta   = 1./(1./(etam + etaf  ) + 1./etax  );                             % effective magma viscosity
+eta   = squeeze(sum(Kv,1));
 eta   = 1./(1./(eta  + etamin) + 1./etamax);                               % limit viscosity range
 etac  = (eta(1:end-1,1:end-1)+eta(2:end,1:end-1) ...                       % viscosity in cell corners
       +  eta(1:end-1,2:end  )+eta(2:end,2:end  ))./4;
-  
+
+Ksgr_x = max(1e-18,min(1e-6,chi./squeeze(Cv(1,:,:))));
+Ksgr_m = max(1e-18,min(1e-6,mu ./squeeze(Cv(2,:,:))));
+Ksgr_f = max(1e-18,min(1e-6,phi./squeeze(Cv(3,:,:))));
+
 % update velocity divergence
 Div_V(2:end-1,2:end-1) = ddz(W(:,2:end-1),h) ...                           % get velocity divergence
                        + ddx(U(2:end-1,:),h);
@@ -62,19 +83,22 @@ tII(:,[1 end]) = tII(:,[2 end-1]);
 tII([1 end],:) = tII([2 end-1],:);
 
 % update phase segregation speeds
-if bndmode==4; sds = -1;      % no slip
+if bndmode>=4; sds = -1;      % no slip
 else;          sds = +1; end  % free slip
 
-wx = 2/9   .* ((rhox(1:end-1,:)+rhox(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0*dx^2./((eta(1:end-1,:)+eta(2:end,:))/2); % crystal settling speed
+% wx = 2/9    .* ((rhox(1:end-1,:)+rhox(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0*dx^2./((eta(1:end-1,:)+eta(2:end,:))/2); % crystal settling speed
+wx = 2/9    .* ((rhox(1:end-1,:)+rhox(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0.*((Ksgr_x(1:end-1,:)+Ksgr_x(2:end,:))/2); % crystal segregation speed
 wx([1 end],:) = 0;
 wx(:,[1 end]) = sds*wx(:,[2 end-1]);
 
-wf = 2/9    .* ((rhof(1:end-1,:)+rhof(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0*df^2./((eta(1:end-1,:)+eta(2:end,:))/2) ...  % bubble flotation speed
-   + 1/5000 .* ((rhof(1:end-1,:)+rhof(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0*dx^2.*((phi(1:end-1,:)+phi(2:end,:))/2).^2.*((chi(1:end-1,:)+chi(2:end,:))/2).^2./((etaf(1:end-1,:)+etaf(2:end,:))/2); % fluid percolation speed
+% wf = 2/9    .* ((rhof(1:end-1,:)+rhof(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0*df^2./((eta(1:end-1,:)+eta(2:end,:))/2) ...  % bubble flotation speed
+%    + 1/5000 .* ((rhof(1:end-1,:)+rhof(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0*dx^2.*((phi(1:end-1,:)+phi(2:end,:))/2).^2.*((chi(1:end-1,:)+chi(2:end,:))/2).^2./((etaf(1:end-1,:)+etaf(2:end,:))/2); % fluid percolation speed
+wf = 2/9    .* ((rhof(1:end-1,:)+rhof(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0.*((Ksgr_f(1:end-1,:)+Ksgr_f(2:end,:))/2); % fluid segregation speed
 wf([1 end],:) = [fout;fin].*wf([2 end-1],:);
 wf(:,[1 end]) = sds*wf(:,[2 end-1]);
 
-wm = 1/50   .* ((rhom(1:end-1,:)+rhom(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0*dx^2.*((mu (1:end-1,:)+mu (2:end,:))/2).^2.*((chi(1:end-1,:)+chi(2:end,:))/2).^2./((etam(1:end-1,:)+etam(2:end,:))/2); % melt percolation speed
+% wm = 1/50   .* ((rhom(1:end-1,:)+rhom(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0*dx^2.*((mu (1:end-1,:)+mu (2:end,:))/2).^2.*((chi(1:end-1,:)+chi(2:end,:))/2).^2./((etam(1:end-1,:)+etam(2:end,:))/2); % melt percolation speed
+wm = 2/9    .* ((rhom(1:end-1,:)+rhom(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0.*((Ksgr_m(1:end-1,:)+Ksgr_m(2:end,:))/2); % melt segregation speed
 wm([1 end],:) = 0;
 wm(:,[1 end]) = sds*wm(:,[2 end-1]);
 
@@ -93,6 +117,9 @@ Div_rhoV =  + advection(rho.*m,0.*U,wm,h,ADVN,'flx') ...
             + advection(rho   ,U   ,W ,h,ADVN,'flx');
 if step>0; VolSrc = -((rho-rhoo)./dt + Div_rhoV - rho.*Div_V)./rho; end
 
-VolSrc = VolSrc - mean(mean(VolSrc(2:end-1,2:end-1)));
+meanVolSrc = mean(mean(VolSrc(2:end-1,2:end-1)));
+VolSrc = VolSrc - meanVolSrc;
+
 UBG    = - 0.*mean(mean(VolSrc(2:end-1,2:end-1)))./2 .* (L/2-XXu);
 WBG    = - 0.*mean(mean(VolSrc(2:end-1,2:end-1)))./2 .* (D/2-ZZw);
+
