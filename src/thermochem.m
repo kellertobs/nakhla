@@ -42,7 +42,7 @@ diff_T(2:end-1,2:end-1) = (- ddz(qTz(:,2:end-1),h) ...                     % hea
                            - ddx(qTx(2:end-1,:),h));
     
 assim = zeros(size(T));
-if ~isnan(Twall); assim = assim + rhoCp .* (Twall-T)./tau_T .* bndshape; end  % impose wall cooling
+if ~isnan(Twall); assim = assim + rhoCp .* (Twall-T)./tau_a .* bndshape; end  % impose wall cooling
 
 dHdt = - advn_H + diff_T + assim;                                          % total rate of change
     
@@ -125,10 +125,11 @@ if (diseq && step>0) || ~react
     x(:,[1 end]) = x(:,[2 end-1]);
     m = 1-f-x;
     
-    Kc = cxq./cmq;
-    cm = c./(m + x.*Kc); cm(x < 1e-3) = cmq(x < 1e-3);
-    cx = c./(m./Kc + x); cx(m < 1e-3) = cxq(m < 1e-3);
-    
+    if react
+        Kc = cxq./cmq;
+        cm = c./(m + x.*Kc);
+        cx = c./(m./Kc + x);
+    end
 else
     
     x  =  alpha.*x + (1-alpha).*xq;

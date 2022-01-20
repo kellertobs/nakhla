@@ -65,8 +65,7 @@ bndmode  =  3;                   % mode of wall cooling/outgassing/assimilation 
 dw       =  h/2;                 % boundary layer thickness for cooling/outgassing/assimilation [m]
 fin      =  0;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
 fout     =  0;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
-tau_T    =  1*hr;                % wall cooling time [s]
-tau_a    =  1*hr;                % wall assimilation time [s]
+tau_a    =  2*hr;                % wall cooling/assimilation time [s]
 Twall    =  500;                 % wall temperature [degC] (nan = insulating)
 cwall    =  0.50;                % wall major component [wt SiO2] (nan = no assimilation)
 vwall    =  0.01;                % wall volatile component [wt H2O] (nan = no assimilation)
@@ -95,9 +94,9 @@ perCx    =  0.48;                % peritectic solidus  composition [wt SiO2]
 perT     =  1050;                % peritectic temperature [degC]
 clap     =  1e-7;                % Clapeyron slope for P-dependence of melting T [degC/Pa]
 dTH2O    =  [1300,1000,300];     % eutectic/peritectic/liquidus shift from water content [degC/wt^0.75]
-tau_r    =  30;                  % reaction time [s]
-Dsx      = -400;                 % entropy change of crystallisation [J/kg/K]
-Dsf      =  600;                 % entropy change of exsolution [J/kg/K]
+tau_r    =  60;                  % reaction time [s]
+Dsx      = -300;                 % entropy change of crystallisation [J/kg/K]
+Dsf      =  500;                 % entropy change of exsolution [J/kg/K]
 
 % set model rheology parameters
 etam0    =  2e2;                 % melt viscosity [Pas]
@@ -131,8 +130,8 @@ ADVN     =  'FRM';               % advection scheme ('UPW2', 'UPW3', or 'FRM')
 rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-7;                % outer its absolute tolerance
 maxit    =  10;                  % maximum outer its
-alpha    =  0.75;                % iterative lag parameter equilibration
-beta     =  0.75;                % iterative lag parameter phase diagram
+alpha    =  0.8;                 % iterative lag parameter equilibration
+beta     =  0.7;                 % iterative lag parameter phase diagram
 etamin   =  1e1;                 % minimum viscosity for stabilisation
 etamax   =  1e7;                 % maximum viscosity for stabilisation
 TINY     =  1e-16;               % minimum cutoff phase, component fractions

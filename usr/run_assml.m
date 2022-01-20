@@ -65,8 +65,7 @@ bndmode  =  3;                   % mode of wall cooling/outgassing/assimilation 
 dw       =  h/2;                 % boundary layer thickness for cooling/outgassing/assimilation [m]
 fin      =  1;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
 fout     =  1;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
-tau_T    =  1*hr;                % wall cooling time [s]
-tau_a    =  1*hr;                % wall assimilation time [s]
+tau_a    =  2*hr;                % wall assimilation time [s]
 Twall    =  500;                 % wall temperature [degC] (nan = insulating)
 cwall    =  0.70;                % wall major component [wt SiO2] (nan = no assimilation)
 vwall    =  0.02;                % wall volatile component [wt H2O] (nan = no assimilation)
@@ -95,21 +94,20 @@ perCx    =  0.48;                % peritectic solidus  composition [wt SiO2]
 perT     =  1050;                % peritectic temperature [degC]
 clap     =  1e-7;                % Clapeyron slope for P-dependence of melting T [degC/Pa]
 dTH2O    =  [1300,1000,300];     % solidus shift from water content [degC/wt^0.75]
-tau_r    =  30;                  % reaction time [s]
-Dsx      = -400;                 % entropy change of crystallisation [J/kg/K]
-Dsf      =  600;                 % entropy change of exsolution [J/kg/K]
+tau_r    =  60;                  % reaction time [s]
+Dsx      = -300;                 % entropy change of crystallisation [J/kg/K]
+Dsf      =  500;                 % entropy change of exsolution [J/kg/K]
 
 % set model rheology parameters
 etam0    =  2e2;                 % melt viscosity [Pas]
 etaf0    =  1e0;                 % fluid viscosity [Pas]
 etax0    =  1e15;                % crystal viscosity [Pas]
-phic     =  0.5;                 % close packing bubble fraction [vol]
-chic     =  0.5;                 % close packing crystal fraction [vol]
-A        = -0.0;                 % bubble weakening exponent
-B        =  2.0;                 % crystal stiffening exponent
 Fmc      =  1e+4;                % major component weakening factor of melt viscosity [1]
 Fmv      =  0.5;                 % volatile component weakening factor of melt viscosity [1]
 Em       =  150e3;               % activation energy melt viscosity [J/mol]
+AA       = [ 0.60, 0.25, 0.30; 0.20, 0.20, 0.20; 0.20, 0.20, 0.20; ];  % permission slopes
+BB       = [ 0.30, 0.15, 0.55; 0.48, 0.02, 0.50; 0.80, 0.08, 0.12; ];  % permission step locations
+CC       = [ 0.20, 0.20, 0.20; 0.60, 0.60, 0.12; 0.20, 0.25, 0.50; ];  % permission step widths
 
 % set model buoyancy parameters
 rhom0    =  2900;                % melt phase ref. density [kg/m3] (at T0,cphs0,Ptop)
@@ -132,8 +130,8 @@ ADVN     =  'FRM';               % advection scheme ('UPW2', 'UPW3', or 'FRM')
 rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-7;                % outer its absolute tolerance
 maxit    =  10;                  % maximum outer its
-alpha    =  0.75;                % iterative lag parameter equilibration
-beta     =  0.75;                % iterative lag parameter phase diagram
+alpha    =  0.8;                 % iterative lag parameter equilibration
+beta     =  0.7;                 % iterative lag parameter phase diagram
 etamin   =  1e1;                 % minimum viscosity for stabilisation
 etamax   =  1e7;                 % maximum viscosity for stabilisation
 TINY     =  1e-16;               % minimum cutoff phase, component fractions
