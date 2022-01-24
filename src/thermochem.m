@@ -3,31 +3,6 @@ dtk = min((h/2)^2./max([kT(:)./rhoCp(:);kc]));                             % dif
 dta = min(min(h/2/max(abs([UBG(:);WBG(:);Um(:);Wm(:);Uf(:);Wf(:);Ux(:);Wx(:)]+1e-16)))); % advective time step size
 dt  = min(2*dto,CFL*min([dtk,dta]));                                       % physical time step size
 
-% boundary conditions shape function
-switch bndmode
-    case 0  % none
-        bndshape = zeros(size(T));
-    case 1  % top only
-        bndshape = exp( ( -ZZ)/dw);
-    case 2  % bot only
-        bndshape = exp(-(D-ZZ)/dw);
-    case 3  % top/bot only
-        bndshape = exp( ( -ZZ)/dw) ...
-                 + exp(-(D-ZZ)/dw);
-    case 4 % all walls
-        bndshape = exp( ( -ZZ)/dw) ...
-                 + exp(-(D-ZZ)/dw) ...
-                 + exp( ( -XX)/dw) ...
-                 + exp(-(L-XX)/dw);
-    case 5 % all walls
-        bndshape = exp( ( -ZZ)/dw) ...
-                 + exp(-(D-ZZ)/dw) ...
-                 + exp( ( -XX)/dw) ...
-                 + exp(-(L-XX)/dw);
-end
-bndshape([1 end],:) = bndshape([2 end-1],:);
-bndshape(:,[1 end]) = bndshape(:,[2 end-1]);
-bndshape = bndshape./(max(bndshape(:))-min(bndshape(:)));
 
 %% *****  THERMO-CHEMICAL EVOLUTION  **************************************
 

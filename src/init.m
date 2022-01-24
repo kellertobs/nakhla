@@ -31,15 +31,41 @@ MapP = reshape(1:NP,Nz  ,Nx  );
 MapW = reshape(1:NW,Nz-1,Nx  );
 MapU = reshape(1:NU,Nz  ,Nx-1) + NW;
 
-% set initial solution fields
-T   =  T0 + (T1-T0) .* (1+erf((ZZ/D-zlay)/wlay_T))/2 + dT.*rp;  meanT0 = mean(mean(T(2:end-1,2:end-1)));  % temperature
-c   =  c0 + (c1-c0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dc.*rp;  meanc0 = mean(mean(c(2:end-1,2:end-1)));  % major component
-v   =  v0 + (v1-v0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dv.*rp;  meanv0 = mean(mean(v(2:end-1,2:end-1)));  % volatile component
+% boundary conditions shape function
+switch bndmode
+    case 0  % none
+        bndshape = zeros(size(T));
+    case 1  % top only
+        bndshape = exp( ( -ZZ)/dw);
+    case 2  % bot only
+        bndshape = exp(-(D-ZZ)/dw);
+    case 3  % top/bot only
+        bndshape = exp( ( -ZZ)/dw) ...
+                 + exp(-(D-ZZ)/dw);
+    case 4 % all walls
+        bndshape = exp( ( -ZZ)/dw) ...
+                 + exp(-(D-ZZ)/dw) ...
+                 + exp( ( -XX)/dw) ...
+                 + exp(-(L-XX)/dw);
+    case 5 % all walls
+        bndshape = exp( ( -ZZ)/dw) ...
+                 + exp(-(D-ZZ)/dw) ...
+                 + exp( ( -XX)/dw) ...
+                 + exp(-(L-XX)/dw);
+end
+bndshape([1 end],:) = bndshape([2 end-1],:);
+bndshape(:,[1 end]) = bndshape(:,[2 end-1]);
+bndshape = bndshape./(max(bndshape(:))-min(bndshape(:)));
 
-it  =  it0 + (it1-it0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dit.*rp;  % incompatible trace element
-ct  =  ct0 + (ct1-ct0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dct.*rp;  % compactible trace element
-si  =  si0 + (si1-si0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dsi.*rp;  % stable isotope ratio
-rip =  ri0 + (ri1-ri0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dri.*rp;  % radiogenic isotope parent
+% set initial solution fields
+T   =  T0 + (T1-T0) .* (1+erf((ZZ/D-zlay)/wlay_T))/2 + dT.*rp;  if ~isnan(Twall); T = T + (Twall-T).*bndshape; end % temperature
+c   =  c0 + (c1-c0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dc.*rp;  if ~isnan(cwall); c = c + (cwall-c).*bndshape; end % major component
+v   =  v0 + (v1-v0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dv.*rp;  if ~isnan(vwall); v = v + (vwall-v).*bndshape; end % volatile component
+
+it  =  it0 + (it1-it0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dit.*rp;  if ~isnan(itwall); it  = it  + (itwall-it ).*bndshape; end % incompatible trace element
+ct  =  ct0 + (ct1-ct0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dct.*rp;  if ~isnan(ctwall); ct  = ct  + (ctwall-ct ).*bndshape; end % compactible trace element
+si  =  si0 + (si1-si0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dsi.*rp;  if ~isnan(siwall); si  = si  + (siwall-si ).*bndshape; end % stable isotope ratio
+rip =  ri0 + (ri1-ri0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dri.*rp;  if ~isnan(riwall); rip = rip + (riwall-rip).*bndshape; end % radiogenic isotope parent
 rid =  rip.*HLRID./HLRIP;                                           % radiogenic isotope daughter
 
 U   =  zeros(size((XX(:,1:end-1)+XX(:,2:end))));  Ui = U;  res_U = 0.*U;
