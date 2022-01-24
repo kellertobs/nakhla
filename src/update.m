@@ -41,9 +41,8 @@ Kv =    ff .*kv.*thtv;
 Cv = (1-ff)./[dx;dm;df].^2.*Kv;
 
 % compose effective viscosity, segregation coefficients
-% eta   = 1./(1./(etam + etaf  ) + 1./etax  );                             % effective magma viscosity
-eta   = squeeze(sum(Kv,1));
-eta   = 1./(1./(eta  + etamin) + 1./etamax);                               % limit viscosity range
+eta   = squeeze(sum(Kv,1));                                                % effective magma viscosity
+eta   = max(etamin,min(etamax,eta));                                       % limit viscosity range
 etac  = (eta(1:end-1,1:end-1)+eta(2:end,1:end-1) ...                       % viscosity in cell corners
       +  eta(1:end-1,2:end  )+eta(2:end,2:end  ))./4;
 

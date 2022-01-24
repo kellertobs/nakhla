@@ -1,7 +1,7 @@
 clear; close all;
 
 % set run parameters
-runID    =  'fract1';            % run identifier
+runID    =  'fract3';            % run identifier
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  50;                  % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot of results
@@ -13,7 +13,7 @@ diseq    =  1;                   % switch on disequilibrium approac
 % set model domain parameters
 D        =  10;                  % chamber depth [m]
 L        =  10;                  % chamber width [m]
-N        =  250 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
+N        =  200 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
 h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
@@ -26,18 +26,18 @@ dt       =  10;                  % initial time step [s]
 % set initial thermo-chemical state
 seed     =  15;                  % random perturbation seed
 smth     =  (N/30)^2;            % regularisation of initial random perturbation
-zlay     =  0.0;                 % layer thickness (relative to domain depth D)
+zlay     =  0.5;                 % layer thickness (relative to domain depth D)
 wlay_T   =  1e-6;                % thickness of smooth layer boundary (relative to domain depth D)
-wlay_c   =  1e-6;                % thickness of smooth layer boundary (relative to domain depth D)
+wlay_c   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
 T0       =  1050;                % temperature top layer [deg C]
 T1       =  1050;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
 c0       =  0.50;                % major component top layer [wt SiO2]
 c1       =  0.50;                % major component base layer [wt SiO2]
-dc       =  1e-3;                % amplitude of random noise [wt SiO2]
-v0       =  0.01;                % volatile component top layer [wt H2O]
-v1       =  0.01;                % volatile component base layer [wt H2O]
-dv       =  1e-4;                % amplitude of random noise [wt H2O]
+dc       =  1e-5;                % amplitude of random noise [wt SiO2]
+v0       =  0.03;                % volatile component top layer [wt H2O]
+v1       =  0.03;                % volatile component base layer [wt H2O]
+dv       =  1e-6;                % amplitude of random noise [wt H2O]
 
 % set model trace and isotope geochemistry parameters
 it0      =  1;                   % incompatible tracer top layer [wt ppm]
@@ -48,9 +48,9 @@ ct0      =  1;                   % compatible tracer top layer [wt ppm]
 ct1      =  1;                   % compatible tracer base layer [wt ppm]
 dct      =  -0.01;               % compatible tracer random noise [wt ppm]
 KCT      =  1e2;                 % compatible tracer partition coefficient
-si0      =  0;                   % stable isotope ratio top layer [delta]
-si1      =  0;                   % stable isotope ratio base layer [delta]
-dsi      =  1;                   % stable isotope ratio random noise [delta]
+si0      =  -1;                  % stable isotope ratio top layer [delta]
+si1      =  1;                   % stable isotope ratio base layer [delta]
+dsi      =  0.01;                % stable isotope ratio random noise [delta]
 ri0      =  1;                   % radiogenic isotope top layer [wt ppm]
 ri1      =  1;                   % radiogenic isotope base layer [wt ppm]
 dri      = -0.01;                % radiogenic isotope random noise [wt ppm]
@@ -62,13 +62,13 @@ HLRID    =  1e3*yr;              % radiogenic daughter isotope half-life [s]
 % set thermo-chemical boundary parameters
 Ptop     =  1e8;                 % top pressure [Pa]
 bndmode  =  3;                   % mode of wall cooling/outgassing/assimilation (0 = none; 1 = top only; 2 = top/bot only; 3 = all walls)
-dw       =  h/2;                 % boundary layer thickness for cooling/outgassing/assimilation [m]
+dw       =  h;                   % boundary layer thickness for cooling/outgassing/assimilation [m]
 fin      =  0;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
-fout     =  0;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
+fout     =  1;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
 tau_a    =  2*hr;                % wall cooling/assimilation time [s]
 Twall    =  500;                 % wall temperature [degC] (nan = insulating)
 cwall    =  0.50;                % wall major component [wt SiO2] (nan = no assimilation)
-vwall    =  0.01;                % wall volatile component [wt H2O] (nan = no assimilation)
+vwall    =  0.03;                % wall volatile component [wt H2O] (nan = no assimilation)
 itwall   =  1;                   % wall incomp. tracer [wt ppm] (nan = no assimilation)
 ctwall   =  1;                   % wall comp. tracer [wt ppm] (nan = no assimilation)
 siwall   =  0;                   % wall stable isotope [delta] (nan = no assimilation)

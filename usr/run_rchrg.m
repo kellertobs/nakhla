@@ -13,7 +13,7 @@ diseq    =  1;                   % switch on disequilibrium approac
 % set model domain parameters
 D        =  10;                  % chamber depth [m]
 L        =  10;                  % chamber width [m]
-N        =  250 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
+N        =  200 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
 h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
@@ -34,10 +34,10 @@ T1       =  675;                 % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
 c0       =  0.70;                % major component top layer [wt SiO2]
 c1       =  0.70;                % major component base layer [wt SiO2]
-dc       =  1e-3;                % amplitude of random noise [wt SiO2]
+dc       =  1e-5;                % amplitude of random noise [wt SiO2]
 v0       =  0.02;                % volatile component top layer [wt H2O]
 v1       =  0.02;                % volatile component base layer [wt H2O]
-dv       =  1e-4;                % amplitude of random noise [wt H2O]
+dv       =  1e-6;                % amplitude of random noise [wt H2O]
 
 % set model trace and isotope geochemistry parameters
 it0      =  2;                   % incompatible tracer top layer [wt ppm]
@@ -62,9 +62,9 @@ HLRID    =  1e3*yr;              % radiogenic daughter isotope half-life [s]
 % set thermo-chemical boundary parameters
 Ptop     =  1e8;                 % top pressure [Pa]
 bndmode  =  2;                   % mode of wall cooling/outgassing/assimilation (0 = none; 1 = top only; 2 = top/bot only; 3 = all walls)
-dw       =  h/2;                 % boundary layer thickness for cooling/outgassing/assimilation [m]
-fin      =  1;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
-fout     =  1;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
+dw       =  h;                   % boundary layer thickness for cooling/outgassing/assimilation [m]
+fin      =  0;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
+fout     =  0;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
 tau_a    =  2*hr;                % wall assimilation time [s]
 Twall    =  1050;                % wall temperature [degC] (nan = insulating)
 cwall    =  0.50;                % wall major component [wt SiO2] (nan = no assimilation)
