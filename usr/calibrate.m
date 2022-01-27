@@ -2,10 +2,10 @@
 clear; addpath('../src');
 
 % calibration run options
-runID     = 'VMSG';    % run ID for output files; [system name_wt.% SiO2_wt.% H2O] 
+runID     = 'test';              % run ID for output files; [system name_wt.% SiO2_wt.% H2O] 
 holdfig   = 0;                   % set to 1 to hold figures, to 0 for new figures
 linestyle = '-';                 % set line style for plots
-save_plot = 0;                   % turn on (1) to save output file in /out directory
+save_plot = 1;                   % turn on (1) to save output file in /out directory
 
 % set phase diagram parameters
 cphs0    =  0.36;                % phase diagram lower bound composition [wt SiO2]
@@ -13,15 +13,15 @@ cphs1    =  0.72;                % phase diagram upper bound composition [wt SiO
 Tphs0    =  750;                 % phase diagram lower bound temperature [degC]
 Tphs1    =  1750;                % phase diagram upper bound temperature [degC]
 PhDg     =  4.0;                 % Phase diagram curvature factor (> 1)
-perCm    =  0.52;                % peritectic liquidus composition [wt SiO2]
+perCm    =  0.51;                % peritectic liquidus composition [wt SiO2]
 perCx    =  0.48;                % peritectic solidus  composition [wt SiO2]
 perT     =  1050;                % peritectic temperature [degC]
 clap     =  1e-7;                % Clapeyron slope for P-dependence of melting T [degC/Pa]
 dTH2O    =  [1300,1000,300];     % solidus shift from water content [degC/wt^0.75]
-beta     =  0.75;                % iterative lag parameter phase diagram [1]
+beta     =  0.7;                 % iterative lag parameter phase diagram [1]
 
 % set model rheology parameters
-etam0    =  3e2;                 % melt viscosity [Pas]
+etam0    =  2e2;                 % melt viscosity [Pas]
 etaf0    =  1e0;                 % fluid viscosity [Pas]
 etax0    =  1e15;                % crystal viscosity [Pas]
 Fmc      =  1e+4;                % major component weakening factor of melt viscosity [1]
@@ -32,7 +32,7 @@ BB       = [ 0.30, 0.15, 0.55; 0.48, 0.02, 0.50; 0.80, 0.08, 0.12; ];  % permiss
 CC       = [ 0.20, 0.20, 0.20; 0.60, 0.60, 0.12; 0.20, 0.25, 0.50; ];  % permission step widths
 
 % set model buoyancy parameters
-rhom0    =  3000;                % melt phase ref. density [kg/m3] (at T0,cphs0,Ptop)
+rhom0    =  2900;                % melt phase ref. density [kg/m3] (at T0,cphs0,Ptop)
 rhox0    =  3300;                % crystal phase ref. density [kg/m3] (at T0,cphs0,Ptop)
 rhof0    =  500;                 % bubble phase ref. density [kg/m3] (at T0,cphs0,Ptop)
 aTm      =  3e-5;                % melt thermal expansivity [1/K]
@@ -40,16 +40,16 @@ aTx      =  1e-5;                % xtal thermal expansivity [1/K]
 aTf      =  1e-4;                % mvp  thermal expansivity [1/K]
 gCm      =  0.5;                 % melt compositional expansion [1/wt]
 gCx      =  0.6;                 % xtal compositional expansion [1/wt]
-bPf      =  1e-9;                % mvp compressibility [1/Pa]
+bPf      =  1e-8;                % mvp compressibility [1/Pa]
 dx       =  0.003;               % crystal size [m]
 df       =  0.003;               % bubble size [m]
-dm       =  0.0003;              % melt film size [m]
+dm       =  0.001;               % melt film size [m]
 g0       =  10.;                 % gravity [m/s2]
 
 % set ranges for control variables T, c, v, P
 T = linspace(600,1600,1e3);    % temperature range [degC]
 c = linspace(0.50,0.50,1e3);   % major component range [wt SiO2]
-v = linspace(0.01,0.01,1e3);   % volatile component range [wt H2O]
+v = linspace(0.02,0.02,1e3);   % volatile component range [wt H2O]
 P = linspace(100,100,1e3)*1e6; % pressure range [Pa]
 
 % equilibrium phase fractions and compositions
@@ -162,8 +162,8 @@ perTs  = perT-dTH2O(2)*vv^0.75;
 TT = linspace(Tphs0s+mean(P(:))*clap,Tphs1s+mean(P(:))*clap,1e3);
 cc = [linspace(cphs1,(perCx+perCm)/2,round((perTs-Tphs0s)./(Tphs1s-Tphs0s)*1e3)),linspace((perCx+perCm)/2,cphs0,round((perTs-Tphs1s)./(Tphs0s-Tphs1s)*1e3))];
 [~,CCx,CCm,~,~,~] = equilibrium(0*TT,0*TT,TT,cc,vv*ones(size(TT)),mean(P(:))*ones(size(TT)),Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,beta);
-plot(CCx.*100,TT,'k:','LineWidth',2); axis tight; hold on; box on;
-plot(CCm.*100,TT,'k:','LineWidth',2);
+plot(CCx.*100,TT,'k-','LineWidth',2); axis tight; hold on; box on;
+plot(CCm.*100,TT,'k-','LineWidth',2);
 plot(cxq.*100,T-(P-mean(P(:))).*clap,'b','LineStyle',linestyle,'LineWidth',2);
 plot(cmq.*100,T-(P-mean(P(:))).*clap,'r','LineStyle',linestyle,'LineWidth',2);
 plot(c./(1-fq+1e-16).*100,T-(P-mean(P(:))).*clap,'k','LineStyle',linestyle,'LineWidth',1);
