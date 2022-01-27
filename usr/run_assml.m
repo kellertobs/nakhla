@@ -1,7 +1,8 @@
 clear; close all;
 
 % set run parameters
-runID    =  'assml3';            % run identifier
+runID    =  'assml1';            % run identifier
+opdir    =  '../out/';           % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  50;                  % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot of results
@@ -24,20 +25,20 @@ tend     =  1*yr;                % end time for simulation [s]
 dt       =  10;                  % initial time step [s]
 
 % set initial thermo-chemical state
-seed     =  15;                  % random perturbation seed
-smth     =  (N/30)^2;            % regularisation of initial random perturbation
-zlay     =  0.0;                 % layer thickness (relative to domain depth D)
-wlay_T   =  1e-6;                % thickness of smooth layer boundary (relative to domain depth D)
-wlay_c   =  1e-6;                % thickness of smooth layer boundary (relative to domain depth D)
 T0       =  1050;                % temperature top layer [deg C]
 T1       =  1050;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
 c0       =  0.50;                % major component top layer [wt SiO2]
 c1       =  0.50;                % major component base layer [wt SiO2]
 dc       =  1e-5;                % amplitude of random noise [wt SiO2]
-v0       =  0.03;                % volatile component top layer [wt H2O]
-v1       =  0.03;                % volatile component base layer [wt H2O]
+v0       =  0.01;                % volatile component top layer [wt H2O]
+v1       =  0.01;                % volatile component base layer [wt H2O]
 dv       =  1e-6;                % amplitude of random noise [wt H2O]
+seed     =  15;                  % random perturbation seed
+smth     =  (N/30)^2;            % regularisation of initial random perturbation
+zlay     =  0.0;                 % layer thickness (relative to domain depth D)
+wlay_T   =  1e-6;                % thickness of smooth layer boundary (relative to domain depth D)
+wlay_c   =  1e-6;                % thickness of smooth layer boundary (relative to domain depth D)
 
 % set model trace and isotope geochemistry parameters
 it0      =  0.5;                 % incompatible tracer top layer [wt ppm]
@@ -62,6 +63,7 @@ HLRID    =  1e3*yr;              % radiogenic daughter isotope half-life [s]
 % set thermo-chemical boundary parameters
 Ptop     =  1e8;                 % top pressure [Pa]
 bndmode  =  3;                   % mode of wall cooling/outgassing/assimilation (0 = none; 1 = top only; 2 = top/bot only; 3 = all walls)
+bndinit  =  0;                   % switch on (1) to initialise with already established boundary layers
 dw       =  h;                   % boundary layer thickness for cooling/outgassing/assimilation [m]
 fin      =  0;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
 fout     =  1;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
@@ -137,13 +139,13 @@ etamax   =  1e7;                 % maximum viscosity for stabilisation
 TINY     =  1e-16;               % minimum cutoff phase, component fractions
 
 % create output directory
-if ~isfolder(['../out/',runID])
-    mkdir(['../out/',runID]);
+if ~isfolder([opdir,runID])
+    mkdir([opdir,runID]);
 end
 
 % save input parameters and runtime options (unless restarting)
 if restart == 0 
-    parfile = ['../out/',runID,'/',runID,'_par'];
+    parfile = [opdir,runID,'/',runID,'_par'];
     save(parfile);
 end
 

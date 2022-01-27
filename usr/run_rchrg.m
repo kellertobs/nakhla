@@ -2,6 +2,7 @@ clear; close all;
 
 % set run parameters
 runID    =  'rchrg3';            % run identifier
+opdir    =  '../out/';           % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  50;                  % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot of results
@@ -62,6 +63,7 @@ HLRID    =  1e3*yr;              % radiogenic daughter isotope half-life [s]
 % set thermo-chemical boundary parameters
 Ptop     =  1e8;                 % top pressure [Pa]
 bndmode  =  2;                   % mode of wall cooling/outgassing/assimilation (0 = none; 1 = top only; 2 = top/bot only; 3 = all walls)
+bndinit  =  0;                   % switch on (1) to initialise with already established boundary layers
 dw       =  h;                   % boundary layer thickness for cooling/outgassing/assimilation [m]
 fin      =  0;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
 fout     =  0;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)

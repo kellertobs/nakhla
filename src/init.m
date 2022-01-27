@@ -58,14 +58,14 @@ bndshape(:,[1 end]) = bndshape(:,[2 end-1]);
 bndshape = bndshape./(max(bndshape(:))-min(bndshape(:)));
 
 % set initial solution fields
-T   =  T0 + (T1-T0) .* (1+erf((ZZ/D-zlay)/wlay_T))/2 + dT.*rp;  if ~isnan(Twall); T = T + (Twall-T).*bndshape; end % temperature
-c   =  c0 + (c1-c0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dc.*rp;  if ~isnan(cwall); c = c + (cwall-c).*bndshape; end % major component
-v   =  v0 + (v1-v0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dv.*rp;  if ~isnan(vwall); v = v + (vwall-v).*bndshape; end % volatile component
+T   =  T0 + (T1-T0) .* (1+erf((ZZ/D-zlay)/wlay_T))/2 + dT.*rp;  if bndinit && ~isnan(Twall); T = T + (Twall-T).*bndshape; end % temperature
+c   =  c0 + (c1-c0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dc.*rp;  if bndinit && ~isnan(cwall); c = c + (cwall-c).*bndshape; end % major component
+v   =  v0 + (v1-v0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dv.*rp;  if bndinit && ~isnan(vwall); v = v + (vwall-v).*bndshape; end % volatile component
 
-it  =  it0 + (it1-it0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dit.*rp;  if ~isnan(itwall); it  = it  + (itwall-it ).*bndshape; end % incompatible trace element
-ct  =  ct0 + (ct1-ct0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dct.*rp;  if ~isnan(ctwall); ct  = ct  + (ctwall-ct ).*bndshape; end % compactible trace element
-si  =  si0 + (si1-si0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dsi.*rp;  if ~isnan(siwall); si  = si  + (siwall-si ).*bndshape; end % stable isotope ratio
-rip =  ri0 + (ri1-ri0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dri.*rp;  if ~isnan(riwall); rip = rip + (riwall-rip).*bndshape; end % radiogenic isotope parent
+it  =  it0 + (it1-it0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dit.*rp;  if bndinit && ~isnan(itwall); it  = it  + (itwall-it ).*bndshape; end % incompatible trace element
+ct  =  ct0 + (ct1-ct0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dct.*rp;  if bndinit && ~isnan(ctwall); ct  = ct  + (ctwall-ct ).*bndshape; end % compactible trace element
+si  =  si0 + (si1-si0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dsi.*rp;  if bndinit && ~isnan(siwall); si  = si  + (siwall-si ).*bndshape; end % stable isotope ratio
+rip =  ri0 + (ri1-ri0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dri.*rp;  if bndinit && ~isnan(riwall); rip = rip + (riwall-rip).*bndshape; end % radiogenic isotope parent
 rid =  rip.*HLRID./HLRIP;                                           % radiogenic isotope daughter
 
 U   =  zeros(size((XX(:,1:end-1)+XX(:,2:end))));  Ui = U;  res_U = 0.*U;
@@ -159,12 +159,12 @@ iter   =  0;
 % overwrite fields from file if restarting run
 if restart
     if     restart < 0  % restart from last continuation frame
-        name = ['../out/',runID,'/',runID,'_cont'];
+        name = [opdir,runID,'/',runID,'_cont'];
     elseif restart > 0  % restart from specified continuation frame
-        name = ['../out/',runID,'/',runID,'_',num2str(restart)];
+        name = [opdir,runID,'/',runID,'_',num2str(restart)];
     end
     load(name,'U','W','P','Pt','f','x','m','phi','chi','mu','H','C','V','T','c','v','cm','cx','vm','vf','IT','CT','SIm','SIx','SI','RIP','RID','it','ct','sim','six','si','rip','rid','dHdt','dCdt','dVdt','dITdt','dCTdt','dSImdt','dSIxdt','dfdt','dxdt','Gf','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step','sumM0','sumH0','sumC0','sumV0');
-%     name = ['../out/',runID,'/',runID,'_par'];
+%     name = [opdir,runID,'/',runID,'_par'];
 %     load(name);
     
     Pto = Pt; etao = eta; rhoo = rho; Div_rhoVo = Div_rhoV;

@@ -244,24 +244,24 @@ drawnow
 
 % save output to file
 if save_op
-    name = ['../out/',runID,'/',runID,'_vp_',num2str(floor(step/nop))];
+    name = [opdir,runID,'/',runID,'_vp_',num2str(floor(step/nop))];
     print(fh1,name,'-dpng','-r300','-opengl');
-    name = ['../out/',runID,'/',runID,'_phs_',num2str(floor(step/nop))];
+    name = [opdir,runID,'/',runID,'_phs_',num2str(floor(step/nop))];
     print(fh2,name,'-dpng','-r300','-opengl');
-    name = ['../out/',runID,'/',runID,'_mat_',num2str(floor(step/nop))];
+    name = [opdir,runID,'/',runID,'_mat_',num2str(floor(step/nop))];
     print(fh3,name,'-dpng','-r300','-opengl');
-    name = ['../out/',runID,'/',runID,'_chm',num2str(floor(step/nop))];
+    name = [opdir,runID,'/',runID,'_chm',num2str(floor(step/nop))];
     print(fh4,name,'-dpng','-r300','-opengl');
-    name = ['../out/',runID,'/',runID,'_eql',num2str(floor(step/nop))];
+    name = [opdir,runID,'/',runID,'_eql',num2str(floor(step/nop))];
     print(fh6,name,'-dpng','-r300','-opengl');
     
-    name = ['../out/',runID,'/',runID,'_',num2str(floor(step/nop))];
+    name = [opdir,runID,'/',runID,'_',num2str(floor(step/nop))];
     save(name,'U','W','P','Pt','f','x','m','phi','chi','mu','H','C','V','T','c','v','cm','cx','vm','vf','IT','CT','SIm','SIx','SI','RIP','RID','it','ct','sim','six','si','rip','rid','dHdt','dCdt','dVdt','dITdt','dCTdt','dSImdt','dSIxdt','dfdt','dxdt','Gf','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step','sumM0','sumH0','sumC0','sumV0');
-    name = ['../out/',runID,'/',runID,'_cont'];
+    name = [opdir,runID,'/',runID,'_cont'];
     save(name,'U','W','P','Pt','f','x','m','phi','chi','mu','H','C','V','T','c','v','cm','cx','vm','vf','IT','CT','SIm','SIx','SI','RIP','RID','it','ct','sim','six','si','rip','rid','dHdt','dCdt','dVdt','dITdt','dCTdt','dSImdt','dSIxdt','dfdt','dxdt','Gf','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step','sumM0','sumH0','sumC0','sumV0');
     
     if step == 1
-        logfile = ['../out/',runID,'/',runID,'.log'];
+        logfile = [opdir,runID,'/',runID,'.log'];
         if exist(logfile,'file'); delete(logfile); end
         diary(logfile)
     end
