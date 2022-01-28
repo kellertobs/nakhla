@@ -5,20 +5,20 @@ clear; addpath('../src');
 runID     = 'test';              % run ID for output files; [system name_wt.% SiO2_wt.% H2O] 
 holdfig   = 0;                   % set to 1 to hold figures, to 0 for new figures
 linestyle = '-';                 % set line style for plots
-save_plot = 1;                   % turn on (1) to save output file in /out directory
+save_plot = 0;                   % turn on (1) to save output file in /out directory
 
 % set phase diagram parameters
 cphs0    =  0.36;                % phase diagram lower bound composition [wt SiO2]
 cphs1    =  0.72;                % phase diagram upper bound composition [wt SiO2]
 Tphs0    =  750;                 % phase diagram lower bound temperature [degC]
 Tphs1    =  1750;                % phase diagram upper bound temperature [degC]
-PhDg     =  4.0;                 % Phase diagram curvature factor (> 1)
+PhDg     =  5.0;                 % Phase diagram curvature factor (> 1)
 perCm    =  0.51;                % peritectic liquidus composition [wt SiO2]
 perCx    =  0.48;                % peritectic solidus  composition [wt SiO2]
-perT     =  1050;                % peritectic temperature [degC]
+perT     =  1100;                % peritectic temperature [degC]
 clap     =  1e-7;                % Clapeyron slope for P-dependence of melting T [degC/Pa]
 dTH2O    =  [1300,1000,300];     % solidus shift from water content [degC/wt^0.75]
-beta     =  0.7;                 % iterative lag parameter phase diagram [1]
+beta     =  0.75;                % iterative lag parameter phase diagram [1]
 
 % set model rheology parameters
 etam0    =  2e2;                 % melt viscosity [Pas]
@@ -43,12 +43,12 @@ gCx      =  0.6;                 % xtal compositional expansion [1/wt]
 bPf      =  1e-8;                % mvp compressibility [1/Pa]
 dx       =  0.003;               % crystal size [m]
 df       =  0.003;               % bubble size [m]
-dm       =  0.001;               % melt film size [m]
+dm       =  0.0003;              % melt film size [m]
 g0       =  10.;                 % gravity [m/s2]
 
 % set ranges for control variables T, c, v, P
 T = linspace(600,1600,1e3);    % temperature range [degC]
-c = linspace(0.50,0.50,1e3);   % major component range [wt SiO2]
+c = linspace(0.70,0.70,1e3);   % major component range [wt SiO2]
 v = linspace(0.02,0.02,1e3);   % volatile component range [wt H2O]
 P = linspace(100,100,1e3)*1e6; % pressure range [Pa]
 
