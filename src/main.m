@@ -24,7 +24,7 @@ while time <= tend && step <= M
     RIPo    = RIP;
     RIDo    = RID;
     rhoo    = rho;
-    etao    = eta;
+    Kvbo    = Kvb;
     dHdto   = dHdt;
     dCdto   = dCdt;
     dVdto   = dVdt;

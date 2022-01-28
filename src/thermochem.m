@@ -80,7 +80,8 @@ end
 
 % update local phase equilibrium
 if react
-    [xq,cxq,cmq,fq,vfq,vmq] = equilibrium(x,f,T,c,v,Pt,Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,beta);
+%     [xq,cxq,cmq,fq,vfq,vmq] = equilibrium(x,f,T,c,v,Pt,Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,beta);
+    [xq,cxq,cmq,fq,vfq,vmq] = equilibrium((x+xo)/2,(f+fo)/2,(T+To)/2,(c+co)/2,(v+vo)/2,(Pt+Pt)/2,Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,beta);
 end
 
 % update crystal fraction
