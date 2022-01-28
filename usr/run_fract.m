@@ -1,7 +1,7 @@
 clear; close all;
 
 % set run parameters
-runID    =  'fract3';            % run identifier
+runID    =  'fract1';            % run identifier
 opdir    =  '../out/';           % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  50;                  % output frame plotted/saved every 'nop' time steps
@@ -9,7 +9,7 @@ plot_op  =  1;                   % switch on to live plot of results
 save_op  =  1;                   % switch on to save output to file
 plot_cv  =  1;                   % switch on to live plot iterative convergence
 react    =  1;                   % switch on reactive mode
-diseq    =  1;                   % switch on disequilibrium approac
+diseq    =  0;                   % switch on disequilibrium approac
 
 % set model domain parameters
 D        =  10;                  % chamber depth [m]
@@ -30,14 +30,14 @@ smth     =  (N/30)^2;            % regularisation of initial random perturbation
 zlay     =  0.5;                 % layer thickness (relative to domain depth D)
 wlay_T   =  1e-6;                % thickness of smooth layer boundary (relative to domain depth D)
 wlay_c   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
-T0       =  1050;                % temperature top layer [deg C]
-T1       =  1050;                % temperature base layer [deg C]
+T0       =  1150;                % temperature top layer [deg C]
+T1       =  1150;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
 c0       =  0.50;                % major component top layer [wt SiO2]
 c1       =  0.50;                % major component base layer [wt SiO2]
 dc       =  1e-5;                % amplitude of random noise [wt SiO2]
-v0       =  0.03;                % volatile component top layer [wt H2O]
-v1       =  0.03;                % volatile component base layer [wt H2O]
+v0       =  0.01;                % volatile component top layer [wt H2O]
+v1       =  0.01;                % volatile component base layer [wt H2O]
 dv       =  1e-6;                % amplitude of random noise [wt H2O]
 
 % set model trace and isotope geochemistry parameters
@@ -69,12 +69,12 @@ fin      =  0;                   % ingassing factor (0 = no ingassing; 1 = free 
 fout     =  1;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
 tau_a    =  2*hr;                % wall cooling/assimilation time [s]
 Twall    =  500;                 % wall temperature [degC] (nan = insulating)
-cwall    =  0.50;                % wall major component [wt SiO2] (nan = no assimilation)
-vwall    =  0.03;                % wall volatile component [wt H2O] (nan = no assimilation)
-itwall   =  1;                   % wall incomp. tracer [wt ppm] (nan = no assimilation)
-ctwall   =  1;                   % wall comp. tracer [wt ppm] (nan = no assimilation)
-siwall   =  0;                   % wall stable isotope [delta] (nan = no assimilation)
-riwall   =  1;                   % wall radiogenic isotope [wt ppm] (nan = no assimilation)
+cwall    =  nan;                 % wall major component [wt SiO2] (nan = no assimilation)
+vwall    =  nan;                 % wall volatile component [wt H2O] (nan = no assimilation)
+itwall   =  nan;                 % wall incomp. tracer [wt ppm] (nan = no assimilation)
+ctwall   =  nan;                 % wall comp. tracer [wt ppm] (nan = no assimilation)
+siwall   =  nan;                 % wall stable isotope [delta] (nan = no assimilation)
+riwall   =  nan;                 % wall radiogenic isotope [wt ppm] (nan = no assimilation)
 
 % set thermo-chemical material parameters
 kc       =  1e-7;                % chemical diffusivity [m^2/s]
@@ -90,19 +90,19 @@ cphs0    =  0.36;                % phase diagram lower bound composition [wt SiO
 cphs1    =  0.72;                % phase diagram upper bound composition [wt SiO2]
 Tphs0    =  750;                 % phase diagram lower bound temperature [degC]
 Tphs1    =  1750;                % phase diagram upper bound temperature [degC]
-PhDg     =  4.0;                 % Phase diagram curvature factor (> 1)
-perCm    =  0.52;                % peritectic liquidus composition [wt SiO2]
+PhDg     =  5.0;                 % Phase diagram curvature factor (> 1)
+perCm    =  0.51;                % peritectic liquidus composition [wt SiO2]
 perCx    =  0.48;                % peritectic solidus  composition [wt SiO2]
-perT     =  1050;                % peritectic temperature [degC]
+perT     =  1100;                % peritectic temperature [degC]
 clap     =  1e-7;                % Clapeyron slope for P-dependence of melting T [degC/Pa]
-dTH2O    =  [1300,1000,300];     % eutectic/peritectic/liquidus shift from water content [degC/wt^0.75]
+dTH2O    =  [1300,1000,300];     % solidus shift from water content [degC/wt^0.75]
 tau_r    =  60;                  % reaction time [s]
 Dsx      = -300;                 % entropy change of crystallisation [J/kg/K]
-Dsf      =  500;                 % entropy change of exsolution [J/kg/K]
+Dsf      =  400;                 % entropy change of exsolution [J/kg/K]
 
 % set model rheology parameters
-etam0    =  2e2;                 % melt viscosity [Pas]
-etaf0    =  1e0;                 % fluid viscosity [Pas]
+etam0    =  100;                 % melt viscosity [Pas]
+etaf0    =  0.1;                 % fluid viscosity [Pas]
 etax0    =  1e15;                % crystal viscosity [Pas]
 Fmc      =  1e+4;                % major component weakening factor of melt viscosity [1]
 Fmv      =  0.5;                 % volatile component weakening factor of melt viscosity [1]
@@ -123,7 +123,7 @@ gCx      =  0.6;                 % xtal compositional expansion [1/wt]
 bPf      =  1e-8;                % mvp compressibility [1/Pa]
 dx       =  3e-3;                % crystal size [m]
 df       =  3e-3;                % bubble size [m]
-dm       =  1e-3;                % melt film size [m]
+dm       =  3e-4;                % melt film size [m]
 g0       =  10.;                 % gravity [m/s2]
 
 % set numerical model parameters
@@ -133,19 +133,19 @@ rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-7;                % outer its absolute tolerance
 maxit    =  10;                  % maximum outer its
 alpha    =  0.8;                 % iterative lag parameter equilibration
-beta     =  0.7;                 % iterative lag parameter phase diagram
+beta     =  0.8;                 % iterative lag parameter phase diagram
 etamin   =  1e1;                 % minimum viscosity for stabilisation
 etamax   =  1e7;                 % maximum viscosity for stabilisation
 TINY     =  1e-16;               % minimum cutoff phase, component fractions
 
 % create output directory
-if ~isfolder(['../out/',runID])
-    mkdir(['../out/',runID]);
+if ~isfolder([opdir,'/',runID])
+    mkdir([opdir,'/',runID]);
 end
 
 % save input parameters and runtime options (unless restarting)
 if restart == 0 
-    parfile = ['../out/',runID,'/',runID,'_par'];
+    parfile = [opdir,'/',runID,'/',runID,'_par'];
     save(parfile);
 end
 
