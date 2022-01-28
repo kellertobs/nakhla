@@ -9,7 +9,7 @@ plot_op  =  1;                   % switch on to live plot of results
 save_op  =  1;                   % switch on to save output to file
 plot_cv  =  1;                   % switch on to live plot iterative convergence
 react    =  1;                   % switch on reactive mode
-diseq    =  0;                   % switch on disequilibrium approac
+diseq    =  1;                   % switch on disequilibrium approac
 
 % set model domain parameters
 D        =  10;                  % chamber depth [m]

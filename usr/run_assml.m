@@ -9,7 +9,7 @@ plot_op  =  1;                   % switch on to live plot of results
 save_op  =  1;                   % switch on to save output to file
 plot_cv  =  1;                   % switch on to live plot iterative convergence
 react    =  1;                   % switch on reactive mode
-diseq    =  0;                   % switch on disequilibrium approac
+diseq    =  1;                   % switch on disequilibrium approac
 
 % set model domain parameters
 D        =  10;                  % chamber depth [m]
@@ -63,8 +63,8 @@ HLRID    =  1e3*yr;              % radiogenic daughter isotope half-life [s]
 % set thermo-chemical boundary parameters
 Ptop     =  1e8;                 % top pressure [Pa]
 bndmode  =  3;                   % mode of wall cooling/outgassing/assimilation (0 = none; 1 = top only; 2 = top/bot only; 3 = all walls)
-bndinit  =  0;                   % switch on (1) to initialise with already established boundary layers
-dw       =  h;                   % boundary layer thickness for cooling/outgassing/assimilation [m]
+bndinit  =  1;                   % switch on (1) to initialise with already established boundary layers
+dw       =  2*h;                 % boundary layer thickness for cooling/outgassing/assimilation [m]
 fin      =  1;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
 fout     =  1;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
 tau_a    =  2*hr;                % wall assimilation time [s]
