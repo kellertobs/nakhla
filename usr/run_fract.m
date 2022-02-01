@@ -1,7 +1,7 @@
 clear; close all;
 
 % set run parameters
-runID    =  'fract1';            % run identifier
+runID    =  'fract1';           % run identifier
 opdir    =  '../out/';           % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  50;                  % output frame plotted/saved every 'nop' time steps
@@ -30,8 +30,8 @@ smth     =  (N/30)^2;            % regularisation of initial random perturbation
 zlay     =  0.5;                 % layer thickness (relative to domain depth D)
 wlay_T   =  1e-6;                % thickness of smooth layer boundary (relative to domain depth D)
 wlay_c   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
-T0       =  1150;                % temperature top layer [deg C]
-T1       =  1150;                % temperature base layer [deg C]
+T0       =  1100;                % temperature top layer [deg C]
+T1       =  1100;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
 c0       =  0.50;                % major component top layer [wt SiO2]
 c1       =  0.50;                % major component base layer [wt SiO2]
@@ -67,7 +67,7 @@ bndinit  =  0;                   % switch on (1) to initialise with already esta
 dw       =  h;                   % boundary layer thickness for cooling/outgassing/assimilation [m]
 fin      =  0;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
 fout     =  1;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
-tau_a    =  2*hr;                % wall cooling/assimilation time [s]
+tau_a    =  4*hr;                % wall cooling/assimilation time [s]
 Twall    =  500;                 % wall temperature [degC] (nan = insulating)
 cwall    =  nan;                 % wall major component [wt SiO2] (nan = no assimilation)
 vwall    =  nan;                 % wall volatile component [wt H2O] (nan = no assimilation)
@@ -121,9 +121,9 @@ aTf      =  1e-4;                % mvp  thermal expansivity [1/K]
 gCm      =  0.5;                 % melt compositional expansion [1/wt]
 gCx      =  0.6;                 % xtal compositional expansion [1/wt]
 bPf      =  1e-8;                % mvp compressibility [1/Pa]
-dx       =  3e-3;                % crystal size [m]
-df       =  3e-3;                % bubble size [m]
-dm       =  3e-4;                % melt film size [m]
+dx       =  1e-3;                % crystal size [m]
+df       =  1e-3;                % bubble size [m]
+dm       =  1e-4;                % melt film size [m]
 g0       =  10.;                 % gravity [m/s2]
 
 % set numerical model parameters

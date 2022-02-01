@@ -21,8 +21,8 @@ dTH2O    =  [1300,1000,300];     % solidus shift from water content [degC/wt^0.7
 beta     =  0.75;                % iterative lag parameter phase diagram [1]
 
 % set model rheology parameters
-etam0    =  2e2;                 % melt viscosity [Pas]
-etaf0    =  1e0;                 % fluid viscosity [Pas]
+etam0    =  100;                 % melt viscosity [Pas]
+etaf0    =  0.1;                 % fluid viscosity [Pas]
 etax0    =  1e15;                % crystal viscosity [Pas]
 Fmc      =  1e+4;                % major component weakening factor of melt viscosity [1]
 Fmv      =  0.5;                 % volatile component weakening factor of melt viscosity [1]
@@ -41,15 +41,15 @@ aTf      =  1e-4;                % mvp  thermal expansivity [1/K]
 gCm      =  0.5;                 % melt compositional expansion [1/wt]
 gCx      =  0.6;                 % xtal compositional expansion [1/wt]
 bPf      =  1e-8;                % mvp compressibility [1/Pa]
-dx       =  0.003;               % crystal size [m]
-df       =  0.003;               % bubble size [m]
-dm       =  0.0003;              % melt film size [m]
+dx       =  1e-3;                % crystal size [m]
+df       =  1e-3;                % bubble size [m]
+dm       =  1e-4;                % melt film size [m]
 g0       =  10.;                 % gravity [m/s2]
 
 % set ranges for control variables T, c, v, P
-T = linspace(600,1600,1e3);    % temperature range [degC]
-c = linspace(0.70,0.70,1e3);   % major component range [wt SiO2]
-v = linspace(0.02,0.02,1e3);   % volatile component range [wt H2O]
+T = linspace(500,1600,1e3);    % temperature range [degC]
+c = linspace(0.50,0.50,1e3);   % major component range [wt SiO2]
+v = linspace(0.01,0.01,1e3);   % volatile component range [wt H2O]
 P = linspace(100,100,1e3)*1e6; % pressure range [Pa]
 
 % equilibrium phase fractions and compositions

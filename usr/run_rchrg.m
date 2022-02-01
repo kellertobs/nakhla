@@ -25,8 +25,8 @@ tend     =  1*yr;                % end time for simulation [s]
 dt       =  10;                  % initial time step [s]
 
 % set initial thermo-chemical state
-T0       =  675;                 % temperature top layer [deg C]
-T1       =  675;                 % temperature base layer [deg C]
+T0       =  672;                 % temperature top layer [deg C]
+T1       =  672;                 % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
 c0       =  0.70;                % major component top layer [wt SiO2]
 c1       =  0.70;                % major component base layer [wt SiO2]
@@ -67,10 +67,10 @@ bndinit  =  1;                   % switch on (1) to initialise with already esta
 dw       =  2*h;                 % boundary layer thickness for cooling/outgassing/assimilation [m]
 fin      =  1;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
 fout     =  1;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
-tau_a    =  2*hr;                % wall assimilation time [s]
-Twall    =  1150;                % wall temperature [degC] (nan = insulating)
+tau_a    =  4*hr;                % wall assimilation time [s]
+Twall    =  1100;                % wall temperature [degC] (nan = insulating)
 cwall    =  0.50;                % wall major component [wt SiO2] (nan = no assimilation)
-vwall    =  0.01;                % wall volatile component [wt H2O] (nan = no assimilation)
+vwall    =  0.03;                % wall volatile component [wt H2O] (nan = no assimilation)
 itwall   =  0.5;                 % wall incomp. tracer [wt ppm] (nan = no assimilation)
 ctwall   =  2;                   % wall comp. tracer [wt ppm] (nan = no assimilation)
 siwall   =  1;                   % wall stable isotope [delta] (nan = no assimilation)
@@ -121,9 +121,9 @@ aTf      =  1e-4;                % mvp  thermal expansivity [1/K]
 gCm      =  0.5;                 % melt compositional expansion [1/wt]
 gCx      =  0.6;                 % xtal compositional expansion [1/wt]
 bPf      =  1e-8;                % mvp compressibility [1/Pa]
-dx       =  3e-3;                % crystal size [m]
-df       =  3e-3;                % bubble size [m]
-dm       =  3e-4;                % melt film size [m]
+dx       =  1e-3;                % crystal size [m]
+df       =  1e-3;                % bubble size [m]
+dm       =  1e-4;                % melt film size [m]
 g0       =  10.;                 % gravity [m/s2]
 
 % set numerical model parameters
@@ -132,8 +132,8 @@ ADVN     =  'FRM';               % advection scheme ('UPW2', 'UPW3', or 'FRM')
 rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-7;                % outer its absolute tolerance
 maxit    =  10;                  % maximum outer its
-alpha    =  0.85;                % iterative lag parameter equilibration
-beta     =  0.75;                % iterative lag parameter phase diagram
+alpha    =  0.8;                 % iterative lag parameter equilibration
+beta     =  0.8;                 % iterative lag parameter phase diagram
 etamin   =  1e1;                 % minimum viscosity for stabilisation
 etamax   =  1e7;                 % maximum viscosity for stabilisation
 TINY     =  1e-16;               % minimum cutoff phase, component fractions
