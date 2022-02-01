@@ -16,12 +16,12 @@ qTx    = - (kT(:,1:end-1)+kT(:,2:end))./2 .* ddx(T,h);                     % hea
 diff_T(2:end-1,2:end-1) = (- ddz(qTz(:,2:end-1),h) ...                     % heat diffusion
                            - ddx(qTx(2:end-1,:),h));
     
-assim = zeros(size(T));
-if ~isnan(Twall); assim = assim + rhoCp .* (Twall-T)./tau_a .* bndshape; end  % impose wall cooling
+bndH = zeros(size(T));
+if ~isnan(Twall); bndH = bndH + rhoCp.*(Twall-T)./tau_a .* bndshape; end   % impose boundary layer
 
-dHdt = - advn_H + diff_T + assim;                                          % total rate of change
+dHdt = - advn_H + diff_T + bndH;                                           % total rate of change
     
-if step>0; H = Ho + (dHdt + dHdto)/2.*dt - H*meanVolSrc*dt; end            % explicit update of enthalpy
+if step>0; H = Ho + (dHdt + dHdto)/2.*dt; end            % explicit update of enthalpy
 H([1 end],:) = H([2 end-1],:);                                             % apply boundary conditions
 H(:,[1 end]) = H(:,[2 end-1]);    
     
@@ -34,12 +34,12 @@ qcx   = - kc.*(rho(:,1:end-1)+rho(:,2:end))/2.*(m(:,1:end-1)+m(:,2:end))/2 .* dd
 diff_c(2:end-1,2:end-1) = - ddz(qcz(:,2:end-1),h) ...                      % major component diffusion
                           - ddx(qcx(2:end-1,:),h);
     
-assim = zeros(size(c));
-if ~isnan(cwall); assim = assim + (cwall-c).*rho./tau_a .* bndshape; end   % impose wall assimilation
+bndC = zeros(size(c));
+if ~isnan(cwall); bndC = bndC + rho.*(cwall-c)./tau_a .* bndshape; end     % impose boundary layer
 
-dCdt = - advn_C + diff_c + assim;                                          % total rate of change
+dCdt = - advn_C + diff_c + bndC;                                           % total rate of change
     
-if step>0; C = Co + (dCdt + dCdto)/2.*dt - C*meanVolSrc*dt; end            % explicit update of major component density
+if step>0; C = Co + (dCdt + dCdto)/2.*dt; end            % explicit update of major component density
 C = min(rho.*cphs1-TINY,max(rho.*cphs0+TINY, C ));
 C([1 end],:) = C([2 end-1],:);                                             % apply boundary conditions
 C(:,[1 end]) = C(:,[2 end-1]);  
@@ -53,12 +53,12 @@ qvx   = - kc.*(rho(:,1:end-1)+rho(:,2:end))/2.*(m(:,1:end-1)+m(:,2:end))/2 .* dd
 diff_v(2:end-1,2:end-1) = - ddz(qvz(:,2:end-1),h) ...                      % volatile component diffusion
                           - ddx(qvx(2:end-1,:),h);
 
-assim = zeros(size(v));
-if ~isnan(vwall); assim = assim + (vwall-v).*rho./tau_a .* bndshape; end   % impose wall assimilation
+bndV = zeros(size(v));
+if ~isnan(vwall); bndV = bndV + rho.*(vwall-v)./tau_a .* bndshape; end     % impose boundary layer
 
-dVdt = - advn_V + diff_v + assim;                                          % total rate of change
+dVdt = - advn_V + diff_v + bndV;                                           % total rate of change
     
-if step>0; V = Vo + (dVdt + dVdto)/2.*dt - V*meanVolSrc*dt; end            % explicit update of volatile component density
+if step>0; V = Vo + (dVdt + dVdto)/2.*dt; end            % explicit update of volatile component density
 V = min(rho.*1-TINY,max(rho.*0+TINY, V ));
 V([1 end],:) = V([2 end-1],:);                                             % apply boundary conditions
 V(:,[1 end]) = V(:,[2 end-1]);  
@@ -70,9 +70,9 @@ if step>0
     c = C./rho;
     v = V./rho;
 else
-    H = (rhoCp + rhoDs).*T;    sumH0 = sum(sum(H(2:end-1,2:end-1)));
-    C = rho.*(m.*cm + x.*cx);  sumC0 = sum(sum(C(2:end-1,2:end-1)));
-    V = rho.*(m.*vm + f.*vf);  sumV0 = sum(sum(V(2:end-1,2:end-1)));
+    H = (rhoCp + rhoDs).*T;
+    C = rho.*(m.*cm + x.*cx);
+    V = rho.*(m.*vm + f.*vf);
 end
 
 
@@ -80,8 +80,8 @@ end
 
 % update local phase equilibrium
 if react
-%     [xq,cxq,cmq,fq,vfq,vmq] = equilibrium(x,f,T,c,v,Pt,Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,beta);
-    [xq,cxq,cmq,fq,vfq,vmq] = equilibrium((x+xo)/2,(f+fo)/2,(T+To)/2,(c+co)/2,(v+vo)/2,(Pt+Pt)/2,Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,beta);
+    [xq,cxq,cmq,fq,vfq,vmq] = equilibrium(x,f,T,c,v,Pt,Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,beta);
+%     [xq,cxq,cmq,fq,vfq,vmq] = equilibrium((x+xo)/2,(f+fo)/2,(T+To)/2,(c+co)/2,(v+vo)/2,(Pt+Pt)/2,Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,beta);
 end
 
 % update crystal fraction
@@ -95,25 +95,23 @@ if (diseq && step>0) || ~react
     
     dxdt   = - advn_x + Gx;                                                % total rate of change
     
-    if step>0; x = (rhoo.*xo + (dxdt + dxdto)/2.*dt - rho.*x*meanVolSrc*dt)./rho; end  % explicit update of crystal fraction
+    if step>0; x = (rhoo.*xo + (dxdt + dxdto)/2.*dt)./rho; end  % explicit update of crystal fraction
     x = min(1-f-TINY,max(TINY,x));                                         % enforce [0,1] limit
     x([1 end],:) = x([2 end-1],:);                                         % apply boundary conditions
     x(:,[1 end]) = x(:,[2 end-1]);
-    m = 1-f-x;
     
-    if react
-        Kc = cxq./cmq;
-        cm = c./(m + x.*Kc);
-        cx = c./(m./Kc + x);
-    end
 else
     
     x  =  alpha.*x + (1-alpha).*xq;
-    cx = cxq;
-    cm = cmq;
     if step>0; Gx = (rho.*x-rhoo.*xo)./dt + advection(rho.*x,Ux,Wx,h,ADVN,'flx'); end  % reconstruct crystallisation rate
     
 end
+
+% if react
+%     Kc = cxq./cmq;
+%     cm = c./(m + x.*Kc);
+%     cx = c./(m./Kc + x);
+% end
 
 % update bubble fraction
 if (diseq && step>0) || ~react
@@ -126,28 +124,39 @@ if (diseq && step>0) || ~react
     
     dfdt   = - advn_f + Gf;                                                % total rate of change
     
-    if step>0; f = (rhoo.*fo + (dfdt + dfdto)/2.*dt- rho.*f*meanVolSrc*dt)./rho; end  % explicit update of bubble fraction
+    if step>0; f = (rhoo.*fo + (dfdt + dfdto)/2.*dt)./rho; end  % explicit update of bubble fraction
     f = min(1-x-TINY,max(TINY,f));                                         % enforce [0,1-x] limit
     f([1 end],:) = f([2 end-1],:);                                         % apply boundary conditions
     f(:,[1 end]) = f(:,[2 end-1]);
-    m = 1-f-x;
-
-    if react
-        vf = vfq;
-        vm = (v - f.*vf)./max(TINY,m); vm(m < 1e-3) = vmq(m < 1e-3);
-    end
     
 else
     
     f  =  alpha.*f + (1-alpha).*fq;
-    vf = vfq;
-    vm = vmq;
     if step>0; Gf = (rho.*f-rhoo.*fo)./dt + advection(rho.*f,Uf,Wf,h,ADVN,'flx'); end  % reconstruct exsolution rate
     
 end
 
 % update melt fraction
-m = 1-x-f;
+m = 1-f-x;
+
+% update phase compositions
+if react && step>0
+    % major component
+    cx = cxq;
+    cm = (c - x.*cx)./max(1e-2,m);
+    
+    % volatile component
+    vf = vfq;
+    vm = (v - f.*vf)./max(1e-2,m);
+    
+    % force equilibrium at low melt fraction
+    ind     = m < 1e-2;
+    f(ind)  = fq(ind);  
+    x(ind)  = xq(ind);
+    m(ind)  = mq(ind);
+    vm(ind) = vmq(ind);
+    cm(ind) = cmq(ind);
+end
 
 
 %% ***** TRACE & ISOTOPE GEOCHEMISTRY  ************************************
@@ -174,7 +183,7 @@ if ~isnan(itwall); assim = assim + (itwall-it).*rho./tau_a .* bndshape; end % im
     
 dITdt = - advn_IT + diff_it + assim;                                       % total rate of change
 
-if step>0; IT = ITo + (dITdt + dITdto)/2.*dt - IT*meanVolSrc*dt; end       % explicit update
+if step>0; IT = ITo + (dITdt + dITdto)/2.*dt; end       % explicit update
 IT = max(0+TINY, IT );
 IT([1 end],:) = IT([2 end-1],:);                                           % boundary conditions
 IT(:,[1 end]) = IT(:,[2 end-1]);
@@ -202,7 +211,7 @@ if ~isnan(ctwall); assim = assim + (ctwall-ct).*rho./tau_a .* bndshape; end % im
 
 dCTdt = - advn_CT + diff_ct + assim;                                       % total rate of change
 
-if step>0; CT = CTo + (dCTdt + dCTdto)/2.*dt - CT*meanVolSrc*dt; end       % explicit update
+if step>0; CT = CTo + (dCTdt + dCTdto)/2.*dt; end       % explicit update
 CT = max(0+TINY, CT );
 CT([1 end],:) = CT([2 end-1],:);                                           % boundary conditions
 CT(:,[1 end]) = CT(:,[2 end-1]);
@@ -226,7 +235,7 @@ if ~isnan(siwall); assim = assim + (siwall-sim).*rho.*m./tau_a .* bndshape; end 
 
 dSImdt = - advn_sim + diff_sim + assim - trns_si;                          % total rate of change
 
-if step>0; SIm = SImo + (dSImdt + dSImdto)/2.*dt - SIm*meanVolSrc*dt; end  % explicit update
+if step>0; SIm = SImo + (dSImdt + dSImdto)/2.*dt; end  % explicit update
 SIm = min(max([max(0,siwall),si0-dsi,si1+dsi]).*rho.*m,max(min([min(0,siwall),si0-dsi,si1+dsi]).*rho.*m,SIm));
 SIm(m < TINY)  = 0;
 SIm([1 end],:) = SIm([2 end-1],:);                                         % boundary conditions
@@ -246,7 +255,7 @@ if ~isnan(siwall); assim = assim + (siwall-six).*rho.*x./tau_a .* bndshape; end 
 
 dSIxdt = - advn_six + diff_six + assim + trns_si;                          % total rate of change
 
-if step>0; SIx = SIxo + (dSIxdt + dSIxdto)/2.*dt - SIx*meanVolSrc*dt; end  % explicit update
+if step>0; SIx = SIxo + (dSIxdt + dSIxdto)/2.*dt; end  % explicit update
 SIx = min(max([max(0,siwall),si0-dsi,si1+dsi]).*rho.*x,max(min([min(0,siwall),si0-dsi,si1+dsi]).*rho.*x,SIx));
 SIx(x < TINY)  = 0;
 SIx([1 end],:) = SIx([2 end-1],:);                                         % boundary conditions
@@ -282,7 +291,7 @@ if ~isnan(riwall); assim = assim + (riwall-rip).*rho./tau_a .* bndshape; end % i
                                        % secular equilibrium!
 dRIPdt = - advn_RIP + diff_rip + assim - dcy_rip + dcy_rip;                % total rate of change
                                        
-if step>0; RIP = RIPo + (dRIPdt + dRIPdto)/2.*dt - RIP*meanVolSrc*dt; end  % explicit update
+if step>0; RIP = RIPo + (dRIPdt + dRIPdto)/2.*dt; end  % explicit update
 RIP = max(0+TINY, RIP );
 RIP([1 end],:) = RIP([2 end-1],:);                                         % boundary conditions
 RIP(:,[1 end]) = RIP(:,[2 end-1]);
@@ -308,7 +317,7 @@ if ~isnan(riwall); assim = assim + (riwall.*HLRID./HLRIP-rid).*rho./tau_a .* bnd
     
 dRIDdt = - advn_RID + diff_rid + assim - dcy_rid + dcy_rip;                % total rate of change
 
-if step>0; RID = RIDo + (dRIDdt + dRIDdto)/2.*dt - RID*meanVolSrc*dt; end  % explicit update
+if step>0; RID = RIDo + (dRIDdt + dRIDdto)/2.*dt; end  % explicit update
 RID = max(0+TINY, RID );
 RID([1 end],:) = RID([2 end-1],:);                                         % boundary conditions
 RID(:,[1 end]) = RID(:,[2 end-1]);

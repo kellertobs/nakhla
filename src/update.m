@@ -111,11 +111,8 @@ Div_rhoV =  + advection(rho.*m,0.*U,wm,h,ADVN,'flx') ...
             + advection(rho.*f,0.*U,wf,h,ADVN,'flx') ...
             + advection(rho.*x,0.*U,wx,h,ADVN,'flx') ...
             + advection(rho   ,U   ,W ,h,ADVN,'flx');
-if step>0; VolSrc = -((rho-rhoo)./dt + Div_rhoV - rho.*Div_V)./rho; end
+VolSrc = -((rho-rhoo)./dt + Div_rhoV - rho.*Div_V)./rho;
+% VolSrc = -((rho-rhoo)./dt + (Div_rhoV - rho.*Div_V + Div_rhoVo)./2)./rho;
 
-meanVolSrc = mean(mean(VolSrc(2:end-1,2:end-1)));
-VolSrc     = VolSrc - meanVolSrc;
-
-UBG    = - 0.*mean(mean(VolSrc(2:end-1,2:end-1)))./2 .* (L/2-XXu);
+UBG    = - mean(mean(VolSrc(2:end-1,2:end-1)))./1 .* (L/2-XXu);
 WBG    = - 0.*mean(mean(VolSrc(2:end-1,2:end-1)))./2 .* (D/2-ZZw);
-

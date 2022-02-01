@@ -155,6 +155,7 @@ VolSrc = 0.*P;   MassErr = 0;  drhodt = 0.*P;  drhodto = 0.*P;
 step   =  0;
 time   =  0;
 iter   =  0;
+hist   = [];
 
 % overwrite fields from file if restarting run
 if restart
@@ -163,7 +164,7 @@ if restart
     elseif restart > 0  % restart from specified continuation frame
         name = [opdir,'/',runID,'/',runID,'_',num2str(restart)];
     end
-    load(name,'U','W','P','Pt','f','x','m','phi','chi','mu','H','C','V','T','c','v','cm','cx','vm','vf','IT','CT','SIm','SIx','SI','RIP','RID','it','ct','sim','six','si','rip','rid','dHdt','dCdt','dVdt','dITdt','dCTdt','dSImdt','dSIxdt','dfdt','dxdt','Gf','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step','sumM0','sumH0','sumC0','sumV0');
+    load(name,'U','W','P','Pt','f','x','m','phi','chi','mu','H','C','V','T','c','v','cm','cx','vm','vf','IT','CT','SIm','SIx','SI','RIP','RID','it','ct','sim','six','si','rip','rid','dHdt','dCdt','dVdt','dITdt','dCTdt','dSImdt','dSIxdt','dfdt','dxdt','Gf','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step','hist');
 %     name = [opdir,runID,'/',runID,'_par'];
 %     load(name);
     

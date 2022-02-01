@@ -218,27 +218,39 @@ plot(time./3600,(meanm),'ro',time./3600,(meanf),'bo',time./3600,(meanx),'ko','Ma
 xlabel('Time [hr]',TX{:},FS{:});
 ylabel('$\mu$, $\phi$, $\chi$ [vol]',TX{:},FS{:});
 
-fh8 = figure(8);
-if step==0
-    sumM0 = sum(sum(rho(2:end-1,2:end-1)));
-    sumH0 = sum(sum(H(2:end-1,2:end-1)));
-    sumC0 = sum(sum(C(2:end-1,2:end-1)));
-    sumV0 = sum(sum(V(2:end-1,2:end-1)));
-end
-Mass = sum(sum(rho(2:end-1,2:end-1)));
+fh8 = figure(8); clf;
+if step>0
 subplot(4,1,1);
-plot(time./3600,sum(sum(H(2:end-1,2:end-1)))./Mass./(sumH0./sumM0)-(1-0*MassErr),'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
-ylabel('consv. $H$',TX{:},FS{:}); set(gca,'XTickLabel',[]);
+plot(hist.time(1:nop:end)./3600,hist.DM(1:nop:end),'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
+ylabel('consv. $M$',TX{:},FS{:}); set(gca,'XTickLabel',[]);
 subplot(4,1,2);
-plot(time./3600,sum(sum(C(2:end-1,2:end-1)))./Mass./(sumC0./sumM0)-(1-0*MassErr),'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
-ylabel('consv. $C$',TX{:},FS{:}); set(gca,'XTickLabel',[]);
+plot(hist.time(1:nop:end)./3600,hist.DH(1:nop:end),'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
+ylabel('consv. $H$',TX{:},FS{:}); set(gca,'XTickLabel',[]);
 subplot(4,1,3);
-plot(time./3600,sum(sum(V(2:end-1,2:end-1)))./Mass./(sumV0./sumM0)-(1-0*MassErr),'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
-ylabel('consv. $V$',TX{:},FS{:}); set(gca,'XTickLabel',[]);
+plot(hist.time(1:nop:end)./3600,hist.DC(1:nop:end),'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
+ylabel('consv. $C$',TX{:},FS{:}); set(gca,'XTickLabel',[]);
 subplot(4,1,4);
-plot(time./3600,sum(sum(rho(2:end-1,2:end-1)))./sumM0-(1+MassErr),'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
-ylabel('consv. $M$',TX{:},FS{:});
+plot(hist.time(1:nop:end)./3600,hist.DV(1:nop:end),'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
+ylabel('consv. $V$',TX{:},FS{:});
 xlabel('Time [hr]',TX{:},FS{:});
+end
+
+fh9 = figure(9); clf;
+if step>0
+subplot(4,1,1);
+plot(hist.time(1:nop:end)./3600,hist.EM(1:nop:end),'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
+ylabel('error $M$',TX{:},FS{:}); set(gca,'XTickLabel',[]);
+subplot(4,1,2);
+plot(hist.time(1:nop:end)./3600,hist.EH(1:nop:end),'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
+ylabel('error $H$',TX{:},FS{:}); set(gca,'XTickLabel',[]);
+subplot(4,1,3);
+plot(hist.time(1:nop:end)./3600,hist.EC(1:nop:end),'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
+ylabel('error $C$',TX{:},FS{:}); set(gca,'XTickLabel',[]);
+subplot(4,1,4);
+plot(hist.time(1:nop:end)./3600,hist.EV(1:nop:end),'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
+ylabel('error $V$',TX{:},FS{:});
+xlabel('Time [hr]',TX{:},FS{:});
+end
 
 drawnow
 
@@ -256,9 +268,9 @@ if save_op
     print(fh6,name,'-dpng','-r300','-opengl');
     
     name = [opdir,'/',runID,'/',runID,'_',num2str(floor(step/nop))];
-    save(name,'U','W','P','Pt','f','x','m','phi','chi','mu','H','C','V','T','c','v','cm','cx','vm','vf','IT','CT','SIm','SIx','SI','RIP','RID','it','ct','sim','six','si','rip','rid','dHdt','dCdt','dVdt','dITdt','dCTdt','dSImdt','dSIxdt','dfdt','dxdt','Gf','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step','sumM0','sumH0','sumC0','sumV0');
+    save(name,'U','W','P','Pt','f','x','m','phi','chi','mu','H','C','V','T','c','v','cm','cx','vm','vf','IT','CT','SIm','SIx','SI','RIP','RID','it','ct','sim','six','si','rip','rid','dHdt','dCdt','dVdt','dITdt','dCTdt','dSImdt','dSIxdt','dfdt','dxdt','Gf','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step','hist');
     name = [opdir,'/',runID,'/',runID,'_cont'];
-    save(name,'U','W','P','Pt','f','x','m','phi','chi','mu','H','C','V','T','c','v','cm','cx','vm','vf','IT','CT','SIm','SIx','SI','RIP','RID','it','ct','sim','six','si','rip','rid','dHdt','dCdt','dVdt','dITdt','dCTdt','dSImdt','dSIxdt','dfdt','dxdt','Gf','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step','sumM0','sumH0','sumC0','sumV0');
+    save(name,'U','W','P','Pt','f','x','m','phi','chi','mu','H','C','V','T','c','v','cm','cx','vm','vf','IT','CT','SIm','SIx','SI','RIP','RID','it','ct','sim','six','si','rip','rid','dHdt','dCdt','dVdt','dITdt','dCTdt','dSImdt','dSIxdt','dfdt','dxdt','Gf','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step','hist');
     
     if step == 0
         logfile = [opdir,'/',runID,'/',runID,'.log'];
@@ -267,5 +279,5 @@ if save_op
     end
 end
 
-clear fh1 fh2 fh3 fh4 fh5 fh6 fh7 fh8
+clear fh1 fh2 fh3 fh4 fh5 fh6 fh7 fh8 fh9
     

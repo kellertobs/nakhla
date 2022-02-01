@@ -38,6 +38,7 @@ while time <= tend && step <= M
     dRIDdto = dRIDdt;
     Pto     = Pt;
     dto     = dt;
+    Div_rhoVo = Div_rhoV - rho.*Div_V;
     
     % reset residuals and iteration count
     resnorm  = 1e3;
@@ -65,6 +66,9 @@ while time <= tend && step <= M
         iter = iter+1;
     end
     
+    % record model history
+    history;
+    
     % print diagnostics
     fprintf(1,'\n         time to solution = %4.4f sec\n\n',toc);
     
@@ -83,9 +87,6 @@ while time <= tend && step <= M
     fprintf(1,'         min W   = %1.4f;    mean W   = %1.4f;    max W   = %1.4f;   [m/s]\n'  ,min(-W(:) ),mean(-W(:) ),max(-W(:) ));
     fprintf(1,'         min P   = %2.4f;    mean P   = %2.4f;    max P   = %2.4f;  [kPa]\n\n',min(P(:)./1e3),mean(P(:)./1e3),max(P(:)./1e3));
 
-    % update mass error due to constant domain volume enforced
-    MassErr = MassErr - meanVolSrc.*dt;
-    
     % plot results
     if ~mod(step,nop); output; end
     
