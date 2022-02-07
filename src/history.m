@@ -37,15 +37,15 @@ hist.EV(step+1) = (hist.sumV(step+1)./hist.sumM(step+1)-hist.DV(step+1))./(hist.
 
 % record variable and coefficient diagnostics
 hist.W(step+1,1) = min(min(W(:,2:end-1)));
-hist.W(step+1,2) = mean(mean(W(:,2:end-1)));
+hist.W(step+1,2) = mean(mean(abs(W(:,2:end-1))));
 hist.W(step+1,3) = max(max(W(:,2:end-1)));
 
 hist.U(step+1,1) = min(min(U(:,2:end-1)));
-hist.U(step+1,2) = mean(mean(U(:,2:end-1)));
+hist.U(step+1,2) = mean(mean(abs(U(:,2:end-1))));
 hist.U(step+1,3) = max(max(U(:,2:end-1)));
 
 hist.P(step+1,1) = min(min(P(:,2:end-1)));
-hist.P(step+1,2) = mean(mean(P(:,2:end-1)));
+hist.P(step+1,2) = mean(mean(abs(P(:,2:end-1))));
 hist.P(step+1,3) = max(max(P(:,2:end-1)));
 
 hist.x(step+1,1) = min(min(x(:,2:end-1)));
