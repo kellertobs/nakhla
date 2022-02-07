@@ -1,7 +1,7 @@
 %% update time step
 dtk = min((h/2)^2./max([kT(:)./rhoCp(:);kc]));                             % diffusive time step size
 dta = min(min(h/2/max(abs([UBG(:);WBG(:);Um(:);Wm(:);Uf(:);Wf(:);Ux(:);Wx(:)]+1e-16)))); % advective time step size
-dt  = min(2*dto,CFL*min([dtk,dta]));                                       % physical time step size
+dt  = min([2*dto,dtmax,CFL*min(dtk,dta)]);                                 % physical time step size
 
 
 %% *****  THERMO-CHEMICAL EVOLUTION  **************************************
@@ -81,14 +81,13 @@ end
 % update local phase equilibrium
 if react
     [xq,cxq,cmq,fq,vfq,vmq] = equilibrium(x,f,T,c,v,Pt,Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,beta);
-%     [xq,cxq,cmq,fq,vfq,vmq] = equilibrium((x+xo)/2,(f+fo)/2,(T+To)/2,(c+co)/2,(v+vo)/2,(Pt+Pt)/2,Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,beta);
 end
 
 % update crystal fraction
 if (diseq && step>0) || ~react
     
     if react
-        Gx = alpha.*Gx + (1-alpha).*((xq-x).*rho./max(2.*dt,tau_r));
+        Gx = alpha.*Gx + (1-alpha).*((xq-x).*rho./max(3.*dt,tau_r));
     end
     
     advn_x = advection(rho.*x,Ux,Wx,h,ADVN,'flx');                         % get advection term
@@ -107,17 +106,11 @@ else
     
 end
 
-% if react
-%     Kc = cxq./cmq;
-%     cm = c./(m + x.*Kc);
-%     cx = c./(m./Kc + x);
-% end
-
 % update bubble fraction
 if (diseq && step>0) || ~react
     
     if react
-        Gf = alpha.*Gf + (1-alpha).*((fq-f).*rho./max(2.*dt,tau_r));
+        Gf = alpha.*Gf + (1-alpha).*((fq-f).*rho./max(3.*dt,tau_r));
     end
     
     advn_f = advection(rho.*f,Uf,Wf,h,ADVN,'flx');                         % get advection term
@@ -137,25 +130,21 @@ else
 end
 
 % update melt fraction
-m = 1-f-x;
+m = min(1-x-TINY,max(TINY,1-f-x));
 
 % update phase compositions
 if react && step>0
+
     % major component
-    cx = cxq;
-    cm = (c - x.*cx)./max(1e-2,m);
+    Kc = cxq./cmq;
+    cm = c./(m + x.*Kc);
+    cx = c./(m./Kc + x);
     
     % volatile component
-    vf = vfq;
-    vm = (v - f.*vf)./max(1e-2,m);
-    
-    % force equilibrium at low melt fraction
-    ind     = m < 1e-2;
-    f(ind)  = fq(ind);  
-    x(ind)  = xq(ind);
-    m(ind)  = mq(ind);
-    vm(ind) = vmq(ind);
-    cm(ind) = cmq(ind);
+    Kf = vfq./vmq;
+    vm = v./(m + f.*Kf);
+    vf = v./(m./Kf + f);
+
 end
 
 

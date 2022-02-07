@@ -1,9 +1,9 @@
 clear; close all;
 
 % set run parameters
-runID    =  'rchrg1';            % run identifier
+runID    =  'rchrg3';            % run identifier
 opdir    =  '../out/';           % output directory
-restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
+restart  =  -1;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  50;                  % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot of results
 save_op  =  1;                   % switch on to save output to file
@@ -23,6 +23,7 @@ hr       =  3600;                % conversion seconds to hours
 yr       =  24*365.25*hr;        % conversion seconds to years
 tend     =  1*yr;                % end time for simulation [s]
 dt       =  10;                  % initial time step [s]
+dtmax    =  10;                  % maximum time step [s]
 
 % set initial thermo-chemical state
 T0       =  672;                 % temperature top layer [deg C]
@@ -65,8 +66,8 @@ Ptop     =  1e8;                 % top pressure [Pa]
 bndmode  =  2;                   % mode of wall cooling/outgassing/assimilation (0 = none; 1 = top only; 2 = top/bot only; 3 = all walls)
 bndinit  =  1;                   % switch on (1) to initialise with already established boundary layers
 dw       =  2*h;                 % boundary layer thickness for cooling/outgassing/assimilation [m]
-fin      =  1;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
-fout     =  1;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
+fin      =  0;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
+fout     =  0;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
 tau_a    =  4*hr;                % wall assimilation time [s]
 Twall    =  1100;                % wall temperature [degC] (nan = insulating)
 cwall    =  0.50;                % wall major component [wt SiO2] (nan = no assimilation)
@@ -132,8 +133,8 @@ ADVN     =  'FRM';               % advection scheme ('UPW2', 'UPW3', or 'FRM')
 rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-7;                % outer its absolute tolerance
 maxit    =  10;                  % maximum outer its
-alpha    =  0.8;                 % iterative lag parameter equilibration
-beta     =  0.8;                 % iterative lag parameter phase diagram
+alpha    =  0.75;                % iterative lag parameter equilibration
+beta     =  0.75;                % iterative lag parameter phase diagram
 etamin   =  1e1;                 % minimum viscosity for stabilisation
 etamax   =  1e7;                 % maximum viscosity for stabilisation
 TINY     =  1e-16;               % minimum cutoff phase, component fractions

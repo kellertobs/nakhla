@@ -14,7 +14,7 @@ diseq    =  1;                   % switch on disequilibrium approac
 % set model domain parameters
 D        =  10;                  % chamber depth [m]
 L        =  10;                  % chamber width [m]
-N        =  200 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
+N        =  250 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
 h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
@@ -23,6 +23,7 @@ hr       =  3600;                % conversion seconds to hours
 yr       =  24*365.25*hr;        % conversion seconds to years
 tend     =  1*yr;                % end time for simulation [s]
 dt       =  10;                  % initial time step [s]
+dtmax    =  10;                  % maximum time step [s]
 
 % set initial thermo-chemical state
 T0       =  1100;                % temperature top layer [deg C]
@@ -65,8 +66,8 @@ Ptop     =  1e8;                 % top pressure [Pa]
 bndmode  =  3;                   % mode of wall cooling/outgassing/assimilation (0 = none; 1 = top only; 2 = top/bot only; 3 = all walls)
 bndinit  =  1;                   % switch on (1) to initialise with already established boundary layers
 dw       =  2*h;                 % boundary layer thickness for cooling/outgassing/assimilation [m]
-fin      =  1;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
-fout     =  1;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
+fin      =  0;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
+fout     =  0;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
 tau_a    =  4*hr;                % wall assimilation time [s]
 Twall    =  500;                 % wall temperature [degC] (nan = insulating)
 cwall    =  0.70;                % wall major component [wt SiO2] (nan = no assimilation)
@@ -96,7 +97,7 @@ perCx    =  0.48;                % peritectic solidus  composition [wt SiO2]
 perT     =  1100;                % peritectic temperature [degC]
 clap     =  1e-7;                % Clapeyron slope for P-dependence of melting T [degC/Pa]
 dTH2O    =  [1300,1000,300];     % solidus shift from water content [degC/wt^0.75]
-tau_r    =  60;                  % reaction time [s]
+tau_r    =  30;                  % reaction time [s]
 Dsx      = -300;                 % entropy change of crystallisation [J/kg/K]
 Dsf      =  400;                 % entropy change of exsolution [J/kg/K]
 
@@ -129,8 +130,8 @@ g0       =  10.;                 % gravity [m/s2]
 % set numerical model parameters
 CFL      =  0.25;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 ADVN     =  'FRM';               % advection scheme ('UPW2', 'UPW3', or 'FRM')
-rtol     =  1e-4;                % outer its relative tolerance
-atol     =  1e-7;                % outer its absolute tolerance
+rtol     =  1e-3;                % outer its relative tolerance
+atol     =  1e-6;                % outer its absolute tolerance
 maxit    =  10;                  % maximum outer its
 alpha    =  0.75;                % iterative lag parameter equilibration
 beta     =  0.75;                % iterative lag parameter phase diagram

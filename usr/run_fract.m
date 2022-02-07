@@ -1,7 +1,7 @@
 clear; close all;
 
 % set run parameters
-runID    =  'fract1';           % run identifier
+runID    =  'fract3';            % run identifier
 opdir    =  '../out/';           % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  50;                  % output frame plotted/saved every 'nop' time steps
@@ -14,7 +14,7 @@ diseq    =  1;                   % switch on disequilibrium approac
 % set model domain parameters
 D        =  10;                  % chamber depth [m]
 L        =  10;                  % chamber width [m]
-N        =  200 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
+N        =  250 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
 h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
@@ -23,6 +23,7 @@ hr       =  3600;                % conversion seconds to hours
 yr       =  24*365.25*hr;        % conversion seconds to years
 tend     =  1*yr;                % end time for simulation [s]
 dt       =  10;                  % initial time step [s]
+dtmax    =  10;                  % maximum time step [s]
 
 % set initial thermo-chemical state
 seed     =  15;                  % random perturbation seed
@@ -36,8 +37,8 @@ dT       =  0;                   % amplitude of random noise [deg C]
 c0       =  0.50;                % major component top layer [wt SiO2]
 c1       =  0.50;                % major component base layer [wt SiO2]
 dc       =  1e-5;                % amplitude of random noise [wt SiO2]
-v0       =  0.01;                % volatile component top layer [wt H2O]
-v1       =  0.01;                % volatile component base layer [wt H2O]
+v0       =  0.03;                % volatile component top layer [wt H2O]
+v1       =  0.03;                % volatile component base layer [wt H2O]
 dv       =  1e-6;                % amplitude of random noise [wt H2O]
 
 % set model trace and isotope geochemistry parameters
@@ -70,7 +71,7 @@ fout     =  1;                   % outgassing factor (0 = no outgassing; 1 = fre
 tau_a    =  4*hr;                % wall cooling/assimilation time [s]
 Twall    =  500;                 % wall temperature [degC] (nan = insulating)
 cwall    =  nan;                 % wall major component [wt SiO2] (nan = no assimilation)
-vwall    =  nan;                 % wall volatile component [wt H2O] (nan = no assimilation)
+vwall    =  nan;                % wall volatile component [wt H2O] (nan = no assimilation)
 itwall   =  nan;                 % wall incomp. tracer [wt ppm] (nan = no assimilation)
 ctwall   =  nan;                 % wall comp. tracer [wt ppm] (nan = no assimilation)
 siwall   =  nan;                 % wall stable isotope [delta] (nan = no assimilation)
@@ -96,7 +97,7 @@ perCx    =  0.48;                % peritectic solidus  composition [wt SiO2]
 perT     =  1100;                % peritectic temperature [degC]
 clap     =  1e-7;                % Clapeyron slope for P-dependence of melting T [degC/Pa]
 dTH2O    =  [1300,1000,300];     % solidus shift from water content [degC/wt^0.75]
-tau_r    =  60;                  % reaction time [s]
+tau_r    =  30;                  % reaction time [s]
 Dsx      = -300;                 % entropy change of crystallisation [J/kg/K]
 Dsf      =  400;                 % entropy change of exsolution [J/kg/K]
 
@@ -129,11 +130,11 @@ g0       =  10.;                 % gravity [m/s2]
 % set numerical model parameters
 CFL      =  0.25;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 ADVN     =  'FRM';               % advection scheme ('UPW2', 'UPW3', or 'FRM')
-rtol     =  1e-4;                % outer its relative tolerance
-atol     =  1e-7;                % outer its absolute tolerance
+rtol     =  1e-3;                % outer its relative tolerance
+atol     =  1e-6;                % outer its absolute tolerance
 maxit    =  10;                  % maximum outer its
-alpha    =  0.8;                 % iterative lag parameter equilibration
-beta     =  0.8;                 % iterative lag parameter phase diagram
+alpha    =  0.75;                % iterative lag parameter equilibration
+beta     =  0.75;                % iterative lag parameter phase diagram
 etamin   =  1e1;                 % minimum viscosity for stabilisation
 etamax   =  1e7;                 % maximum viscosity for stabilisation
 TINY     =  1e-16;               % minimum cutoff phase, component fractions
