@@ -94,7 +94,7 @@ wf = ((rhof(1:end-1,:)+rhof(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0.*((K
 wf([1 end],:) = [fout;fin].*wf([2 end-1],:);
 wf(:,[1 end]) = sds*wf(:,[2 end-1]);
 
-wm = ((rhom(1:end-1,:)+rhom(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0.*((Ksgr_m(1:end-1,:)+Ksgr_m(2:end,:))/2); % melt segregation speed
+wm = 0.*((rhom(1:end-1,:)+rhom(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0.*((Ksgr_m(1:end-1,:)+Ksgr_m(2:end,:))/2); % melt segregation speed
 wm([1 end],:) = 0;
 wm(:,[1 end]) = sds*wm(:,[2 end-1]);
 
@@ -114,5 +114,5 @@ Div_rhoV =  + advection(rho.*m,0.*U,wm,h,ADVN,'flx') ...
 VolSrc = -((rho-rhoo)./dt + Div_rhoV - rho.*Div_V)./rho;
 % VolSrc = -((rho-rhoo)./dt + (Div_rhoV - rho.*Div_V + Div_rhoVo)./2)./rho;
 
-UBG    = - mean(mean(VolSrc(2:end-1,2:end-1)))./1 .* (L/2-XXu);
-WBG    = - 0.*mean(mean(VolSrc(2:end-1,2:end-1)))./2 .* (D/2-ZZw);
+UBG    = - mean(mean(VolSrc(2:end-1,2:end-1)))./2 .* (L/2-XXu);
+WBG    = - mean(mean(VolSrc(2:end-1,2:end-1)))./2 .* (D/2-ZZw);
