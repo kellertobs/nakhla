@@ -68,7 +68,8 @@ bndinit  =  1;                   % switch on (1) to initialise with already esta
 dw       =  2*h;                 % boundary layer thickness for cooling/outgassing/assimilation [m]
 fin      =  0;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
 fout     =  0;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
-tau_a    =  4*hr;                % wall assimilation time [s]
+tau_T    =  4*hr;                % wall cooling time [s]
+tau_a    =  8*hr;                % wall assimilation time [s]
 Twall    =  1100;                % wall temperature [degC] (nan = insulating)
 cwall    =  0.50;                % wall major component [wt SiO2] (nan = no assimilation)
 vwall    =  0.03;                % wall volatile component [wt H2O] (nan = no assimilation)
