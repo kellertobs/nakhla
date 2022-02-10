@@ -5,6 +5,84 @@ if plot_op
     TL = {'TickLabelInterpreter','Latex'}; TS = {'FontSize',10};
     UN = {'Units','Centimeters'};
     
+    if Nx <= 5 && Nz <= 5  % create 0D plots
+        
+        if iter > 0
+            
+            figure(1); clf;
+            subplot(5,1,1)
+            plot(hist.time/hr,hist.T(:,2),'LineWidth',2); axis xy tight; box on;
+            title('$T [^\circ$C]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+            subplot(5,1,2)
+            plot(hist.time/hr,hist.c(:,2),'LineWidth',2); axis xy tight; box on;
+            title('$\bar{c}$ [wt\% SiO$_2$]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+            subplot(5,1,3)
+            plot(hist.time/hr,hist.v(:,2),'LineWidth',2); axis xy tight; box on;
+            title('$\bar{v}$ [wt\% H$_2$O]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+            subplot(5,1,4)
+            plot(hist.time/hr,hist.chi(:,2),'LineWidth',2); axis xy tight; box on;
+            title(['$\chi$ [vol\%]'],TX{:},FS{:}); set(gca,TL{:},TS{:});
+            subplot(5,1,5)
+            plot(hist.time/hr,hist.phi(:,2),'LineWidth',2); axis xy tight; box on;
+            title(['$\phi$ [vol\%]'],TX{:},FS{:}); set(gca,TL{:},TS{:});
+            
+            figure(2);
+            subplot(5,1,1)
+            plot(hist.time/hr,hist.W(:,2),'LineWidth',2); axis xy tight; box on;
+            title('$W$ [m/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+            subplot(5,1,2)
+            plot(hist.time/hr,hist.wx(:,2),'LineWidth',2); axis xy tight; box on;
+            title('$w_\Delta^x$ [m/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+            subplot(5,1,3)
+            plot(hist.time/hr,hist.wf(:,2),'LineWidth',2); axis xy tight; box on;
+            title('$w_\Delta^x$ [m/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+            subplot(5,1,4)
+            plot(hist.time/hr,hist.rho(:,2),'LineWidth',2); axis xy tight; box on;
+            title('$\bar{\rho}$ [kg/m$^3$]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+            subplot(5,1,5)
+            plot(hist.time/hr,hist.eta(:,2),'LineWidth',2); axis xy tight; box on;
+            title('$\bar{\eta}$ [log$_{10}$ Pas]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+            
+        end
+        
+    elseif Nx <= 0.1*Nz  % create 1D plots
+        
+        figure(1); clf;
+        subplot(1,5,1)
+        plot(mean(T(2:end-1,2:end-1),2),Z(2:end-1).','LineWidth',2); axis ij tight; box on;
+        title('$T [^\circ$C]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+        subplot(1,5,2)
+        plot(mean(c(2:end-1,2:end-1),2),Z(2:end-1).','LineWidth',2); axis ij tight; box on;
+        title('$\bar{c}$ [wt\% SiO$_2$]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+        subplot(1,5,3)
+        plot(mean(v(2:end-1,2:end-1),2),Z(2:end-1).','LineWidth',2); axis ij tight; box on;
+        title('$\bar{v}$ [wt\% H$_2$O]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+        subplot(1,5,4)
+        plot(mean(chi(2:end-1,2:end-1),2),Z(2:end-1).','LineWidth',2); axis ij tight; box on;
+        title(['$\chi$ [vol\%]'],TX{:},FS{:}); set(gca,TL{:},TS{:});
+        subplot(1,5,5)
+        plot(mean(phi(2:end-1,2:end-1),2),Z(2:end-1).','LineWidth',2); axis ij tight; box on;
+        title(['$\phi$ [vol\%]'],TX{:},FS{:}); set(gca,TL{:},TS{:});
+        
+        figure(2);
+        subplot(1,5,1)
+        plot(mean(-W(:,2:end-1),2)*hr,Zfc.','LineWidth',2); axis ij tight; box on;
+        title('$W$ [m/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+        subplot(1,5,2)
+        plot(mean(-(chi(1:end-1,2:end-1)+chi(2:end,2:end-1))/2.*wx(:,2:end-1),2)*hr,Zfc.','LineWidth',2); axis ij tight; box on;
+        title('$w_\Delta^x$ [m/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+        subplot(1,5,3)
+        plot(mean(-(phi(1:end-1,2:end-1)+phi(2:end,2:end-1))/2.*wf(:,2:end-1),2)*hr,Zfc.','LineWidth',2); axis ij tight; box on;
+        title('$w_\Delta^x$ [m/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+        subplot(1,5,4)
+        plot(mean(rho(2:end-1,2:end-1),2),Z(2:end-1).','LineWidth',2); axis ij tight; box on;
+        title('$\bar{\rho}$ [kg/m$^3$]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+        subplot(1,5,5)
+        plot(mean(log10(eta(2:end-1,2:end-1)),2),Z(2:end-1).','LineWidth',2); axis ij tight; box on;
+        title('$\bar{\eta}$ [log$_{10}$ Pas]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+    
+    else % create 2D plots
+        
     % set axis and border dimensions
     axh = 6.00; axw = axh*L/D;
     ahs = 0.40; avs = 0.2;
@@ -134,11 +212,11 @@ if plot_op
     figure(4);
     axes(ax(41));
     imagesc(X(2:end-1),Z(2:end-1),      rho(2:end-1,2:end-1) ); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\rho$ [kg/m$^3$]'],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel('Depth [m]',TX{:},FS{:});
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\bar{\rho}$ [kg/m$^3$]'],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel('Depth [m]',TX{:},FS{:});
     text(L/2,0.9*D,['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','w','VerticalAlignment','middle','HorizontalAlignment','center');
     axes(ax(42));
     imagesc(X(2:end-1),Z(2:end-1),log10(eta(2:end-1,2:end-1))); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\eta$ [log$_{10}$ Pas]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\bar{\eta}$ [log$_{10}$ Pas]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
     axes(ax(43));
     imagesc(X(2:end-1),Z(2:end-1),-(chi(1:end-1,2:end-1)+chi(2:end,2:end-1))/2.*wx(:,2:end-1).*hr); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$w_\Delta^x$ [m/hr]'],TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:}); xlabel('Width [m]',TX{:},FS{:});
@@ -181,110 +259,114 @@ if plot_op
         imagesc(X(2:end-1),Z(2:end-1), res_P(2:end-1,2:end-1)./(1e-16+norm(RR(:),2)./N)); axis ij equal tight; box on; cb = colorbar;
         set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['res. $P$'],TX{:},FS{:}); set(gca,'YTickLabel',[]); 
     end
-end
-
-% plot phase diagram
-fh7 = figure(7); clf;
-vv = (4.8e-5.*Ptop.^0.6 + 1e-9.*Ptop)./100;
-TT = linspace(Tphs0+Ptop*clap,Tphs1+Ptop*clap,1e3);
-cc = [linspace(cphs1,(perCx+perCm)/2,ceil((perT-Tphs0)./(Tphs1-Tphs0)*1e3)),linspace((perCx+perCm)/2,cphs0,floor((perT-Tphs1)./(Tphs0-Tphs1)*1e3))];
-[~,CCx,CCm,~,~,~] = equilibrium(0*TT,0*TT,TT,cc,0*TT,Ptop*ones(size(TT)),Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,beta);
-plot(CCx,TT,'k:','LineWidth',2); axis tight; hold on; box on;
-plot(CCm,TT,'k:','LineWidth',2);
-Tphs0s = Tphs0-dTH2O(1)*v0^0.75;
-Tphs1s = Tphs1-dTH2O(3)*v0^0.75;
-perTs  = perT-dTH2O(2)*v0^0.75;
-TT = linspace(Tphs0s+Ptop*clap,Tphs1s+Ptop*clap,1e3);
-cc = [linspace(cphs1,(perCx+perCm)/2,round((perTs-Tphs0s)./(Tphs1s-Tphs0s)*1e3)),linspace((perCx+perCm)/2,cphs0,round((perTs-Tphs1s)./(Tphs0s-Tphs1s)*1e3))];
-[~,CCx,CCm,~,~,~] = equilibrium(0*TT,0*TT,TT,cc,v0*ones(size(TT)),Ptop*ones(size(TT)),Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,beta);
-plot(CCx,TT,'k-','LineWidth',2); axis tight; hold on; box on;
-plot(CCm,TT,'k-','LineWidth',2);
-Tphs0s = Tphs0-dTH2O(1)*vv^0.75;
-Tphs1s = Tphs1-dTH2O(3)*vv^0.75;
-perTs  = perT-dTH2O(2)*vv^0.75;
-TT = linspace(Tphs0s+Ptop*clap,Tphs1s+Ptop*clap,1e3);
-cc = [linspace(cphs1,(perCx+perCm)/2,round((perTs-Tphs0s)./(Tphs1s-Tphs0s)*1e3)),linspace((perCx+perCm)/2,cphs0,round((perTs-Tphs1s)./(Tphs0s-Tphs1s)*1e3))];
-[~,CCx,CCm,~,~,~] = equilibrium(0*TT,0*TT,TT,cc,vv*ones(size(TT)),Ptop*ones(size(TT)),Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,beta);
-plot(CCx,TT,'k:','LineWidth',2); axis tight; hold on; box on;
-plot(CCm,TT,'k:','LineWidth',2);
-
-Tplt = T - (Pt-Ptop)*clap;
-cplt = c./(1-f);
-plot(cplt(2:end-1,2:end-1),Tplt(2:end-1,2:end-1),'k.',cx(2:end-1,2:end-1),Tplt(2:end-1,2:end-1),'b.',cm(2:end-1,2:end-1),Tplt(2:end-1,2:end-1),'r.','LineWidth',2,'MarkerSize',15);
-
-set(gca,'TickLabelInterpreter','latex','FontSize',15)
-title('Phase Diagram','Interpreter','latex','FontSize',22)
-xlabel('Composition','Interpreter','latex','FontSize',18)
-ylabel('Temperature','Interpreter','latex','FontSize',18)
+    
+    end
+    
+    % plot phase diagram
+    fh7 = figure(7); clf;
+    vv = (4.8e-5.*Ptop.^0.6 + 1e-9.*Ptop)./100;
+    TT = linspace(Tphs0+Ptop*clap,Tphs1+Ptop*clap,1e3);
+    cc = [linspace(cphs1,(perCx+perCm)/2,ceil((perT-Tphs0)./(Tphs1-Tphs0)*1e3)),linspace((perCx+perCm)/2,cphs0,floor((perT-Tphs1)./(Tphs0-Tphs1)*1e3))];
+    [~,CCx,CCm,~,~,~] = equilibrium(0*TT,0*TT,TT,cc,0*TT,Ptop*ones(size(TT)),Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,beta);
+    plot(CCx,TT,'k:','LineWidth',2); axis tight; hold on; box on;
+    plot(CCm,TT,'k:','LineWidth',2);
+    Tphs0s = Tphs0-dTH2O(1)*v0^0.75;
+    Tphs1s = Tphs1-dTH2O(3)*v0^0.75;
+    perTs  = perT-dTH2O(2)*v0^0.75;
+    TT = linspace(Tphs0s+Ptop*clap,Tphs1s+Ptop*clap,1e3);
+    cc = [linspace(cphs1,(perCx+perCm)/2,round((perTs-Tphs0s)./(Tphs1s-Tphs0s)*1e3)),linspace((perCx+perCm)/2,cphs0,round((perTs-Tphs1s)./(Tphs0s-Tphs1s)*1e3))];
+    [~,CCx,CCm,~,~,~] = equilibrium(0*TT,0*TT,TT,cc,v0*ones(size(TT)),Ptop*ones(size(TT)),Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,beta);
+    plot(CCx,TT,'k-','LineWidth',2); axis tight; hold on; box on;
+    plot(CCm,TT,'k-','LineWidth',2);
+    Tphs0s = Tphs0-dTH2O(1)*vv^0.75;
+    Tphs1s = Tphs1-dTH2O(3)*vv^0.75;
+    perTs  = perT-dTH2O(2)*vv^0.75;
+    TT = linspace(Tphs0s+Ptop*clap,Tphs1s+Ptop*clap,1e3);
+    cc = [linspace(cphs1,(perCx+perCm)/2,round((perTs-Tphs0s)./(Tphs1s-Tphs0s)*1e3)),linspace((perCx+perCm)/2,cphs0,round((perTs-Tphs1s)./(Tphs0s-Tphs1s)*1e3))];
+    [~,CCx,CCm,~,~,~] = equilibrium(0*TT,0*TT,TT,cc,vv*ones(size(TT)),Ptop*ones(size(TT)),Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,beta);
+    plot(CCx,TT,'k:','LineWidth',2); axis tight; hold on; box on;
+    plot(CCm,TT,'k:','LineWidth',2);
+    
+    Tplt = T - (Pt-Ptop)*clap;
+    cplt = c./(1-f);
+    plot(cplt(2:end-1,2:end-1),Tplt(2:end-1,2:end-1),'k.',cx(2:end-1,2:end-1),Tplt(2:end-1,2:end-1),'b.',cm(2:end-1,2:end-1),Tplt(2:end-1,2:end-1),'r.','LineWidth',2,'MarkerSize',15);
+    
+    set(gca,'TickLabelInterpreter','latex','FontSize',15)
+    title('Phase Diagram','Interpreter','latex','FontSize',22)
+    xlabel('Composition','Interpreter','latex','FontSize',18)
+    ylabel('Temperature','Interpreter','latex','FontSize',18)
+    
+    % plot model history
+    if iter > 0
+        fh8 = figure(8); clf;
+        subplot(3,1,1);
+        plot(hist.time(1:nop:end)./3600,hist.T(1:nop:end,2),'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
+        ylabel('$T$ [$^\circ$C]',TX{:},FS{:}); set(gca,'XTickLabel',[]);
+        subplot(3,1,2);
+        histV = sqrt(hist.W.^2 + hist.U.^2);
+        plot(hist.time(1:nop:end)./3600,log10(histV(1:nop:end,2)),'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
+        ylabel('log$_{10}$ $|\mathbf{v}|$ [m/s]',TX{:},FS{:}); set(gca,'XTickLabel',[]);
+        subplot(3,1,3);
+        plot(hist.time(1:nop:end)./3600,hist.chi(1:nop:end,2),'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
+        plot(hist.time(1:nop:end)./3600,hist.phi(1:nop:end,2),'bo','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
+        plot(hist.time(1:nop:end)./3600,hist.mu (1:nop:end,2),'ro','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
+        xlabel('Time [hr]',TX{:},FS{:});
+        ylabel('$\mu$, $\phi$, $\chi$ [vol]',TX{:},FS{:});
+    end
+    
+    if plot_cv && iter > 0
+        fh9 = figure(9); clf;
+        subplot(4,1,1);
+        plot(hist.time(1:nop:end)./3600,hist.DM(1:nop:end)./hist.sumM(1:nop:end),'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
+        ylabel('consv. $M$',TX{:},FS{:}); set(gca,'XTickLabel',[]);
+        subplot(4,1,2);
+        plot(hist.time(1:nop:end)./3600,hist.DH(1:nop:end)./hist.sumH(1:nop:end),'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
+        ylabel('consv. $H$',TX{:},FS{:}); set(gca,'XTickLabel',[]);
+        subplot(4,1,3);
+        plot(hist.time(1:nop:end)./3600,hist.DC(1:nop:end)./hist.sumC(1:nop:end),'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
+        ylabel('consv. $C$',TX{:},FS{:}); set(gca,'XTickLabel',[]);
+        subplot(4,1,4);
+        plot(hist.time(1:nop:end)./3600,hist.DV(1:nop:end)./hist.sumV(1:nop:end),'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
+        ylabel('consv. $V$',TX{:},FS{:});
+        xlabel('Time [hr]',TX{:},FS{:});
         
-% plot model history
-fh8 = figure(8);
-if step>0
-subplot(3,1,1);
-plot(hist.time(1:nop:end)./3600,hist.T(1:nop:end,2),'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
-ylabel('$T$ [$^\circ$C]',TX{:},FS{:}); set(gca,'XTickLabel',[]);
-subplot(3,1,2);
-histV = sqrt(hist.W.^2 + hist.U.^2);
-plot(hist.time(1:nop:end)./3600,log10(histV(1:nop:end,2)),'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
-ylabel('log$_{10}$ $|\mathbf{v}|$ [m/s]',TX{:},FS{:}); set(gca,'XTickLabel',[]);
-subplot(3,1,3);
-plot(hist.time(1:nop:end)./3600,hist.chi(1:nop:end,2),'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
-plot(hist.time(1:nop:end)./3600,hist.phi(1:nop:end,2),'bo','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
-plot(hist.time(1:nop:end)./3600,hist.mu (1:nop:end,2),'ro','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
-xlabel('Time [hr]',TX{:},FS{:});
-ylabel('$\mu$, $\phi$, $\chi$ [vol]',TX{:},FS{:});
-end
+        
+        fh10 = figure(10); clf;
+        subplot(4,1,1);
+        plot(hist.time(1:nop:end)./3600,hist.EM(1:nop:end),'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
+        ylabel('error $M$',TX{:},FS{:}); set(gca,'XTickLabel',[]);
+        subplot(4,1,2);
+        plot(hist.time(1:nop:end)./3600,hist.EH(1:nop:end),'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
+        ylabel('error $H$',TX{:},FS{:}); set(gca,'XTickLabel',[]);
+        subplot(4,1,3);
+        plot(hist.time(1:nop:end)./3600,hist.EC(1:nop:end),'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
+        ylabel('error $C$',TX{:},FS{:}); set(gca,'XTickLabel',[]);
+        subplot(4,1,4);
+        plot(hist.time(1:nop:end)./3600,hist.EV(1:nop:end),'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
+        ylabel('error $V$',TX{:},FS{:});
+        xlabel('Time [hr]',TX{:},FS{:});
+    end
+    
+    drawnow
 
-fh9 = figure(9); clf;
-if step>0
-subplot(4,1,1);
-plot(hist.time(1:nop:end)./3600,hist.DM(1:nop:end),'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
-ylabel('consv. $M$',TX{:},FS{:}); set(gca,'XTickLabel',[]);
-subplot(4,1,2);
-plot(hist.time(1:nop:end)./3600,hist.DH(1:nop:end),'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
-ylabel('consv. $H$',TX{:},FS{:}); set(gca,'XTickLabel',[]);
-subplot(4,1,3);
-plot(hist.time(1:nop:end)./3600,hist.DC(1:nop:end),'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
-ylabel('consv. $C$',TX{:},FS{:}); set(gca,'XTickLabel',[]);
-subplot(4,1,4);
-plot(hist.time(1:nop:end)./3600,hist.DV(1:nop:end),'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
-ylabel('consv. $V$',TX{:},FS{:});
-xlabel('Time [hr]',TX{:},FS{:});
 end
-
-fh10 = figure(10); clf;
-if step>0
-subplot(4,1,1);
-plot(hist.time(1:nop:end)./3600,hist.EM(1:nop:end),'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
-ylabel('error $M$',TX{:},FS{:}); set(gca,'XTickLabel',[]);
-subplot(4,1,2);
-plot(hist.time(1:nop:end)./3600,hist.EH(1:nop:end),'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
-ylabel('error $H$',TX{:},FS{:}); set(gca,'XTickLabel',[]);
-subplot(4,1,3);
-plot(hist.time(1:nop:end)./3600,hist.EC(1:nop:end),'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
-ylabel('error $C$',TX{:},FS{:}); set(gca,'XTickLabel',[]);
-subplot(4,1,4);
-plot(hist.time(1:nop:end)./3600,hist.EV(1:nop:end),'ko','MarkerSize',5,'LineWidth',2); hold on; axis tight; box on;
-ylabel('error $V$',TX{:},FS{:});
-xlabel('Time [hr]',TX{:},FS{:});
-end
-
-drawnow
 
 % save output to file
 if save_op
-    name = [opdir,'/',runID,'/',runID,'_vp_',num2str(floor(step/nop))];
-    print(fh1,name,'-dpng','-r300','-opengl');
-    name = [opdir,'/',runID,'/',runID,'_tc_',num2str(floor(step/nop))];
-    print(fh2,name,'-dpng','-r300','-opengl');
-    name = [opdir,'/',runID,'/',runID,'_phs_',num2str(floor(step/nop))];
-    print(fh3,name,'-dpng','-r300','-opengl');
-    name = [opdir,'/',runID,'/',runID,'_sgr_',num2str(floor(step/nop))];
-    print(fh4,name,'-dpng','-r300','-opengl');
-    name = [opdir,'/',runID,'/',runID,'_chm',num2str(floor(step/nop))];
-    print(fh5,name,'-dpng','-r300','-opengl');
-    name = [opdir,'/',runID,'/',runID,'_eql',num2str(floor(step/nop))];
-    print(fh7,name,'-dpng','-r300','-opengl');
+    if plot_op
+        name = [opdir,'/',runID,'/',runID,'_vp_',num2str(floor(step/nop))];
+        print(fh1,name,'-dpng','-r300','-opengl');
+        name = [opdir,'/',runID,'/',runID,'_tc_',num2str(floor(step/nop))];
+        print(fh2,name,'-dpng','-r300','-opengl');
+        name = [opdir,'/',runID,'/',runID,'_phs_',num2str(floor(step/nop))];
+        print(fh3,name,'-dpng','-r300','-opengl');
+        name = [opdir,'/',runID,'/',runID,'_sgr_',num2str(floor(step/nop))];
+        print(fh4,name,'-dpng','-r300','-opengl');
+        name = [opdir,'/',runID,'/',runID,'_chm',num2str(floor(step/nop))];
+        print(fh5,name,'-dpng','-r300','-opengl');
+        name = [opdir,'/',runID,'/',runID,'_eql',num2str(floor(step/nop))];
+        print(fh7,name,'-dpng','-r300','-opengl');
+    end
     
     name = [opdir,'/',runID,'/',runID,'_',num2str(floor(step/nop))];
     save(name,'U','W','P','Pt','f','x','m','phi','chi','mu','H','C','V','T','c','v','cm','cx','vm','vf','IT','CT','SIm','SIx','SI','RIP','RID','it','ct','sim','six','si','rip','rid','dHdt','dCdt','dVdt','dITdt','dCTdt','dSImdt','dSIxdt','dfdt','dxdt','Gf','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step','hist');
