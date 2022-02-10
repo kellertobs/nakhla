@@ -40,12 +40,12 @@ Kv =    ff .*kv.*thtv;
 Cv = (1-ff)./[dx;dm;df].^2.*Kv;
 
 % compose effective viscosity, segregation coefficients
-Kvb = squeeze(sum(Kv,1));                                                  % effective magma viscosity
-if step>0; eta = (Kvb + Kvbo)/2; 
-else;      eta =  Kvb;  end
-eta   = max(etamin,min(etamax,eta));                                       % limit viscosity range
-etac  = (eta(1:end-1,1:end-1)+eta(2:end,1:end-1) ...                       % viscosity in cell corners
-      +  eta(1:end-1,2:end  )+eta(2:end,2:end  ))./4;
+eta = squeeze(sum(Kv,1));                                                  
+eta = max(etamin,min(etamax,eta));                                         % limit viscosity range
+if step>0; etact = (eta + etao)/2;                                         % effective viscosity in cell centres
+else;      etact =  eta;  end
+etaco  = (etact(1:end-1,1:end-1)+etact(2:end,1:end-1) ...                  % effective viscosity in cell corners
+       +  etact(1:end-1,2:end  )+etact(2:end,2:end  ))./4;
 
 Ksgr_x = max(1e-18,min(1e-6,chi./squeeze(Cv(1,:,:))));
 Ksgr_m = max(1e-18,min(1e-6,mu ./squeeze(Cv(2,:,:))));
@@ -67,9 +67,9 @@ ezz(:,[1 end]) = ezz(:,[2 end-1]);
 exz            = 1/2.*(diff(U,1,1)./h+diff(W,1,2)./h);                     % shear strain rate
 
 % update stresses
-txx = eta .* exx;                                                          % x-normal stress
-tzz = eta .* ezz;                                                          % z-normal stress
-txz = etac.* exz;                                                          % xz-shear stress
+txx = etact .* exx;                                                        % x-normal stress
+tzz = etact .* ezz;                                                        % z-normal stress
+txz = etaco .* exz;                                                        % xz-shear stress
 
 % update tensor magnitudes
 eII(2:end-1,2:end-1) = 1e-16 + (0.5.*(exx(2:end-1,2:end-1).^2 + ezz(2:end-1,2:end-1).^2 ...  % get strain rate magnitude
@@ -111,8 +111,8 @@ Div_rhoV =  + advection(rho.*m,0.*U,wm,h,ADVN,'flx') ...
             + advection(rho.*f,0.*U,wf,h,ADVN,'flx') ...
             + advection(rho.*x,0.*U,wx,h,ADVN,'flx') ...
             + advection(rho   ,U   ,W ,h,ADVN,'flx');
-VolSrc = -((rho-rhoo)./dt + Div_rhoV - rho.*Div_V)./rho;
-% VolSrc = -((rho-rhoo)./dt + (Div_rhoV - rho.*Div_V + Div_rhoVo)./2)./rho;
+% VolSrc = -((rho-rhoo)./dt + Div_rhoV - rho.*Div_V)./rho;
+VolSrc = -((rho-rhoo)/dt + (Div_rhoV - rho.*Div_V + Div_rhoVo)/2)./rho;
 
 UBG    = - mean(mean(VolSrc(2:end-1,2:end-1)))./2 .* (L/2-XXu);
 WBG    = - mean(mean(VolSrc(2:end-1,2:end-1)))./2 .* (D/2-ZZw);
