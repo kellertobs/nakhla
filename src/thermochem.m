@@ -17,7 +17,7 @@ diff_T(2:end-1,2:end-1) = (- ddz(qTz(:,2:end-1),h) ...                     % hea
                            - ddx(qTx(2:end-1,:),h));
     
 bndH = zeros(size(T));
-if ~isnan(Twall); bndH = bndH + rhoCp.*(Twall-T)./tau_a .* bndshape; end   % impose boundary layer
+if ~isnan(Twall); bndH = bndH + rhoCp.*(Twall-T)./tau_T .* bndshape; end   % impose boundary layer
 
 dHdt = - advn_H + diff_T + bndH;                                           % total rate of change
     
