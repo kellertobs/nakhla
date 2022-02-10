@@ -53,9 +53,11 @@ switch bndmode
                  + exp( ( -XX)/dw) ...
                  + exp(-(L-XX)/dw);
 end
+bndshape = max(0,min(1,bndshape));
 bndshape([1 end],:) = bndshape([2 end-1],:);
 bndshape(:,[1 end]) = bndshape(:,[2 end-1]);
-bndshape = bndshape./(max(bndshape(:))-min(bndshape(:)));
+% bndshape = bndshape./(max(bndshape(:))-min(bndshape(:)) + 1e-16);
+bndshape = max(0,min(1,bndshape));
 
 % set initial solution fields
 T   =  T0 + (T1-T0) .* (1+erf((ZZ/D-zlay)/wlay_T))/2 + dT.*rp;  if bndinit && ~isnan(Twall); T = T + (Twall-T).*bndshape; end % temperature
