@@ -221,8 +221,8 @@ ylabel('Viscosity [log$_{10}$ Pas]','Interpreter','latex','FontSize',15)
 
 % plot phase segregation speeds
 figure(7); if ~holdfig; clf; end
-semilogy(T,max(1e-12,abs(wx)).*3600,'k',T,max(1e-12,abs(wm)).*3600,'r',T,max(1e-12,abs(wf)).*3600,'b','LineStyle',linestyle,'LineWidth',2); hold on; box on; axis tight;
-legend('crystals','melt','fluid','Interpreter','latex','FontSize',15,'box','off','location','best')
+semilogy(T,max(1e-12,abs(wx)).*3600,'k',T,max(1e-12,abs(wf)).*3600,'b','LineStyle',linestyle,'LineWidth',2); hold on; box on; axis tight;
+legend('crystals','fluid','Interpreter','latex','FontSize',15,'box','off','location','best')
 set(gca,'TickLabelInterpreter','latex','FontSize',13)
 title('Phase segregation model','Interpreter','latex','FontSize',18)
 xlabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',15)
