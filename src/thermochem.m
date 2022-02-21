@@ -45,24 +45,25 @@ C([1 end],:) = C([2 end-1],:);                                             % app
 C(:,[1 end]) = C(:,[2 end-1]);  
     
 % update volatile component
-advn_V = advection(rho.*m.*vm,Um,Wm,h,ADVN,'flx') ...
-       + advection(rho.*f.*vf,Uf,Wf,h,ADVN,'flx');
-        
-qvz   = - kc.*(rho(1:end-1,:)+rho(2:end,:))/2.*(m(1:end-1,:)+m(2:end,:))/2 .* ddz(v,h);  % volatile component diffusion z-flux
-qvx   = - kc.*(rho(:,1:end-1)+rho(:,2:end))/2.*(m(:,1:end-1)+m(:,2:end))/2 .* ddx(v,h);  % volatile component diffusion x-flux
-diff_v(2:end-1,2:end-1) = - ddz(qvz(:,2:end-1),h) ...                      % volatile component diffusion
-                          - ddx(qvx(2:end-1,:),h);
-
 bndV = zeros(size(v));
-if ~isnan(vwall); bndV = bndV + rho.*(vwall-v)./tau_a .* bndshape; end     % impose boundary layer
-
-dVdt = - advn_V + diff_v + bndV;                                           % total rate of change
+if any(v(:)>1e-6)
+    advn_V = advection(rho.*m.*vm,Um,Wm,h,ADVN,'flx') ...
+           + advection(rho.*f.*vf,Uf,Wf,h,ADVN,'flx');
     
-if step>0; V = Vo + (dVdt + dVdto)/2.*dt; end            % explicit update of volatile component density
-V = min(rho.*1-TINY,max(rho.*0+TINY, V ));
-V([1 end],:) = V([2 end-1],:);                                             % apply boundary conditions
-V(:,[1 end]) = V(:,[2 end-1]);  
-
+    qvz   = - kc.*(rho(1:end-1,:)+rho(2:end,:))/2.*(m(1:end-1,:)+m(2:end,:))/2 .* ddz(v,h);  % volatile component diffusion z-flux
+    qvx   = - kc.*(rho(:,1:end-1)+rho(:,2:end))/2.*(m(:,1:end-1)+m(:,2:end))/2 .* ddx(v,h);  % volatile component diffusion x-flux
+    diff_v(2:end-1,2:end-1) = - ddz(qvz(:,2:end-1),h) ...                      % volatile component diffusion
+        - ddx(qvx(2:end-1,:),h);
+    
+    if ~isnan(vwall); bndV = bndV + rho.*(vwall-v)./tau_a .* bndshape; end     % impose boundary layer
+    
+    dVdt = - advn_V + diff_v + bndV;                                           % total rate of change
+    
+    if step>0; V = Vo + (dVdt + dVdto)/2.*dt; end            % explicit update of volatile component density
+    V = min(rho.*1-TINY,max(rho.*0+TINY, V ));
+    V([1 end],:) = V([2 end-1],:);                                             % apply boundary conditions
+    V(:,[1 end]) = V(:,[2 end-1]);
+end
 
 % convert enthalpy and component densities to temperature and concentrations
 if step>0
@@ -87,7 +88,7 @@ end
 if (diseq && step>0) || ~react
     
     if react
-        Gx = alpha.*Gx + (1-alpha).*((xq-x).*rho./max(3.*dt,tau_r));
+        Gx = alpha.*Gx + (1-alpha).*((xq-x).*rho./max(4.*dt,tau_r));
     end
     
     advn_x = advection(rho.*x,Ux,Wx,h,ADVN,'flx');                         % get advection term
@@ -107,10 +108,10 @@ else
 end
 
 % update bubble fraction
-if (diseq && step>0) || ~react
+if (diseq && step>0 && any(v(:)>1e-6)) || ~react
     
     if react
-        Gf = alpha.*Gf + (1-alpha).*((fq-f).*rho./max(3.*dt,tau_r));
+        Gf = alpha.*Gf + (1-alpha).*((fq-f).*rho./max(4.*dt,tau_r));
     end
     
     advn_f = advection(rho.*f,Uf,Wf,h,ADVN,'flx');                         % get advection term
@@ -141,9 +142,11 @@ if react && step>0
     cx = c./(m./Kc + x);
     
     % volatile component
-    Kf = vfq./vmq;
-    vm = v./(m + f.*Kf);
-    vf = v./(m./Kf + f);
+    if any(v(:)>1e-6)
+        Kf = vfq./vmq;
+        vm = v./(m + f.*Kf);
+        vf = v./(m./Kf + f);
+    end
 
 end
 
