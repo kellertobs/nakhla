@@ -34,7 +34,7 @@ MapU = reshape(1:NU,Nz  ,Nx-1) + NW;
 % boundary conditions shape function
 switch bndmode
     case 0  % none
-        bndshape = zeros(size(T));
+        bndshape = zeros(size(ZZ));
     case 1  % top only
         bndshape = exp( ( -ZZ)/dw);
     case 2  % bot only
@@ -151,7 +151,7 @@ eIIref =  1e-6;
 Div_V  =  0.*P;  Div_rhoV = 0.*P;  Div_rhoVo = Div_rhoV;
 exx    =  0.*P;  ezz = 0.*P;  exz = zeros(size(f)-1);  eII = 0.*P;  
 txx    =  0.*P;  tzz = 0.*P;  txz = zeros(size(f)-1);  tII = 0.*P; 
-VolSrc = 0.*P;   MassErr = 0;  drhodt = 0.*P;  drhodto = 0.*P;
+VolSrc =  0.*P;  MassErr = 0;  drhodt = 0.*P;  drhodto = 0.*P;
 
 % initialise timing and iterative parameters
 step   =  0;
