@@ -52,7 +52,7 @@ while time <= tend && step <= M
     iter     = 0;
     
     % non-linear iteration loop
-    while resnorm/resnorm0 >= rtol && resnorm >= atol && iter <= maxit || iter <= 2
+    while resnorm/resnorm0 >= rtol && resnorm >= atol && iter <= maxit || iter < 2
             
         % solve thermo-chemical equations
         thermochem;
