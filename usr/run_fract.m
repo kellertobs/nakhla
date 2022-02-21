@@ -1,7 +1,7 @@
 clear; close all;
 
 % set run parameters
-runID    =  'fract3';            % run identifier
+runID    =  'fract0';            % run identifier
 opdir    =  '../out/';           % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  50;                  % output frame plotted/saved every 'nop' time steps
@@ -10,6 +10,7 @@ save_op  =  1;                   % switch on to save output to file
 plot_cv  =  1;                   % switch on to live plot iterative convergence
 react    =  1;                   % switch on reactive mode
 diseq    =  1;                   % switch on disequilibrium approac
+bnchm    =  0;                   % switch on to run manufactured solution benchmark on flui mechanics solver
 
 % set model domain parameters
 D        =  10;                  % chamber depth [m]
@@ -31,14 +32,14 @@ smth     =  (N/30)^2;            % regularisation of initial random perturbation
 zlay     =  0.5;                 % layer thickness (relative to domain depth D)
 wlay_T   =  1e-6;                % thickness of smooth layer boundary (relative to domain depth D)
 wlay_c   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
-T0       =  1100;                % temperature top layer [deg C]
-T1       =  1100;                % temperature base layer [deg C]
+T0       =  1150;                % temperature top layer [deg C]
+T1       =  1150;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
 c0       =  0.50;                % major component top layer [wt SiO2]
 c1       =  0.50;                % major component base layer [wt SiO2]
 dc       =  1e-5;                % amplitude of random noise [wt SiO2]
-v0       =  0.03;                % volatile component top layer [wt H2O]
-v1       =  0.03;                % volatile component base layer [wt H2O]
+v0       =  0.00;                % volatile component top layer [wt H2O]
+v1       =  0.00;                % volatile component base layer [wt H2O]
 dv       =  1e-6;                % amplitude of random noise [wt H2O]
 
 % set model trace and isotope geochemistry parameters

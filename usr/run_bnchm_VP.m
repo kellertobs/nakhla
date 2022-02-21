@@ -1,7 +1,6 @@
 clear; close all;
 
 NN = [40,80,160];  % test increasing time steps
-figure(15); clf;
 
 for nn = NN
     
@@ -167,7 +166,7 @@ subplot(2,3,2); imagesc(xu_mms,z_mms, U(2:end-1,:)*hr); axis ij equal tight; box
 subplot(2,3,3); imagesc(x_mms ,z_mms, P(2:end-1,2:end-1)/1e3); axis ij equal tight; box on; colorbar('TicklabelInterpreter','latex'); title('num. sol. $P$ [kPa]','Interpreter','latex'); set(gca,'TicklabelInterpreter','latex')
 subplot(2,3,4); imagesc(x_mms,zw_mms,-(W(:,2:end-1)-W_mms(:,2:end-1))*hr); axis ij equal tight; box on; colorbar('TicklabelInterpreter','latex'); title('num. err. $W$ [m/hr]','Interpreter','latex'); set(gca,'TicklabelInterpreter','latex')
 subplot(2,3,5); imagesc(xu_mms,z_mms, (U(2:end-1,:)-U_mms(2:end-1,:))*hr); axis ij equal tight; box on; colorbar('TicklabelInterpreter','latex'); title('num. err. $U$ [m/hr]','Interpreter','latex'); set(gca,'TicklabelInterpreter','latex')
-subplot(2,3,6); imagesc(x_mms ,z_mms, (P(2:end-1,2:end-1)-P_mms(2:end-1,2:end-1))/1e3); axis ij equal tight; box on; colorbar('TicklabelInterpreter','latex'); title('num. err. $P$ [m/hr]','Interpreter','latex'); set(gca,'TicklabelInterpreter','latex')
+subplot(2,3,6); imagesc(x_mms ,z_mms, (P(2:end-1,2:end-1)-P_mms(2:end-1,2:end-1))/1e3); axis ij equal tight; box on; colorbar('TicklabelInterpreter','latex'); title('num. err. $P$ [kPa]','Interpreter','latex'); set(gca,'TicklabelInterpreter','latex')
 drawnow;
 
 % get solution error
@@ -177,28 +176,37 @@ errP = norm(P(2:end-1,2:end-1)-P_mms(2:end-1,2:end-1),2)./norm(P_mms(2:end-1,2:e
 
 % plot error convergence
 figure(18); 
-loglog(h,errW,'r+',h,errU,'g+',h,errP,'b+','MarkerSize',8,'LineWidth',2); axis xy tight; hold on; box on; 
-
+p1 = loglog(h,errW,'r+','MarkerSize',8,'LineWidth',2); axis xy tight; hold on; box on; 
+p2 = loglog(h,errU,'g+','MarkerSize',8,'LineWidth',2); axis xy tight; hold on; box on; 
+p3 = loglog(h,errP,'b+','MarkerSize',8,'LineWidth',2); axis xy tight; hold on; box on; 
+set(gca,'TicklabelInterpreter','latex','FontSize',12)
+xlabel('grid spacing [m]','Interpreter','latex')
+ylabel('numerical error [1]','Interpreter','latex')
+set(gca,'TicklabelInterpreter','latex')
+title('Numerical convergence in space','Interpreter','latex','FontSize',20)
+    
 if nn == NN(1)
-    loglog(L./NN,mean([errW,errU,errP]).*(NN(1)./NN).^2,'k-','LineWidth',2);  % plot linear trend for comparison
-    legend('error W','error U','error P','quadratic','Interpreter','latex','box','on','location','southeast')
-    xlabel('grid spacing [m]','Interpreter','latex')
-    ylabel('numerical error [1]','Interpreter','latex')
-    set(gca,'TicklabelInterpreter','latex')
+    p4 = loglog(L./NN,mean([errW,errU,errP]).*(NN(1)./NN).^2,'k-','LineWidth',2);  % plot linear trend for comparison
+end
+if nn == NN(end)
+    legend([p1,p2,p3,p4],{'error W','error U','error P','quadratic'},'Interpreter','latex','box','on','location','southeast')
 end
 
 % plot error convergence
 figure(19);
 DOFS = (NN+2).*(NN+2) + 2.*(NN+1).*(NN+2);
 dofs = (nn+2).*(nn+2) + 2.*(nn+1).*(nn+2);
-loglog(dofs,solvetime,'r+','MarkerSize',8,'LineWidth',2); axis xy tight; hold on; box on; 
+p5 = loglog(dofs,solvetime,'r+','MarkerSize',8,'LineWidth',2); axis xy tight; hold on; box on; 
+set(gca,'TicklabelInterpreter','latex','FontSize',12)
+xlabel('\# dofs [1]','Interpreter','latex','FontSize',16)
+ylabel('time to solution [s]','Interpreter','latex','FontSize',16)
+title('Scaling of direct solver','Interpreter','latex','FontSize',20)
 
 if nn == NN(1)
-    loglog(DOFS,0.95*solvetime*(DOFS./DOFS(1)).^1,'k-','LineWidth',2);  % plot linear trend for comparison
-    legend('time to solution','linear','Interpreter','latex','box','on','location','southeast')
-    xlabel('\# dofs [1]','Interpreter','latex')
-    ylabel('time to solution [s]','Interpreter','latex')
-    set(gca,'TicklabelInterpreter','latex')
+    p6 = loglog(DOFS,0.95*solvetime*(DOFS./DOFS(1)).^1,'k-','LineWidth',2);  % plot linear trend for comparison
+end
+if nn == NN(end)
+    legend([p5,p6],{'time to solution','linear'},'Interpreter','latex','box','on','location','southeast')
 end
 
 end

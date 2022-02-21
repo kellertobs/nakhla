@@ -5,14 +5,14 @@ syms U_mms(x,z) W_mms(x,z) P_mms(x,z) eta_mms(x,z) rho_mms(x,z) src_mms(x,z)
 fprintf(1,'  ***  compose manufactured solution\n\n');
 
 % compose manufactured solution variables
-W_mms(x,z) = 5.00e-6.*(cos(4*(x)*pi/L).*sin(4*(z)*pi/L));
-U_mms(x,z) = 1.00e-6.*(sin(4*(x)*pi/L).*cos(4*(z)*pi/L));
-P_mms(x,z) = 2.00e+3.*(sin(4*(x)*pi/L).*sin(4*(z)*pi/L));
+W_mms(x,z) = 5.00e-5.*(cos(4*(x)*pi/L).*sin(4*(z)*pi/L));
+U_mms(x,z) = 1.00e-5.*(sin(4*(x)*pi/L).*cos(4*(z)*pi/L));
+P_mms(x,z) = 2.00e+4.*(sin(4*(x)*pi/L).*sin(4*(z)*pi/L));
 
 % compose manufactured material coefficients and volume source
-eta_mms(x,z) = 1e+3-5e+2.*(cos(4*(x)*pi/L).*sin(4*(z)*pi/L));
-rho_mms(x,z) =     -5e+0.*(cos(4*(x)*pi/L).*sin(4*(z)*pi/L));
-src_mms(x,z) =     -5e-5.*(sin(4*(x)*pi/L).*sin(4*(z)*pi/L));
+eta_mms(x,z) = 1e+3-8e+2.*(cos(4*(x)*pi/L).*sin(4*(z)*pi/L));
+rho_mms(x,z) =     -1e+1.*(cos(4*(x)*pi/L).*sin(4*(z)*pi/L));
+src_mms(x,z) =     -1e-4.*(sin(4*(x)*pi/L).*sin(4*(z)*pi/L));
 
 fprintf(1,'       W   = %s \n',char(W_mms));
 fprintf(1,'       U   = %s \n',char(U_mms));

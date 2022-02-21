@@ -11,7 +11,7 @@ chi   = x.*rho./rhox;
 phi   = f.*rho./rhof;
 mu    = m.*rho./rhom;
 rhoBF = ((rho (2:end-2,2:end-1)+rho (3:end-1,2:end-1))/4 + (rhoo(2:end-2,2:end-1)+rhoo(3:end-1,2:end-1))/4 - rhoref);  % taken at mid-point in time
-if Nx <= 5; rhoBF = repmat(mean(rhoBF,2),1,Nx-2); end
+if Nx <= 10; rhoBF = repmat(mean(rhoBF,2),1,Nx-2); end
 
 
 % update thermal properties
@@ -85,8 +85,8 @@ tII(:,[1 end]) = tII(:,[2 end-1]);
 tII([1 end],:) = tII([2 end-1],:);
 
 % update phase segregation speeds
-if bndmode>=4; sds = -1;      % no slip
-else;          sds = +1; end  % free slip
+if bndmode==4; sds = -1;      % no slip for 'all sides(4)'
+else;          sds = +1; end  % free slip for other types
 
 wx = ((rhox(1:end-1,:)+rhox(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0.*((Ksgr_x(1:end-1,:)+Ksgr_x(2:end,:))/2); % crystal segregation speed
 wx([1 end],:) = 0;
@@ -109,12 +109,11 @@ Wm   = W + wm;                                                             % mlt
 Um   = U + 0.;                                                             % mlt x-velocity
 
 % update volume source
-Div_rhoV =  + advection(rho.*m,0.*U,wm,h,ADVN,'flx') ...
-            + advection(rho.*f,0.*U,wf,h,ADVN,'flx') ...
+Div_rhoV =  + advection(rho.*f,0.*U,wf,h,ADVN,'flx') ...
             + advection(rho.*x,0.*U,wx,h,ADVN,'flx') ...
             + advection(rho   ,U   ,W ,h,ADVN,'flx');
 % VolSrc = -((rho-rhoo)./dt + Div_rhoV - rho.*Div_V)./rho;
 VolSrc = -((rho-rhoo)/dt + (Div_rhoV - rho.*Div_V + Div_rhoVo)/2)./rho;
 
-UBG    = - mean(mean(VolSrc(2:end-1,2:end-1)))./2 .* (L/2-XXu);
-WBG    = - mean(mean(VolSrc(2:end-1,2:end-1)))./2 .* (D/2-ZZw);
+UBG    = + mean(mean(VolSrc(2:end-1,2:end-1)))./2 .* (L/2-XXu);
+WBG    = + mean(mean(VolSrc(2:end-1,2:end-1)))./2 .* (D/2-ZZw);

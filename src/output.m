@@ -5,7 +5,7 @@ if plot_op
     TL = {'TickLabelInterpreter','Latex'}; TS = {'FontSize',10};
     UN = {'Units','Centimeters'};
     
-    if Nx <= 5 && Nz <= 5  % create 0D plots
+    if Nx <= 10 && Nz <= 10  % create 0D plots
         
         if iter > 0
             
@@ -45,7 +45,7 @@ if plot_op
             
         end
         
-    elseif Nx <= 5  % create 1D plots
+    elseif Nx <= 10  % create 1D plots
         
         fh1 = figure(1); clf;
         subplot(1,5,1)
@@ -354,7 +354,7 @@ end
 % save output to file
 if save_op
     if plot_op
-        if Nx <= 5 && Nz <= 5  % print 0D plots
+        if Nx <= 10 && Nz <= 10  % print 0D plots
             if iter>0
                 name = [opdir,'/',runID,'/',runID,'_thc_',num2str(floor(step/nop))];
                 print(fh1,name,'-dpng','-r300','-opengl');
@@ -363,7 +363,7 @@ if save_op
                 name = [opdir,'/',runID,'/',runID,'_eql',num2str(floor(step/nop))];
                 print(fh7,name,'-dpng','-r300','-opengl');
             end
-        elseif Nx <= 5*Nz  % create 1D plots
+        elseif Nx <= 10  % create 1D plots
             name = [opdir,'/',runID,'/',runID,'_thc_',num2str(floor(step/nop))];
             print(fh1,name,'-dpng','-r300','-opengl');
             name = [opdir,'/',runID,'/',runID,'_vep_',num2str(floor(step/nop))];

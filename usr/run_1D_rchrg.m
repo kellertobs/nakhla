@@ -10,6 +10,7 @@ save_op  =  1;                   % switch on to save output to file
 plot_cv  =  1;                   % switch on to live plot iterative convergence
 react    =  1;                   % switch on reactive mode
 diseq    =  1;                   % switch on disequilibrium approac
+bnchm    =  0;                   % switch on to run manufactured solution benchmark on flui mechanics solver
 
 % set model domain parameters
 D        =  10;                  % chamber depth [m]
