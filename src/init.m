@@ -36,28 +36,21 @@ switch bndmode
     case 0  % none
         bndshape = zeros(size(ZZ));
     case 1  % top only
-        bndshape = exp( ( -ZZ)/dw);
+        bndshape = exp( ( -ZZ+h/2)/dw);
     case 2  % bot only
-        bndshape = exp(-(D-ZZ)/dw);
+        bndshape = exp(-(D-ZZ-h/2)/dw);
     case 3  % top/bot only
-        bndshape = exp( ( -ZZ)/dw) ...
-                 + exp(-(D-ZZ)/dw);
+        bndshape = exp( ( -ZZ+h/2)/dw) ...
+                 + exp(-(D-ZZ-h/2)/dw);
     case 4 % all walls
-        bndshape = exp( ( -ZZ)/dw) ...
-                 + exp(-(D-ZZ)/dw) ...
-                 + exp( ( -XX)/dw) ...
-                 + exp(-(L-XX)/dw);
-    case 5 % all walls
-        bndshape = exp( ( -ZZ)/dw) ...
-                 + exp(-(D-ZZ)/dw) ...
-                 + exp( ( -XX)/dw) ...
-                 + exp(-(L-XX)/dw);
+        bndshape = exp( ( -ZZ+h/2)/dw) ...
+                 + exp(-(D-ZZ-h/2)/dw) ...
+                 + exp( ( -XX+h/2)/dw) ...
+                 + exp(-(L-XX-h/2)/dw);
 end
 bndshape = max(0,min(1,bndshape));
 bndshape([1 end],:) = bndshape([2 end-1],:);
 bndshape(:,[1 end]) = bndshape(:,[2 end-1]);
-% bndshape = bndshape./(max(bndshape(:))-min(bndshape(:)) + 1e-16);
-bndshape = max(0,min(1,bndshape));
 
 % set initial solution fields
 T   =  T0 + (T1-T0) .* (1+erf((ZZ/D-zlay)/wlay_T))/2 + dT.*rp;  if bndinit && ~isnan(Twall); T = T + (Twall-T).*bndshape; end % temperature
@@ -99,6 +92,7 @@ while res > tol
     
     rhoref  = mean(mean(rho(2:end-1,2:end-1)));
     Pt      = Ptop + rhoref.*g0.*ZZ;
+    if Nx<=10; Pt = mean(mean(Pt(2:end-1,2:end-1))); end
     
     res  = (norm(x(:)-xi(:),2) + norm(f(:)-fi(:),2))./sqrt(2*length(x(:)));
     iter = iter+1;

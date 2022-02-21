@@ -6,14 +6,13 @@ IIR  = [];       % equation indeces into R
 AAR  = [];       % forcing entries for R
 
 
-% set cooling boundaries to no slip, else to free slip
-if bndmode>=4; sds = +1;      % no slip
-else;          sds = -1; end  % free slip
-if bndmode==5; top = -1;      % free slip
-elseif bndmode >0; top = +1;  % no slip
-else;          top = -1; end  % free slip
-if bndmode >1; bot = +1;      % no slip
-else;          bot = -1; end  % free slip
+% set specified boundaries to no slip, else to free slip
+if bndmode==4;               sds = +1;      % no slip sides for 'all sides(4)'
+else;                        sds = -1; end  % free slip sides for other types
+if bndmode==1 || bndmode>=3; top = +1;      % no slip top for 'top only(1)', 'top/bot(3)', 'all sides(4)'
+else;                        top = -1; end  % free slip for other types
+if bndmode>=2;               bot = +1;      % no slip bot for 'bot only(2)', 'top/bot(3)', 'all sides(4)'
+else;                        bot = -1; end  % free slip for other types
 
 
 % assemble coefficients of z-stress divergence
@@ -261,15 +260,15 @@ Pscale = geomean(etact(:))/h;
 nzp = round((Nz-2)/2)+1;
 nxp = round((Nx-2)/2)+1;
 KP(MapP(nzp,nxp),:) = 0;
-KP(MapP(nzp,nxp),MapP(nzp,nxp)) = 1;
+KP(MapP(nzp,nxp),MapP(nzp,nxp)) = Pscale*1;
 RP(MapP(nzp,nxp),:) = 0;
-if bnchm; RP(MapP(nzp,nxp),:) = P_mms(nzp,nxp)/Pscale; end
+if bnchm; RP(MapP(nzp,nxp),:) = P_mms(nzp,nxp); end
 
 
 
 %% assemble global coefficient matrix and right-hand side vector
-LL = [ KV         -Pscale.*GG  ; ...
-       Pscale.*DD  Pscale.*KP  ];
+LL = [ KV         -Pscale.*GG ; ...
+       Pscale.*DD  Pscale.*KP ];
 
 RR = [RV; Pscale.*RP];
 
