@@ -10,7 +10,9 @@ rho   = 1./(m./rhom + x./rhox + f./rhof);  rho([1 end],:) = rho([2 end-1],:);  r
 chi   = x.*rho./rhox;
 phi   = f.*rho./rhof;
 mu    = m.*rho./rhom;
-rhoBF = ((rho (2:end-2,2:end-1)+rho (3:end-1,2:end-1))/4 + (rho (2:end-2,2:end-1)+rho (3:end-1,2:end-1))/4 - rhoref);  % taken at mid-point in time
+rhoBF = ((rho (2:end-2,2:end-1)+rho (3:end-1,2:end-1))/4 + (rhoo(2:end-2,2:end-1)+rhoo(3:end-1,2:end-1))/4 - rhoref);  % taken at mid-point in time
+if Nx <= 5; rhoBF = repmat(mean(rhoBF,2),1,Nx-2); end
+
 
 % update thermal properties
 rhoCp = rho.*(m.*Cpm + x.*Cpx + f.*Cpf);
@@ -27,7 +29,7 @@ etax  = etax0.* ones(size(x));                                             % con
 kv = permute(cat(3,etax,etam,etaf),[3,1,2]);
 Mv = permute(repmat(kv,1,1,1,3),[4,1,2,3])./permute(repmat(kv,1,1,1,3),[1,4,2,3]);
  
-ff = permute(cat(3,chi,mu,phi),[3,1,2]);
+ff = max(1e-16,permute(cat(3,chi,mu,phi),[3,1,2]));
 FF = permute(repmat(ff,1,1,1,3),[4,1,2,3]);
 Sf = (FF./BB).^(1./CC);  Sf = Sf./sum(Sf,2);
 Xf = sum(AA.*Sf,2).*FF + (1-sum(AA.*Sf,2)).*Sf;
@@ -90,7 +92,7 @@ wx = ((rhox(1:end-1,:)+rhox(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0.*((K
 wx([1 end],:) = 0;
 wx(:,[1 end]) = sds*wx(:,[2 end-1]);
 
-wf = ((rhof(1:end-1,:)+rhof(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0.*((Ksgr_f(1:end-1,:)+Ksgr_f(2:end,:))/2); % fluid segregation speed
+wf = any(v(:)>1e-6).*((rhof(1:end-1,:)+rhof(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0.*((Ksgr_f(1:end-1,:)+Ksgr_f(2:end,:))/2); % fluid segregation speed
 wf([1 end],:) = [fout;fin].*wf([2 end-1],:);
 wf(:,[1 end]) = sds*wf(:,[2 end-1]);
 
