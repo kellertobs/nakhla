@@ -6,12 +6,12 @@ figure(15); clf;
 for dt = DT
     
 % set run parameters
-runID    =  'bnchm_TC_dt8';      % run identifier
+runID    =  ['bnchm_TC_dt',int2str(dt)];      % run identifier
 opdir    =  '../out/';           % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  16;                  % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot of results
-save_op  =  0;                   % switch on to save output to file
+save_op  =  1;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
 react    =  1;                   % switch on reactive mode
 diseq    =  1;                   % switch on disequilibrium approac
@@ -103,7 +103,7 @@ perCx    =  0.48;                % peritectic solidus  composition [wt SiO2]
 perT     =  1100;                % peritectic temperature [degC]
 clap     =  1e-7;                % Clapeyron slope for P-dependence of melting T [degC/Pa]
 dTH2O    =  [1300,1000,300];     % solidus shift from water content [degC/wt^0.75]
-tau_r    =  90;                  % reaction time [s]
+tau_r    =  60;                  % reaction time [s]
 Dsx      = -300;                 % entropy change of crystallisation [J/kg/K]
 Dsf      =  400;                 % entropy change of exsolution [J/kg/K]
 

@@ -9,7 +9,7 @@ if plot_op
         
         if iter > 0
             
-            figure(1); clf;
+            fh1 = figure(1); clf;
             subplot(5,1,1)
             plot(hist.time/hr,hist.T(:,2),'LineWidth',2); axis xy tight; box on;
             title('$T [^\circ$C]',TX{:},FS{:}); set(gca,TL{:},TS{:});
@@ -26,16 +26,16 @@ if plot_op
             plot(hist.time/hr,hist.phi(:,2),'LineWidth',2); axis xy tight; box on;
             title(['$\phi$ [vol\%]'],TX{:},FS{:}); set(gca,TL{:},TS{:});
             
-            figure(2);
+            fh2 = figure(2); clf;
             subplot(5,1,1)
-            plot(hist.time/hr,hist.W(:,2),'LineWidth',2); axis xy tight; box on;
+            plot(hist.time/hr,hist.W(:,2)*hr,'LineWidth',2); axis xy tight; box on;
             title('$W$ [m/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
             subplot(5,1,2)
-            plot(hist.time/hr,hist.wx(:,2),'LineWidth',2); axis xy tight; box on;
+            plot(hist.time/hr,hist.wx(:,2)*hr,'LineWidth',2); axis xy tight; box on;
             title('$w_\Delta^x$ [m/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
             subplot(5,1,3)
-            plot(hist.time/hr,hist.wf(:,2),'LineWidth',2); axis xy tight; box on;
-            title('$w_\Delta^x$ [m/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+            plot(hist.time/hr,hist.wf(:,2)*hr,'LineWidth',2); axis xy tight; box on;
+            title('$w_\Delta^f$ [m/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
             subplot(5,1,4)
             plot(hist.time/hr,hist.rho(:,2),'LineWidth',2); axis xy tight; box on;
             title('$\bar{\rho}$ [kg/m$^3$]',TX{:},FS{:}); set(gca,TL{:},TS{:});
@@ -45,9 +45,9 @@ if plot_op
             
         end
         
-    elseif Nx <= 0.1*Nz  % create 1D plots
+    elseif Nx <= 5  % create 1D plots
         
-        figure(1); clf;
+        fh1 = figure(1); clf;
         subplot(1,5,1)
         plot(mean(T(2:end-1,2:end-1),2),Z(2:end-1).','LineWidth',2); axis ij tight; box on;
         title('$T [^\circ$C]',TX{:},FS{:}); set(gca,TL{:},TS{:});
@@ -64,7 +64,7 @@ if plot_op
         plot(mean(phi(2:end-1,2:end-1),2),Z(2:end-1).','LineWidth',2); axis ij tight; box on;
         title(['$\phi$ [vol\%]'],TX{:},FS{:}); set(gca,TL{:},TS{:});
         
-        figure(2);
+        fh2 = figure(2); clf;
         subplot(1,5,1)
         plot(mean(-W(:,2:end-1),2)*hr,Zfc.','LineWidth',2); axis ij tight; box on;
         title('$W$ [m/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
@@ -73,7 +73,7 @@ if plot_op
         title('$w_\Delta^x$ [m/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(1,5,3)
         plot(mean(-(phi(1:end-1,2:end-1)+phi(2:end,2:end-1))/2.*wf(:,2:end-1),2)*hr,Zfc.','LineWidth',2); axis ij tight; box on;
-        title('$w_\Delta^x$ [m/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+        title('$w_\Delta^f$ [m/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(1,5,4)
         plot(mean(rho(2:end-1,2:end-1),2),Z(2:end-1).','LineWidth',2); axis ij tight; box on;
         title('$\bar{\rho}$ [kg/m$^3$]',TX{:},FS{:}); set(gca,TL{:},TS{:});
@@ -354,18 +354,36 @@ end
 % save output to file
 if save_op
     if plot_op
-        name = [opdir,'/',runID,'/',runID,'_vp_',num2str(floor(step/nop))];
-        print(fh1,name,'-dpng','-r300','-opengl');
-        name = [opdir,'/',runID,'/',runID,'_tc_',num2str(floor(step/nop))];
-        print(fh2,name,'-dpng','-r300','-opengl');
-        name = [opdir,'/',runID,'/',runID,'_phs_',num2str(floor(step/nop))];
-        print(fh3,name,'-dpng','-r300','-opengl');
-        name = [opdir,'/',runID,'/',runID,'_sgr_',num2str(floor(step/nop))];
-        print(fh4,name,'-dpng','-r300','-opengl');
-        name = [opdir,'/',runID,'/',runID,'_chm',num2str(floor(step/nop))];
-        print(fh5,name,'-dpng','-r300','-opengl');
-        name = [opdir,'/',runID,'/',runID,'_eql',num2str(floor(step/nop))];
-        print(fh7,name,'-dpng','-r300','-opengl');
+        if Nx <= 5 && Nz <= 5  % print 0D plots
+            if iter>0
+                name = [opdir,'/',runID,'/',runID,'_thc_',num2str(floor(step/nop))];
+                print(fh1,name,'-dpng','-r300','-opengl');
+                name = [opdir,'/',runID,'/',runID,'_vep_',num2str(floor(step/nop))];
+                print(fh2,name,'-dpng','-r300','-opengl');
+                name = [opdir,'/',runID,'/',runID,'_eql',num2str(floor(step/nop))];
+                print(fh7,name,'-dpng','-r300','-opengl');
+            end
+        elseif Nx <= 5*Nz  % create 1D plots
+            name = [opdir,'/',runID,'/',runID,'_thc_',num2str(floor(step/nop))];
+            print(fh1,name,'-dpng','-r300','-opengl');
+            name = [opdir,'/',runID,'/',runID,'_vep_',num2str(floor(step/nop))];
+            print(fh2,name,'-dpng','-r300','-opengl');
+            name = [opdir,'/',runID,'/',runID,'_eql',num2str(floor(step/nop))];
+            print(fh7,name,'-dpng','-r300','-opengl');
+        else
+            name = [opdir,'/',runID,'/',runID,'_vep_',num2str(floor(step/nop))];
+            print(fh1,name,'-dpng','-r300','-opengl');
+            name = [opdir,'/',runID,'/',runID,'_thc_',num2str(floor(step/nop))];
+            print(fh2,name,'-dpng','-r300','-opengl');
+            name = [opdir,'/',runID,'/',runID,'_phs_',num2str(floor(step/nop))];
+            print(fh3,name,'-dpng','-r300','-opengl');
+            name = [opdir,'/',runID,'/',runID,'_sgr_',num2str(floor(step/nop))];
+            print(fh4,name,'-dpng','-r300','-opengl');
+            name = [opdir,'/',runID,'/',runID,'_gch',num2str(floor(step/nop))];
+            print(fh5,name,'-dpng','-r300','-opengl');
+            name = [opdir,'/',runID,'/',runID,'_eql',num2str(floor(step/nop))];
+            print(fh7,name,'-dpng','-r300','-opengl');
+        end
     end
     
     name = [opdir,'/',runID,'/',runID,'_',num2str(floor(step/nop))];
