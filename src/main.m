@@ -1,6 +1,12 @@
 % initialise model run
 init;
 
+% run manufactured solution benchmark on fluid mechanics solver if specified
+if bnchm 
+    mms; 
+    return; 
+end
+
 % physical time stepping loop
 while time <= tend && step <= M
         

@@ -75,7 +75,8 @@ IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL; (1/2*EtaC2(:)-1/3*EtaP2(:
 
 % z-RHS vector
 
-rr = rhoBF .* g0;
+rr = - rhoBF .* g0;
+if bnchm; rr = rr + src_W_mms(2:end-1,2:end-1); end
 
 IIR = [IIR; ii(:)];  AAR = [AAR; rr(:)];
 
@@ -139,12 +140,15 @@ IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL; (1/2*EtaC2(:)-1/3*EtaP2(:
 
 % x-RHS vector
 rr = zeros(size(ii));
+if bnchm; rr = rr + src_U_mms(2:end-1,2:end-1); end
+
 IIR = [IIR; ii(:)];  AAR = [AAR; rr(:)];
 
 
 % assemble coefficient matrix & right-hand side vector
 KV = sparse(IIL,JJL,AAL,NW+NU,NW+NU);
 RV = sparse(IIR,ones(size(IIR)),AAR);
+
 
 
 %% assemble coefficients for gradient operator
@@ -179,6 +183,7 @@ IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL; aa(:)+1/h];     % one to 
 GG = sparse(IIL,JJL,AAL,NW+NU,NP);
 
 
+
 %% assemble coefficients for divergence operator
 IIL  = [];       % equation indeces into A
 JJL  = [];       % variable indeces into A
@@ -199,6 +204,7 @@ IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL; aa(:)+1/h];  % W one belo
 
 % assemble coefficient matrix
 DD = sparse(IIL,JJL,AAL,NP,NW+NU);
+
 
 
 %% assemble coefficients for matrix pressure diagonal and right-hand side
@@ -239,6 +245,8 @@ IIL = [IIL; ii(:)]; JJL = [JJL; ii(:)];    AAL = [AAL; aa(:)];  % P on stencil c
 
 % RHS
 rr = VolSrc(2:end-1,2:end-1);
+if bnchm; rr = rr + src_P_mms(2:end-1,2:end-1); end
+
 IIR = [IIR; ii(:)];
 AAR = [AAR; rr(:)];
 
@@ -247,19 +255,24 @@ AAR = [AAR; rr(:)];
 KP = sparse(IIL,JJL,AAL,NP,NP);
 RP = sparse(IIR,ones(size(IIR)),AAR,NP,1);
 
+% get pressure scaling factor
+Pscale = geomean(etact(:))/h;
+
 nzp = round((Nz-2)/2)+1;
 nxp = round((Nx-2)/2)+1;
 KP(MapP(nzp,nxp),:) = 0;
 KP(MapP(nzp,nxp),MapP(nzp,nxp)) = 1;
 RP(MapP(nzp,nxp),:) = 0;
+if bnchm; RP(MapP(nzp,nxp),:) = P_mms(nzp,nxp)/Pscale; end
+
 
 
 %% assemble global coefficient matrix and right-hand side vector
-Pscale = geomean(etact(:))/h;
 LL = [ KV         -Pscale.*GG  ; ...
        Pscale.*DD  Pscale.*KP  ];
 
-RR = [-RV; Pscale.*RP];
+RR = [RV; Pscale.*RP];
+
 
 
 %% get residual
@@ -273,6 +286,7 @@ res_U  = full(reshape(FF(MapU(:))        , Nz   ,(Nx-1)));                 % x-v
 res_P  = full(reshape(FF(MapP(:)+(NW+NU)), Nz   , Nx   ));                 % dynamic pressure
         
 
+
 %% Solve linear system of equations for vx, vz, P
 S = LL\RR;  % update solution
 
@@ -280,4 +294,5 @@ S = LL\RR;  % update solution
 W  = full(reshape(S(MapW(:))        ,(Nz-1), Nx   ));                      % matrix z-velocity
 U  = full(reshape(S(MapU(:))        , Nz   ,(Nx-1)));                      % matrix x-velocity
 P  = full(reshape(S(MapP(:)+(NW+NU)), Nz   , Nx   )).*Pscale;              % matrix dynamic pressure
+
 
