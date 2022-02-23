@@ -164,6 +164,8 @@ if restart
 %     name = [opdir,runID,'/',runID,'_par'];
 %     load(name);
     
+    Pscale = geomean(eta(:))/h;
+    S = [W(:);U(:);P(:)/Pscale];
     Pto = Pt; etao = eta; rhoo = rho; Div_rhoVo = Div_rhoV;
     update; output;
     time = time+dt;

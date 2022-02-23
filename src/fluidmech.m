@@ -151,107 +151,109 @@ RV = sparse(IIR,ones(size(IIR)),AAR);
 
 
 %% assemble coefficients for gradient operator
-IIL  = [];       % equation indeces into A
-JJL  = [];       % variable indeces into A
-AAL  = [];       % coefficients for A
-
-
-% coefficients for z-gradient
-ii = MapW(2:end-1,2:end-1);
-
-%         top              ||          bottom
-jj1 = MapP(2:end-2,2:end-1); jj2 = MapP(3:end-1,2:end-1);
-
-aa = zeros(size(ii));
-IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; aa(:)-1/h];     % one to the top
-IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL; aa(:)+1/h];     % one to the bottom
-
-
-% coefficients for x-gradient
-ii = MapU(2:end-1,2:end-1);
-
-%         left             ||           right
-jj1 = MapP(2:end-1,2:end-2); jj2 = MapP(2:end-1,3:end-1);
-
-aa = zeros(size(ii));
-IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; aa(:)-1/h];     % one to the left
-IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL; aa(:)+1/h];     % one to the right
-
-
-% assemble coefficient matrix
-GG = sparse(IIL,JJL,AAL,NW+NU,NP);
-
+if iter==0
+    IIL  = [];       % equation indeces into A
+    JJL  = [];       % variable indeces into A
+    AAL  = [];       % coefficients for A
+    
+    
+    % coefficients for z-gradient
+    ii = MapW(2:end-1,2:end-1);
+    
+    %         top              ||          bottom
+    jj1 = MapP(2:end-2,2:end-1); jj2 = MapP(3:end-1,2:end-1);
+    
+    aa = zeros(size(ii));
+    IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; aa(:)-1/h];     % one to the top
+    IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL; aa(:)+1/h];     % one to the bottom
+    
+    
+    % coefficients for x-gradient
+    ii = MapU(2:end-1,2:end-1);
+    
+    %         left             ||           right
+    jj1 = MapP(2:end-1,2:end-2); jj2 = MapP(2:end-1,3:end-1);
+    
+    aa = zeros(size(ii));
+    IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; aa(:)-1/h];     % one to the left
+    IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL; aa(:)+1/h];     % one to the right
+    
+    
+    % assemble coefficient matrix
+    GG = sparse(IIL,JJL,AAL,NW+NU,NP);
+end
 
 
 %% assemble coefficients for divergence operator
-IIL  = [];       % equation indeces into A
-JJL  = [];       % variable indeces into A
-AAL  = [];       % coefficients for A
-
-%internal points
-ii = MapP(2:end-1,2:end-1);
-
-% coefficients multiplying velocities U, W
-%          left U          ||           right U       ||           top W           ||          bottom W
-jj1 = MapU(2:end-1,1:end-1); jj2 = MapU(2:end-1,2:end); jj3 = MapW(1:end-1,2:end-1); jj4 = MapW(2:end,2:end-1);
-
-aa = zeros(size(ii));
-IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; aa(:)-1/h];  % U one to the left
-IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL; aa(:)+1/h];  % U one to the right
-IIL = [IIL; ii(:)]; JJL = [JJL; jj3(:)];   AAL = [AAL; aa(:)-1/h];  % W one above
-IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL; aa(:)+1/h];  % W one below
-
-% assemble coefficient matrix
-DD = sparse(IIL,JJL,AAL,NP,NW+NU);
-
+if iter==0
+    IIL  = [];       % equation indeces into A
+    JJL  = [];       % variable indeces into A
+    AAL  = [];       % coefficients for A
+    
+    %internal points
+    ii = MapP(2:end-1,2:end-1);
+    
+    % coefficients multiplying velocities U, W
+    %          left U          ||           right U       ||           top W           ||          bottom W
+    jj1 = MapU(2:end-1,1:end-1); jj2 = MapU(2:end-1,2:end); jj3 = MapW(1:end-1,2:end-1); jj4 = MapW(2:end,2:end-1);
+    
+    aa = zeros(size(ii));
+    IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; aa(:)-1/h];  % U one to the left
+    IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL; aa(:)+1/h];  % U one to the right
+    IIL = [IIL; ii(:)]; JJL = [JJL; jj3(:)];   AAL = [AAL; aa(:)-1/h];  % W one above
+    IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL; aa(:)+1/h];  % W one below
+    
+    % assemble coefficient matrix
+    DD = sparse(IIL,JJL,AAL,NP,NW+NU);
+end
 
 
 %% assemble coefficients for matrix pressure diagonal and right-hand side
-IIL  = [];       % equation indeces into A
-JJL  = [];       % variable indeces into A
-AAL  = [];       % coefficients for A
+if iter==0
+    IIL  = [];       % equation indeces into A
+    JJL  = [];       % variable indeces into A
+    AAL  = [];       % coefficients for A
+    
+    % boundary points
+    ii  = [MapP(1,:).'; MapP(end  ,:).']; % top & bottom
+    jj1 = ii;
+    jj2 = [MapP(2,:).'; MapP(end-1,:).'];
+    
+    aa = zeros(size(ii));
+    IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; aa(:)+1];
+    IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL; aa(:)-1];
+    
+    ii  = [MapP(:,1); MapP(:,end  )]; % left & right
+    jj1 = ii;
+    jj2 = [MapP(:,2); MapP(:,end-1)];
+    
+    aa = zeros(size(ii));
+    IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; aa(:)+1];
+    IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL; aa(:)-1];
+    
+    % internal points
+    ii = MapP(2:end-1,2:end-1);
+    
+    % coefficients multiplying matrix pressure P
+    aa = zeros(size(ii));
+    IIL = [IIL; ii(:)]; JJL = [JJL; ii(:)];    AAL = [AAL; aa(:)];  % P on stencil centre
+    
+    % assemble coefficient matrix
+    KP = sparse(IIL,JJL,AAL,NP,NP);
+end
+
+% RHS
 IIR  = [];       % equation indeces into R
 AAR  = [];       % forcing entries for R
 
-
-% boundary points
-ii  = [MapP(1,:).'; MapP(end  ,:).']; % top & bottom
-jj1 = ii;
-jj2 = [MapP(2,:).'; MapP(end-1,:).'];
-
-aa = zeros(size(ii));
-IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; aa(:)+1];
-IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL; aa(:)-1];
-IIR = [IIR; ii(:)]; AAR = [AAR; aa(:)];
-
-ii  = [MapP(:,1); MapP(:,end  )]; % left & right
-jj1 = ii;
-jj2 = [MapP(:,2); MapP(:,end-1)];
-
-aa = zeros(size(ii));
-IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; aa(:)+1];
-IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL; aa(:)-1];
-IIR = [IIR; ii(:)]; AAR = [AAR; aa(:)];
-
-
-% internal points
 ii = MapP(2:end-1,2:end-1);
 
-% coefficients multiplying matrix pressure P
-aa = zeros(size(ii));
-IIL = [IIL; ii(:)]; JJL = [JJL; ii(:)];    AAL = [AAL; aa(:)];  % P on stencil centre
-
-
-% RHS
 rr = VolSrc(2:end-1,2:end-1);
 if bnchm; rr = rr + src_P_mms(2:end-1,2:end-1); end
 
-IIR = [IIR; ii(:)];
-AAR = [AAR; rr(:)];
+IIR = [IIR; ii(:)]; AAR = [AAR; rr(:)];
 
-
-% assemble coefficient matrix and right-hand side vector
-KP = sparse(IIL,JJL,AAL,NP,NP);
+% assemble right-hand side vector
 RP = sparse(IIR,ones(size(IIR)),AAR,NP,1);
 
 % get pressure scaling factor
@@ -260,7 +262,7 @@ Pscale = geomean(etact(:))/h;
 nzp = round((Nz-2)/2)+1;
 nxp = round((Nx-2)/2)+1;
 KP(MapP(nzp,nxp),:) = 0;
-KP(MapP(nzp,nxp),MapP(nzp,nxp)) = Pscale*1;
+KP(MapP(nzp,nxp),MapP(nzp,nxp)) = Pscale;
 RP(MapP(nzp,nxp),:) = 0;
 if bnchm; RP(MapP(nzp,nxp),:) = P_mms(nzp,nxp); end
 
@@ -292,6 +294,6 @@ S = LL\RR;  % update solution
 % map solution vector to 2D arrays
 W  = full(reshape(S(MapW(:))        ,(Nz-1), Nx   ));                      % matrix z-velocity
 U  = full(reshape(S(MapU(:))        , Nz   ,(Nx-1)));                      % matrix x-velocity
-P  = full(reshape(S(MapP(:)+(NW+NU)), Nz   , Nx   )).*Pscale;              % matrix dynamic pressure
+P  = full(reshape(S(MapP(:)+(NW+NU)), Nz   , Nx   ))*Pscale;               % matrix dynamic pressure
 
 
