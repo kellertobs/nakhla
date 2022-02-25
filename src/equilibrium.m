@@ -23,7 +23,7 @@ if any(v(:)>1e-6)
                
         vfq = ones(size(v));
 
-        vmq = min(v./(1-xq),vmq0);
+        vmq = max(0,min(1,min(v./(1-xq),vmq0)));
 
         Tphs0 = Tphs0d - dTH2O(1).*vmq.^0.75;
         Tphs1 = Tphs1d - dTH2O(3).*vmq.^0.75;
