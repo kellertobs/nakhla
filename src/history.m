@@ -9,13 +9,6 @@ hist.sumH(step+1) = sum(sum(  H(2:end-1,2:end-1)*h*h*1));  % [J]
 hist.sumC(step+1) = sum(sum(  C(2:end-1,2:end-1)*h*h*1));  % [kg]
 hist.sumV(step+1) = sum(sum(  V(2:end-1,2:end-1)*h*h*1));  % [kg]
 
-if step==0
-    hist.sumM0 = hist.sumM(1);
-    hist.sumH0 = hist.sumH(1);
-    hist.sumC0 = hist.sumC(1);
-    hist.sumV0 = hist.sumV(1);
-end
-
 % record expected rates of change by volume change and imposed boundaries layers
 dsumMdt = sum(rho(2,2:end-1).*W(1,2:end-1)*h*1) - sum(rho(end-1,2:end-1).*W(end,2:end-1)*h*1) ...
         + sum(rho(2:end-1,2).*U(2:end-1,1)*h*1) - sum(rho(2:end-1,end-1).*U(2:end-1,end)*h*1);  % [kg/s]
@@ -35,10 +28,10 @@ if step>0; hist.DC(step+1) = hist.DC(step) + dsumCdt.*dt; else; hist.DC(step+1) 
 if step>0; hist.DV(step+1) = hist.DV(step) + dsumVdt.*dt; else; hist.DV(step+1) = 0; end  % [kg]
 
 % record conservation error of mass M, heat H, major component C, volatile component V
-hist.EM(step+1) = (hist.sumM(step+1) - hist.DM(step+1))./hist.sumM0 - 1;  % [kg/kg]
-hist.EH(step+1) = (hist.sumH(step+1) - hist.DH(step+1))./hist.sumH0 - 1;  % [J /J ]
-hist.EC(step+1) = (hist.sumC(step+1) - hist.DC(step+1))./hist.sumC0 - 1;  % [kg/kg]
-hist.EV(step+1) = (hist.sumV(step+1) - hist.DV(step+1))./hist.sumV0 - 1;  % [kg/kg]
+hist.EM(step+1) = (hist.sumM(step+1) - hist.DM(step+1))./hist.sumM(1) - 1;  % [kg/kg]
+hist.EH(step+1) = (hist.sumH(step+1) - hist.DH(step+1))./hist.sumH(1) - 1;  % [J /J ]
+hist.EC(step+1) = (hist.sumC(step+1) - hist.DC(step+1))./hist.sumC(1) - 1;  % [kg/kg]
+hist.EV(step+1) = (hist.sumV(step+1) - hist.DV(step+1))./hist.sumV(1) - 1;  % [kg/kg]
 
 % record variable and coefficient diagnostics
 hist.W(step+1,1) = min(min(-W(:,2:end-1)));
