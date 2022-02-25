@@ -248,7 +248,7 @@ AAR  = [];       % forcing entries for R
 
 ii = MapP(2:end-1,2:end-1);
 
-rr = VolSrc(2:end-1,2:end-1);
+rr = - VolSrc(2:end-1,2:end-1);
 if bnchm; rr = rr + src_P_mms(2:end-1,2:end-1); end
 
 IIR = [IIR; ii(:)]; AAR = [AAR; rr(:)];
@@ -257,7 +257,7 @@ IIR = [IIR; ii(:)]; AAR = [AAR; rr(:)];
 RP = sparse(IIR,ones(size(IIR)),AAR,NP,1);
 
 % get pressure scaling factor
-Pscale = geomean(etact(:))/h;
+Pscale = geomean(etact(:))/4/h;
 
 nzp = round((Nz-2)/2)+1;
 nxp = round((Nx-2)/2)+1;
@@ -270,7 +270,7 @@ if bnchm; RP(MapP(nzp,nxp),:) = P_mms(nzp,nxp); end
 
 %% assemble global coefficient matrix and right-hand side vector
 LL = [ KV         -Pscale.*GG ; ...
-       Pscale.*DD  Pscale.*KP ];
+      -Pscale.*DD  Pscale.*KP ];
 
 RR = [RV; Pscale.*RP];
 
