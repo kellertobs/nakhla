@@ -82,6 +82,34 @@ hist.v(step+1,1) = min(min(v(2:end-1,2:end-1)));
 hist.v(step+1,2) = mean(mean(v(2:end-1,2:end-1)));
 hist.v(step+1,3) = max(max(v(2:end-1,2:end-1)));
 
+hist.cx(step+1,1) = min(min(cx(2:end-1,2:end-1)));
+hist.cx(step+1,2) = mean(mean(cx(2:end-1,2:end-1)));
+hist.cx(step+1,3) = max(max(cx(2:end-1,2:end-1)));
+
+hist.cm(step+1,1) = min(min(cm(2:end-1,2:end-1)));
+hist.cm(step+1,2) = mean(mean(cm(2:end-1,2:end-1)));
+hist.cm(step+1,3) = max(max(cm(2:end-1,2:end-1)));
+
+hist.vf(step+1,1) = min(min(vf(2:end-1,2:end-1)));
+hist.vf(step+1,2) = mean(mean(vf(2:end-1,2:end-1)));
+hist.vf(step+1,3) = max(max(vf(2:end-1,2:end-1)));
+
+hist.vm(step+1,1) = min(min(vm(2:end-1,2:end-1)));
+hist.vm(step+1,2) = mean(mean(vm(2:end-1,2:end-1)));
+hist.vm(step+1,3) = max(max(vm(2:end-1,2:end-1)));
+
+hist.Gx(step+1,1) = min(min(Gx(2:end-1,2:end-1)));
+hist.Gx(step+1,2) = mean(mean(Gx(2:end-1,2:end-1)));
+hist.Gx(step+1,3) = max(max(Gx(2:end-1,2:end-1)));
+
+hist.Gf(step+1,1) = min(min(Gf(2:end-1,2:end-1)));
+hist.Gf(step+1,2) = mean(mean(Gf(2:end-1,2:end-1)));
+hist.Gf(step+1,3) = max(max(Gf(2:end-1,2:end-1)));
+
+hist.dV(step+1,1) = min(min(VolSrc(2:end-1,2:end-1)));
+hist.dV(step+1,2) = mean(mean(VolSrc(2:end-1,2:end-1)));
+hist.dV(step+1,3) = max(max(VolSrc(2:end-1,2:end-1)));
+
 hist.rho(step+1,1) = min(min(rho(2:end-1,2:end-1)));
 hist.rho(step+1,2) = mean(mean(rho(2:end-1,2:end-1)));
 hist.rho(step+1,3) = max(max(rho(2:end-1,2:end-1)));
@@ -97,3 +125,23 @@ hist.wx(step+1,3) = max(max(-(chi(1:end-1,2:end-1)+chi(2:end,2:end-1))/2.*wx(:,2
 hist.wf(step+1,1) = min(min(-(phi(1:end-1,2:end-1)+phi(2:end,2:end-1))/2.*wf(:,2:end-1)));
 hist.wf(step+1,2) = mean(mean(abs((phi(1:end-1,2:end-1)+phi(2:end,2:end-1))/2.*wf(:,2:end-1))));
 hist.wf(step+1,3) = max(max(-(phi(1:end-1,2:end-1)+phi(2:end,2:end-1))/2.*wf(:,2:end-1)));
+
+hist.it(step+1,1) = min(min(it(2:end-1,2:end-1)));
+hist.it(step+1,2) = mean(mean(it(2:end-1,2:end-1)));
+hist.it(step+1,3) = max(max(it(2:end-1,2:end-1)));
+
+hist.ct(step+1,1) = min(min(ct(2:end-1,2:end-1)));
+hist.ct(step+1,2) = mean(mean(ct(2:end-1,2:end-1)));
+hist.ct(step+1,3) = max(max(ct(2:end-1,2:end-1)));
+
+hist.si(step+1,1) = min(min(si(2:end-1,2:end-1)));
+hist.si(step+1,2) = mean(mean(si(2:end-1,2:end-1)));
+hist.si(step+1,3) = max(max(si(2:end-1,2:end-1)));
+
+hist.rip(step+1,1) = min(min(rip(2:end-1,2:end-1)));
+hist.rip(step+1,2) = mean(mean(rip(2:end-1,2:end-1)));
+hist.rip(step+1,3) = max(max(rip(2:end-1,2:end-1)));
+
+hist.rid(step+1,1) = min(min(rid(2:end-1,2:end-1)));
+hist.rid(step+1,2) = mean(mean(rid(2:end-1,2:end-1)));
+hist.rid(step+1,3) = max(max(rid(2:end-1,2:end-1)));
