@@ -17,11 +17,11 @@ rng(seed);
 rp = randn(Nz,Nx);
 for i = 1:round(smth)
     rp(2:end-1,2:end-1) = rp(2:end-1,2:end-1) + diff(rp(:,2:end-1),2,1)./8 + diff(rp(2:end-1,:),2,2)./8;
-    rp([1 2 end-1 end],:) = 0;
-    rp(:,[1 2 end-1 end]) = 0;
+    rp = rp - mean(mean(rp(2:end-1,2:end-1)));
+    rp([1 end],:) = 0;
+    rp(:,[1 end]) = 0;
 end
 rp = rp./max(abs(rp(:)));
-rp = rp - mean(mean(rp(2:end-1,2:end-1)));
 
 % get mapping arrays
 NP =  Nz   * Nx   ;
@@ -52,6 +52,8 @@ bndshape = max(0,min(1,bndshape));
 bndshape([1 end],:) = bndshape([2 end-1],:);
 bndshape(:,[1 end]) = bndshape(:,[2 end-1]);
 
+bndH = 0.*bndshape;  bndC =  0.*bndshape;  bndV =  0.*bndshape;
+
 % set initial solution fields
 T   =  T0 + (T1-T0) .* (1+erf((ZZ/D-zlay)/wlay_T))/2 + dT.*rp;  if bndinit && ~isnan(Twall); T = T + (Twall-T).*bndshape; end % temperature
 c   =  c0 + (c1-c0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dc.*rp;  if bndinit && ~isnan(cwall); c = c + (cwall-c).*bndshape; end % major component
@@ -65,11 +67,13 @@ rid =  rip.*HLRID./HLRIP;                                           % radiogenic
 
 U   =  zeros(size((XX(:,1:end-1)+XX(:,2:end))));  Ui = U;  res_U = 0.*U;
 W   =  zeros(size((XX(1:end-1,:)+XX(2:end,:))));  Wi = W;  res_W = 0.*W; wf = 0.*W; wc = 0.*W;
-P   =  0.*c;  Pi = P;  res_P = 0.*P;  meanQ = 0;  Pt = rhom0.*g0.*ZZ + Ptop;
+P   =  0.*c;  Pi = P;  res_P = 0.*P;  meanQ = 0;  
+Pt  = rhom0.*g0.*ZZ + Ptop;
+if Nx<=10; Pt = mean(mean(Pt(2:end-1,2:end-1))).*ones(size(Pt)); end
 S   = [W(:);U(:);P(:)];
 
 % get volume fractions and bulk density
-res = 1;  tol = 1e-15;  iter = 0;  x = 0;  f = 0;
+res = 1;  tol = 1e-15;  iter = 0;  x = ones(size(T));  f = v;
 while res > tol
     xi = x;  fi = f;
     
@@ -105,9 +109,9 @@ Pto     = Pt;
 if ~react;  Dsx = 0;  Dsf = 0;  end
 rhoCp = rho.*(m.*Cpm + x.*Cpx + f.*Cpf);
 rhoDs = rho.*(m.*0   + x.*Dsx + f.*Dsf);
-H = (rhoCp + rhoDs).*T;    sumH0 = sum(sum(H(2:end-1,2:end-1)));
-C = rho.*(m.*cm + x.*cx);  sumC0 = sum(sum(C(2:end-1,2:end-1)));
-V = rho.*(m.*vm + f.*vf);  sumV0 = sum(sum(V(2:end-1,2:end-1)));
+H = (rhoCp + rhoDs).*T;
+C = rho.*(m.*cm + x.*cx);
+V = rho.*(m.*vm + f.*vf);
 
 itm  = it./(m + x.*KIT); itx = it./(m./KIT + x);
 ctm  = ct./(m + x.*KCT); ctx = ct./(m./KCT + x);
@@ -132,8 +136,8 @@ dcy_rid = rho.*rid./HLRID.*log(2);
 dHdt   = 0.*T;  diff_T = 0.*T;
 dCdt   = 0.*c;  diff_c = 0.*c;
 dVdt   = 0.*v;  diff_v = 0.*v;  
-dfdt   = 0.*f;
-dxdt   = 0.*x;
+dfdt   = 0.*f;  diff_f = 0.*f;  
+dxdt   = 0.*x;  diff_x = 0.*x;  
 dSImdt = 0.*si;  diff_sim = 0.*sim;
 dSIxdt = 0.*si;  diff_six = 0.*SIx;
 dITdt  = 0.*IT;  diff_it  = 0.*IT;
@@ -161,15 +165,15 @@ if restart
         name = [opdir,'/',runID,'/',runID,'_',num2str(restart)];
     end
     load(name,'U','W','P','Pt','f','x','m','phi','chi','mu','H','C','V','T','c','v','cm','cx','vm','vf','IT','CT','SIm','SIx','SI','RIP','RID','it','ct','sim','six','si','rip','rid','dHdt','dCdt','dVdt','dITdt','dCTdt','dSImdt','dSIxdt','dfdt','dxdt','Gf','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step','hist');
-%     name = [opdir,runID,'/',runID,'_par'];
-%     load(name);
     
     Pscale = geomean(eta(:))/h;
     S = [W(:);U(:);P(:)/Pscale];
+    dcy_rip = rho.*rip./HLRIP.*log(2);
+    dcy_rid = rho.*rid./HLRID.*log(2);
     Pto = Pt; etao = eta; rhoo = rho; Div_rhoVo = Div_rhoV;
     update; output;
     time = time+dt;
     step = step+1;
 else
-    update; output;
+    update; history; output;
 end
