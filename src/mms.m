@@ -37,7 +37,7 @@ fprintf(1,' . ');
 % manufactured solution residuals
 res_W_mms = (diff(tzz_mms,z) + diff(txz_mms,x)) - diff(P_mms,z) + rho_mms(x,z)*g0;
 res_U_mms = (diff(txx_mms,x) + diff(txz_mms,z)) - diff(P_mms,x);
-res_P_mms = (diff(  W_mms,z) + diff(  U_mms,x))                 - src_mms(x,z);
+res_P_mms =-(diff(  W_mms,z) + diff(  U_mms,x))                 + src_mms(x,z);
 fprintf(1,' . ');
 
 % plot manufactured solution
@@ -94,7 +94,7 @@ etact  = double(subs(eta_mms)); fprintf(1,' . ');
 VolSrc = double(subs(src_mms)); fprintf(1,' . ');
 [x,z]  = meshgrid(xu_mms,zw_mms);
 etaco  = double(subs(eta_mms)); fprintf(1,' . ');
-
+theta  = 1;
 
 fprintf(1,' . \n');
    
