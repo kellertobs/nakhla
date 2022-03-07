@@ -1,3 +1,5 @@
+% get combined residual norm
+resnorm = resnorm_VP + resnorm_TC;
 if iter<=0 || resnorm>resnorm0; resnorm0 = resnorm + 1e-32; end  % reset reference residual
 
 % report iterations
