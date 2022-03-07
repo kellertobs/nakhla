@@ -17,8 +17,8 @@ perCm    =  0.51;                % peritectic liquidus composition [wt SiO2]
 perCx    =  0.48;                % peritectic solidus  composition [wt SiO2]
 perT     =  1100;                % peritectic temperature [degC]
 clap     =  1e-7;                % Clapeyron slope for P-dependence of melting T [degC/Pa]
-dTH2O    =  [1300,1000,300];     % solidus shift from water content [degC/wt^0.75]
-beta     =  0.75;                % iterative lag parameter phase diagram [1]
+dTH2O    =  [1300,1000,300];     % solidus shift from water content [degC/wt^0.75
+beta     =  0.50;                % iterative lag parameter phase diagram [1]
 
 % set model rheology parameters
 etam0    =  100;                 % melt viscosity [Pas]
@@ -48,7 +48,7 @@ g0       =  10.;                 % gravity [m/s2]
 
 % set ranges for control variables T, c, v, P
 T = linspace(500,1600,1e3);    % temperature range [degC]
-c = linspace(0.50,0.50,1e3);   % major component range [wt SiO2]
+c = linspace(0.49,0.49,1e3);   % major component range [wt SiO2]
 v = linspace(0.01,0.01,1e3);   % volatile component range [wt H2O]
 P = linspace(100,100,1e3)*1e6; % pressure range [Pa]
 
@@ -166,7 +166,7 @@ plot(CCx.*100,TT,'k-','LineWidth',2); axis tight; hold on; box on;
 plot(CCm.*100,TT,'k-','LineWidth',2);
 plot(cxq.*100,T-(P-mean(P(:))).*clap,'b','LineStyle',linestyle,'LineWidth',2);
 plot(cmq.*100,T-(P-mean(P(:))).*clap,'r','LineStyle',linestyle,'LineWidth',2);
-plot(c./(1-fq+1e-16).*100,T-(P-mean(P(:))).*clap,'k','LineStyle',linestyle,'LineWidth',1);
+plot(c./(1-fq+1e-16).*100,T-(P-mean(P(:))).*clap,'Color',[0.5 0.5 0.5],'LineStyle',linestyle,'LineWidth',2);
 set(gca,'TickLabelInterpreter','latex','FontSize',13)
 title('Phase Diagram','Interpreter','latex','FontSize',18)
 xlabel('Major component [wt\% SiO$_2$]','Interpreter','latex','FontSize',15)
@@ -202,7 +202,7 @@ ylabel('Volatile component [wt\% H$_2$O]','Interpreter','latex','FontSize',15)
 % plot phase densities
 figure(5); if ~holdfig; clf; end
 plot(T,rhox,'k',T,rhom,'r',T,rhof,'b','LineStyle',linestyle,'LineWidth',2); hold on; box on; axis tight;
-plot(T,rho ,'k','LineStyle',':','LineWidth',2); hold on; box on; axis tight;
+plot(T,rho ,'Color',[0.5 0.5 0.5],'LineStyle',linestyle,'LineWidth',2); hold on; box on; axis tight;
 legend('crystals','melt','fluid','mixture','Interpreter','latex','FontSize',15,'box','off','location','best')
 set(gca,'TickLabelInterpreter','latex','FontSize',13)
 title('Density model','Interpreter','latex','FontSize',18)
@@ -212,7 +212,7 @@ ylabel('Density [kg/m$^3$]','Interpreter','latex','FontSize',15)
 % plot mixture rheology
 figure(6); if ~holdfig; clf; end
 semilogy(T,ones(size(T)).*etax0,'k',T,min(etam,eta),'r',T,ones(size(T)).*etaf0,'b','LineStyle',linestyle,'LineWidth',2); hold on; box on; axis tight;
-semilogy(T,eta,'k','LineStyle',':','LineWidth',2); hold on; box on; axis tight;
+semilogy(T,eta,'Color',[0.5 0.5 0.5],'LineStyle',linestyle,'LineWidth',2); hold on; box on; axis tight;
 legend('crystals','melt','fluid','mixture','Interpreter','latex','FontSize',15,'box','off','location','best')
 set(gca,'TickLabelInterpreter','latex','FontSize',13)
 title('Viscosity model','Interpreter','latex','FontSize',18)
@@ -221,7 +221,7 @@ ylabel('Viscosity [log$_{10}$ Pas]','Interpreter','latex','FontSize',15)
 
 % plot phase segregation speeds
 figure(7); if ~holdfig; clf; end
-semilogy(T,max(1e-12,abs(wx)).*3600,'k',T,max(1e-12,abs(wf)).*3600,'b','LineStyle',linestyle,'LineWidth',2); hold on; box on; axis tight;
+semilogy(T,max(1e-12,abs(wx)).*3600,'k',T,max(1e-12,abs(wf)).*3600,'b',T,max(1e-12,abs(wm)).*3600,'r','LineStyle',linestyle,'LineWidth',2); hold on; box on; axis tight;
 legend('crystals','fluid','Interpreter','latex','FontSize',15,'box','off','location','best')
 set(gca,'TickLabelInterpreter','latex','FontSize',13)
 title('Phase segregation model','Interpreter','latex','FontSize',18)

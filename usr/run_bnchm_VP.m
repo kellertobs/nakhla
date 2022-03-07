@@ -5,7 +5,7 @@ NN = [40,80,160];  % test increasing time steps
 for nn = NN
     
 % set run parameters
-runID    =  ['bnchm_mms',int2str(nn)];      % run identifier
+runID    =  'bnchm_mms';         % run identifier
 opdir    =  '../out/';           % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  1;                   % output frame plotted/saved every 'nop' time steps
@@ -25,7 +25,7 @@ h        =  D/(N-2);             % grid spacing (equal in both dimensions, do no
 % set model timing parameters
 M        =  1;                   % number of time steps to take
 hr       =  3600;                % conversion seconds to hours
-yr       =  12*hr;               % conversion seconds to years
+yr       =  24*365.25*hr;        % conversion seconds to years
 tend     =  1*yr;                % end time for simulation [s]
 dt       =  10;                  % initial time step [s]
 dtmax    =  10;                  % maximum time step [s]
@@ -68,7 +68,7 @@ HLRID    =  1e3*yr;              % radiogenic daughter isotope half-life [s]
 
 % set thermo-chemical boundary parameters
 Ptop     =  1e8;                 % top pressure [Pa]
-bndmode  =  0;                   % mode of wall cooling/outgassing/assimilation (0 = none; 1 = top only; 2 = top/bot only; 3 = all walls)
+bndmode  =  0;                   % boundary condition mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all sides)
 bndinit  =  0;                   % switch on (1) to initialise with already established boundary layers
 dw       =  2*h;                 % boundary layer thickness for cooling/outgassing/assimilation [m]
 fin      =  0;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
@@ -140,7 +140,7 @@ rtol     =  1e-9;                % outer its relative tolerance
 atol     =  1e-6;                % outer its absolute tolerance
 maxit    =  100;                 % maximum outer its
 alpha    =  0.75;                % iterative lag parameter equilibration
-beta     =  0.75;                % iterative lag parameter phase diagram
+beta     =  0.50;                % iterative lag parameter phase diagram
 etamin   =  1e1;                 % minimum viscosity for stabilisation
 etamax   =  1e7;                 % maximum viscosity for stabilisation
 TINY     =  1e-16;               % minimum cutoff phase, component fractions
@@ -150,8 +150,8 @@ if ~isfolder([opdir,'/',runID])
     mkdir([opdir,'/',runID]);
 end
 
-% save input parameters and runtime options (unless restarting)
-if restart == 0 
+% save input parameters and runtime options (unless restarting or benchmarking)
+if restart == 0 && bnchm == 0
     parfile = [opdir,'/',runID,'/',runID,'_par'];
     save(parfile);
 end
@@ -175,7 +175,7 @@ errU = norm(U(2:end-1,:)-U_mms(2:end-1,:),2)./norm(U_mms(2:end-1,:),2);
 errP = norm(P(2:end-1,2:end-1)-P_mms(2:end-1,2:end-1),2)./norm(P_mms(2:end-1,2:end-1),2);
 
 % plot error convergence
-figure(18); 
+fh18 = figure(18); 
 p1 = loglog(h,errW,'r+','MarkerSize',8,'LineWidth',2); axis xy tight; hold on; box on; 
 p2 = loglog(h,errU,'g+','MarkerSize',8,'LineWidth',2); axis xy tight; hold on; box on; 
 p3 = loglog(h,errP,'b+','MarkerSize',8,'LineWidth',2); axis xy tight; hold on; box on; 
@@ -193,7 +193,7 @@ if nn == NN(end)
 end
 
 % plot error convergence
-figure(19);
+fh19 = figure(19);
 DOFS = (NN+2).*(NN+2) + 2.*(NN+1).*(NN+2);
 dofs = (nn+2).*(nn+2) + 2.*(nn+1).*(nn+2);
 p5 = loglog(dofs,solvetime,'r+','MarkerSize',8,'LineWidth',2); axis xy tight; hold on; box on; 
@@ -210,3 +210,9 @@ if nn == NN(end)
 end
 
 end
+
+name = [opdir,'/',runID,'/',runID,'_bnchm'];
+print(fh18,name,'-dpng','-r300','-opengl');
+
+name = [opdir,'/',runID,'/',runID,'_sclng'];
+print(fh19,name,'-dpng','-r300','-opengl');
