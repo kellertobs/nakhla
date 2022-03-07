@@ -7,13 +7,13 @@ AAR  = [];       % forcing entries for R
 
 
 % set specified boundaries to no slip, else to free slip
-if bndmode==4;               sds = +1;      % no slip sides for 'all sides(4)'
-else;                        sds = -1; end  % free slip sides for other types
-if bndmode==1 || bndmode>=3; top = +1;      % no slip top for 'top only(1)', 'top/bot(3)', 'all sides(4)'
-else;                        top = -1; end  % free slip for other types
-if bndmode>=2;               bot = +1;      % no slip bot for 'bot only(2)', 'top/bot(3)', 'all sides(4)'
-else;                        bot = -1; end  % free slip for other types
-
+% if bndmode==4;               sds = +1;      % no slip sides for 'all sides(4)'
+% else;                        sds = -1; end  % free slip sides for other types
+% if bndmode==1 || bndmode>=3; top = +1;      % no slip top for 'top only(1)', 'top/bot(3)', 'all sides(4)'
+% else;                        top = -1; end  % free slip for other types
+% if bndmode>=2;               bot = +1;      % no slip bot for 'bot only(2)', 'top/bot(3)', 'all sides(4)'
+% else;                        bot = -1; end  % free slip for other types
+sds = -1; top = -1; bot = -1;
 
 % assemble coefficients of z-stress divergence
     
@@ -257,7 +257,7 @@ IIR = [IIR; ii(:)]; AAR = [AAR; rr(:)];
 RP = sparse(IIR,ones(size(IIR)),AAR,NP,1);
 
 % get pressure scaling factor
-Pscale = geomean(etact(:))/4/h;
+Pscale = sqrt(geomean(etact(:))/h^2);
 
 nzp = round((Nz-2)/2)+1;
 nxp = round((Nx-2)/2)+1;
@@ -278,8 +278,8 @@ RR = [RV; Pscale.*RP];
 
 %% get residual
 % get non-linear residual
-FF      = LL*S - RR;
-resnorm = norm(FF(:),2)./norm(RR(:),2);
+FF         = LL*S - RR;
+resnorm_VP = norm(FF(:),2)./(norm(RR(:),2)+TINY);
 
 % map residual vector to 2D arrays
 res_W  = full(reshape(FF(MapW(:))        ,(Nz-1), Nx   ));                 % z-velocity
