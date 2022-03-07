@@ -14,7 +14,6 @@ res   = 1;
 tol   = 1e-15;
 
 vmq0 = (4.8e-5.*P.^0.6 + 1e-9.*P)./100; % check Liu, Shang & Behrens, 2005
-vmq  = min(v./(1-xq),vmq0);
 
 if any(v(:)>1e-6)
     
