@@ -13,6 +13,8 @@ while time <= tend && step <= M
     fprintf(1,'\n\n\n*****  step %d;  dt = %4.4e;  time = %4.4e [hr]\n\n',step,dt./3600,time./3600);
     tic;
     
+    if step<=1; theta = 1; else; theta = 0.5; end
+            
     % store previous solution
     Ho      = H;
     Co      = C;
@@ -44,10 +46,9 @@ while time <= tend && step <= M
     dRIDdto = dRIDdt;
     Pto     = Pt;
     dto     = dt;
-    Div_rhoVo = Div_rhoV - rho.*Div_V;
     
     % reset residuals and iteration count
-    resnorm  = 1e3;
+    resnorm  = 1;
     resnorm0 = resnorm;
     iter     = 0;
     
@@ -56,10 +57,7 @@ while time <= tend && step <= M
             
         % solve thermo-chemical equations
         thermochem;
-        
-        % update non-linear parameters and auxiliary variables
-        update;
-        
+
         % solve fluid-mechanics equations
         fluidmech;
         
