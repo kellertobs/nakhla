@@ -68,7 +68,7 @@ HLRID    =  1e3*yr;              % radiogenic daughter isotope half-life [s]
 
 % set thermo-chemical boundary parameters
 Ptop     =  1e8;                 % top pressure [Pa]
-bndmode  =  0;                   % boundary condition mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all sides)
+bndmode  =  0;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls)
 bndinit  =  0;                   % switch on (1) to initialise with already established boundary layers
 dw       =  2*h;                 % boundary layer thickness for cooling/outgassing/assimilation [m]
 fin      =  0;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
@@ -141,6 +141,7 @@ atol     =  1e-6;                % outer its absolute tolerance
 maxit    =  100;                 % maximum outer its
 alpha    =  0.75;                % iterative lag parameter equilibration
 beta     =  0.50;                % iterative lag parameter phase diagram
+delta    =  20;                  % smoothness of segregation speed
 etamin   =  1e1;                 % minimum viscosity for stabilisation
 etamax   =  1e7;                 % maximum viscosity for stabilisation
 TINY     =  1e-16;               % minimum cutoff phase, component fractions
