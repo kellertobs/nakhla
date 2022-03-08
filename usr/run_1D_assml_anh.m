@@ -23,8 +23,8 @@ M        =  5e4;                 % number of time steps to take
 hr       =  3600;                % conversion seconds to hours
 yr       =  24*365.25*hr;        % conversion seconds to years
 tend     =  24*hr;               % end time for simulation [s]
-dt       =  1;                   % initial time step [s]
-dtmax    =  1;                   % maximum time step [s]
+dt       =  5;                   % initial time step [s]
+dtmax    =  5;                   % maximum time step [s]
 
 % set initial thermo-chemical state
 seed     =  15;                  % random perturbation seed
