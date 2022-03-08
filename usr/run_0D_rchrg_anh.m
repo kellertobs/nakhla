@@ -73,7 +73,7 @@ tau_T    =  4*hr;                % wall cooling/assimilation time [s]
 tau_a    =  2*hr;                % wall cooling/assimilation time [s]
 Twall    =  1175;                % wall temperature [degC] (nan = insulating)
 cwall    =  0.49;                % wall major component [wt SiO2] (nan = no assimilation)
-vwall    =  0.03;                % wall volatile component [wt H2O] (nan = no assimilation)
+vwall    =  0.00;                % wall volatile component [wt H2O] (nan = no assimilation)
 itwall   =  0.1;                 % wall incomp. tracer [wt ppm] (nan = no assimilation)
 ctwall   =  10.;                 % wall comp. tracer [wt ppm] (nan = no assimilation)
 siwall   =  5;                   % wall stable isotope [delta] (nan = no assimilation)

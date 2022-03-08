@@ -71,7 +71,7 @@ fin      =  0;                   % ingassing factor (0 = no ingassing; 1 = free 
 fout     =  0;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
 tau_T    =  4*hr;                % wall cooling/assimilation time [s]
 tau_a    =  2*hr;                % wall cooling/assimilation time [s]
-Twall    =  1175;                % wall temperature [degC] (nan = insulating)
+Twall    =  1100;                % wall temperature [degC] (nan = insulating)
 cwall    =  0.49;                % wall major component [wt SiO2] (nan = no assimilation)
 vwall    =  0.03;                % wall volatile component [wt H2O] (nan = no assimilation)
 itwall   =  0.1;                 % wall incomp. tracer [wt ppm] (nan = no assimilation)
