@@ -1,6 +1,6 @@
 %% update time step
 dtk = min((h/2)^2./max([kT(:)./rhoCp(:);kc]));                             % diffusive time step size
-dta = min(min(h/2/max(abs([UBG(:);WBG(:);Um(:);Wm(:);Uf(:);Wf(:);Ux(:);Wx(:)]+1e-16)))); % advective time step size
+dta = min(min(h/2/max(abs([U(:);W(:)]+1e-16)))); % advective time step size
 dt  = min([2*dto,dtmax,CFL*min(dtk,dta)]);                                 % physical time step size
 
 

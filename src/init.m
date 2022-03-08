@@ -72,6 +72,11 @@ Pt  = rhom0.*g0.*ZZ + Ptop;
 if Nx<=10; Pt = mean(mean(Pt(2:end-1,2:end-1))).*ones(size(Pt)); end
 S   = [W(:);U(:);P(:)];
 
+% initialise phase velocities
+Wf  = W;  Uf  = U; 
+Wx  = W;  Ux  = U;
+Wm  = W;  Um  = U;
+
 % get volume fractions and bulk density
 res = 1;  tol = 1e-15;  iter = 0;  x = ones(size(T));  f = v;
 while res > tol

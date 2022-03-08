@@ -57,12 +57,12 @@ while time <= tend && step <= M
             
         % solve thermo-chemical equations
         thermochem;
+                
+        % update non-linear parameters and auxiliary variables
+        update;
 
         % solve fluid-mechanics equations
         fluidmech;
-        
-        % update non-linear parameters and auxiliary variables
-        update;
         
         % report convergence
         report;

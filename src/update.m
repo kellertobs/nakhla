@@ -13,7 +13,6 @@ mu    = m.*rho./rhom;
 rhoBF = ((rho (2:end-2,2:end-1)+rho (3:end-1,2:end-1))/4 + (rhoo(2:end-2,2:end-1)+rhoo(3:end-1,2:end-1))/4 - rhoref);  % taken at mid-point in time
 if Nx <= 10; rhoBF = repmat(mean(rhoBF,2),1,Nx-2); end
 
-
 % update thermal properties
 rhoCp = rho.*(m.*Cpm + x.*Cpx + f.*Cpf);
 rhoDs = rho.*(m.*0   + x.*Dsx + f.*Dsf);
@@ -109,20 +108,12 @@ for i = 1:round(delta)
     wm(:,[1 end]) = sds*wm(:,[2 end-1]);
 end
 
-% update phase velocities
-Wf   = W + wf;                                                             % mvp z-velocity
-Uf   = U + 0.;                                                             % mvp x-velocity
-Wx   = W + wx;                                                             % xtl z-velocity
-Ux   = U + 0.;                                                             % xtl x-velocity
-Wm   = W + wm;                                                             % mlt z-velocity
-Um   = U + 0.;                                                             % mlt x-velocity
-
 % update volume source
 Div_rhoV =  + advection(rho.*f,0.*U,wf,h,ADVN,'flx') ...
             + advection(rho.*x,0.*U,wx,h,ADVN,'flx') ...
+            + advection(rho.*m,0.*U,wm,h,ADVN,'flx') ...
             + advection(rho   ,U   ,W ,h,ADVN,'flx');
 if step>0; VolSrc = -((rho-rhoo)./dt + Div_rhoV - rho.*Div_V)./rho; end
-% VolSrc = -((rho-rhoo)/dt + (Div_rhoV - rho.*Div_V + Div_rhoVo)/2)./rho; end
 
-UBG    =  mean(mean(VolSrc(2:end-1,2:end-1)))./2 .* (L/2-XXu);
-WBG    =  mean(mean(VolSrc(2:end-1,2:end-1)))./2 .* (D/2-ZZw);
+UBG    = - mean(mean(VolSrc(2:end-1,2:end-1)))./2 .* (L/2-XXu);
+WBG    = - mean(mean(VolSrc(2:end-1,2:end-1)))./2 .* (D/2-ZZw);

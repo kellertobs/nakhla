@@ -35,14 +35,14 @@ IIR = [IIR; ii(:)]; AAR = [AAR; aa(:)];
 ii = MapW(1,2:end-1); jj = ii;
 aa = zeros(size(ii));
 IIL = [IIL; ii(:)]; JJL = [JJL; jj(:)];   AAL = [AAL; aa(:)+1];
-aa = zeros(size(ii)) - WBG(1,2:end-1);
+aa = zeros(size(ii)) + WBG(1,2:end-1);
 IIR = [IIR; ii(:)]; AAR = [AAR; aa(:)];
 
 % bottom boundary
 ii = MapW(end,2:end-1); jj = ii;
 aa = zeros(size(ii));
 IIL = [IIL; ii(:)]; JJL = [JJL; jj(:)];   AAL = [AAL; aa(:)+1];
-aa = zeros(size(ii)) - WBG(end,2:end-1);
+aa = zeros(size(ii)) + WBG(end,2:end-1);
 IIR = [IIR; ii(:)]; AAR = [AAR; aa(:)];
 
 
@@ -100,14 +100,14 @@ IIR = [IIR; ii(:)]; AAR = [AAR; aa(:)];
 ii = MapU(2:end-1,1); jj = ii;
 aa = zeros(size(ii));
 IIL = [IIL; ii(:)]; JJL = [JJL; jj(:)];   AAL = [AAL; aa(:)+1];
-aa = zeros(size(ii)) - UBG(2:end-1,1);
+aa = zeros(size(ii)) + UBG(2:end-1,1);
 IIR = [IIR; ii(:)]; AAR = [AAR; aa(:)];
 
 % right side boundary
 ii = MapU(2:end-1,end); jj = ii;
 aa = zeros(size(ii));
 IIL = [IIL; ii(:)]; JJL = [JJL; jj(:)];   AAL = [AAL; aa(:)+1];
-aa = zeros(size(ii)) - UBG(2:end-1,end);
+aa = zeros(size(ii)) + UBG(2:end-1,end);
 IIR = [IIR; ii(:)]; AAR = [AAR; aa(:)];
 
 
@@ -297,3 +297,10 @@ U  = full(reshape(S(MapU(:))        , Nz   ,(Nx-1)));                      % mat
 P  = full(reshape(S(MapP(:)+(NW+NU)), Nz   , Nx   ))*Pscale;               % matrix dynamic pressure
 
 
+% update phase velocities
+Wf   = W + wf;                                                             % mvp z-velocity
+Uf   = U + 0.;                                                             % mvp x-velocity
+Wx   = W + wx;                                                             % xtl z-velocity
+Ux   = U + 0.;                                                             % xtl x-velocity
+Wm   = W + wm;                                                             % mlt z-velocity
+Um   = U + 0.;                                                             % mlt x-velocity
