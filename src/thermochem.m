@@ -49,7 +49,7 @@ C(:,[1 end]) = C(:,[2 end-1]);
     
 % update volatile component
 bndV = zeros(size(v));
-if any(v(:)>1e-6)
+if any([v0;v1;vwall;v(:)]>1e-6)
     advn_V = advection(rho.*m.*vm,Um,Wm,h,ADVN,'flx') ...
            + advection(rho.*f.*vf,Uf,Wf,h,ADVN,'flx');
     
@@ -117,7 +117,7 @@ else
 end
 
 % update bubble fraction
-if (diseq && any(v(:)>1e-6)) || ~react
+if (diseq && any([v0;v1;vwall;v(:)]>1e-6)) || ~react
     
     if react
         Gf = alpha.*Gf + (1-alpha).*((fq-f).*rho./max(4.*dt,tau_r));
@@ -157,7 +157,7 @@ if react && step>0
     cx = c./(m./Kc + x);
     
     % volatile component
-    if any(v(:)>1e-6)
+    if any([v0;v1;vwall;v(:)]>1e-6)
         Kf = vfq./vmq;
         vm = v./(m + f.*Kf);
         vf = v./(m./Kf + f);
