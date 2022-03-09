@@ -1,6 +1,6 @@
 %% update time step
 dtk = min((h/2)^2./max([kT(:)./rhoCp(:);kc]));                             % diffusive time step size
-dta = min(min(h/2/max(abs([U(:);W(:)]+1e-16)))); % advective time step size
+dta = min(min(h/2/max(abs([Ux(:);Wx(:);Uf(:);Wf(:);Um(:);Wm(:)]+1e-16)))); % advective time step size
 dt  = min([2*dto,dtmax,CFL*min(dtk,dta)]);                                 % physical time step size
 
 
@@ -92,7 +92,7 @@ if diseq || ~react
     
     if react
         Gx = alpha.*Gx + (1-alpha).*((xq-x).*rho./max(4.*dt,tau_r));
-        Gx = max(-0.01*rhox/dt,min(0.01*rho/dt,Gx));  % limit to 0.1 vol% phase change per time step
+%         Gx = max(-0.01*rhox/dt,min(0.01*rho/dt,Gx));  % limit to 0.1 vol% phase change per time step
     end
     
     advn_x = advection(rho.*x,Ux,Wx,h,ADVN,'flx');                         % get advection term
@@ -121,7 +121,7 @@ if (diseq && any(v(:)>1e-6)) || ~react
     
     if react
         Gf = alpha.*Gf + (1-alpha).*((fq-f).*rho./max(4.*dt,tau_r));
-        Gf = max(-0.01*rhof/dt,min(0.01*rho/dt,Gf));  % limit to 0.1 vol% phase change per time step
+%         Gf = max(-0.01*rhof/dt,min(0.01*rho/dt,Gf));  % limit to 0.1 vol% phase change per time step
     end
     
     advn_f = advection(rho.*f,Uf,Wf,h,ADVN,'flx');                         % get advection term

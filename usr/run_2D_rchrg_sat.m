@@ -23,8 +23,8 @@ M        =  5e4;                 % number of time steps to take
 hr       =  3600;                % conversion seconds to hours
 yr       =  24*365.25*hr;        % conversion seconds to years
 tend     =  24*hr;               % end time for simulation [s]
-dt       =  10;                  % initial time step [s]
-dtmax    =  10;                  % maximum time step [s]
+dt       =  50;                 % initial time step [s]
+dtmax    =  50;                 % maximum time step [s]
 
 % set initial thermo-chemical state
 seed     =  15;                  % random perturbation seed
@@ -37,10 +37,10 @@ T1       =  671;                 % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
 c0       =  0.69;                % major component top layer [wt SiO2]
 c1       =  0.69;                % major component base layer [wt SiO2]
-dc       =  1e-4;                % amplitude of random noise [wt SiO2]
+dc       =  1e-3;                % amplitude of random noise [wt SiO2]
 v0       =  0.03;                % volatile component top layer [wt H2O]
 v1       =  0.03;                % volatile component base layer [wt H2O]
-dv       =  1e-5;                % amplitude of random noise [wt H2O]
+dv       =  0e-5;                % amplitude of random noise [wt H2O]
 
 % set model trace and isotope geochemistry parameters
 it0      =  10.;                 % incompatible tracer top layer [wt ppm]
