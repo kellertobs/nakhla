@@ -23,8 +23,8 @@ M        =  5e4;                 % number of time steps to take
 hr       =  3600;                % conversion seconds to hours
 yr       =  24*365.25*hr;        % conversion seconds to years
 tend     =  24*hr;               % end time for simulation [s]
-dt       =  5;                   % initial time step [s]
-dtmax    =  5;                   % maximum time step [s]
+dt       =  10;                  % initial time step [s]
+dtmax    =  10;                  % maximum time step [s]
 
 % set initial thermo-chemical state
 seed     =  15;                  % random perturbation seed
@@ -73,7 +73,7 @@ tau_T    =  4*hr;                % wall cooling/assimilation time [s]
 tau_a    =  8*hr;                % wall cooling/assimilation time [s]
 Twall    =  500;                 % wall temperature [degC] (nan = insulating)
 cwall    =  0.69;                % wall major component [wt SiO2] (nan = no assimilation)
-vwall    =  0.00;                % wall volatile component [wt H2O] (nan = no assimilation)
+vwall    =  0.02;                % wall volatile component [wt H2O] (nan = no assimilation)
 itwall   =  10;                  % wall incomp. tracer [wt ppm] (nan = no assimilation)
 ctwall   =  0.1;                 % wall comp. tracer [wt ppm] (nan = no assimilation)
 siwall   =  -5;                  % wall stable isotope [delta] (nan = no assimilation)
