@@ -4,7 +4,7 @@ clear; close all;
 runID    =  '2D_assml_anh';      % run identifier
 opdir    =  '../out/';           % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
-nop      =  20;                  % output frame plotted/saved every 'nop' time steps
+nop      =  50;                  % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot of results
 save_op  =  1;                   % switch on to save output to file
 plot_cv  =  1;                   % switch on to live plot iterative convergence
@@ -15,7 +15,7 @@ bnchm    =  0;                   % switch on to run manufactured solution benchm
 % set model domain parameters
 D        =  10;                  % chamber depth [m]
 L        =  10;                  % chamber width [m]
-N        =  100 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
+N        =  200 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
 h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
@@ -23,8 +23,8 @@ M        =  5e4;                 % number of time steps to take
 hr       =  3600;                % conversion seconds to hours
 yr       =  24*365.25*hr;        % conversion seconds to years
 tend     =  24*hr;               % end time for simulation [s]
-dt       =  100;                 % initial time step [s]
-dtmax    =  100;                 % maximum time step [s]
+dt       =  10;                  % initial time step [s]
+dtmax    =  10;                  % maximum time step [s]
 
 % set initial thermo-chemical state
 seed     =  15;                  % random perturbation seed
@@ -73,7 +73,7 @@ tau_T    =  4*hr;                % wall cooling/assimilation time [s]
 tau_a    =  8*hr;                % wall cooling/assimilation time [s]
 Twall    =  500;                 % wall temperature [degC] (nan = insulating)
 cwall    =  0.69;                % wall major component [wt SiO2] (nan = no assimilation)
-vwall    =  0.00;                % wall volatile component [wt H2O] (nan = no assimilation)
+vwall    =  0.02;                % wall volatile component [wt H2O] (nan = no assimilation)
 itwall   =  10;                  % wall incomp. tracer [wt ppm] (nan = no assimilation)
 ctwall   =  0.1;                 % wall comp. tracer [wt ppm] (nan = no assimilation)
 siwall   =  -5;                  % wall stable isotope [delta] (nan = no assimilation)
