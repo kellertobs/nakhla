@@ -73,19 +73,36 @@ if plot_op
         plot(mean(T(2:end-1,2:end-1),2),Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
         title('$T [^\circ$C]',TX{:},FS{:}); ylabel('Depth [km]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(1,5,2)
-        plot(mean(cx(2:end-1,2:end-1),2),Z(2:end-1).','b-',mean(cm(2:end-1,2:end-1),2),Z(2:end-1).','r-',mean(c(2:end-1,2:end-1)./(1-f(2:end-1,2:end-1)),2),Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
+        plot(mean(cx(2:end-1,2:end-1),2)*100,Z(2:end-1).','b-',mean(cm(2:end-1,2:end-1),2),Z(2:end-1).','r-',mean(c(2:end-1,2:end-1)./(1-f(2:end-1,2:end-1)),2),Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
         title('$\bar{c}$ [wt\% SiO$_2$]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(1,5,3)
-        plot(mean(vm(2:end-1,2:end-1),2),Z(2:end-1).','r-',mean(v(2:end-1,2:end-1)./(1-x(2:end-1,2:end-1)),2),Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
+        plot(mean(vm(2:end-1,2:end-1),2)*100,Z(2:end-1).','r-',mean(v(2:end-1,2:end-1)./(1-x(2:end-1,2:end-1)),2),Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
         title('$\bar{v}$ [wt\% H$_2$O]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(1,5,4)
-        plot(mean(chi(2:end-1,2:end-1),2),Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
+        plot(mean(chi(2:end-1,2:end-1),2)*100,Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
         title(['$\chi$ [vol\%]'],TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(1,5,5)
-        plot(mean(phi(2:end-1,2:end-1),2),Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
+        plot(mean(phi(2:end-1,2:end-1),2)*100,Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
         title(['$\phi$ [vol\%]'],TX{:},FS{:}); set(gca,TL{:},TS{:});
-        
+ 
         fh2 = figure(2); clf;
+        subplot(1,5,1)
+        plot(mean(-W(:,2:end-1),2)*hr,Zfc.','k-','LineWidth',2); axis ij tight; box on;
+        title('$W$ [m/hr]',TX{:},FS{:}); ylabel('Depth [km]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+        subplot(1,5,2)
+        plot(mean(-(x(1:end-1,2:end-1)+x(2:end,2:end-1))/2.*wx(:,2:end-1),2)*hr,Zfc.','k-','LineWidth',2); axis ij tight; box on;
+        title('$w_\Delta^x$ [m/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+        subplot(1,5,3)
+        plot(mean(-(f(1:end-1,2:end-1)+f(2:end,2:end-1))/2.*wf(:,2:end-1),2)*hr,Zfc.','k-','LineWidth',2); axis ij tight; box on;
+        title('$w_\Delta^f$ [m/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+        subplot(1,5,4)
+        plot(mean(-(m(1:end-1,2:end-1)+m(2:end,2:end-1))/2.*wm(:,2:end-1),2)*hr,Zfc.','k-','LineWidth',2); axis ij tight; box on;
+        title('$w_\Delta^m$ [m/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+        subplot(1,5,5)
+        plot(mean(P(2:end-1,2:end-1),2)/1e3,Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
+        title('$P$ [kPa]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+        
+        fh3 = figure(3); clf;
         subplot(1,5,1)
         plot(mean(rho(2:end-1,2:end-1),2),Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
         title('$\bar{\rho}$ [kg/m$^3$]',TX{:},FS{:}); ylabel('Depth [km]',TX{:},FS{:}); set(gca,TL{:},TS{:});
@@ -102,8 +119,7 @@ if plot_op
         plot(mean(VolSrc(2:end-1,2:end-1),2),Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
         title('$\dot{V}$ [1/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
 
-    
-        fh3 = figure(3); clf;
+        fh4 = figure(4); clf;
         subplot(1,5,1)
         plot(mean(it(2:end-1,2:end-1),2),Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
         title('incomp. trace',TX{:},FS{:}); ylabel('Depth [km]',TX{:},FS{:}); set(gca,TL{:},TS{:});
@@ -352,7 +368,6 @@ if plot_op
         ylabel('consv. $V$',TX{:},FS{:}); set(gca,TL{:},TS{:});
         xlabel('Time [hr]',TX{:},FS{:});
         
-        
         fh10 = figure(10); clf;
         subplot(4,1,1);
         plot(hist.time/hr,hist.EM,'k-','LineWidth',2); hold on; axis tight; box on;
@@ -380,7 +395,7 @@ if save_op
             if iter>0
                 name = [opdir,'/',runID,'/',runID,'_thc_',num2str(floor(step/nop))];
                 print(fh1,name,'-dpng','-r300','-opengl');
-                name = [opdir,'/',runID,'/',runID,'_vep_',num2str(floor(step/nop))];
+                name = [opdir,'/',runID,'/',runID,'_aux_',num2str(floor(step/nop))];
                 print(fh2,name,'-dpng','-r300','-opengl');
                 name = [opdir,'/',runID,'/',runID,'_gch_',num2str(floor(step/nop))];
                 print(fh3,name,'-dpng','-r300','-opengl');
@@ -390,10 +405,12 @@ if save_op
         elseif Nx <= 10  % create 1D plots
             name = [opdir,'/',runID,'/',runID,'_thc_',num2str(floor(step/nop))];
             print(fh1,name,'-dpng','-r300','-opengl');
-            name = [opdir,'/',runID,'/',runID,'_vep_',num2str(floor(step/nop))];
+            name = [opdir,'/',runID,'/',runID,'_aux_',num2str(floor(step/nop))];
             print(fh2,name,'-dpng','-r300','-opengl');
-            name = [opdir,'/',runID,'/',runID,'_gch_',num2str(floor(step/nop))];
+            name = [opdir,'/',runID,'/',runID,'_vep_',num2str(floor(step/nop))];
             print(fh3,name,'-dpng','-r300','-opengl');
+            name = [opdir,'/',runID,'/',runID,'_gch_',num2str(floor(step/nop))];
+            print(fh4,name,'-dpng','-r300','-opengl');
             name = [opdir,'/',runID,'/',runID,'_eql',num2str(floor(step/nop))];
             print(fh7,name,'-dpng','-r300','-opengl');
         else
