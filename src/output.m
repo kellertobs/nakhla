@@ -73,10 +73,10 @@ if plot_op
         plot(mean(T(2:end-1,2:end-1),2),Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
         title('$T [^\circ$C]',TX{:},FS{:}); ylabel('Depth [km]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(1,5,2)
-        plot(mean(cx(2:end-1,2:end-1),2)*100,Z(2:end-1).','b-',mean(cm(2:end-1,2:end-1),2),Z(2:end-1).','r-',mean(c(2:end-1,2:end-1)./(1-f(2:end-1,2:end-1)),2),Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
+        plot(mean(cx(2:end-1,2:end-1),2)*100,Z(2:end-1).','b-',mean(cm(2:end-1,2:end-1),2)*100,Z(2:end-1).','r-',mean(c(2:end-1,2:end-1)./(1-f(2:end-1,2:end-1)),2)*100,Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
         title('$\bar{c}$ [wt\% SiO$_2$]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(1,5,3)
-        plot(mean(vm(2:end-1,2:end-1),2)*100,Z(2:end-1).','r-',mean(v(2:end-1,2:end-1)./(1-x(2:end-1,2:end-1)),2),Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
+        plot(mean(vm(2:end-1,2:end-1),2)*100,Z(2:end-1).','r-',mean(v(2:end-1,2:end-1)./(1-x(2:end-1,2:end-1)),2)*100,Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
         title('$\bar{v}$ [wt\% H$_2$O]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(1,5,4)
         plot(mean(chi(2:end-1,2:end-1),2)*100,Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
@@ -397,9 +397,9 @@ if save_op
         elseif Nx <= 10  % create 1D plots
             name = [opdir,'/',runID,'/',runID,'_tch_',num2str(floor(step/nop))];
             print(fh1,name,'-dpng','-r300','-opengl');
-            name = [opdir,'/',runID,'/',runID,'_aux_',num2str(floor(step/nop))];
-            print(fh2,name,'-dpng','-r300','-opengl');
             name = [opdir,'/',runID,'/',runID,'_vep_',num2str(floor(step/nop))];
+            print(fh2,name,'-dpng','-r300','-opengl');
+            name = [opdir,'/',runID,'/',runID,'_aux_',num2str(floor(step/nop))];
             print(fh3,name,'-dpng','-r300','-opengl');
             name = [opdir,'/',runID,'/',runID,'_gch_',num2str(floor(step/nop))];
             print(fh4,name,'-dpng','-r300','-opengl');
