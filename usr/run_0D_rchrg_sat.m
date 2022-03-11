@@ -4,7 +4,7 @@ clear; close all;
 runID    =  '0D_rchrg_sat';      % run identifier
 opdir    =  '../out/';           % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
-nop      =  100;                 % output frame plotted/saved every 'nop' time steps
+nop      =  50;                  % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot of results
 save_op  =  1;                   % switch on to save output to file
 plot_cv  =  1;                   % switch on to live plot iterative convergence
@@ -22,9 +22,9 @@ h        =  D/(N-2);             % grid spacing (equal in both dimensions, do no
 M        =  5e4;                 % number of time steps to take
 hr       =  3600;                % conversion seconds to hours
 yr       =  24*365.25*hr;        % conversion seconds to years
-tend     =  12*hr;               % end time for simulation [s]
-dt       =  5;                   % initial time step [s]
-dtmax    =  5;                   % maximum time step [s]
+tend     =  24*hr;               % end time for simulation [s]
+dt       =  10;                  % initial time step [s]
+dtmax    =  10;                  % maximum time step [s]
 
 % set initial thermo-chemical state
 seed     =  15;                  % random perturbation seed
@@ -32,14 +32,14 @@ smth     =  (N/30)^2;            % regularisation of initial random perturbation
 zlay     =  0.5;                 % layer thickness (relative to domain depth D)
 wlay_T   =  1e-6;                % thickness of smooth layer boundary (relative to domain depth D)
 wlay_c   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
-T0       =  671;                 % temperature top layer [deg C]
-T1       =  671;                 % temperature base layer [deg C]
+T0       =  675;                 % temperature top layer [deg C]
+T1       =  675;                 % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
 c0       =  0.69;                % major component top layer [wt SiO2]
 c1       =  0.69;                % major component base layer [wt SiO2]
-dc       =  0e-5;                % amplitude of random noise [wt SiO2]
-v0       =  0.03;                % volatile component top layer [wt H2O]
-v1       =  0.03;                % volatile component base layer [wt H2O]
+dc       =  1e-3;                % amplitude of random noise [wt SiO2]
+v0       =  0.02;                % volatile component top layer [wt H2O]
+v1       =  0.02;                % volatile component base layer [wt H2O]
 dv       =  0e-6;                % amplitude of random noise [wt H2O]
 
 % set model trace and isotope geochemistry parameters
@@ -68,7 +68,7 @@ bndmode  =  2;                   % boundary assimilation mode (0 = none; 1 = top
 bndinit  =  0;                   % switch on (1) to initialise with already established boundary layers
 dw       =  2*h;                 % boundary layer thickness for assimilation [m]
 fin      =  0;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
-fout     =  0;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
+fout     =  0.75;                % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
 tau_T    =  4*hr;                % wall cooling/assimilation time [s]
 tau_a    =  2*hr;                % wall cooling/assimilation time [s]
 Twall    =  1100;                % wall temperature [degC] (nan = insulating)
@@ -139,7 +139,7 @@ alpha    =  0.75;                % iterative lag parameter equilibration
 beta     =  0.50;                % iterative lag parameter phase diagram
 delta    =  20;                  % smoothness of segregation speed
 etamin   =  1e1;                 % minimum viscosity for stabilisation
-etamax   =  1e8;                 % maximum viscosity for stabilisation
+etamax   =  1e7;                 % maximum viscosity for stabilisation
 TINY     =  1e-16;               % minimum cutoff phase, component fractions
 
 % create output directory
