@@ -22,7 +22,7 @@ h        =  D/(N-2);             % grid spacing (equal in both dimensions, do no
 M        =  5e4;                 % number of time steps to take
 hr       =  3600;                % conversion seconds to hours
 yr       =  24*365.25*hr;        % conversion seconds to years
-tend     =  24*hr;               % end time for simulation [s]
+tend     =  12*hr;               % end time for simulation [s]
 dt       =  10;                  % initial time step [s]
 dtmax    =  10;                  % maximum time step [s]
 
@@ -104,7 +104,7 @@ Dsx      = -300;                 % entropy change of crystallisation [J/kg/K]
 Dsf      =  400;                 % entropy change of exsolution [J/kg/K]
 
 % set model rheology parameters
-etam0    =  100;                 % melt viscosity [Pas]
+etam0    =  300;                 % melt viscosity [Pas]
 etaf0    =  0.1;                 % fluid viscosity [Pas]
 etax0    =  1e15;                % crystal viscosity [Pas]
 Fmc      =  1e+4;                % major component weakening factor of melt viscosity [1]
@@ -139,7 +139,7 @@ alpha    =  0.75;                % iterative lag parameter equilibration
 beta     =  0.50;                % iterative lag parameter phase diagram
 delta    =  20;                  % smoothness of segregation speed
 etamin   =  1e1;                 % minimum viscosity for stabilisation
-etamax   =  1e7;                 % maximum viscosity for stabilisation
+etamax   =  1e16;                % maximum viscosity for stabilisation
 TINY     =  1e-16;               % minimum cutoff phase, component fractions
 
 % create output directory

@@ -104,7 +104,7 @@ Dsx      = -300;                 % entropy change of crystallisation [J/kg/K]
 Dsf      =  400;                 % entropy change of exsolution [J/kg/K]
 
 % set model rheology parameters
-etam0    =  100;                 % melt viscosity [Pas]
+etam0    =  300;                 % melt viscosity [Pas]
 etaf0    =  0.1;                 % fluid viscosity [Pas]
 etax0    =  1e15;                % crystal viscosity [Pas]
 Fmc      =  1e+4;                % major component weakening factor of melt viscosity [1]

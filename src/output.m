@@ -323,14 +323,6 @@ if plot_op
     TT = linspace(Tphs0+Ptop*clap,Tphs1+Ptop*clap,1e3);
     cc = [linspace(cphs1,(perCx+perCm)/2,ceil((perT-Tphs0)./(Tphs1-Tphs0)*1e3)),linspace((perCx+perCm)/2,cphs0,floor((perT-Tphs1)./(Tphs0-Tphs1)*1e3))];
     [~,CCx,CCm,~,~,~] = equilibrium(0*TT,0*TT,TT,cc,0*TT,Ptop*ones(size(TT)),Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,beta);
-    plot(CCx,TT,'k:','LineWidth',2); axis tight; hold on; box on;
-    plot(CCm,TT,'k:','LineWidth',2);
-    Tphs0s = Tphs0-dTH2O(1)*v0^0.75;
-    Tphs1s = Tphs1-dTH2O(3)*v0^0.75;
-    perTs  = perT-dTH2O(2)*v0^0.75;
-    TT = linspace(Tphs0s+Ptop*clap,Tphs1s+Ptop*clap,1e3);
-    cc = [linspace(cphs1,(perCx+perCm)/2,round((perTs-Tphs0s)./(Tphs1s-Tphs0s)*1e3)),linspace((perCx+perCm)/2,cphs0,round((perTs-Tphs1s)./(Tphs0s-Tphs1s)*1e3))];
-    [~,CCx,CCm,~,~,~] = equilibrium(0*TT,0*TT,TT,cc,v0*ones(size(TT)),Ptop*ones(size(TT)),Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,beta);
     plot(CCx,TT,'k-','LineWidth',2); axis tight; hold on; box on;
     plot(CCm,TT,'k-','LineWidth',2);
     Tphs0s = Tphs0-dTH2O(1)*vv^0.75;
@@ -339,8 +331,8 @@ if plot_op
     TT = linspace(Tphs0s+Ptop*clap,Tphs1s+Ptop*clap,1e3);
     cc = [linspace(cphs1,(perCx+perCm)/2,round((perTs-Tphs0s)./(Tphs1s-Tphs0s)*1e3)),linspace((perCx+perCm)/2,cphs0,round((perTs-Tphs1s)./(Tphs0s-Tphs1s)*1e3))];
     [~,CCx,CCm,~,~,~] = equilibrium(0*TT,0*TT,TT,cc,vv*ones(size(TT)),Ptop*ones(size(TT)),Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,beta);
-    plot(CCx,TT,'k:','LineWidth',2); axis tight; hold on; box on;
-    plot(CCm,TT,'k:','LineWidth',2);
+    plot(CCx,TT,'k-','LineWidth',2); axis tight; hold on; box on;
+    plot(CCm,TT,'k-','LineWidth',2);
     
     Tplt = T - (Pt-Ptop)*clap;
     cplt = c./(1-f);
@@ -393,7 +385,7 @@ if save_op
     if plot_op
         if Nx <= 10 && Nz <= 10  % print 0D plots
             if iter>0
-                name = [opdir,'/',runID,'/',runID,'_thc_',num2str(floor(step/nop))];
+                name = [opdir,'/',runID,'/',runID,'_tch_',num2str(floor(step/nop))];
                 print(fh1,name,'-dpng','-r300','-opengl');
                 name = [opdir,'/',runID,'/',runID,'_aux_',num2str(floor(step/nop))];
                 print(fh2,name,'-dpng','-r300','-opengl');
@@ -403,7 +395,7 @@ if save_op
                 print(fh7,name,'-dpng','-r300','-opengl');
             end
         elseif Nx <= 10  % create 1D plots
-            name = [opdir,'/',runID,'/',runID,'_thc_',num2str(floor(step/nop))];
+            name = [opdir,'/',runID,'/',runID,'_tch_',num2str(floor(step/nop))];
             print(fh1,name,'-dpng','-r300','-opengl');
             name = [opdir,'/',runID,'/',runID,'_aux_',num2str(floor(step/nop))];
             print(fh2,name,'-dpng','-r300','-opengl');

@@ -23,8 +23,8 @@ M        =  5e4;                 % number of time steps to take
 hr       =  3600;                % conversion seconds to hours
 yr       =  24*365.25*hr;        % conversion seconds to years
 tend     =  24*hr;               % end time for simulation [s]
-dt       =  50;                  % initial time step [s]
-dtmax    =  50;                  % maximum time step [s]
+dt       =  100;                 % initial time step [s]
+dtmax    =  100;                 % maximum time step [s]
 
 % set initial thermo-chemical state
 seed     =  15;                  % random perturbation seed
@@ -104,7 +104,7 @@ Dsx      = -300;                 % entropy change of crystallisation [J/kg/K]
 Dsf      =  400;                 % entropy change of exsolution [J/kg/K]
 
 % set model rheology parameters
-etam0    =  100;                 % melt viscosity [Pas]
+etam0    =  300;                 % melt viscosity [Pas]
 etaf0    =  0.1;                 % fluid viscosity [Pas]
 etax0    =  1e15;                % crystal viscosity [Pas]
 Fmc      =  1e+4;                % major component weakening factor of melt viscosity [1]
