@@ -68,7 +68,7 @@ bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top
 bndinit  =  0;                   % switch on (1) to initialise with already established boundary layers
 dw       =  2*h;                 % boundary layer thickness for assimilation [m]
 fin      =  0;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
-fout     =  0.75;                % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
+fout     =  0;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
 tau_T    =  4*hr;                % wall cooling/assimilation time [s]
 tau_a    =  8*hr;                % wall cooling/assimilation time [s]
 Twall    =  500;                 % wall temperature [degC] (nan = insulating)
