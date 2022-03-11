@@ -1,7 +1,7 @@
 clear; close all;
 
 % set run parameters
-runID    =  '0D_cryst_sat';      % run identifier
+runID    =  '0D_fract_anh';      % run identifier
 opdir    =  '../out/';           % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  50;                  % output frame plotted/saved every 'nop' time steps
@@ -32,14 +32,14 @@ smth     =  (N/30)^2;            % regularisation of initial random perturbation
 zlay     =  0.5;                 % layer thickness (relative to domain depth D)
 wlay_T   =  1e-6;                % thickness of smooth layer boundary (relative to domain depth D)
 wlay_c   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
-T0       =  1100;                % temperature top layer [deg C]
-T1       =  1100;                % temperature base layer [deg C]
+T0       =  1175;                % temperature top layer [deg C]
+T1       =  1175;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
 c0       =  0.49;                % major component top layer [wt SiO2]
 c1       =  0.49;                % major component base layer [wt SiO2]
 dc       =  1e-4;                % amplitude of random noise [wt SiO2]
-v0       =  0.03;                % volatile component top layer [wt H2O]
-v1       =  0.03;                % volatile component base layer [wt H2O]
+v0       =  0.00;                % volatile component top layer [wt H2O]
+v1       =  0.00;                % volatile component base layer [wt H2O]
 dv       =  0e-6;                % amplitude of random noise [wt H2O]
 
 % set model trace and isotope geochemistry parameters
@@ -68,7 +68,7 @@ bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top
 bndinit  =  0;                   % switch on (1) to initialise with already established boundary layers
 dw       =  2*h;                 % boundary layer thickness for assimilation [m]
 fin      =  0;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
-fout     =  0.75;                % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
+fout     =  0;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
 tau_T    =  4*hr;                % wall cooling/assimilation time [s]
 tau_a    =  8*hr;                % wall cooling/assimilation time [s]
 Twall    =  500;                 % wall temperature [degC] (nan = insulating)
