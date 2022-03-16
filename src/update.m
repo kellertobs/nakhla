@@ -20,7 +20,7 @@ kT    = mu.*kTm + chi.*kTx + phi.*kTf;                                     % mag
 
 % update effective viscosity
 etam  = etam0 .* exp(Em./(8.3145.*(T+273.15))-Em./(8.3145.*((Tphs0+Tphs1)/2+273.15))) ...
-              .* Fmc.^(cm-(cphs0+cphs1)/2) .* Fmv.^(vm./0.01);             % variable melt viscosity
+              .* Fmc.^((cm-(cphs0+cphs1)/2)./(cphs1-cphs0)) .* Fmv.^(vm./0.01);  % variable melt viscosity
 etaf  = etaf0.* ones(size(f));                                             % constant fluid viscosity
 etax  = etax0.* ones(size(x));                                             % constant crysta viscosity
 
