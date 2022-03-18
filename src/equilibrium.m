@@ -13,7 +13,9 @@ maxit = 1e3;
 res   = 1;
 tol   = 1e-15;
 
-vmq0 = (4.8e-5.*P.^0.6 + 1e-9.*P)./100; % check Liu, Shang & Behrens, 2005
+vmq_c0 = (4.7773e-7.*P.^0.6 + 1e-11.*P) .* exp(2565*(1./(T0+273.15)-1./(perTd+273.15))); % Katz et al., 2003; Moore et al., 1998
+vmq_c1 = ((354.94e-5.*P.^0.5 + 9.623e-8.*P - 1.5223e-11.*P.^1.5)./(T0+273.15) + 0.0012436e-11.*P.^1.5); % Liu et al., 2015
+vmq0 = (1-c).*vmq_c0 + c.*vmq_c1;
 
 if any(v(:)>1e-6)
     

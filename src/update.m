@@ -1,9 +1,9 @@
 %%*****  UPDATE PARAMETERS & AUXILIARY FIELDS  ****************************
 
 % update phase densities
-rhom = rhom0 .* (1 - aTm.*(T-Tphs0) - gCm.*(cm-cphs0));
-rhox = rhox0 .* (1 - aTx.*(T-Tphs0) - gCx.*(cx-cphs0));
-rhof = rhof0 .* (1 - aTf.*(T-Tphs0) + bPf.*(Pt-Ptop ));
+rhom = rhom0 .* (1 - aTm.*(T-perT) - gCm.*(cm-(perCx+perCm)/2));
+rhox = rhox0 .* (1 - aTx.*(T-perT) - gCx.*(cx-(perCx+perCm)/2));
+rhof = rhof0 .* (1 - aTf.*(T-perT) + bPf.*(Pt-Ptop ));
 
 % convert weight to volume fraction, update bulk density
 rho   = 1./(m./rhom + x./rhox + f./rhof);  rho([1 end],:) = rho([2 end-1],:);  rho(:,[1 end]) = rho(:,[2 end-1]);
@@ -19,8 +19,8 @@ rhoDs = rho.*(m.*0   + x.*Dsx + f.*Dsf);
 kT    = mu.*kTm + chi.*kTx + phi.*kTf;                                     % magma thermal conductivity
 
 % update effective viscosity
-etam  = etam0 .* exp(Em./(8.3145.*(T+273.15))-Em./(8.3145.*((Tphs0+Tphs1)/2+273.15))) ...
-              .* Fmc.^((cm-(cphs0+cphs1)/2)./(cphs1-cphs0)) .* Fmv.^(vm./0.01);  % variable melt viscosity
+etam  = etam0 .* exp(Em./(8.3145.*(T+273.15))-Em./(8.3145.*(perT+273.15))) ...
+              .* Fmc.^((cm-(perCx+perCm)/2)./(cphs1-cphs0)) .* Fmv.^(vm./0.01);  % variable melt viscosity
 etaf  = etaf0.* ones(size(f));                                             % constant fluid viscosity
 etax  = etax0.* ones(size(x));                                             % constant crysta viscosity
 

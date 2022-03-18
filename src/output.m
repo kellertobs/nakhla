@@ -20,10 +20,10 @@ if plot_op
             plot(hist.time/hr,hist.vm(:,2)*100,'r-',hist.time/hr,hist.v(:,2)./(1-hist.x(:,2))*100,'k-','LineWidth',2); axis xy tight; box on;
             title('$\bar{v}$ [wt\% H$_2$O]',TX{:},FS{:}); set(gca,TL{:},TS{:});
             subplot(5,1,4)
-            plot(hist.time/hr,hist.chi(:,2)*100,'k-','LineWidth',2); axis xy tight; box on;
+            plot(hist.time/hr,hist.chi(:,2)*100.*(hist.chi(:,2)>1e-9),'k-','LineWidth',2); axis xy tight; box on;
             title(['$\chi$ [vol\%]'],TX{:},FS{:}); set(gca,TL{:},TS{:});
             subplot(5,1,5)
-            plot(hist.time/hr,hist.phi(:,2)*100,'k-','LineWidth',2); axis xy tight; box on;
+            plot(hist.time/hr,hist.phi(:,2)*100.*(hist.phi(:,2)>1e-9),'k-','LineWidth',2); axis xy tight; box on;
             title(['$\phi$ [vol\%]'],TX{:},FS{:}); set(gca,TL{:},TS{:});
             xlabel('Time [hr]',TX{:},FS{:});
 
@@ -36,10 +36,10 @@ if plot_op
             plot(hist.time/hr,log10(hist.eta(:,2)),'k-','LineWidth',2); axis xy tight; box on;
             title('$\bar{\eta}$ [log$_{10}$ Pas]',TX{:},FS{:}); set(gca,TL{:},TS{:});
             subplot(5,1,3)
-            plot(hist.time/hr,hist.Gx(:,2)./hist.rho(:,2)*hr*100,'k-','LineWidth',2); axis xy tight; box on;
+            plot(hist.time/hr,hist.Gx(:,2)./hist.rho(:,2)*hr*100.*(hist.chi(:,2)>1e-9),'k-','LineWidth',2); axis xy tight; box on;
             title('$\Gamma_x/\bar{\rho}$ [\%/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
             subplot(5,1,4)
-            plot(hist.time/hr,hist.Gf(:,2)./hist.rho(:,2)*hr*100,'k-','LineWidth',2); axis xy tight; box on;
+            plot(hist.time/hr,hist.Gf(:,2)./hist.rho(:,2)*hr*100.*(hist.phi(:,2)>1e-9),'k-','LineWidth',2); axis xy tight; box on;
             title('$\Gamma_f/\bar{\rho}$ [\%/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
             subplot(5,1,5)
             plot(hist.time/hr,hist.dV(:,2)*hr,'k-','LineWidth',2); axis xy tight; box on;
@@ -79,10 +79,10 @@ if plot_op
         plot(mean(vm(2:end-1,2:end-1),2)*100,Z(2:end-1).','r-',mean(v(2:end-1,2:end-1)./(1-x(2:end-1,2:end-1)),2)*100,Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
         title('$\bar{v}$ [wt\% H$_2$O]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(1,5,4)
-        plot(mean(chi(2:end-1,2:end-1),2)*100,Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
+        plot(mean(chi(2:end-1,2:end-1),2)*100.*(mean(chi(2:end-1,2:end-1),2)>1e-9),Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
         title(['$\chi$ [vol\%]'],TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(1,5,5)
-        plot(mean(phi(2:end-1,2:end-1),2)*100,Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
+        plot(mean(phi(2:end-1,2:end-1),2)*100.*(mean(phi(2:end-1,2:end-1),2)>1e-9),Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
         title(['$\phi$ [vol\%]'],TX{:},FS{:}); set(gca,TL{:},TS{:});
  
         fh2 = figure(2); clf;
@@ -110,10 +110,10 @@ if plot_op
         plot(mean(log10(eta(2:end-1,2:end-1)),2),Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
         title('$\bar{\eta}$ [log$_{10}$ Pas]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(1,5,3)
-        plot(mean(Gx(2:end-1,2:end-1)./rho(2:end-1,2:end-1),2)*100*hr,Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
+        plot(mean(Gx(2:end-1,2:end-1)./rho(2:end-1,2:end-1),2)*100*hr.*(mean(chi(2:end-1,2:end-1),2)>1e-9),Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
         title('$\Gamma_x/\bar{\rho}$ [\%/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(1,5,4)
-        plot(mean(Gf(2:end-1,2:end-1)./rho(2:end-1,2:end-1),2)*100*hr,Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
+        plot(mean(Gf(2:end-1,2:end-1)./rho(2:end-1,2:end-1),2)*100*hr.*(mean(phi(2:end-1,2:end-1),2)>1e-9),Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
         title('$\Gamma_f/\bar{\rho}$ [\%/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(1,5,5)
         plot(mean(VolSrc(2:end-1,2:end-1),2),Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
@@ -319,18 +319,24 @@ if plot_op
     
     % plot phase diagram
     fh7 = figure(7); clf;
-    vv = (4.8e-5.*Ptop.^0.6 + 1e-9.*Ptop)./100;
     TT = linspace(Tphs0+Ptop*clap,Tphs1+Ptop*clap,1e3);
     cc = [linspace(cphs1,(perCx+perCm)/2,ceil((perT-Tphs0)./(Tphs1-Tphs0)*1e3)),linspace((perCx+perCm)/2,cphs0,floor((perT-Tphs1)./(Tphs0-Tphs1)*1e3))];
     [~,CCx,CCm,~,~,~] = equilibrium(0*TT,0*TT,TT,cc,0*TT,Ptop*ones(size(TT)),Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,beta);
     plot(CCx,TT,'k-','LineWidth',2); axis tight; hold on; box on;
     plot(CCm,TT,'k-','LineWidth',2);
-    Tphs0s = Tphs0-dTH2O(1)*vv^0.75;
-    Tphs1s = Tphs1-dTH2O(3)*vv^0.75;
-    perTs  = perT-dTH2O(2)*vv^0.75;
-    TT = linspace(Tphs0s+Ptop*clap,Tphs1s+Ptop*clap,1e3);
-    cc = [linspace(cphs1,(perCx+perCm)/2,round((perTs-Tphs0s)./(Tphs1s-Tphs0s)*1e3)),linspace((perCx+perCm)/2,cphs0,round((perTs-Tphs1s)./(Tphs0s-Tphs1s)*1e3))];
-    [~,CCx,CCm,~,~,~] = equilibrium(0*TT,0*TT,TT,cc,vv*ones(size(TT)),Ptop*ones(size(TT)),Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,beta);
+    perTs  = perT;
+    Tphs0s = Tphs0;
+    Tphs1s = Tphs1;
+    vv = 0.10*ones(size(TT));
+    for i = 1:10
+        perTs  = perT -dTH2O(2)*mean(vv(abs(TT-Ptop*clap-perTs )<1)).^0.75;
+        Tphs0s = Tphs0-dTH2O(1)*mean(vv(abs(TT-Ptop*clap-Tphs0s)<1)).^0.75;
+        Tphs1s = Tphs1-dTH2O(3)*mean(vv(abs(TT-Ptop*clap-Tphs1s)<1)).^0.75;
+        TTi = Tphs0s+Ptop*clap:1:Tphs1s+Ptop*clap;
+        vv = interp1(TT,vv,TTi,'linear','extrap'); TT = TTi;
+        cc = [linspace(cphs1,(perCx+perCm)/2,round((perTs-Tphs0s)./(Tphs1s-Tphs0s)*length(TT))),linspace((perCx+perCm)/2,cphs0,round((perTs-Tphs1s)./(Tphs0s-Tphs1s)*length(TT)))];
+        [~,CCx,CCm,~,~,vv] = equilibrium(0*TT,0*TT,TT,cc,vv,Ptop*ones(size(TT)),Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,beta);
+    end
     plot(CCx,TT,'k-','LineWidth',2); axis tight; hold on; box on;
     plot(CCm,TT,'k-','LineWidth',2);
     
