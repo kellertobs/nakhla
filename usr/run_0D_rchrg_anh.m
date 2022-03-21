@@ -37,7 +37,7 @@ T1       =  680;                 % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
 c0       =  0.69;                % major component top layer [wt SiO2]
 c1       =  0.69;                % major component base layer [wt SiO2]
-dc       =  1e-3;                % amplitude of random noise [wt SiO2]
+dc       =  0e-3;                % amplitude of random noise [wt SiO2]
 v0       =  0.02;                % volatile component top layer [wt H2O]
 v1       =  0.02;                % volatile component base layer [wt H2O]
 dv       =  0e-6;                % amplitude of random noise [wt H2O]
@@ -68,7 +68,7 @@ bndmode  =  2;                   % boundary assimilation mode (0 = none; 1 = top
 bndinit  =  0;                   % switch on (1) to initialise with already established boundary layers
 dw       =  2*h;                 % boundary layer thickness for assimilation [m]
 fin      =  0;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
-fout     =  0.75;                % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
+fout     =  0;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
 tau_T    =  4*hr;                % wall cooling/assimilation time [s]
 tau_a    =  2*hr;                % wall cooling/assimilation time [s]
 Twall    =  1150;                % wall temperature [degC] (nan = insulating)

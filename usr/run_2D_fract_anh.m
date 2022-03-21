@@ -22,7 +22,7 @@ h        =  D/(N-2);             % grid spacing (equal in both dimensions, do no
 M        =  5e4;                 % number of time steps to take
 hr       =  3600;                % conversion seconds to hours
 yr       =  24*365.25*hr;        % conversion seconds to years
-tend     =  24*hr;               % end time for simulation [s]
+tend     =  5*24*hr;             % end time for simulation [s]
 dt       =  10;                  % initial time step [s]
 dtmax    =  10;                  % maximum time step [s]
 
@@ -32,8 +32,8 @@ smth     =  (N/30)^2;            % regularisation of initial random perturbation
 zlay     =  0.5;                 % layer thickness (relative to domain depth D)
 wlay_T   =  1e-6;                % thickness of smooth layer boundary (relative to domain depth D)
 wlay_c   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
-T0       =  1175;                % temperature top layer [deg C]
-T1       =  1175;                % temperature base layer [deg C]
+T0       =  1150;                % temperature top layer [deg C]
+T1       =  1150;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
 c0       =  0.49;                % major component top layer [wt SiO2]
 c1       =  0.49;                % major component base layer [wt SiO2]
@@ -87,24 +87,24 @@ kTf      =  0.02;                % mvp  thermal conductivity [W/m/k]
 Cpm      =  1400;                % melt heat capacity [J/kg/K]
 Cpx      =  1000;                % xtal heat capacity [J/kg/K]
 Cpf      =  2000;                % mvp  heat capacity [J/kg/K]
+Dsx      = -300;                 % entropy change of crystallisation [J/kg/K]
+Dsf      =  400;                 % entropy change of exsolution [J/kg/K]
 
-% set model phase equilibrium parameters
-cphs0    =  0.36;                % phase diagram lower bound composition [wt SiO2]
-cphs1    =  0.72;                % phase diagram upper bound composition [wt SiO2]
+% set phase diagram parameters
+cphs0    =  0.35;                % phase diagram lower bound composition [wt SiO2]
+cphs1    =  0.75;                % phase diagram upper bound composition [wt SiO2]
 Tphs0    =  750;                 % phase diagram lower bound temperature [degC]
 Tphs1    =  1750;                % phase diagram upper bound temperature [degC]
 PhDg     =  5.0;                 % Phase diagram curvature factor (> 1)
 perCm    =  0.51;                % peritectic liquidus composition [wt SiO2]
-perCx    =  0.48;                % peritectic solidus  composition [wt SiO2]
+perCx    =  0.47;                % peritectic solidus  composition [wt SiO2]
 perT     =  1100;                % peritectic temperature [degC]
 clap     =  1e-7;                % Clapeyron slope for P-dependence of melting T [degC/Pa]
-dTH2O    =  [1300,1000,300];     % solidus shift from water content [degC/wt^0.75]
+dTH2O    =  [1200,1000,200];     % solidus shift from water content [degC/wt^0.75
 tau_r    =  10;                  % reaction time [s]
-Dsx      = -300;                 % entropy change of crystallisation [J/kg/K]
-Dsf      =  400;                 % entropy change of exsolution [J/kg/K]
 
 % set model rheology parameters
-etam0    =  300;                 % melt viscosity [Pas]
+etam0    =  100;                 % melt viscosity [Pas]
 etaf0    =  0.1;                 % fluid viscosity [Pas]
 etax0    =  1e15;                % crystal viscosity [Pas]
 Fmc      =  1e+4;                % major component weakening factor of melt viscosity [1]
@@ -115,8 +115,8 @@ BB       = [ 0.30, 0.15, 0.55; 0.48, 0.02, 0.50; 0.80, 0.08, 0.12; ];  % permiss
 CC       = [ 0.20, 0.20, 0.20; 0.60, 0.60, 0.12; 0.20, 0.25, 0.50; ];  % permission step widths
 
 % set model buoyancy parameters
-rhom0    =  2900;                % melt phase ref. density [kg/m3] (at T0,cphs0,Ptop)
-rhox0    =  3300;                % crystal phase ref. density [kg/m3] (at T0,cphs0,Ptop)
+rhom0    =  2700;                % melt phase ref. density [kg/m3] (at T0,cphs0,Ptop)
+rhox0    =  3100;                % crystal phase ref. density [kg/m3] (at T0,cphs0,Ptop)
 rhof0    =  500;                 % bubble phase ref. density [kg/m3] (at T0,cphs0,Ptop)
 aTm      =  3e-5;                % melt thermal expansivity [1/K]
 aTx      =  1e-5;                % xtal thermal expansivity [1/K]
@@ -135,11 +135,11 @@ ADVN     =  'FRM';               % advection scheme ('UPW2', 'UPW3', or 'FRM')
 rtol     =  1e-3;                % outer its relative tolerance
 atol     =  1e-6;                % outer its absolute tolerance
 maxit    =  100;                 % maximum outer its
-alpha    =  0.85;                % iterative lag parameter equilibration
-beta     =  0.50;                % iterative lag parameter phase diagram
+alpha    =  0.75;                % iterative lag parameter equilibration
+beta     =  0.75;                % iterative lag parameter phase diagram
 delta    =  20;                  % smoothness of segregation speed
 etamin   =  1e1;                 % minimum viscosity for stabilisation
-etamax   =  1e7;                 % maximum viscosity for stabilisation
+etamax   =  1e16;                % maximum viscosity for stabilisation
 TINY     =  1e-16;               % minimum cutoff phase, component fractions
 
 % create output directory
