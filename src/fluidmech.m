@@ -304,3 +304,9 @@ Wx   = W + wx;                                                             % xtl
 Ux   = U + 0.;                                                             % xtl x-velocity
 Wm   = W + wm;                                                             % mlt z-velocity
 Um   = U + 0.;                                                             % mlt x-velocity
+
+
+%% update time step
+dtk = min((h/2)^2./max([kT(:)./rhoCp(:);kc]));                             % diffusive time step size
+dta = min(min(h/2/max(abs([Ux(:);Wx(:);Uf(:);Wf(:);Um(:);Wm(:)]+1e-16)))); % advective time step size
+dt  = min([2*dto,dtmax,CFL*min(dtk,dta)]);                                 % physical time step size

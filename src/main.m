@@ -13,8 +13,8 @@ while time <= tend && step <= M
     fprintf(1,'\n\n\n*****  step %d;  dt = %4.4e;  time = %4.4e [hr]\n\n',step,dt./3600,time./3600);
     tic;
     
-    if step<=1; theta = 1; else; theta = 0.5; end
-            
+    if step==1; THETA = 1;     else;  THETA = theta; end
+    
     % store previous solution
     Ho      = H;
     Co      = C;
@@ -32,6 +32,7 @@ while time <= tend && step <= M
     RIPo    = RIP;
     RIDo    = RID;
     rhoo    = rho;
+    Div_rhoVo =  Div_rhoV;
     etao    = eta;
     dHdto   = dHdt;
     dCdto   = dCdt;
@@ -50,11 +51,13 @@ while time <= tend && step <= M
     % reset residuals and iteration count
     resnorm  = 1;
     resnorm0 = resnorm;
-    iter     = 0;
+    iter     = 1;
     
     % non-linear iteration loop
     while resnorm/resnorm0 >= rtol && resnorm >= atol && iter <= maxit || iter < 2
-            
+        
+        if step==1; ALPHA = max(alpha,1-iter/50); else;  ALPHA = alpha; end
+
         % solve thermo-chemical equations
         thermochem;
                 

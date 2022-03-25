@@ -54,7 +54,7 @@ bndshape(:,[1 end]) = bndshape(:,[2 end-1]);
 
 bndH = 0.*bndshape;  bndC =  0.*bndshape;  bndV =  0.*bndshape;
 
-% set initial solution fields
+% initialise solution fields
 T   =  T0 + (T1-T0) .* (1+erf((ZZ/D-zlay)/wlay_T))/2 + dT.*rp;  if bndinit && ~isnan(Twall); T = T + (Twall-T).*bndshape; end % temperature
 c   =  c0 + (c1-c0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dc.*rp;  if bndinit && ~isnan(cwall); c = c + (cwall-c).*bndshape; end % major component
 v   =  v0 + (v1-v0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dv.*rp;  if bndinit && ~isnan(vwall); v = v + (vwall-v).*bndshape; end % volatile component
@@ -68,17 +68,30 @@ rid =  rip.*HLRID./HLRIP;                                           % radiogenic
 U   =  zeros(size((XX(:,1:end-1)+XX(:,2:end))));  Ui = U;  res_U = 0.*U;
 W   =  zeros(size((XX(1:end-1,:)+XX(2:end,:))));  Wi = W;  res_W = 0.*W; wf = 0.*W; wc = 0.*W;
 P   =  0.*c;  Pi = P;  res_P = 0.*P;  meanQ = 0;  
-Pt  = rhom0.*g0.*ZZ + Ptop;
-if Nx<=10; Pt = mean(mean(Pt(2:end-1,2:end-1))).*ones(size(Pt)); end
 S   = [W(:);U(:);P(:)];
 
-% initialise phase velocities
+% initialise auxiliary fields
 Wf  = W;  Uf  = U; 
 Wx  = W;  Ux  = U;
 Wm  = W;  Um  = U;
 
+eIIref =  1e-6;  
+Div_V  =  0.*P;  Div_rhoV = 0.*P;  Div_rhoVo = Div_rhoV;
+exx    =  0.*P;  ezz = 0.*P;  exz = zeros(Nz-1,Nx-1);  eII = 0.*P;  
+txx    =  0.*P;  tzz = 0.*P;  txz = zeros(Nz-1,Nx-1);  tII = 0.*P; 
+VolSrc =  0.*P;  MassErr = 0;  drhodt = 0.*P;  drhodto = 0.*P;
+
+if ~react;  Dsx = 0;  Dsf = 0;  end
+rhoo =  rhom0.*ones(size(T)); rhoref = rhom0;  %#ok<NASGU>
+etao =  etam0.*ones(size(T));                  %#ok<NASGU>
+dto  =  dt;
+Pt   =  rhoref.*g0.*ZZ + Ptop;  
+if Nx<=10; Pt = mean(mean(Pt(2:end-1,2:end-1))).*ones(size(Pt)); end
+
 % get volume fractions and bulk density
-res = 1;  tol = 1e-15;  iter = 0;  x = ones(size(T));  f = v;
+ALPHA  =  1.0;
+THETA  =  1;
+res = 1;  tol = 1e-15;  x = ones(size(T));  f = v;
 while res > tol
     xi = x;  fi = f;
     
@@ -88,42 +101,33 @@ while res > tol
     x  = xq;  f = fq;  m = mq;
     cm = cmq; cx = cxq;
     vm = vmq; vf = vfq;
-        
-    rhom = rhom0 .* (1 - aTm.*(T-Tphs0) - gCm.*(cm-cphs0));
-    rhox = rhox0 .* (1 - aTx.*(T-Tphs0) - gCx.*(cx-cphs0));
-    rhof = rhof0 .* (1 - aTf.*(T-Tphs0) + bPf.*(Pt-Ptop));
-    
-    rho  = 1./(m./rhom + x./rhox + f./rhof);
 
-    chi  = x.*rho./rhox;
-    phi  = f.*rho./rhof;
-    mu   = m.*rho./rhom;
+    update;
     
     rhoref  = mean(mean(rho(2:end-1,2:end-1)));
     Pt      = Ptop + rhoref.*g0.*ZZ;
     if Nx<=10; Pt = mean(mean(Pt(2:end-1,2:end-1))); end
     
     res  = (norm(x(:)-xi(:),2) + norm(f(:)-fi(:),2))./sqrt(2*length(x(:)));
-    iter = iter+1;
 end
 rhoBF   = (rho(2:end-2,2:end-1)+rho(3:end-1,2:end-1))/2 - rhoref;
 rhoo    = rho;
+etao    = eta;
 Pto     = Pt;
-  
-% get bulk enthalpy, silica, volatile content densities
-if ~react;  Dsx = 0;  Dsf = 0;  end
-rhoCp = rho.*(m.*Cpm + x.*Cpx + f.*Cpf);
-rhoDs = rho.*(m.*0   + x.*Dsx + f.*Dsf);
-H = (rhoCp + rhoDs).*T;
-C = rho.*(m.*cm + x.*cx);
-V = rho.*(m.*vm + f.*vf);
 
+% get geochemical phase compositions
 itm  = it./(m + x.*KIT); itx = it./(m./KIT + x);
 ctm  = ct./(m + x.*KCT); ctx = ct./(m./KCT + x);
 sim  = si;               six = si;
 ripm = rip./(m + x.*KRIP); ripx = rip./(m./KRIP + x);
 ridm = rid./(m + x.*KRID); ridx = rid./(m./KRID + x);
+  
+% get bulk enthalpy, silica, volatile content densities
+H = (rhoCp + rhoDs).*T;
+C = rho.*(m.*cm + x.*cx);
+V = rho.*(m.*vm + f.*vf);
 
+% get geochemical content densities
 IT  = rho.*(m.*itm + x.*itx);
 CT  = rho.*(m.*ctm + x.*ctx);
 SIm = rho.* m.*sim;  
@@ -150,17 +154,15 @@ dCTdt  = 0.*CT;  diff_ct  = 0.*CT;
 dRIPdt = 0.*RIP; diff_rip  = 0.*RIP;
 dRIDdt = 0.*RID; diff_rid  = 0.*RID;
 
-eIIref =  1e-6;  
-Div_V  =  0.*P;  Div_rhoV = 0.*P;  Div_rhoVo = Div_rhoV;
-exx    =  0.*P;  ezz = 0.*P;  exz = zeros(size(f)-1);  eII = 0.*P;  
-txx    =  0.*P;  tzz = 0.*P;  txz = zeros(size(f)-1);  tII = 0.*P; 
-VolSrc =  0.*P;  MassErr = 0;  drhodt = 0.*P;  drhodto = 0.*P;
-
 % initialise timing and iterative parameters
-step   =  0;
-time   =  0;
-iter   =  0;
-hist   = [];
+step    =  0;
+time    =  0;
+iter    =  0;
+hist    = [];
+dsumMdt = 0;
+dsumHdt = 0;
+dsumCdt = 0;
+dsumVdt = 0;
 
 % overwrite fields from file if restarting run
 if restart
@@ -180,5 +182,10 @@ if restart
     time = time+dt;
     step = step+1;
 else
-    update; history; output;
+    update;
+    fluidmech;
+    history; 
+    output;
+    time = time+dt;
+    step = step+1;
 end

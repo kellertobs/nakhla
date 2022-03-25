@@ -71,7 +71,7 @@ if plot_op
         fh1 = figure(1); clf;
         subplot(1,5,1)
         plot(mean(T(2:end-1,2:end-1),2),Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
-        title('$T [^\circ$C]',TX{:},FS{:}); ylabel('Depth [km]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+        title('$T [^\circ$C]',TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(1,5,2)
         plot(mean(cx(2:end-1,2:end-1),2)*100,Z(2:end-1).','b-',mean(cm(2:end-1,2:end-1),2)*100,Z(2:end-1).','r-',mean(c(2:end-1,2:end-1)./(1-f(2:end-1,2:end-1)),2)*100,Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
         title('$\bar{c}$ [wt\% SiO$_2$]',TX{:},FS{:}); set(gca,TL{:},TS{:});
@@ -88,7 +88,7 @@ if plot_op
         fh2 = figure(2); clf;
         subplot(1,5,1)
         plot(mean(-W(:,2:end-1),2)*hr,Zfc.','k-','LineWidth',2); axis ij tight; box on;
-        title('$W$ [m/hr]',TX{:},FS{:}); ylabel('Depth [km]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+        title('$W$ [m/hr]',TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(1,5,2)
         plot(mean(-(x(1:end-1,2:end-1)+x(2:end,2:end-1))/2.*wx(:,2:end-1),2)*hr,Zfc.','k-','LineWidth',2); axis ij tight; box on;
         title('$w_\Delta^x$ [m/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
@@ -122,7 +122,7 @@ if plot_op
         fh4 = figure(4); clf;
         subplot(1,5,1)
         plot(mean(it(2:end-1,2:end-1),2),Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
-        title('incomp. trace',TX{:},FS{:}); ylabel('Depth [km]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+        title('incomp. trace',TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(1,5,2)
         plot(mean(ct(2:end-1,2:end-1),2),Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
         title('comp. trace',TX{:},FS{:}); set(gca,TL{:},TS{:});

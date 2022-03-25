@@ -1,13 +1,7 @@
-%% update time step
-dtk = min((h/2)^2./max([kT(:)./rhoCp(:);kc]));                             % diffusive time step size
-dta = min(min(h/2/max(abs([Ux(:);Wx(:);Uf(:);Wf(:);Um(:);Wm(:)]+1e-16)))); % advective time step size
-dt  = min([2*dto,dtmax,CFL*min(dtk,dta)]);                                 % physical time step size
-
-
 %% *****  THERMO-CHEMICAL EVOLUTION  **************************************
 
 % store previous iteration
-Ti = T; xi = x;
+Ti = T; xi = x; fi = f;
 
 % update temperature
 advn_H = advection(rho.*m.*(Cpm + 0  ).*T,Um,Wm,h,ADVN,'flx') ...
@@ -24,7 +18,7 @@ if ~isnan(Twall); bndH = bndH + rhoCp.*(Twall-T)./tau_T .* bndshape; end   % imp
 
 dHdt = - advn_H + diff_T + bndH;                                           % total rate of change
     
-if step>0; H = Ho + (dHdt + dHdto)/2.*dt; end                              % explicit update of enthalpy
+H = Ho + (THETA.*dHdt + (1-THETA).*dHdto).*dt;            % explicit update of enthalpy
 H([1 end],:) = H([2 end-1],:);                                             % apply boundary conditions
 H(:,[1 end]) = H(:,[2 end-1]);    
     
@@ -42,7 +36,7 @@ if ~isnan(cwall); bndC = bndC + rho.*(cwall-c)./tau_a .* bndshape; end     % imp
 
 dCdt = - advn_C + diff_c + bndC;                                           % total rate of change
     
-if step>0; C = Co + (dCdt + dCdto)/2.*dt; end                              % explicit update of major component density
+C = Co + (THETA.*dCdt + (1-THETA).*dCdto).*dt;              % explicit update of major component density
 C = min(rho.*cphs1-TINY,max(rho.*cphs0+TINY, C ));
 C([1 end],:) = C([2 end-1],:);                                             % apply boundary conditions
 C(:,[1 end]) = C(:,[2 end-1]);  
@@ -62,33 +56,26 @@ if any([v0;v1;vwall;v(:)]>1e-6)
     
     dVdt = - advn_V + diff_v + bndV;                                           % total rate of change
     
-    if step>0; V = Vo + (dVdt + dVdto)/2.*dt; end                              % explicit update of volatile component density
+    V = Vo + (THETA.*dVdt + (1-THETA).*dVdto).*dt;                              % explicit update of volatile component density
     V = min(rho.*1-TINY,max(rho.*0+TINY, V ));
     V([1 end],:) = V([2 end-1],:);                                             % apply boundary conditions
     V(:,[1 end]) = V(:,[2 end-1]);
 end
 
 % convert enthalpy and component densities to temperature and concentrations
-if step>0
-    T = H./(rhoCp + rhoDs);
-    c = C./rho;
-    v = V./rho;
-else
-    H = (rhoCp + rhoDs).*T;
-    C = rho.*(m.*cm + x.*cx);
-    V = rho.*(m.*vm + f.*vf);
-end
+T = H./(rhoCp + rhoDs);
+c = C./rho;
+v = V./rho;
 
 
 %% *****  UPDATE PHASE PROPORTIONS  ***************************************
 
 % update local phase equilibrium
 if react
-%     [xq,cxq,cmq,fq,vfq,vmq] = equilibrium(x,f,T,c,v,Pt,Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,beta);
-    [xq,cxq,cmq,fq,vfq,vmq] = equilibrium(x,f,theta.*T +(1-theta).*To, ...
-                                              theta.*c +(1-theta).*co, ...
-                                              theta.*v +(1-theta).*vo, ...
-                                              theta.*Pt+(1-theta).*Pto, ...
+    [xq,cxq,cmq,fq,vfq,vmq] = equilibrium(x,f,THETA.*T +(1-THETA).*To, ...
+                                              THETA.*c +(1-THETA).*co, ...
+                                              THETA.*v +(1-THETA).*vo, ...
+                                              THETA.*Pt+(1-THETA).*Pto, ...
                                               Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,beta);
 end
 
@@ -96,8 +83,7 @@ end
 if diseq || ~react
     
     if react
-        Gx = alpha.*Gx + (1-alpha).*((xq-x).*rho./max(4.*dt,tau_r));
-%         Gx = max(-0.01*rhox/dt,min(0.01*rho/dt,Gx));  % limit to 0.1 vol% phase change per time step
+        Gx = ALPHA.*Gx + (1-ALPHA).*((xq-x).*rho./max(4.*dt,tau_r));
     end
     
     advn_x = advection(rho.*x,Ux,Wx,h,ADVN,'flx');                         % get advection term
@@ -109,15 +95,15 @@ if diseq || ~react
     
     dxdt   = - advn_x + diff_x + Gx;                                       % total rate of change
     
-    if step>0; x = (rhoo.*xo + (dxdt + dxdto)/2.*dt)./rho; end             % explicit update of crystal fraction
+    x = (rhoo.*xo + (THETA.*dxdt + (1-THETA).*dxdto).*dt)./rho;  % explicit update of crystal fraction
     x = min(1-f-TINY,max(TINY,x));                                         % enforce [0,1] limit
     x([1 end],:) = x([2 end-1],:);                                         % apply boundary conditions
     x(:,[1 end]) = x(:,[2 end-1]);
     
 else
     
-    x  =  alpha.*x + (1-alpha).*xq;
-    if step>0; Gx = (rho.*x-rhoo.*xo)./dt + advection(rho.*x,Ux,Wx,h,ADVN,'flx'); end  % reconstruct crystallisation rate
+    x  =  ALPHA.*x + (1-ALPHA).*xq;
+    Gx = (rho.*x-rhoo.*xo)./dt + advection(rho.*x,Ux,Wx,h,ADVN,'flx');  % reconstruct crystallisation rate
     
 end
 
@@ -125,8 +111,7 @@ end
 if (diseq && any([v0;v1;vwall;v(:)]>1e-6)) || ~react
     
     if react
-        Gf = alpha.*Gf + (1-alpha).*((fq-f).*rho./max(4.*dt,tau_r));
-%         Gf = max(-0.01*rhof/dt,min(0.01*rho/dt,Gf));  % limit to 0.1 vol% phase change per time step
+        Gf = ALPHA.*Gf + (1-ALPHA).*((fq-f).*rho./max(4.*dt,tau_r));
     end
     
     advn_f = advection(rho.*f,Uf,Wf,h,ADVN,'flx');                         % get advection term
@@ -138,15 +123,15 @@ if (diseq && any([v0;v1;vwall;v(:)]>1e-6)) || ~react
                           
     dfdt   = - advn_f + diff_f + Gf;                                       % total rate of change
     
-    if step>0; f = (rhoo.*fo + (dfdt + dfdto)/2.*dt)./rho; end             % explicit update of bubble fraction
+    f = (rhoo.*fo + (THETA.*dfdt + (1-THETA).*dfdto).*dt)./rho;  % explicit update of bubble fraction
     f = min(1-x-TINY,max(TINY,f));                                         % enforce [0,1-x] limit
     f([1 end],:) = f([2 end-1],:);                                         % apply boundary conditions
     f(:,[1 end]) = f(:,[2 end-1]);
     
 else
     
-    f  =  alpha.*f + (1-alpha).*fq;
-    if step>0; Gf = (rho.*f-rhoo.*fo)./dt + advection(rho.*f,Uf,Wf,h,ADVN,'flx'); end  % reconstruct exsolution rate
+    f  =  ALPHA.*f + (1-ALPHA).*fq;
+    Gf = (rho.*f-rhoo.*fo)./dt + advection(rho.*f,Uf,Wf,h,ADVN,'flx');  % reconstruct exsolution rate
     
 end
 
@@ -172,7 +157,8 @@ end
 
 % get residual of thermochemical equations from iterative update
 resnorm_TC = norm(T - Ti,2)./(norm(T,2)+TINY) ...
-           + norm(x - xi,2)./(norm(x,2)+TINY);
+           + norm(x - xi,2)./(norm(x,2)+TINY) ...
+           + norm(f - fi,2)./(norm(f,2)+TINY);
 
 
 %% ***** TRACE & ISOTOPE GEOCHEMISTRY  ************************************
@@ -199,7 +185,7 @@ if ~isnan(itwall); assim = assim + (itwall-it).*rho./tau_a .* bndshape; end % im
     
 dITdt = - advn_IT + diff_it + assim;                                       % total rate of change
 
-if step>0; IT = ITo + (dITdt + dITdto)/2.*dt; end                          % explicit update
+IT = ITo + (THETA.*dITdt + (1-THETA).*dITdto).*dt;          % explicit update
 IT = max(0+TINY, IT );
 IT([1 end],:) = IT([2 end-1],:);                                           % boundary conditions
 IT(:,[1 end]) = IT(:,[2 end-1]);
@@ -227,7 +213,7 @@ if ~isnan(ctwall); assim = assim + (ctwall-ct).*rho./tau_a .* bndshape; end % im
 
 dCTdt = - advn_CT + diff_ct + assim;                                       % total rate of change
 
-if step>0; CT = CTo + (dCTdt + dCTdto)/2.*dt; end                          % explicit update
+CT = CTo + (THETA.*dCTdt + (1-THETA).*dCTdto).*dt;          % explicit update
 CT = max(0+TINY, CT );
 CT([1 end],:) = CT([2 end-1],:);                                           % boundary conditions
 CT(:,[1 end]) = CT(:,[2 end-1]);
@@ -251,7 +237,7 @@ if ~isnan(siwall); assim = assim + (siwall-sim).*rho.*m./tau_a .* bndshape; end 
 
 dSImdt = - advn_sim + diff_sim + assim - trns_si;                          % total rate of change
 
-if step>0; SIm = SImo + (dSImdt + dSImdto)/2.*dt; end                      % explicit update
+SIm = SImo + (THETA.*dSImdt + (1-THETA).*dSImdto).*dt;      % explicit update
 SIm = min(max([max(0,siwall),si0-dsi,si1+dsi]).*rho.*m,max(min([min(0,siwall),si0-dsi,si1+dsi]).*rho.*m,SIm));
 SIm(m < TINY)  = 0;
 SIm([1 end],:) = SIm([2 end-1],:);                                         % boundary conditions
@@ -271,7 +257,7 @@ if ~isnan(siwall); assim = assim + (siwall-six).*rho.*x./tau_a .* bndshape; end 
 
 dSIxdt = - advn_six + diff_six + assim + trns_si;                          % total rate of change
 
-if step>0; SIx = SIxo + (dSIxdt + dSIxdto)/2.*dt; end                      % explicit update
+SIx = SIxo + (THETA.*dSIxdt + (1-THETA).*dSIxdto).*dt;      % explicit update
 SIx = min(max([max(0,siwall),si0-dsi,si1+dsi]).*rho.*x,max(min([min(0,siwall),si0-dsi,si1+dsi]).*rho.*x,SIx));
 SIx(x < TINY)  = 0;
 SIx([1 end],:) = SIx([2 end-1],:);                                         % boundary conditions
@@ -307,7 +293,7 @@ if ~isnan(riwall); assim = assim + (riwall-rip).*rho./tau_a .* bndshape; end % i
                                        % secular equilibrium!
 dRIPdt = - advn_RIP + diff_rip + assim - dcy_rip + dcy_rip;                % total rate of change
                                        
-if step>0; RIP = RIPo + (dRIPdt + dRIPdto)/2.*dt; end                      % explicit update
+RIP = RIPo + (THETA.*dRIPdt + (1-THETA).*dRIPdto).*dt;      % explicit update
 RIP = max(0+TINY, RIP );
 RIP([1 end],:) = RIP([2 end-1],:);                                         % boundary conditions
 RIP(:,[1 end]) = RIP(:,[2 end-1]);
@@ -333,25 +319,15 @@ if ~isnan(riwall); assim = assim + (riwall.*HLRID./HLRIP-rid).*rho./tau_a .* bnd
     
 dRIDdt = - advn_RID + diff_rid + assim - dcy_rid + dcy_rip;                % total rate of change
 
-if step>0; RID = RIDo + (dRIDdt + dRIDdto)/2.*dt; end                      % explicit update
+RID = RIDo + (THETA.*dRIDdt + (1-THETA).*dRIDdto).*dt;      % explicit update
 RID = max(0+TINY, RID );
 RID([1 end],:) = RID([2 end-1],:);                                         % boundary conditions
 RID(:,[1 end]) = RID(:,[2 end-1]);
 
-if step>0
-    it  = IT./rho;
-    ct  = CT./rho;
-    sim = SIm./rho./max(TINY,m);
-    six = SIx./rho./max(TINY,x);
-    si  = SI./rho./max(TINY,1-f);
-    rip = RIP./rho;
-    rid = RID./rho;
-else
-    IT  = rho.*(m.*itm + x.*itx);
-    CT  = rho.*(m.*ctm + x.*ctx);
-    SIm = rho.* m.*sim;
-    SIx = rho.* x.*six;
-    SI  = SIm + SIx;
-    RIP = rho.*(m.*ripm + x.*ripx);
-    RID = rho.*(m.*ridm + x.*ridx);
-end
+it  = IT./rho;
+ct  = CT./rho;
+sim = SIm./rho./max(TINY,m);
+six = SIx./rho./max(TINY,x);
+si  = SI./rho./max(TINY,1-f);
+rip = RIP./rho;
+rid = RID./rho;

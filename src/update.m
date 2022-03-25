@@ -10,7 +10,8 @@ rho   = 1./(m./rhom + x./rhox + f./rhof);  rho([1 end],:) = rho([2 end-1],:);  r
 chi   = x.*rho./rhox;
 phi   = f.*rho./rhof;
 mu    = m.*rho./rhom;
-rhoBF = ((rho (2:end-2,2:end-1)+rho (3:end-1,2:end-1))/4 + (rhoo(2:end-2,2:end-1)+rhoo(3:end-1,2:end-1))/4 - rhoref);  % taken at mid-point in time
+rhoBF = (  THETA *(rho (2:end-2,2:end-1)+rho (3:end-1,2:end-1))/2 ...
+      + (1-THETA)*(rhoo(2:end-2,2:end-1)+rhoo(3:end-1,2:end-1))/2 - rhoref);  % taken at mid-point in time
 if Nx <= 10; rhoBF = repmat(mean(rhoBF,2),1,Nx-2); end
 
 % update thermal properties
@@ -41,16 +42,16 @@ Kv =    ff .*kv.*thtv;
 Cv = (1-ff)./[dx;dm;df].^2.*Kv;
 
 % compose effective viscosity, segregation coefficients
-eta = squeeze(sum(Kv,1));                                                  
-eta = max(etamin,min(etamax,eta));                                         % limit viscosity range
-if step>0; etact = (eta + etao)/2;                                         % effective viscosity in cell centres
-else;      etact =  eta;  end
+eta    = squeeze(sum(Kv,1));                                                  
+eta    = max(etamin,min(etamax,eta));                                         % limit viscosity range
+etact  = THETA*eta + (1-THETA)*etao;                                        % effective viscosity in cell centres
+
 etaco  = (etact(1:end-1,1:end-1)+etact(2:end,1:end-1) ...                  % effective viscosity in cell corners
        +  etact(1:end-1,2:end  )+etact(2:end,2:end  ))./4;
 
-Ksgr_x = max(1e-18,min(1e-6,chi./squeeze(Cv(1,:,:))));
-Ksgr_m = max(1e-18,min(1e-6,mu ./squeeze(Cv(2,:,:))));
-Ksgr_f = max(1e-18,min(1e-6,phi./squeeze(Cv(3,:,:))));
+Csgr_x = max(1e-18,min(1e-6,chi./squeeze(Cv(1,:,:))));
+Csgr_m = max(1e-18,min(1e-6,mu ./squeeze(Cv(2,:,:))));
+Csgr_f = max(1e-18,min(1e-6,phi./squeeze(Cv(3,:,:))));
 
 % update velocity divergence
 Div_V(2:end-1,2:end-1) = ddz(W(:,2:end-1),h) ...                           % get velocity divergence
@@ -87,21 +88,21 @@ tII([1 end],:) = tII([2 end-1],:);
 if bndmode==4; sds = -1;      % no slip for 'all sides(4)'
 else;          sds = +1; end  % free slip for other types
 
-wx = ((rhox(1:end-1,:)+rhox(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0.*((Ksgr_x(1:end-1,:)+Ksgr_x(2:end,:))/2); % crystal segregation speed
+wx = ((rhox(1:end-1,:)+rhox(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0.*((Csgr_x(1:end-1,:)+Csgr_x(2:end,:))/2); % crystal segregation speed
 for i = 1:round(delta)
     wx(2:end-1,2:end-1) = wx(2:end-1,2:end-1) + diff(wx(:,2:end-1),2,1)./8 + diff(wx(2:end-1,:),2,2)./8;
     wx([1 end],:) = 0;
     wx(:,[1 end]) = sds*wx(:,[2 end-1]);
 end
 
-wf = any(v(:)>1e-6).*((rhof(1:end-1,:)+rhof(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0.*((Ksgr_f(1:end-1,:)+Ksgr_f(2:end,:))/2); % fluid segregation speed
+wf = any(v(:)>1e-6).*((rhof(1:end-1,:)+rhof(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0.*((Csgr_f(1:end-1,:)+Csgr_f(2:end,:))/2); % fluid segregation speed
 for i = 1:round(delta)
     wf(2:end-1,2:end-1) = wf(2:end-1,2:end-1) + diff(wf(:,2:end-1),2,1)./8 + diff(wf(2:end-1,:),2,2)./8;
     wf([1 end],:) = [fout;fin].*wf([2 end-1],:);
     wf(:,[1 end]) = sds*wf(:,[2 end-1]);
 end
 
-wm = ((rhom(1:end-1,:)+rhom(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0.*((Ksgr_m(1:end-1,:)+Ksgr_m(2:end,:))/2); % melt segregation speed
+wm = ((rhom(1:end-1,:)+rhom(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0.*((Csgr_m(1:end-1,:)+Csgr_m(2:end,:))/2); % melt segregation speed
 for i = 1:round(delta)
     wm(2:end-1,2:end-1) = wm(2:end-1,2:end-1) + diff(wm(:,2:end-1),2,1)./8 + diff(wm(2:end-1,:),2,2)./8;
     wm([1 end],:) = 0;
@@ -113,7 +114,10 @@ Div_rhoV =  + advection(rho.*f,0.*U,wf,h,ADVN,'flx') ...
             + advection(rho.*x,0.*U,wx,h,ADVN,'flx') ...
             + advection(rho.*m,0.*U,wm,h,ADVN,'flx') ...
             + advection(rho   ,U   ,W ,h,ADVN,'flx');
-if step>0; VolSrc = -((rho-rhoo)./dt + Div_rhoV - rho.*Div_V)./rho; end
+%     VolSrci = -((rho-rhoo)./dt + Div_rhoV - rho.*Div_V)./rho;
+VolSrci = VolSrc;
+VolSrc  = ALPHA.*VolSrc + (1-ALPHA).* (-((rho-rhoo)./dt + THETA*(Div_rhoV - rho.*Div_V) + (1-THETA)*Div_rhoVo)./(THETA*rho));
+% VolSrc  = -((rho-rhoo)./dt + THETA*(Div_rhoV - rho.*Div_V) + (1-THETA)*Div_rhoVo)./(THETA*rho);
 
 UBG    = - mean(mean(VolSrc(2:end-1,2:end-1)))./2 .* (L/2-XXu);
 WBG    = - mean(mean(VolSrc(2:end-1,2:end-1)))./2 .* (D/2-ZZw);

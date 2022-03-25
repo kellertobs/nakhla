@@ -1,6 +1,6 @@
 % get combined residual norm
 resnorm = resnorm_VP + resnorm_TC;
-if iter<=0 || resnorm>resnorm0; resnorm0 = resnorm + 1e-32; end  % reset reference residual
+if iter==1 || resnorm>resnorm0; resnorm0 = resnorm + 1e-32; end  % reset reference residual
 
 % report iterations
 if     iter >=  0  && iter <  10
@@ -13,7 +13,7 @@ end
 
 % plot convergence of outer iterations
 if plot_cv
-    figure(100); if iter==0; clf; else; hold on; end
+    figure(100); if iter==1; clf; else; hold on; end
     plot(iter,log10(resnorm),'r.','MarkerSize',15); box on; axis tight;
     drawnow;
 end
