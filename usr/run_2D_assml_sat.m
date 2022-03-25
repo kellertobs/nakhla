@@ -23,8 +23,8 @@ M        =  5e4;                 % number of time steps to take
 hr       =  3600;                % conversion seconds to hours
 yr       =  24*365.25*hr;        % conversion seconds to years
 tend     =  5*24*hr;             % end time for simulation [s]
-dt       =  10;                  % initial time step [s]
-dtmax    =  10;                  % maximum time step [s]
+dt       =  2;                   % initial time step [s]
+dtmax    =  2;                   % maximum time step [s]
 
 % set initial thermo-chemical state
 seed     =  15;                  % random perturbation seed
@@ -68,7 +68,7 @@ bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top
 bndinit  =  1;                   % switch on (1) to initialise with already established boundary layers
 dw       =  2*h;                 % boundary layer thickness for assimilation [m]
 fin      =  0;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
-fout     =  0.75;                 % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
+fout     =  1.0;                 % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
 tau_T    =  4*hr;                % wall cooling/assimilation time [s]
 tau_a    =  8*hr;                % wall cooling/assimilation time [s]
 Twall    =  500;                 % wall temperature [degC] (nan = insulating)
@@ -104,11 +104,11 @@ dTH2O    =  [1200,1000,200];     % solidus shift from water content [degC/wt^0.7
 tau_r    =  10;                  % reaction time [s]
 
 % set model rheology parameters
-etam0    =  100;                 % melt viscosity [Pas]
+etam0    =  300;                 % melt viscosity [Pas]
 etaf0    =  0.1;                 % fluid viscosity [Pas]
 etax0    =  1e15;                % crystal viscosity [Pas]
 Fmc      =  1e+4;                % major component weakening factor of melt viscosity [1]
-Fmv      =  0.5;                 % volatile component weakening factor of melt viscosity [1]
+Fmv      =  0.4;                 % volatile component weakening factor of melt viscosity [1]
 Em       =  150e3;               % activation energy melt viscosity [J/mol]
 AA       = [ 0.60, 0.25, 0.30; 0.20, 0.20, 0.20; 0.20, 0.20, 0.20; ];  % permission slopes
 BB       = [ 0.30, 0.15, 0.55; 0.48, 0.02, 0.50; 0.80, 0.08, 0.12; ];  % permission step locations
@@ -132,14 +132,15 @@ g0       =  10.;                 % gravity [m/s2]
 % set numerical model parameters
 CFL      =  0.5;                 % (physical) time stepping courant number (multiplies stable step) [0,1]
 ADVN     =  'FRM';               % advection scheme ('UPW2', 'UPW3', or 'FRM')
+theta    =  1/2;                 % time-stepping parameter (1 = 1st-order implicit; 1/2 = 2nd-order semi-implicit)
 rtol     =  1e-3;                % outer its relative tolerance
 atol     =  1e-6;                % outer its absolute tolerance
-maxit    =  100;                 % maximum outer its
+maxit    =  20;                  % maximum outer its
 alpha    =  0.75;                % iterative lag parameter equilibration
 beta     =  0.75;                % iterative lag parameter phase diagram
 delta    =  20;                  % smoothness of segregation speed
 etamin   =  1e1;                 % minimum viscosity for stabilisation
-etamax   =  1e16;                % maximum viscosity for stabilisation
+etamax   =  1e7;                 % maximum viscosity for stabilisation
 TINY     =  1e-16;               % minimum cutoff phase, component fractions
 
 % create output directory

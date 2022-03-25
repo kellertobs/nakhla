@@ -32,8 +32,8 @@ smth     =  (N/30)^2;            % regularisation of initial random perturbation
 zlay     =  0.5;                 % layer thickness (relative to domain depth D)
 wlay_T   =  1e-6;                % thickness of smooth layer boundary (relative to domain depth D)
 wlay_c   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
-T0       =  675;                 % temperature top layer [deg C]
-T1       =  675;                 % temperature base layer [deg C]
+T0       =  680;                 % temperature top layer [deg C]
+T1       =  680;                 % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
 c0       =  0.69;                % major component top layer [wt SiO2]
 c1       =  0.69;                % major component base layer [wt SiO2]
@@ -68,12 +68,12 @@ bndmode  =  2;                   % boundary assimilation mode (0 = none; 1 = top
 bndinit  =  0;                   % switch on (1) to initialise with already established boundary layers
 dw       =  2*h;                 % boundary layer thickness for assimilation [m]
 fin      =  0;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
-fout     =  0.75;                % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
+fout     =  1.0;                 % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
 tau_T    =  4*hr;                % wall cooling/assimilation time [s]
 tau_a    =  2*hr;                % wall cooling/assimilation time [s]
-Twall    =  1100;                % wall temperature [degC] (nan = insulating)
+Twall    =  1050;                % wall temperature [degC] (nan = insulating)
 cwall    =  0.49;                % wall major component [wt SiO2] (nan = no assimilation)
-vwall    =  0.03;                % wall volatile component [wt H2O] (nan = no assimilation)
+vwall    =  0.04;                % wall volatile component [wt H2O] (nan = no assimilation)
 itwall   =  0.1;                 % wall incomp. tracer [wt ppm] (nan = no assimilation)
 ctwall   =  10.;                 % wall comp. tracer [wt ppm] (nan = no assimilation)
 siwall   =  5;                   % wall stable isotope [delta] (nan = no assimilation)
@@ -104,11 +104,11 @@ dTH2O    =  [1200,1000,200];     % solidus shift from water content [degC/wt^0.7
 tau_r    =  10;                  % reaction time [s]
 
 % set model rheology parameters
-etam0    =  100;                 % melt viscosity [Pas]
+etam0    =  300;                 % melt viscosity [Pas]
 etaf0    =  0.1;                 % fluid viscosity [Pas]
 etax0    =  1e15;                % crystal viscosity [Pas]
 Fmc      =  1e+4;                % major component weakening factor of melt viscosity [1]
-Fmv      =  0.5;                 % volatile component weakening factor of melt viscosity [1]
+Fmv      =  0.4;                 % volatile component weakening factor of melt viscosity [1]
 Em       =  150e3;               % activation energy melt viscosity [J/mol]
 AA       = [ 0.60, 0.25, 0.30; 0.20, 0.20, 0.20; 0.20, 0.20, 0.20; ];  % permission slopes
 BB       = [ 0.30, 0.15, 0.55; 0.48, 0.02, 0.50; 0.80, 0.08, 0.12; ];  % permission step locations
@@ -132,14 +132,15 @@ g0       =  10.;                 % gravity [m/s2]
 % set numerical model parameters
 CFL      =  0.5;                 % (physical) time stepping courant number (multiplies stable step) [0,1]
 ADVN     =  'FRM';               % advection scheme ('UPW2', 'UPW3', or 'FRM')
+theta    =  1/2;                 % time-stepping parameter (1 = 1st-order implicit; 1/2 = 2nd-order semi-implicit)
 rtol     =  1e-5;                % outer its relative tolerance
 atol     =  1e-7;                % outer its absolute tolerance
 maxit    =  100;                 % maximum outer its
-alpha    =  0.75;                % iterative lag parameter equilibration
+alpha    =  0.80;                % iterative lag parameter equilibration
 beta     =  0.75;                % iterative lag parameter phase diagram
 delta    =  20;                  % smoothness of segregation speed
 etamin   =  1e1;                 % minimum viscosity for stabilisation
-etamax   =  1e16;                % maximum viscosity for stabilisation
+etamax   =  1e7;                 % maximum viscosity for stabilisation
 TINY     =  1e-16;               % minimum cutoff phase, component fractions
 
 % create output directory

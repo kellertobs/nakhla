@@ -104,11 +104,11 @@ dTH2O    =  [1200,1000,200];     % solidus shift from water content [degC/wt^0.7
 tau_r    =  10;                  % reaction time [s]
 
 % set model rheology parameters
-etam0    =  100;                 % melt viscosity [Pas]
+etam0    =  300;                 % melt viscosity [Pas]
 etaf0    =  0.1;                 % fluid viscosity [Pas]
 etax0    =  1e15;                % crystal viscosity [Pas]
 Fmc      =  1e+4;                % major component weakening factor of melt viscosity [1]
-Fmv      =  0.5;                 % volatile component weakening factor of melt viscosity [1]
+Fmv      =  0.4;                 % volatile component weakening factor of melt viscosity [1]
 Em       =  150e3;               % activation energy melt viscosity [J/mol]
 AA       = [ 0.60, 0.25, 0.30; 0.20, 0.20, 0.20; 0.20, 0.20, 0.20; ];  % permission slopes
 BB       = [ 0.30, 0.15, 0.55; 0.48, 0.02, 0.50; 0.80, 0.08, 0.12; ];  % permission step locations
@@ -132,6 +132,7 @@ g0       =  10.;                 % gravity [m/s2]
 % set numerical model parameters
 CFL      =  0.5;                 % (physical) time stepping courant number (multiplies stable step) [0,1]
 ADVN     =  'FRM';               % advection scheme ('UPW2', 'UPW3', or 'FRM')
+theta    =  1/2;                 % time-stepping parameter (1 = 1st-order implicit; 1/2 = 2nd-order semi-implicit)
 rtol     =  1e-5;                % outer its relative tolerance
 atol     =  1e-7;                % outer its absolute tolerance
 maxit    =  100;                 % maximum outer its
