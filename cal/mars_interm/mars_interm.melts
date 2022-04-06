@@ -1,0 +1,20 @@
+Title: mars_interm
+Initial Composition: SiO2 61.9075
+Initial Composition: TiO2 1.9599
+Initial Composition: Al2O3 10.1575
+Initial Composition: Fe2O3 0.9013
+Initial Composition: FeO 8.4426
+Initial Composition: MnO 0.2851
+Initial Composition: MgO 1.4259
+Initial Composition: CaO 5.9164
+Initial Composition: Na2O 5.6329
+Initial Composition: K2O 2.4251
+Initial Composition: P2O5 0.9457
+Initial Temperature: 1100.00
+Final Temperature: 700.00
+Initial Pressure: 150.00
+Final Pressure: 150.00
+Increment Temperature: 5.00
+Increment Pressure: 0.00
+dp/dt: 0.00
+log fo2 Path: -2FMQ

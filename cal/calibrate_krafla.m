@@ -1,5 +1,5 @@
 % calibrate phase diagram
-clear; addpath('../src');
+clear; addpath('../src'); close all;
 
 % calibration run options
 runID     = 'test';     % run ID for output files; [system name_wt.% SiO2_wt.% H2O]
@@ -34,9 +34,9 @@ dm       =  1e-4;                % melt film size [m]
 g0       =  10.;                 % gravity [m/s2]
 
 % Load MELTS tables in csv format
-krafla_mafic_liquid = load('../MELTS/krafla_mafic/Liquid_comp_tbl.csv');   % output file of MELTS for Krafla mafic comp
-krafla_mafic_solid  = load('../MELTS/krafla_mafic/Solid_comp_tbl.csv');   % output file of MELTS for Krafla mafic comp
-krafla_mafic_bulk   = load('../MELTS/krafla_mafic/Bulk_comp_tbl.csv');   % output file of MELTS for Krafla mafic comp
+krafla_mafic_liquid = load('./krafla_mafic/Liquid_comp_tbl.csv');   % output file of MELTS for Krafla mafic comp
+krafla_mafic_solid  = load('./krafla_mafic/Solid_comp_tbl.csv');   % output file of MELTS for Krafla mafic comp
+krafla_mafic_bulk   = load('./krafla_mafic/Bulk_comp_tbl.csv');   % output file of MELTS for Krafla mafic comp
 
 % read in P,T,c,v variables from MELTS tables
 P_mafic = krafla_mafic_bulk(:,1).'.*1e5;
@@ -53,9 +53,9 @@ cx_mafic = krafla_mafic_solid(:,4).'./100;
 % cm_mafic(T_mafic>=1100) = cm_mafic(T_mafic>=1100) + 0.03.*cx_mafic(T_mafic>=1100)./cm_mafic(T_mafic>=1100);
 
 % Load MELTS tables in csv format
-krafla_interm_liquid = load('../MELTS/krafla_interm/Liquid_comp_tbl.csv');   % output file of MELTS for Krafla interm comp
-krafla_interm_solid  = load('../MELTS/krafla_interm/Solid_comp_tbl.csv');   % output file of MELTS for Krafla interm comp
-krafla_interm_bulk   = load('../MELTS/krafla_interm/Bulk_comp_tbl.csv');   % output file of MELTS for Krafla interm comp
+krafla_interm_liquid = load('./krafla_interm/Liquid_comp_tbl.csv');   % output file of MELTS for Krafla interm comp
+krafla_interm_solid  = load('./krafla_interm/Solid_comp_tbl.csv');   % output file of MELTS for Krafla interm comp
+krafla_interm_bulk   = load('./krafla_interm/Bulk_comp_tbl.csv');   % output file of MELTS for Krafla interm comp
 
 % read in P,T,c,v variables from MELTS tables
 P_interm = krafla_interm_bulk(:,1).'.*1e5;
@@ -72,9 +72,9 @@ cx_interm = krafla_interm_solid(:,4).'./100;
 % cm_interm(T_interm>=940) = cm_interm(T_interm>=940) - 0.03.*cx_interm(T_interm>=940)./cm_interm(T_interm>=940);
 
 % Load MELTS tables in csv format
-krafla_ultram_liquid = load('../MELTS/krafla_ultram/Liquid_comp_tbl.csv');   % output file of MELTS for Krafla ultram comp
-krafla_ultram_solid  = load('../MELTS/krafla_ultram/Solid_comp_tbl.csv');   % output file of MELTS for Krafla ultram comp
-krafla_ultram_bulk   = load('../MELTS/krafla_ultram/Bulk_comp_tbl.csv');   % output file of MELTS for Krafla ultram comp
+krafla_ultram_liquid = load('./krafla_ultram/Liquid_comp_tbl.csv');   % output file of MELTS for Krafla ultram comp
+krafla_ultram_solid  = load('./krafla_ultram/Solid_comp_tbl.csv');   % output file of MELTS for Krafla ultram comp
+krafla_ultram_bulk   = load('./krafla_ultram/Bulk_comp_tbl.csv');   % output file of MELTS for Krafla ultram comp
 
 % read in P,T,c,v variables from MELTS tables
 P_ultram = krafla_ultram_bulk(:,1).'.*1e5;
@@ -87,22 +87,20 @@ m_ultram  = krafla_ultram_liquid(:,3).'./krafla_ultram_bulk(:,3).';
 x_ultram  = krafla_ultram_solid(:,3).'./krafla_ultram_bulk(:,3).';
 cm_ultram = krafla_ultram_liquid(:,4).'./100;
 cx_ultram = krafla_ultram_solid(:,4).'./100;
-% cx_ultram(T_ultram>=940) = cx_ultram(T_ultram>=940) + 0.03;
-% cm_ultram(T_ultram>=940) = cm_ultram(T_ultram>=940) - 0.03.*cx_ultram(T_ultram>=940)./cm_ultram(T_ultram>=940);
 
-cphs0_bst  =  0.425;                % phase diagram lower bound composition [wt SiO2]
-cphs1_bst  =  0.777;                % phase diagram upper bound composition [wt SiO2]
-Tphs0_bst  =  844.7;                 % phase diagram lower bound temperature [degC]
-Tphs1_bst  =  1847;                % phase diagram upper bound temperature [degC]
-PhDg_bst   =  [7.0,4.2,1.22,0.92];   % Phase diagram curvature factor (> 1)
-perCm_bst  =  0.520;                % peritectic liquidus composition [wt SiO2]
-perCx_bst  =  0.478;                % peritectic solidus  composition [wt SiO2]
-perT_bst   =  1149;                % peritectic temperature [degC]
+cphs0_bst  =  0.428;               % phase diagram lower bound composition [wt SiO2]
+cphs1_bst  =  0.783;               % phase diagram upper bound composition [wt SiO2]
+Tphs0_bst  =  843.7;               % phase diagram lower bound temperature [degC]
+Tphs1_bst  =  1867;                % phase diagram upper bound temperature [degC]
+PhDg_bst   =  [7.0,4.2,1.0,0.93];  % Phase diagram curvature factor (> 1)
+perCm_bst  =  0.517;               % peritectic liquidus composition [wt SiO2]
+perCx_bst  =  0.475;               % peritectic solidus  composition [wt SiO2]
+perT_bst   =  1147;                % peritectic temperature [degC]
 clap       =  1e-7;                % Clapeyron slope for P-dependence of melting T [degC/Pa]
-dTH2O      =  [1300,1100,0];        % solidus shift from water content [degC/wt^0.75]
-beta       =  0.9;                % iterative lag parameter phase diagram [1]
+dTH2O      =  [1200,1000,100];     % solidus shift from water content [degC/wt^0.75]
+beta       =  0.9;                 % iterative lag parameter phase diagram [1]
 
-misfit  = 1e3; tol = 5e-1;
+misfit  = 1e3; tol = 0.4;
 bestfit = misfit;
 
 time0 = tic;
@@ -137,20 +135,20 @@ while misfit > tol
         Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,beta);
     mq_ultram = 1-fq_ultram-xq_ultram;
     
-    misfit =          norm( m_mafic- mq_mafic,2)./norm( mq_mafic,2) ...
+    misfit =          norm( m_mafic.*linspace(1.15,1,length(m_mafic))- mq_mafic,2)./norm( mq_mafic,2) ...
                     + norm( x_mafic- xq_mafic,2)./norm( xq_mafic,2) ...                    
                     + norm(cm_mafic-cmq_mafic,2)./norm(cmq_mafic,2) ...
-                    + norm(cx_mafic-cxq_mafic,2)./norm(cxq_mafic,2);
+                    + norm(cx_mafic-cxq_mafic,2)./norm(cxq_mafic,2)*0.8;
     misfit = misfit + norm( m_interm- mq_interm,2)./norm( mq_interm,2) ...
                     + norm( x_interm- xq_interm,2)./norm( xq_interm,2) ...                    
                     + norm(cm_interm-cmq_interm,2)./norm(cmq_interm,2) ...
-                    + norm(cx_interm-cxq_interm,2)./norm(cxq_interm,2);
+                    + norm(cx_interm-cxq_interm,2)./norm(cxq_interm,2)*0.8;
    misfit = misfit + norm(  m_ultram- mq_ultram,2)./norm( mq_ultram,2) ...
                     + norm( x_ultram- xq_ultram,2)./norm( xq_ultram,2) ...                    
                     + norm(cm_ultram-cmq_ultram,2)./norm(cmq_ultram,2) ...
                     + norm(cx_ultram-cxq_ultram,2)./norm(cxq_ultram,2); 
 
-    if misfit < 1.001*bestfit         % if misfit < bestfit set bestfit values as misfit
+    if misfit < 1.0005*bestfit         % if misfit < bestfit set bestfit values as misfit
         fprintf(1,'   misfit = %1.4e \n',misfit);
         bestfit = misfit;       %set bestfit values of parameter to model parameters
         cphs0_bst = cphs0;

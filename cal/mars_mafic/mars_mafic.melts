@@ -1,20 +1,20 @@
 Title: mars_mafic
-Initial Composition: SiO2 49.2678
-Initial Composition: TiO2 0.9794
-Initial Composition: Al2O3 10.4931
-Initial Composition: Fe2O3 4.0427
-Initial Composition: FeO 14.5505
-Initial Composition: MnO 0.3798
-Initial Composition: MgO 9.0541
-Initial Composition: CaO 6.9155
-Initial Composition: Na2O 2.9681
-Initial Composition: K2O 0.4497
-Initial Composition: P2O5 0.8994
+Initial Composition: SiO2 49.4129
+Initial Composition: TiO2 0.9822
+Initial Composition: Al2O3 10.5241
+Initial Composition: Fe2O3 1.1150
+Initial Composition: FeO 17.2384
+Initial Composition: MnO 0.3809
+Initial Composition: MgO 9.0808
+Initial Composition: CaO 6.9359
+Initial Composition: Na2O 2.9768
+Initial Composition: K2O 0.4510
+Initial Composition: P2O5 0.9021
 Initial Temperature: 1300.00
-Final Temperature: 750.00
-Initial Pressure: 1000.00
-Final Pressure: 1000.00
+Final Temperature: 1100.00
+Initial Pressure: 150.00
+Final Pressure: 150.00
 Increment Temperature: 5.00
 Increment Pressure: 0.00
 dp/dt: 0.00
-log fo2 Path: NNO
+log fo2 Path: -2FMQ

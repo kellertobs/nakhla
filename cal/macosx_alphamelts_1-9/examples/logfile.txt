@@ -1,44 +1,50 @@
 ! *************************************
-!  Isobaric batch crystallization 
+!  Equilibrium (batch) crystallization 
 ! *************************************
-
 ! this variable chooses MELTS or pMELTS; for low-pressure use MELTS
 ALPHAMELTS_VERSION         MELTS
-!ALPHAMELTS_MULTIPLE_LIQUIDS true
+ALPHAMELTS_MULTIPLE_LIQUIDS true
 ALPHAMELTS_CELSIUS_OUTPUT   true
-
 ! don't use this unless fO2 anomalies at the solidus are a problem
 !ALPHAMELTS_ALTERNATIVE_FO2	true
-
 ! use this if you want to buffer fO2 for isentropic, isenthalpic or isochoric mode
 ! e.g. if you are doing isenthalpic AFC
 !ALPHAMELTS_IMPOSE_FO2
-
 ! use if you want assimilation and fractional crystallization (AFC)
 !ALPHAMELTS_ASSIMILATE   true
-
 ! isothermal, isobaric, isentropic, isenthalpic, isochoric, geothermal or PTPath
 ALPHAMELTS_MODE          isobaric
 !ALPHAMELTS_PTPATH_FILE	ptpath.txt
-
 ! need to set DELTAP for polybaric paths; DELTAT for isobaric paths
 ALPHAMELTS_DELTAP      0
-ALPHAMELTS_DELTAT      -5
-ALPHAMELTS_MAXP        1000
-ALPHAMELTS_MINP        10
-ALPHAMELTS_MAXT        1800
-ALPHAMELTS_MINT        700
-
+ALPHAMELTS_DELTAT      -10
+ALPHAMELTS_MAXP         1500
+ALPHAMELTS_MINP          500
+ALPHAMELTS_MAXT         1100
+ALPHAMELTS_MINT          800
 ! this one turns on fractional crystallization for all solids
 ! use 'Fractionate:' in the melts file instead for selective fractionation
 !ALPHAMELTS_FRACTIONATE_SOLIDS	true
 !ALPHAMELTS_MASSIN        0.001
-
 ! free water is unlikely but can be extracted
 !ALPHAMELTS_FRACTIONATE_WATER      true
-!ALPHAMELTS_MINW          0.001
-
+!ALPHAMELTS_MINW          0.005
+! the next six options refer to the trace element engine
+!ALPHAMELTS_DO_TRACE            true
+!ALPHAMELTS_TRACE_DEFAULT_DPTX true
+!ALPHAMELTS_TRACE_NORMALIZATION 2
+!ALPHAMELTS_TRACE_INPUT_FILE   yourtraceinfile.txt
+!ALPHAMELTS_TRACE_USELIQFEMG   true
 ! the next one gives an output file that is always updated, even for single calculations
 ALPHAMELTS_SAVE_ALL true
 ALPHAMELTS_SKIP_FAILURE true
+! this information overwrites stuff in the initial melts file
+! a new melts file is created if this information is different
+!Initial Temperature: 1400
+!Initial Pressure: 500
+!Log fO2 Path: FMQ
 
+! alphamelts run by tokeller 
+! Time: Mar 29 2022 at 09:09 
+! Command line: -f ../equilibrium_xtaln.txt -b ../REF.run 
+! Settings file: ../equilibrium_xtaln.txt

@@ -1,0 +1,20 @@
+Title: mars_ultram
+Initial Composition: SiO2 44.6772
+Initial Composition: TiO2 0.1409
+Initial Composition: Al2O3 3.0389
+Initial Composition: Fe2O3 1.1010
+Initial Composition: FeO 17.0211
+Initial Composition: MnO 0.4629
+Initial Composition: MgO 30.3885
+Initial Composition: CaO 2.4653
+Initial Composition: Na2O 0.5031
+Initial Composition: K2O 0.0402
+Initial Composition: P2O5 0.1610
+Initial Temperature: 1700.00
+Final Temperature: 1100.00
+Initial Pressure: 150.00
+Final Pressure: 150.00
+Increment Temperature: 5.00
+Increment Pressure: 0.00
+dp/dt: 0.00
+log fo2 Path: -2FMQ

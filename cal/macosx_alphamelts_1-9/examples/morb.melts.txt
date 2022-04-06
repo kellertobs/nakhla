@@ -1,0 +1,21 @@
+Title: dummy
+Initial Composition: SiO2 48.6800
+Initial Composition: TiO2 1.0100
+Initial Composition: Al2O3 17.6400
+Initial Composition: Fe2O3 0.8900
+Initial Composition: Cr2O3 0.0425
+Initial Composition: FeO 7.5900
+Initial Composition: MgO 9.1000
+Initial Composition: CaO 12.4500
+Initial Composition: Na2O 2.6500
+Initial Composition: K2O 0.0300
+Initial Composition: P2O5 0.0800
+Initial Composition: H2O 0.2000
+Initial Temperature: 1500.00
+Final Temperature: 980.00
+Initial Pressure: 1000.00
+Final Pressure: 1000.00
+Increment Temperature: 5.00
+Increment Pressure: 0.00
+dp/dt: 0.00
+log fo2 Path: None

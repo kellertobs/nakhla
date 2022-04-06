@@ -19,9 +19,9 @@ ALPHAMELTS_MODE          isobaric
 ALPHAMELTS_DELTAP      0
 ALPHAMELTS_DELTAT      -5
 ALPHAMELTS_MAXP        1000
-ALPHAMELTS_MINP        1000
+ALPHAMELTS_MINP        10
 ALPHAMELTS_MAXT        1800
-ALPHAMELTS_MINT        800
+ALPHAMELTS_MINT        1000
 ! this one turns on fractional crystallization for all solids
 ! use 'Fractionate:' in the melts file instead for selective fractionation
 !ALPHAMELTS_FRACTIONATE_SOLIDS	true
@@ -34,6 +34,6 @@ ALPHAMELTS_SAVE_ALL true
 ALPHAMELTS_SKIP_FAILURE true
 
 ! alphamelts run by tokeller 
-! Time: Mar 30 2022 at 09:02 
-! Command line: -f isobaric_xtaln.txt -b krafla_ultram.run 
+! Time: Apr 6 2022 at 12:59 
+! Command line: -f isobaric_xtaln.txt -b mars_ultram.run 
 ! Settings file: isobaric_xtaln.txt
