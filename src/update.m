@@ -7,11 +7,12 @@ rhof = rhof0 .* (1 - aTf.*(T-perT) + bPf.*(Pt-Ptop ));
 
 % convert weight to volume fraction, update bulk density
 rho   = 1./(m./rhom + x./rhox + f./rhof);  rho([1 end],:) = rho([2 end-1],:);  rho(:,[1 end]) = rho(:,[2 end-1]);
+
 chi   = x.*rho./rhox;
 phi   = f.*rho./rhof;
 mu    = m.*rho./rhom;
-rhoBF = (  THETA *(rho (2:end-2,2:end-1)+rho (3:end-1,2:end-1))/2 ...
-      + (1-THETA)*(rhoo(2:end-2,2:end-1)+rhoo(3:end-1,2:end-1))/2 - rhoref);  % taken at mid-point in time
+rhoBF =    THETA *(rho (2:end-2,2:end-1)+rho (3:end-1,2:end-1))/2 ...
+      + (1-THETA)*(rhoo(2:end-2,2:end-1)+rhoo(3:end-1,2:end-1))/2 - rhoref;  % taken at mid-point in time
 if Nx <= 10; rhoBF = repmat(mean(rhoBF,2),1,Nx-2); end
 
 % update thermal properties
@@ -29,7 +30,7 @@ etax  = etax0.* ones(size(x));                                             % con
 kv = permute(cat(3,etax,etam,etaf),[3,1,2]);
 Mv = permute(repmat(kv,1,1,1,3),[4,1,2,3])./permute(repmat(kv,1,1,1,3),[1,4,2,3]);
  
-ff = max(1e-16,permute(cat(3,chi,mu,phi),[3,1,2]));
+ff = max(1e-4,min(1-1e-4,permute(cat(3,chi,mu,phi),[3,1,2])));
 FF = permute(repmat(ff,1,1,1,3),[4,1,2,3]);
 Sf = (FF./BB).^(1./CC);  Sf = Sf./sum(Sf,2);
 Xf = sum(AA.*Sf,2).*FF + (1-sum(AA.*Sf,2)).*Sf;
@@ -37,21 +38,27 @@ Xf = sum(AA.*Sf,2).*FF + (1-sum(AA.*Sf,2)).*Sf;
 % get momentum and volume permissions
 thtv = squeeze(prod(Mv.^Xf,2));
 
-% get momentum and volume flux and transfer coefficients
-Kv =    ff .*kv.*thtv;
-Cv = (1-ff)./[dx;dm;df].^2.*Kv;
-
-% compose effective viscosity, segregation coefficients
-eta    = squeeze(sum(Kv,1));                                                  
-eta    = max(etamin,min(etamax,eta));                                         % limit viscosity range
-etact  = THETA*eta + (1-THETA)*etao;                                        % effective viscosity in cell centres
+% get effective viscosity
+eta    = squeeze(sum(ff.*kv.*thtv,1));                                                  
+eta    = (1./etamax + 1./eta).^-1 + etamin;                                % limit viscosity range
+eta    = log10(eta);
+for i = 1:round(delta/5)
+    eta(2:end-1,2:end-1) = eta(2:end-1,2:end-1) + diff(eta(:,2:end-1),2,1)./8 + diff(eta(2:end-1,:),2,2)./8;
+    eta([1 end],:) = eta([2 end-1],:);
+    eta(:,[1 end]) = eta(:,[2 end-1]);
+end
+eta    = 10.^eta;
+etact  = THETA*eta + (1-THETA)*etao;                                       % effective viscosity in cell centres
 
 etaco  = (etact(1:end-1,1:end-1)+etact(2:end,1:end-1) ...                  % effective viscosity in cell corners
        +  etact(1:end-1,2:end  )+etact(2:end,2:end  ))./4;
 
-Csgr_x = max(1e-18,min(1e-6,chi./squeeze(Cv(1,:,:))));
-Csgr_m = max(1e-18,min(1e-6,mu ./squeeze(Cv(2,:,:))));
-Csgr_f = max(1e-18,min(1e-6,phi./squeeze(Cv(3,:,:))));
+% get segregation coefficients
+Csgr = ((1-ff)./[dx;dm;df].^2.*kv.*thtv).^-1;
+
+Csgr_x = squeeze(Csgr(1,:,:)) + 1e-16;
+Csgr_m = squeeze(Csgr(2,:,:)) + 1e-16;
+Csgr_f = squeeze(Csgr(3,:,:)) + 1e-16;
 
 % update velocity divergence
 Div_V(2:end-1,2:end-1) = ddz(W(:,2:end-1),h) ...                           % get velocity divergence
@@ -114,10 +121,7 @@ Div_rhoV =  + advection(rho.*f,0.*U,wf,h,ADVN,'flx') ...
             + advection(rho.*x,0.*U,wx,h,ADVN,'flx') ...
             + advection(rho.*m,0.*U,wm,h,ADVN,'flx') ...
             + advection(rho   ,U   ,W ,h,ADVN,'flx');
-%     VolSrci = -((rho-rhoo)./dt + Div_rhoV - rho.*Div_V)./rho;
-VolSrci = VolSrc;
 VolSrc  = ALPHA.*VolSrc + (1-ALPHA).* (-((rho-rhoo)./dt + THETA*(Div_rhoV - rho.*Div_V) + (1-THETA)*Div_rhoVo)./(THETA*rho));
-% VolSrc  = -((rho-rhoo)./dt + THETA*(Div_rhoV - rho.*Div_V) + (1-THETA)*Div_rhoVo)./(THETA*rho);
 
 UBG    = - mean(mean(VolSrc(2:end-1,2:end-1)))./2 .* (L/2-XXu);
 WBG    = - mean(mean(VolSrc(2:end-1,2:end-1)))./2 .* (D/2-ZZw);
