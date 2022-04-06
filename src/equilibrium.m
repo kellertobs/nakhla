@@ -50,7 +50,7 @@ if any(v(:)>1e-6)
         cxq = min(c./(1-fq),cphs0 + cxq.*(cphs1-cphs0));
 
         xq  = beta.*xi + (1-beta) .* max(TINY,min(1-fq-TINY, (c-(1-fq).*cmq)./(cxq-cmq) ));
-        fq  = beta.*fi + (1-beta) .* max(TINY,min(1-xq-TINY, (v-(1-xq).*vmq)./(vfq-vmq) ));
+        fq  = beta.*fi + (1-beta) .* max(TINY,min(1   -TINY, (v-(1-xq).*vmq)./(vfq-vmq) ));
         
         res = (norm(xq(:)-xi(:),2) + norm(fq(:)-fi(:),2))./sqrt(2*length(xq(:)));
         iter = iter+1;
