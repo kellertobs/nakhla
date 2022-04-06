@@ -15,7 +15,7 @@ bnchm    =  0;                   % switch on to run manufactured solution benchm
 % set model domain parameters
 D        =  10;                  % chamber depth [m]
 L        =  10;                  % chamber width [m]
-N        =  200 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
+N        =  150 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
 h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
@@ -32,11 +32,11 @@ smth     =  (N/30)^2;            % regularisation of initial random perturbation
 zlay     =  0.5;                 % layer thickness (relative to domain depth D)
 wlay_T   =  1e-6;                % thickness of smooth layer boundary (relative to domain depth D)
 wlay_c   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
-T0       =  1150;                % temperature top layer [deg C]
-T1       =  1150;                % temperature base layer [deg C]
+T0       =  1160;                % temperature top layer [deg C]
+T1       =  1160;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
-c0       =  0.49;                % major component top layer [wt SiO2]
-c1       =  0.49;                % major component base layer [wt SiO2]
+c0       =  0.50;                % major component top layer [wt SiO2]
+c1       =  0.50;                % major component base layer [wt SiO2]
 dc       =  1e-4;                % amplitude of random noise [wt SiO2]
 v0       =  0.00;                % volatile component top layer [wt H2O]
 v1       =  0.00;                % volatile component base layer [wt H2O]
@@ -72,7 +72,7 @@ fout     =  1.0;                 % outgassing factor (0 = no outgassing; 1 = fre
 tau_T    =  4*hr;                % wall cooling/assimilation time [s]
 tau_a    =  8*hr;                % wall cooling/assimilation time [s]
 Twall    =  500;                 % wall temperature [degC] (nan = insulating)
-cwall    =  0.69;                % wall major component [wt SiO2] (nan = no assimilation)
+cwall    =  0.70;                % wall major component [wt SiO2] (nan = no assimilation)
 vwall    =  0.02;                % wall volatile component [wt H2O] (nan = no assimilation)
 itwall   =  10;                  % wall incomp. tracer [wt ppm] (nan = no assimilation)
 ctwall   =  0.1;                 % wall comp. tracer [wt ppm] (nan = no assimilation)
@@ -91,16 +91,16 @@ Dsx      = -300;                 % entropy change of crystallisation [J/kg/K]
 Dsf      =  400;                 % entropy change of exsolution [J/kg/K]
 
 % set phase diagram parameters
-cphs0    =  0.35;                % phase diagram lower bound composition [wt SiO2]
-cphs1    =  0.75;                % phase diagram upper bound composition [wt SiO2]
-Tphs0    =  750;                 % phase diagram lower bound temperature [degC]
-Tphs1    =  1750;                % phase diagram upper bound temperature [degC]
-PhDg     =  5.0;                 % Phase diagram curvature factor (> 1)
+cphs0    =  0.42;                % phase diagram lower bound composition [wt SiO2]
+cphs1    =  0.77;                % phase diagram upper bound composition [wt SiO2]
+Tphs0    =  840;                 % phase diagram lower bound temperature [degC]
+Tphs1    =  1840;                % phase diagram upper bound temperature [degC]
+PhDg     =  [7.0,4.2,1.2,0.9];   % Phase diagram curvature factor (> 1)
 perCm    =  0.51;                % peritectic liquidus composition [wt SiO2]
 perCx    =  0.47;                % peritectic solidus  composition [wt SiO2]
-perT     =  1100;                % peritectic temperature [degC]
+perT     =  1125;                % peritectic temperature [degC]
 clap     =  1e-7;                % Clapeyron slope for P-dependence of melting T [degC/Pa]
-dTH2O    =  [1200,1000,200];     % solidus shift from water content [degC/wt^0.75
+dTH2O    =  [1200,1000,100];     % solidus shift from water content [degC/wt^0.75]
 tau_r    =  10;                  % reaction time [s]
 
 % set model rheology parameters
@@ -136,9 +136,9 @@ theta    =  1/2;                 % time-stepping parameter (1 = 1st-order implic
 rtol     =  1e-3;                % outer its relative tolerance
 atol     =  1e-6;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its
-alpha    =  0.75;                % iterative lag parameter equilibration
+alpha    =  0.80;                % iterative lag parameter equilibration
 beta     =  0.75;                % iterative lag parameter phase diagram
-delta    =  20;                  % smoothness of segregation speed
+delta    =  10;                  % smoothness of segregation speed
 etamin   =  1e1;                 % minimum viscosity for stabilisation
 etamax   =  1e7;                 % maximum viscosity for stabilisation
 TINY     =  1e-16;               % minimum cutoff phase, component fractions
