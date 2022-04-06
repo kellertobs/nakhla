@@ -8,32 +8,32 @@ linestyle = '-';                 % set line style for plots
 save_plot = 0;                   % turn on (1) to save output file in /out directory
 
 % set phase diagram parameters
-cphs0    =  0.35;                % phase diagram lower bound composition [wt SiO2]
-cphs1    =  0.75;                % phase diagram upper bound composition [wt SiO2]
-Tphs0    =  750;                 % phase diagram lower bound temperature [degC]
-Tphs1    =  1750;                % phase diagram upper bound temperature [degC]
-PhDg     =  5.0;                 % Phase diagram curvature factor (> 1)
-perCm    =  0.51;                % peritectic liquidus composition [wt SiO2]
-perCx    =  0.47;                % peritectic solidus  composition [wt SiO2]
-perT     =  1100;                % peritectic temperature [degC]
-clap     =  1e-7;                % Clapeyron slope for P-dependence of melting T [degC/Pa]
-dTH2O    =  [1200,1000,200];     % solidus shift from water content [degC/wt^0.75
-beta     =  0.80;                % iterative lag parameter phase diagram [1]
+cphs0  =  0.43;                % phase diagram lower bound composition [wt SiO2]
+cphs1  =  0.78;                % phase diagram upper bound composition [wt SiO2]
+Tphs0  =  844;                 % phase diagram lower bound temperature [degC]
+Tphs1  =  1867;                % phase diagram upper bound temperature [degC]
+PhDg   =  [7.0,4.2,1.0,0.9];   % Phase diagram curvature factor (> 1)
+perCm  =  0.517;               % peritectic liquidus composition [wt SiO2]
+perCx  =  0.475;               % peritectic solidus  composition [wt SiO2]
+perT   =  1147;                % peritectic temperature [degC]
+clap   =  1e-7;                % Clapeyron slope for P-dependence of melting T [degC/Pa]
+dTH2O  =  [1200,1000,100];     % solidus shift from water content [degC/wt^0.75]
+beta   =  0.80;                % iterative lag parameter phase diagram [1]
 
 % set model rheology parameters
 etam0    =  300;                 % melt viscosity [Pas]
 etaf0    =  0.1;                 % fluid viscosity [Pas]
 etax0    =  1e15;                % crystal viscosity [Pas]
-Fmc      =  1e+4;                % major component weakening factor of melt viscosity [1]
-Fmv      =  0.4;                 % volatile component weakening factor of melt viscosity [1]
-Em       =  150e3;               % activation energy melt viscosity [J/mol]
+Fmc      =  5e+5;                % major component weakening factor of melt viscosity [1]
+Fmv      =  0.6;                 % volatile component weakening factor of melt viscosity [1]
+Em       =  175e3;               % activation energy melt viscosity [J/mol]
 AA       = [ 0.60, 0.25, 0.30; 0.20, 0.20, 0.20; 0.20, 0.20, 0.20; ];  % permission slopes
 BB       = [ 0.30, 0.15, 0.55; 0.48, 0.02, 0.50; 0.80, 0.08, 0.12; ];  % permission step locations
 CC       = [ 0.20, 0.20, 0.20; 0.60, 0.60, 0.12; 0.20, 0.25, 0.50; ];  % permission step widths
 
 % set model buoyancy parameters
-rhom0    =  2700;                % melt phase ref. density [kg/m3] (at T0,cphs0,Ptop)
-rhox0    =  3100;                % crystal phase ref. density [kg/m3] (at T0,cphs0,Ptop)
+rhom0    =  2750;                % melt phase ref. density [kg/m3] (at T0,cphs0,Ptop)
+rhox0    =  3050;                % crystal phase ref. density [kg/m3] (at T0,cphs0,Ptop)
 rhof0    =  500;                 % bubble phase ref. density [kg/m3] (at T0,cphs0,Ptop)
 aTm      =  3e-5;                % melt thermal expansivity [1/K]
 aTx      =  1e-5;                % xtal thermal expansivity [1/K]
@@ -48,7 +48,7 @@ g0       =  10.;                 % gravity [m/s2]
 
 % set ranges for control variables T, c, v, P
 T = linspace(500,1600,1e3);    % temperature range [degC]
-c = linspace(0.49,0.49,1e3);   % major component range [wt SiO2]
+c = linspace(0.70,0.70,1e3);   % major component range [wt SiO2]
 v = linspace(0.02,0.02,1e3);   % volatile component range [wt H2O]
 P = linspace(100,100,1e3)*1e6; % pressure range [Pa]
 
@@ -68,17 +68,17 @@ chi    = xq.*rho./rhox;
 phi    = fq.*rho./rhof;
 mu     = mq.*rho./rhom;
 
+% update effective viscosity
 etam  = etam0 .* exp(Em./(8.3145.*(T+273.15))-Em./(8.3145.*(perT+273.15))) ...
-              .* Fmc.^((cmq-(perCx+perCm)/2)./(cphs1-cphs0)) .* Fmv.^(vmq./0.01); % T-c-v-dep. melt viscosity
-etaf  = etaf0.* ones(size(fq));                                  % constant volatile fluid viscosity
-etax  = etax0.* ones(size(xq));                                  % constant volatile fluid viscosity
+              .* Fmc.^((cmq-(perCx+perCm)/2)./(cphs1-cphs0)) .* Fmv.^(vmq./0.01);  % variable melt viscosity
+etaf  = etaf0.* ones(size(fq));                                             % constant fluid viscosity
+etax  = etax0.* ones(size(xq));                                             % constant crysta viscosity
 
 % get permission weights
-kv = permute(cat(3,etax,etam,etaf),[3,1,2]);
+kv = squeeze(permute(cat(3,etax,etam,etaf),[3,1,2]));
 Mv = squeeze(permute(repmat(kv,1,1,1,3),[4,1,2,3])./permute(repmat(kv,1,1,1,3),[1,4,2,3]));
-kv = squeeze(kv);
 
-ff = squeeze(permute(cat(3,chi,mu,phi),[3,1,2]));
+ff = max(1e-4,min(1-1e-4,squeeze(permute(cat(3,chi,mu,phi),[3,1,2]))));
 FF = permute(repmat(ff,1,1,1,3),[4,1,2,3]);
 Sf = (FF./BB).^(1./CC);  Sf = Sf./sum(Sf,2);
 Xf = sum(AA.*Sf,2).*FF + (1-sum(AA.*Sf,2)).*Sf;
@@ -86,18 +86,19 @@ Xf = sum(AA.*Sf,2).*FF + (1-sum(AA.*Sf,2)).*Sf;
 % get momentum and volume permissions
 thtv = squeeze(prod(Mv.^Xf,2));
 
-% get momentum and volume flux and transfer coefficients
-Kv =    ff .*kv.*thtv;
-Cv = (1-ff)./[dx;dm;df].^2.*Kv;
+% get effective viscosity
+eta    = squeeze(sum(ff.*kv.*thtv,1));                                                  
 
-eta    = squeeze(sum(Kv,1));
-Ksgr_x = max(1e-24,min(1e-6,chi./squeeze(Cv(1,:,:))));
-Ksgr_m = max(1e-24,min(1e-6,mu ./squeeze(Cv(2,:,:))));
-Ksgr_f = max(1e-24,min(1e-6,phi./squeeze(Cv(3,:,:))));
+% get segregation coefficients
+Csgr = ((1-ff)./[dx;dm;df].^2.*kv.*thtv).^-1;
 
-wx = chi.*Ksgr_x .* (rhox-rho)*g0; % crystal segregation speed
-wf = phi.*Ksgr_f .* (rhof-rho)*g0; % fluid segregation speed
-wm = mu .*Ksgr_m .* (rhom-rho)*g0; % melt segregation speed
+Csgr_x = squeeze(Csgr(1,:,:)) + 1e-16;
+Csgr_m = squeeze(Csgr(2,:,:)) + 1e-16;
+Csgr_f = squeeze(Csgr(3,:,:)) + 1e-16;
+
+wx = chi.*Csgr_x .* (rhox-rho)*g0; % crystal segregation speed
+wf = phi.*Csgr_f .* (rhof-rho)*g0; % fluid segregation speed
+wm = mu .*Csgr_m .* (rhom-rho)*g0; % melt segregation speed
 
 % simplified mineral assemblage (ol+px+fs+qz)
 olv0 = perCx;  olv1 = cphs0; 
