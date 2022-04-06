@@ -6,65 +6,62 @@ if plot_op
     UN = {'Units','Centimeters'};
     
     if Nx <= 10 && Nz <= 10  % create 0D plots
-        
-        if iter > 0
             
-            fh1 = figure(1); clf;
-            subplot(5,1,1)
-            plot(hist.time/hr,hist.T(:,2),'k-','LineWidth',2); axis xy tight; box on;
-            title('$T [^\circ$C]',TX{:},FS{:}); set(gca,TL{:},TS{:});
-            subplot(5,1,2)
-            plot(hist.time/hr,hist.cx(:,2)*100,'b-',hist.time/hr,hist.cm(:,2)*100,'r-',hist.time/hr,hist.c(:,2)./(1-hist.f(:,2))*100,'k-','LineWidth',2); axis xy tight; box on;
-            title('$\bar{c}$ [wt\% SiO$_2$]',TX{:},FS{:}); set(gca,TL{:},TS{:});
-            subplot(5,1,3)
-            plot(hist.time/hr,hist.vm(:,2)*100,'r-',hist.time/hr,hist.v(:,2)./(1-hist.x(:,2))*100,'k-','LineWidth',2); axis xy tight; box on;
-            title('$\bar{v}$ [wt\% H$_2$O]',TX{:},FS{:}); set(gca,TL{:},TS{:});
-            subplot(5,1,4)
-            plot(hist.time/hr,hist.chi(:,2)*100.*(hist.chi(:,2)>1e-9),'k-','LineWidth',2); axis xy tight; box on;
-            title(['$\chi$ [vol\%]'],TX{:},FS{:}); set(gca,TL{:},TS{:});
-            subplot(5,1,5)
-            plot(hist.time/hr,hist.phi(:,2)*100.*(hist.phi(:,2)>1e-9),'k-','LineWidth',2); axis xy tight; box on;
-            title(['$\phi$ [vol\%]'],TX{:},FS{:}); set(gca,TL{:},TS{:});
-            xlabel('Time [hr]',TX{:},FS{:});
-
-            fh2 = figure(2); clf;
-
-            subplot(5,1,1)
-            plot(hist.time/hr,hist.rho(:,2),'k-','LineWidth',2); axis xy tight; box on;
-            title('$\bar{\rho}$ [kg/m$^3$]',TX{:},FS{:}); set(gca,TL{:},TS{:});
-            subplot(5,1,2)
-            plot(hist.time/hr,log10(hist.eta(:,2)),'k-','LineWidth',2); axis xy tight; box on;
-            title('$\bar{\eta}$ [log$_{10}$ Pas]',TX{:},FS{:}); set(gca,TL{:},TS{:});
-            subplot(5,1,3)
-            plot(hist.time/hr,hist.Gx(:,2)./hist.rho(:,2)*hr*100.*(hist.chi(:,2)>1e-9),'k-','LineWidth',2); axis xy tight; box on;
-            title('$\Gamma_x/\bar{\rho}$ [\%/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
-            subplot(5,1,4)
-            plot(hist.time/hr,hist.Gf(:,2)./hist.rho(:,2)*hr*100.*(hist.phi(:,2)>1e-9),'k-','LineWidth',2); axis xy tight; box on;
-            title('$\Gamma_f/\bar{\rho}$ [\%/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
-            subplot(5,1,5)
-            plot(hist.time/hr,hist.dV(:,2)*hr,'k-','LineWidth',2); axis xy tight; box on;
-            title('$\dot{V}$ [1/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
-
-            xlabel('Time [hr]',TX{:},FS{:});
-
-            fh3 = figure(3); clf;
-            subplot(5,1,1)
-            plot(hist.time/hr,hist.it(:,2),'k-','LineWidth',2); axis xy tight; box on;
-            title('incomp. trace',TX{:},FS{:}); set(gca,TL{:},TS{:});
-            subplot(5,1,2)
-            plot(hist.time/hr,hist.ct(:,2),'k-','LineWidth',2); axis xy tight; box on;
-            title('comp. trace',TX{:},FS{:}); set(gca,TL{:},TS{:});
-            subplot(5,1,3)
-            plot(hist.time/hr,hist.si(:,2),'k-','LineWidth',2); axis xy tight; box on;
-            title('stable isotope',TX{:},FS{:}); set(gca,TL{:},TS{:});
-            subplot(5,1,4)
-            plot(hist.time/hr,hist.rip(:,2),'k-','LineWidth',2); axis xy tight; box on;
-            title('radiogenic parent',TX{:},FS{:}); set(gca,TL{:},TS{:});
-            subplot(5,1,5)
-            plot(hist.time/hr,hist.rid(:,2),'k-','LineWidth',2); axis xy tight; box on;
-            title('radiogenic daughter',TX{:},FS{:}); set(gca,TL{:},TS{:});
-            xlabel('Time [hr]',TX{:},FS{:});
-        end
+        fh1 = figure(1); clf;
+        subplot(5,1,1)
+        plot(hist.time/hr,hist.T(:,2),'k-','LineWidth',2); axis xy tight; box on;
+        title('$T [^\circ$C]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+        subplot(5,1,2)
+        plot(hist.time/hr,hist.cx(:,2)*100,'b-',hist.time/hr,hist.cm(:,2)*100,'r-',hist.time/hr,hist.c(:,2)./(1-hist.f(:,2))*100,'k-','LineWidth',2); axis xy tight; box on;
+        title('$\bar{c}/(1-f)$ [wt\% SiO$_2$]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+        subplot(5,1,3)
+        plot(hist.time/hr,hist.vm(:,2)*100,'r-',hist.time/hr,hist.v(:,2)./(1-hist.x(:,2))*100,'k-','LineWidth',2); axis xy tight; box on;
+        title('$\bar{v}/(1-x)$ [wt\% H$_2$O]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+        subplot(5,1,4)
+        plot(hist.time/hr,hist.chi(:,2)*100.*(hist.chi(:,2)>1e-9),'k-','LineWidth',2); axis xy tight; box on;
+        title(['$\chi$ [vol\%]'],TX{:},FS{:}); set(gca,TL{:},TS{:});
+        subplot(5,1,5)
+        plot(hist.time/hr,hist.phi(:,2)*100.*(hist.phi(:,2)>1e-9),'k-','LineWidth',2); axis xy tight; box on;
+        title(['$\phi$ [vol\%]'],TX{:},FS{:}); set(gca,TL{:},TS{:});
+        xlabel('Time [hr]',TX{:},FS{:});
+        
+        fh2 = figure(2); clf;
+        
+        subplot(5,1,1)
+        plot(hist.time/hr,hist.rho(:,2),'k-','LineWidth',2); axis xy tight; box on;
+        title('$\bar{\rho}$ [kg/m$^3$]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+        subplot(5,1,2)
+        plot(hist.time/hr,log10(hist.eta(:,2)),'k-','LineWidth',2); axis xy tight; box on;
+        title('$\bar{\eta}$ [log$_{10}$ Pas]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+        subplot(5,1,3)
+        plot(hist.time/hr,hist.Gx(:,2)./hist.rho(:,2)*hr*100.*(hist.chi(:,2)>1e-9),'k-','LineWidth',2); axis xy tight; box on;
+        title('$\Gamma_x/\bar{\rho}$ [\%/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+        subplot(5,1,4)
+        plot(hist.time/hr,hist.Gf(:,2)./hist.rho(:,2)*hr*100.*(hist.phi(:,2)>1e-9),'k-','LineWidth',2); axis xy tight; box on;
+        title('$\Gamma_f/\bar{\rho}$ [\%/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+        subplot(5,1,5)
+        plot(hist.time/hr,hist.dV(:,2)*hr,'k-','LineWidth',2); axis xy tight; box on;
+        title('$\dot{V}$ [1/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+        
+        xlabel('Time [hr]',TX{:},FS{:});
+        
+        fh3 = figure(3); clf;
+        subplot(5,1,1)
+        plot(hist.time/hr,hist.it(:,2),'k-','LineWidth',2); axis xy tight; box on;
+        title('incomp. trace',TX{:},FS{:}); set(gca,TL{:},TS{:});
+        subplot(5,1,2)
+        plot(hist.time/hr,hist.ct(:,2),'k-','LineWidth',2); axis xy tight; box on;
+        title('comp. trace',TX{:},FS{:}); set(gca,TL{:},TS{:});
+        subplot(5,1,3)
+        plot(hist.time/hr,hist.si(:,2),'k-','LineWidth',2); axis xy tight; box on;
+        title('stable isotope',TX{:},FS{:}); set(gca,TL{:},TS{:});
+        subplot(5,1,4)
+        plot(hist.time/hr,hist.rip(:,2),'k-','LineWidth',2); axis xy tight; box on;
+        title('radiogenic parent',TX{:},FS{:}); set(gca,TL{:},TS{:});
+        subplot(5,1,5)
+        plot(hist.time/hr,hist.rid(:,2),'k-','LineWidth',2); axis xy tight; box on;
+        title('radiogenic daughter',TX{:},FS{:}); set(gca,TL{:},TS{:});
+        xlabel('Time [hr]',TX{:},FS{:});
         
     elseif Nx <= 10  % create 1D plots
         
@@ -74,10 +71,10 @@ if plot_op
         title('$T [^\circ$C]',TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(1,5,2)
         plot(mean(cx(2:end-1,2:end-1),2)*100,Z(2:end-1).','b-',mean(cm(2:end-1,2:end-1),2)*100,Z(2:end-1).','r-',mean(c(2:end-1,2:end-1)./(1-f(2:end-1,2:end-1)),2)*100,Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
-        title('$\bar{c}$ [wt\% SiO$_2$]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+        title('$\bar{c}/(1-f)$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(1,5,3)
         plot(mean(vm(2:end-1,2:end-1),2)*100,Z(2:end-1).','r-',mean(v(2:end-1,2:end-1)./(1-x(2:end-1,2:end-1)),2)*100,Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
-        title('$\bar{v}$ [wt\% H$_2$O]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+        title('$\bar{v}/(1-x)$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(1,5,4)
         plot(mean(chi(2:end-1,2:end-1),2)*100.*(mean(chi(2:end-1,2:end-1),2)>1e-9),Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
         title(['$\chi$ [vol\%]'],TX{:},FS{:}); set(gca,TL{:},TS{:});
@@ -390,16 +387,14 @@ end
 if save_op
     if plot_op
         if Nx <= 10 && Nz <= 10  % print 0D plots
-            if iter>0
-                name = [opdir,'/',runID,'/',runID,'_tch_',num2str(floor(step/nop))];
-                print(fh1,name,'-dpng','-r300','-opengl');
-                name = [opdir,'/',runID,'/',runID,'_aux_',num2str(floor(step/nop))];
-                print(fh2,name,'-dpng','-r300','-opengl');
-                name = [opdir,'/',runID,'/',runID,'_gch_',num2str(floor(step/nop))];
-                print(fh3,name,'-dpng','-r300','-opengl');
-                name = [opdir,'/',runID,'/',runID,'_eql',num2str(floor(step/nop))];
-                print(fh7,name,'-dpng','-r300','-opengl');
-            end
+            name = [opdir,'/',runID,'/',runID,'_tch_',num2str(floor(step/nop))];
+            print(fh1,name,'-dpng','-r300','-opengl');
+            name = [opdir,'/',runID,'/',runID,'_aux_',num2str(floor(step/nop))];
+            print(fh2,name,'-dpng','-r300','-opengl');
+            name = [opdir,'/',runID,'/',runID,'_gch_',num2str(floor(step/nop))];
+            print(fh3,name,'-dpng','-r300','-opengl');
+            name = [opdir,'/',runID,'/',runID,'_eql',num2str(floor(step/nop))];
+            print(fh7,name,'-dpng','-r300','-opengl');
         elseif Nx <= 10  % create 1D plots
             name = [opdir,'/',runID,'/',runID,'_tch_',num2str(floor(step/nop))];
             print(fh1,name,'-dpng','-r300','-opengl');
