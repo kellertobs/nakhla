@@ -88,14 +88,9 @@ if diseq || ~react
     
     advn_x = advection(rho.*x,Ux,Wx,h,ADVN,'flx');                         % get advection term
     
-    qxz   = - kc.*(rho(1:end-1,:)+rho(2:end,:))/2 .* ddz(x,h);             % crystal fraction diffusion z-flux
-    qxx   = - kc.*(rho(:,1:end-1)+rho(:,2:end))/2 .* ddx(x,h);             % crystal fraction diffusion x-flux
-    diff_x(2:end-1,2:end-1) = - ddz(qxz(:,2:end-1),h) ...                  % crystal fraction diffusion
-                              - ddx(qxx(2:end-1,:),h);
+    dxdt   = - advn_x + Gx;                                                % total rate of change
     
-    dxdt   = - advn_x + diff_x + Gx;                                       % total rate of change
-    
-    x = (rhoo.*xo + (THETA.*dxdt + (1-THETA).*dxdto).*dt)./rho;  % explicit update of crystal fraction
+    x = (rhoo.*xo + (THETA.*dxdt + (1-THETA).*dxdto).*dt)./rho;            % explicit update of crystal fraction
     x = min(1-f-TINY,max(TINY,x));                                         % enforce [0,1] limit
     x([1 end],:) = x([2 end-1],:);                                         % apply boundary conditions
     x(:,[1 end]) = x(:,[2 end-1]);
@@ -103,7 +98,7 @@ if diseq || ~react
 else
     
     x  =  ALPHA.*x + (1-ALPHA).*xq;
-    Gx = (rho.*x-rhoo.*xo)./dt + advection(rho.*x,Ux,Wx,h,ADVN,'flx');  % reconstruct crystallisation rate
+    Gx = (rho.*x-rhoo.*xo)./dt + advection(rho.*x,Ux,Wx,h,ADVN,'flx');     % reconstruct crystallisation rate
     
 end
 
@@ -115,23 +110,18 @@ if (diseq && any([v0;v1;vwall;v(:)]>1e-6)) || ~react
     end
     
     advn_f = advection(rho.*f,Uf,Wf,h,ADVN,'flx');                         % get advection term
-    
-    qfz   = - kc.*(rho(1:end-1,:)+rho(2:end,:))/2 .* ddz(f,h);             % bubble fraction diffusion z-flux
-    qfx   = - kc.*(rho(:,1:end-1)+rho(:,2:end))/2 .* ddx(f,h);             % bubble fraction diffusion x-flux
-    diff_f(2:end-1,2:end-1) = - ddz(qfz(:,2:end-1),h) ...                  % bubble fraction diffusion
-                              - ddx(qfx(2:end-1,:),h);
                           
-    dfdt   = - advn_f + diff_f + Gf;                                       % total rate of change
+    dfdt   = - advn_f + Gf;                                                % total rate of change
     
-    f = (rhoo.*fo + (THETA.*dfdt + (1-THETA).*dfdto).*dt)./rho;  % explicit update of bubble fraction
-    f = min(1-x-TINY,max(TINY,f));                                         % enforce [0,1-x] limit
+    f = (rhoo.*fo + (THETA.*dfdt + (1-THETA).*dfdto).*dt)./rho;            % explicit update of bubble fraction
+    f = min(1-TINY,max(TINY,f));                                           % enforce [0,1-x] limit
     f([1 end],:) = f([2 end-1],:);                                         % apply boundary conditions
     f(:,[1 end]) = f(:,[2 end-1]);
     
 else
     
     f  =  ALPHA.*f + (1-ALPHA).*fq;
-    Gf = (rho.*f-rhoo.*fo)./dt + advection(rho.*f,Uf,Wf,h,ADVN,'flx');  % reconstruct exsolution rate
+    Gf = (rho.*f-rhoo.*fo)./dt + advection(rho.*f,Uf,Wf,h,ADVN,'flx');     % reconstruct exsolution rate
     
 end
 
@@ -157,8 +147,8 @@ end
 
 % get residual of thermochemical equations from iterative update
 resnorm_TC = norm(T - Ti,2)./(norm(T,2)+TINY) ...
-           + norm(x - xi,2)./(norm(x,2)+TINY) ...
-           + norm(f - fi,2)./(norm(f,2)+TINY);
+           + norm((x - xi).*(x>1e-6),2)./(norm(x,2)+TINY) ...
+           + norm((f - fi).*(f>1e-6),2)./(norm(f,2)+TINY);
 
 
 %% ***** TRACE & ISOTOPE GEOCHEMISTRY  ************************************
