@@ -31,7 +31,6 @@ MapP = reshape(1:NP,Nz  ,Nx  );
 MapW = reshape(1:NW,Nz-1,Nx  );
 MapU = reshape(1:NU,Nz  ,Nx-1) + NW;
 
-% boundary conditions shape function
 switch bndmode
     case 0  % none
         bndshape = zeros(size(ZZ));
@@ -90,7 +89,7 @@ if Nx<=10; Pt = mean(mean(Pt(2:end-1,2:end-1))).*ones(size(Pt)); end
 
 % get volume fractions and bulk density
 ALPHA  =  1.0;
-THETA  =  1;
+THETA  =  1.0;
 res = 1;  tol = 1e-15;  x = ones(size(T));  f = v;
 while res > tol
     xi = x;  fi = f;
@@ -179,13 +178,13 @@ if restart
     dcy_rid = rho.*rid./HLRID.*log(2);
     Pto = Pt; etao = eta; rhoo = rho; Div_rhoVo = Div_rhoV;
     update; output;
-    time = time+dt;
-    step = step+1;
+    time  = time+dt;
+    step  = step+1;
 else
     update;
     fluidmech;
     history; 
     output;
-    time = time+dt;
-    step = step+1;
+    time  = time+dt;
+    step  = step+1;
 end
