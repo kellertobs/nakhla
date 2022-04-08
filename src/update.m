@@ -11,8 +11,7 @@ rho   = 1./(m./rhom + x./rhox + f./rhof);  rho([1 end],:) = rho([2 end-1],:);  r
 chi   = x.*rho./rhox;
 phi   = f.*rho./rhof;
 mu    = m.*rho./rhom;
-rhoBF =    THETA *(rho (2:end-2,2:end-1)+rho (3:end-1,2:end-1))/2 ...
-      + (1-THETA)*(rhoo(2:end-2,2:end-1)+rhoo(3:end-1,2:end-1))/2 - rhoref;  % taken at mid-point in time
+rhoBF = (rho (2:end-2,2:end-1)+rho (3:end-1,2:end-1))/2 - rhoref;
 if Nx <= 10; rhoBF = repmat(mean(rhoBF,2),1,Nx-2); end
 
 % update thermal properties
@@ -47,8 +46,7 @@ for i = 1:round(delta/5)
     eta([1 end],:) = eta([2 end-1],:);
     eta(:,[1 end]) = eta(:,[2 end-1]);
 end
-eta    = 10.^eta;
-etact  = THETA*eta + (1-THETA)*etao;                                       % effective viscosity in cell centres
+etact  = 10.^eta;
 
 etaco  = (etact(1:end-1,1:end-1)+etact(2:end,1:end-1) ...                  % effective viscosity in cell corners
        +  etact(1:end-1,2:end  )+etact(2:end,2:end  ))./4;
@@ -118,7 +116,8 @@ Div_rhoV =  + advection(rho.*f,0.*U,wf,h,ADVN,'flx') ...
             + advection(rho.*x,0.*U,wx,h,ADVN,'flx') ...
             + advection(rho.*m,0.*U,wm,h,ADVN,'flx') ...
             + advection(rho   ,U   ,W ,h,ADVN,'flx');
-VolSrc  = ALPHA.*VolSrc + (1-ALPHA).* (-((rho-rhoo)./dt + THETA*(Div_rhoV - rho.*Div_V) + (1-THETA)*Div_rhoVo)./(THETA*rho));
+% VolSrc  = ALPHA.*VolSrc + (1-ALPHA).* (-((rho-rhoo)./dt + THETA*(Div_rhoV - rho.*Div_V) + (1-THETA)*Div_rhoVo)./(THETA*rho));
+VolSrc  = ALPHA.*VolSrc + (1-ALPHA).* (-((rho-rhoo)./dt + Div_rhoV - rho.*Div_V)./rho);
 
 UBG    = - mean(mean(VolSrc(2:end-1,2:end-1)))./2 .* (L/2-XXu);
 WBG    = - mean(mean(VolSrc(2:end-1,2:end-1)))./2 .* (D/2-ZZw);

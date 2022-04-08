@@ -29,7 +29,8 @@ dsumVdt = sum(sum(bndV(2:end-1,2:end-1)*h*h*1)) ...
         + sum(  V(2,2:end-1).*W(1,2:end-1)*h*1) - sum(  V(end-1,2:end-1).*W(end,2:end-1)*h*1) ...
         + sum(  V(2:end-1,2).*U(2:end-1,1)*h*1) - sum(  V(2:end-1,end-1).*U(2:end-1,end)*h*1);  % [kg/s]
 
-if step>1; hist.DM(stp) = hist.DM(stp-1) + (THETA*dsumMdt + (1-THETA)*dsumMdto).*dt; else; hist.DM(stp) = 0; end  % [kg]
+% if step>1; hist.DM(stp) = hist.DM(stp-1) + (THETA*dsumMdt + (1-THETA)*dsumMdto).*dt; else; hist.DM(stp) = 0; end  % [kg]
+if step>1; hist.DM(stp) = hist.DM(stp-1) + dsumMdt.*dt; else; hist.DM(stp) = 0; end  % [kg]
 if step>1; hist.DH(stp) = hist.DH(stp-1) + (THETA*dsumHdt + (1-THETA)*dsumHdto).*dt; else; hist.DH(stp) = 0; end  % [J ]
 if step>1; hist.DC(stp) = hist.DC(stp-1) + (THETA*dsumCdt + (1-THETA)*dsumCdto).*dt; else; hist.DC(stp) = 0; end  % [kg]
 if step>1; hist.DV(stp) = hist.DV(stp-1) + (THETA*dsumVdt + (1-THETA)*dsumVdto).*dt; else; hist.DV(stp) = 0; end  % [kg]
