@@ -11,7 +11,8 @@ rho   = 1./(m./rhom + x./rhox + f./rhof);  rho([1 end],:) = rho([2 end-1],:);  r
 chi   = x.*rho./rhox;
 phi   = f.*rho./rhof;
 mu    = m.*rho./rhom;
-rhoBF = (rho (2:end-2,2:end-1)+rho (3:end-1,2:end-1))/2 - rhoref;
+rhoBF =    THETA .*(rho (2:end-2,2:end-1)+rho (3:end-1,2:end-1))/2 ...
+      + (1-THETA).*(rhoo(2:end-2,2:end-1)+rhoo(3:end-1,2:end-1))/2 - rhoref;
 if Nx <= 10; rhoBF = repmat(mean(rhoBF,2),1,Nx-2); end
 
 % update thermal properties
