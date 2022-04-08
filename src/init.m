@@ -53,6 +53,14 @@ bndshape(:,[1 end]) = bndshape(:,[2 end-1]);
 
 bndH = 0.*bndshape;  bndC =  0.*bndshape;  bndV =  0.*bndshape;
 
+% set specified boundaries to no slip, else to free slip
+if bndmode==4;               sds = +1;      % no slip sides for 'all sides(4)'
+else;                        sds = -1; end  % free slip sides for other types
+if bndmode==1 || bndmode>=3; top = +1;      % no slip top for 'top only(1)', 'top/bot(3)', 'all sides(4)'
+else;                        top = -1; end  % free slip for other types
+if bndmode>=2;               bot = +1;      % no slip bot for 'bot only(2)', 'top/bot(3)', 'all sides(4)'
+else;                        bot = -1; end  % free slip for other types
+
 % initialise solution fields
 T   =  T0 + (T1-T0) .* (1+erf((ZZ/D-zlay)/wlay_T))/2 + dT.*rp;  if bndinit && ~isnan(Twall); T = T + (Twall-T).*bndshape; end % temperature
 c   =  c0 + (c1-c0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dc.*rp;  if bndinit && ~isnan(cwall); c = c + (cwall-c).*bndshape; end % major component

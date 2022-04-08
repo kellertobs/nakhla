@@ -92,28 +92,25 @@ tII(:,[1 end]) = tII(:,[2 end-1]);
 tII([1 end],:) = tII([2 end-1],:);
 
 % update phase segregation speeds
-if bndmode==4; sds = -1;      % no slip for 'all sides(4)'
-else;          sds = +1; end  % free slip for other types
-
 wx = ((rhox(1:end-1,:)+rhox(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0.*((Csgr_x(1:end-1,:)+Csgr_x(2:end,:))/2); % crystal segregation speed
 for i = 1:round(delta)
     wx(2:end-1,2:end-1) = wx(2:end-1,2:end-1) + diff(wx(:,2:end-1),2,1)./8 + diff(wx(2:end-1,:),2,2)./8;
     wx([1 end],:) = 0;
-    wx(:,[1 end]) = sds*wx(:,[2 end-1]);
+    wx(:,[1 end]) = -sds*wx(:,[2 end-1]);
 end
 
 wf = any(v(:)>1e-6).*((rhof(1:end-1,:)+rhof(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0.*((Csgr_f(1:end-1,:)+Csgr_f(2:end,:))/2); % fluid segregation speed
 for i = 1:round(delta)
     wf(2:end-1,2:end-1) = wf(2:end-1,2:end-1) + diff(wf(:,2:end-1),2,1)./8 + diff(wf(2:end-1,:),2,2)./8;
     wf([1 end],:) = [fout;fin].*wf([2 end-1],:);
-    wf(:,[1 end]) = sds*wf(:,[2 end-1]);
+    wf(:,[1 end]) = -sds*wf(:,[2 end-1]);
 end
 
 wm = ((rhom(1:end-1,:)+rhom(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0.*((Csgr_m(1:end-1,:)+Csgr_m(2:end,:))/2); % melt segregation speed
 for i = 1:round(delta)
     wm(2:end-1,2:end-1) = wm(2:end-1,2:end-1) + diff(wm(:,2:end-1),2,1)./8 + diff(wm(2:end-1,:),2,2)./8;
     wm([1 end],:) = 0;
-    wm(:,[1 end]) = sds*wm(:,[2 end-1]);
+    wm(:,[1 end]) = -sds*wm(:,[2 end-1]);
 end
 
 % update volume source

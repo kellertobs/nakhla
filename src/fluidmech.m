@@ -6,15 +6,6 @@ IIR  = [];       % equation indeces into R
 AAR  = [];       % forcing entries for R
 
 
-% set specified boundaries to no slip, else to free slip
-% if bndmode==4;               sds = +1;      % no slip sides for 'all sides(4)'
-% else;                        sds = -1; end  % free slip sides for other types
-% if bndmode==1 || bndmode>=3; top = +1;      % no slip top for 'top only(1)', 'top/bot(3)', 'all sides(4)'
-% else;                        top = -1; end  % free slip for other types
-% if bndmode>=2;               bot = +1;      % no slip bot for 'bot only(2)', 'top/bot(3)', 'all sides(4)'
-% else;                        bot = -1; end  % free slip for other types
-sds = -1; top = -1; bot = -1;
-
 % assemble coefficients of z-stress divergence
     
 % left boundary
@@ -262,18 +253,16 @@ Pscale = sqrt(geomean(etact(:))/h^2);
 nzp = round((Nz-2)/2)+1;
 nxp = round((Nx-2)/2)+1;
 KP(MapP(nzp,nxp),:) = 0;
-KP(MapP(nzp,nxp),MapP(nzp,nxp)) = Pscale;
+KP(MapP(nzp,nxp),MapP(nzp,nxp)) = 1;
 RP(MapP(nzp,nxp),:) = 0;
 if bnchm; RP(MapP(nzp,nxp),:) = P_mms(nzp,nxp); end
 
 
-
 %% assemble global coefficient matrix and right-hand side vector
-LL = [ KV         -Pscale.*GG ; ...
-      -Pscale.*DD  Pscale.*KP ];
+LL = [ KV  -GG ; ...
+      -DD  KP ];
 
-RR = [RV; Pscale.*RP];
-
+RR = [RV; RP];
 
 
 %% get residual
@@ -282,19 +271,24 @@ FF         = LL*S - RR;
 resnorm_VP = norm(FF(:),2)./(norm(RR(:),2)+TINY);
 
 % map residual vector to 2D arrays
-res_W  = full(reshape(FF(MapW(:))        ,(Nz-1), Nx   ));                 % z-velocity
-res_U  = full(reshape(FF(MapU(:))        , Nz   ,(Nx-1)));                 % x-velocity
-res_P  = full(reshape(FF(MapP(:)+(NW+NU)), Nz   , Nx   ));                 % dynamic pressure
+res_W  = full(reshape(FF(MapW(:))        ,(Nz-1), Nx   ));  % z-velocity
+res_U  = full(reshape(FF(MapU(:))        , Nz   ,(Nx-1)));  % x-velocity
+res_P  = full(reshape(FF(MapP(:)+(NW+NU)), Nz   , Nx   ));  % dynamic pressure
         
 
-
 %% Solve linear system of equations for vx, vz, P
-S = LL\RR;  % update solution
+SS = sqrt(abs(diag(LL)));
+SS = diag(sparse(1./(SS+1)));
+
+LL = SS*LL*SS;
+RR = SS*RR;
+
+S = SS*(LL\RR);  % update solution
 
 % map solution vector to 2D arrays
 W  = full(reshape(S(MapW(:))        ,(Nz-1), Nx   ));                      % matrix z-velocity
 U  = full(reshape(S(MapU(:))        , Nz   ,(Nx-1)));                      % matrix x-velocity
-P  = full(reshape(S(MapP(:)+(NW+NU)), Nz   , Nx   ))*Pscale;               % matrix dynamic pressure
+P  = full(reshape(S(MapP(:)+(NW+NU)), Nz   , Nx   ));                      % matrix dynamic pressure
 
 
 % update phase velocities
