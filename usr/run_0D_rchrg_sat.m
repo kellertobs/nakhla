@@ -1,4 +1,4 @@
-clear; close all;
+clear all; close all;
 
 % set run parameters
 runID    =  '0D_rchrg_sat';      % run identifier
@@ -13,8 +13,8 @@ diseq    =  1;                   % switch on disequilibrium approac
 bnchm    =  0;                   % switch on to run manufactured solution benchmark on flui mechanics solver
 
 % set model domain parameters
-D        =  100;                 % chamber depth [m]
-L        =  100;                 % chamber width [m]
+D        =  20;                  % chamber depth [m]
+L        =  20;                  % chamber width [m]
 N        =  1 + 2;               % number of grid points in z-direction (incl. 2 ghosts)
 h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
 
@@ -32,8 +32,8 @@ smth     =  (N/30)^2;            % regularisation of initial random perturbation
 zlay     =  0.5;                 % layer thickness (relative to domain depth D)
 wlay_T   =  1e-6;                % thickness of smooth layer boundary (relative to domain depth D)
 wlay_c   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
-T0       =  780;                 % temperature top layer [deg C]
-T1       =  780;                 % temperature base layer [deg C]
+T0       =  800;                 % temperature top layer [deg C]
+T1       =  800;                 % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
 c0       =  0.70;                % major component top layer [wt SiO2]
 c1       =  0.70;                % major component base layer [wt SiO2]
@@ -91,16 +91,16 @@ Dsx      = -300;                 % entropy change of crystallisation [J/kg/K]
 Dsf      =  400;                 % entropy change of exsolution [J/kg/K]
 
 % set phase diagram parameters
-cphs0  =  0.43;                % phase diagram lower bound composition [wt SiO2]
-cphs1  =  0.78;                % phase diagram upper bound composition [wt SiO2]
-Tphs0  =  844;                 % phase diagram lower bound temperature [degC]
-Tphs1  =  1867;                % phase diagram upper bound temperature [degC]
-PhDg   =  [7.0,4.2,1.0,0.9];   % Phase diagram curvature factor (> 1)
-perCm  =  0.517;               % peritectic liquidus composition [wt SiO2]
-perCx  =  0.475;               % peritectic solidus  composition [wt SiO2]
-perT   =  1147;                % peritectic temperature [degC]
-clap   =  1e-7;                % Clapeyron slope for P-dependence of melting T [degC/Pa]
-dTH2O  =  [1200,1000,100];     % solidus shift from water content [degC/wt^0.75]
+cphs0    =  0.43;                % phase diagram lower bound composition [wt SiO2]
+cphs1    =  0.78;                % phase diagram upper bound composition [wt SiO2]
+Tphs0    =  844;                 % phase diagram lower bound temperature [degC]
+Tphs1    =  1867;                % phase diagram upper bound temperature [degC]
+PhDg     =  [7.0,4.2,1.0,0.9];   % Phase diagram curvature factor (> 1)
+perCm    =  0.517;               % peritectic liquidus composition [wt SiO2]
+perCx    =  0.475;               % peritectic solidus  composition [wt SiO2]
+perT     =  1147;                % peritectic temperature [degC]
+clap     =  1e-7;                % Clapeyron slope for P-dependence of melting T [degC/Pa]
+dTH2O    =  [1200,1000,100];     % solidus shift from water content [degC/wt^0.75]
 tau_r    =  10;                  % reaction time [s]
 
 % set model rheology parameters
@@ -122,7 +122,7 @@ aTm      =  3e-5;                % melt thermal expansivity [1/K]
 aTx      =  1e-5;                % xtal thermal expansivity [1/K]
 aTf      =  1e-4;                % mvp  thermal expansivity [1/K]
 gCm      =  0.5;                 % melt compositional expansion [1/wt]
-gCx      =  0.6;                 % xtal compositional expansion [1/wt]
+gCx      =  0.5;                 % xtal compositional expansion [1/wt]
 bPf      =  1e-8;                % mvp compressibility [1/Pa]
 dx       =  1e-3;                % crystal size [m]
 df       =  1e-3;                % bubble size [m]

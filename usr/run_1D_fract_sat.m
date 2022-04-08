@@ -1,4 +1,4 @@
-clear; close all;
+clear all; close all;
 
 % set run parameters
 runID    =  '1D_fract_sat';      % run identifier
@@ -22,9 +22,9 @@ h        =  D/(N-2);             % grid spacing (equal in both dimensions, do no
 M        =  5e4;                 % number of time steps to take
 hr       =  3600;                % conversion seconds to hours
 yr       =  24*365.25*hr;        % conversion seconds to years
-tend     =  24*hr;               % end time for simulation [s]
-dt       =  1;                   % initial time step [s]
-dtmax    =  1;                   % maximum time step [s]
+tend     =  48*hr;               % end time for simulation [s]
+dt       =  10;                  % initial time step [s]
+dtmax    =  10;                  % maximum time step [s]
 
 % set initial thermo-chemical state
 seed     =  15;                  % random perturbation seed
@@ -122,7 +122,7 @@ aTm      =  3e-5;                % melt thermal expansivity [1/K]
 aTx      =  1e-5;                % xtal thermal expansivity [1/K]
 aTf      =  1e-4;                % mvp  thermal expansivity [1/K]
 gCm      =  0.5;                 % melt compositional expansion [1/wt]
-gCx      =  0.6;                 % xtal compositional expansion [1/wt]
+gCx      =  0.5;                 % xtal compositional expansion [1/wt]
 bPf      =  1e-8;                % mvp compressibility [1/Pa]
 dx       =  1e-3;                % crystal size [m]
 df       =  1e-3;                % bubble size [m]
@@ -136,7 +136,7 @@ theta    =  0.5;                 % time-stepping parameter (1 = 1st-order implic
 rtol     =  1e-5;                % outer its relative tolerance
 atol     =  1e-7;                % outer its absolute tolerance
 maxit    =  100;                 % maximum outer its
-alpha    =  0.85;                % iterative lag parameter equilibration
+alpha    =  0.80;                % iterative lag parameter equilibration
 beta     =  0.75;                % iterative lag parameter phase diagram
 delta    =  10;                  % smoothness of segregation speed
 etamin   =  1e1;                 % minimum viscosity for stabilisation

@@ -1,10 +1,10 @@
-clear; close all;
+clear all; close all;
 
 % set run parameters
-runID    =  '2D_fract_bushveld'; % run identifier
+runID    =  '2D_fract_anh';      % run identifier
 opdir    =  '../out/';           % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
-nop      =  20;                  % output frame plotted/saved every 'nop' time steps
+nop      =  50;                  % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot of results
 save_op  =  1;                   % switch on to save output to file
 plot_cv  =  1;                   % switch on to live plot iterative convergence
@@ -13,18 +13,18 @@ diseq    =  1;                   % switch on disequilibrium approac
 bnchm    =  0;                   % switch on to run manufactured solution benchmark on flui mechanics solver
 
 % set model domain parameters
-D        =  300;                 % chamber depth [m]
-L        =  300;                 % chamber width [m]
-N        =  100 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
+D        =  10;                  % chamber depth [m]
+L        =  10;                  % chamber width [m]
+N        =  150 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
 h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
 M        =  5e4;                 % number of time steps to take
 hr       =  3600;                % conversion seconds to hours
 yr       =  24*365.25*hr;        % conversion seconds to years
-tend     =  100*24*hr;           % end time for simulation [s]
-dt       =  50;                  % initial time step [s]
-dtmax    =  50;                  % maximum time step [s]
+tend     =  48*hr;               % end time for simulation [s]
+dt       =  10;                  % initial time step [s]
+dtmax    =  10;                  % maximum time step [s]
 
 % set initial thermo-chemical state
 seed     =  15;                  % random perturbation seed
@@ -32,14 +32,14 @@ smth     =  (N/30)^2;            % regularisation of initial random perturbation
 zlay     =  0.5;                 % layer thickness (relative to domain depth D)
 wlay_T   =  1e-6;                % thickness of smooth layer boundary (relative to domain depth D)
 wlay_c   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
-T0       =  825;                 % temperature top layer [deg C]
-T1       =  825;                 % temperature base layer [deg C]
+T0       =  1250;                % temperature top layer [deg C]
+T1       =  1250;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
-c0       =  0.70;                % major component top layer [wt SiO2]
-c1       =  0.70;                % major component base layer [wt SiO2]
+c0       =  0.50;                % major component top layer [wt SiO2]
+c1       =  0.50;                % major component base layer [wt SiO2]
 dc       =  1e-4;                % amplitude of random noise [wt SiO2]
-v0       =  0.03;                % volatile component top layer [wt H2O]
-v1       =  0.03;                % volatile component base layer [wt H2O]
+v0       =  0.00;                % volatile component top layer [wt H2O]
+v1       =  0.00;                % volatile component base layer [wt H2O]
 dv       =  0e-6;                % amplitude of random noise [wt H2O]
 
 % set model trace and isotope geochemistry parameters
@@ -63,15 +63,15 @@ HLRIP    =  1e4*yr;              % radiogenic parent isotope half-life [s]
 HLRID    =  1e3*yr;              % radiogenic daughter isotope half-life [s]
 
 % set thermo-chemical boundary parameters
-Ptop     =  2e8;                 % top pressure [Pa]
+Ptop     =  1e8;                 % top pressure [Pa]
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls)
-bndinit  =  1;                   % switch on (1) to initialise with already established boundary layers
+bndinit  =  0;                   % switch on (1) to initialise with already established boundary layers
 dw       =  2*h;                 % boundary layer thickness for assimilation [m]
 fin      =  0;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
 fout     =  0;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
-tau_T    =  24*hr;               % wall cooling/assimilation time [s]
-tau_a    =  24*hr;               % wall cooling/assimilation time [s]
-Twall    =  400;                 % wall temperature [degC] (nan = insulating)
+tau_T    =  4*hr;                % wall cooling/assimilation time [s]
+tau_a    =  8*hr;                % wall cooling/assimilation time [s]
+Twall    =  500;                 % wall temperature [degC] (nan = insulating)
 cwall    =  nan;                 % wall major component [wt SiO2] (nan = no assimilation)
 vwall    =  nan;                 % wall volatile component [wt H2O] (nan = no assimilation)
 itwall   =  nan;                 % wall incomp. tracer [wt ppm] (nan = no assimilation)
@@ -122,7 +122,7 @@ aTm      =  3e-5;                % melt thermal expansivity [1/K]
 aTx      =  1e-5;                % xtal thermal expansivity [1/K]
 aTf      =  1e-4;                % mvp  thermal expansivity [1/K]
 gCm      =  0.5;                 % melt compositional expansion [1/wt]
-gCx      =  0.6;                 % xtal compositional expansion [1/wt]
+gCx      =  0.5;                 % xtal compositional expansion [1/wt]
 bPf      =  1e-8;                % mvp compressibility [1/Pa]
 dx       =  1e-3;                % crystal size [m]
 df       =  1e-3;                % bubble size [m]
@@ -139,8 +139,8 @@ maxit    =  100;                 % maximum outer its
 alpha    =  0.80;                % iterative lag parameter equilibration
 beta     =  0.75;                % iterative lag parameter phase diagram
 delta    =  10;                  % smoothness of segregation speed
-etamin   =  1e3;                 % minimum viscosity for stabilisation
-etamax   =  1e12;                % maximum viscosity for stabilisation
+etamin   =  1e1;                 % minimum viscosity for stabilisation
+etamax   =  1e8;                 % maximum viscosity for stabilisation
 TINY     =  1e-16;               % minimum cutoff phase, component fractions
 
 % create output directory

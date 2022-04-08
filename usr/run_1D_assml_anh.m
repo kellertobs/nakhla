@@ -1,4 +1,4 @@
-clear; close all;
+clear all; close all;
 
 % set run parameters
 runID    =  '1D_assml_anh';      % run identifier
@@ -122,7 +122,7 @@ aTm      =  3e-5;                % melt thermal expansivity [1/K]
 aTx      =  1e-5;                % xtal thermal expansivity [1/K]
 aTf      =  1e-4;                % mvp  thermal expansivity [1/K]
 gCm      =  0.5;                 % melt compositional expansion [1/wt]
-gCx      =  0.6;                 % xtal compositional expansion [1/wt]
+gCx      =  0.5;                 % xtal compositional expansion [1/wt]
 bPf      =  1e-8;                % mvp compressibility [1/Pa]
 dx       =  1e-3;                % crystal size [m]
 df       =  1e-3;                % bubble size [m]

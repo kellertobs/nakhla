@@ -1,4 +1,4 @@
-clear; close all;
+clear all; close all;
 
 % set run parameters
 runID    =  '1D_rchrg_sat';      % run identifier
@@ -13,8 +13,8 @@ diseq    =  1;                   % switch on disequilibrium approac
 bnchm    =  0;                   % switch on to run manufactured solution benchmark on flui mechanics solver
 
 % set model domain parameters
-D        =  100;                 % chamber depth [m]
-L        =  0.5;                 % chamber width [m]
+D        =  20;                  % chamber depth [m]
+L        =  0.1;                 % chamber width [m]
 N        =  200 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
 h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
 
@@ -22,7 +22,7 @@ h        =  D/(N-2);             % grid spacing (equal in both dimensions, do no
 M        =  5e4;                 % number of time steps to take
 hr       =  3600;                % conversion seconds to hours
 yr       =  24*365.25*hr;        % conversion seconds to years
-tend     =  24*hr;               % end time for simulation [s]
+tend     =  48*hr;               % end time for simulation [s]
 dt       =  50;                  % initial time step [s]
 dtmax    =  50;                  % maximum time step [s]
 
@@ -32,8 +32,8 @@ smth     =  (N/30)^2;            % regularisation of initial random perturbation
 zlay     =  0.5;                 % layer thickness (relative to domain depth D)
 wlay_T   =  1e-6;                % thickness of smooth layer boundary (relative to domain depth D)
 wlay_c   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
-T0       =  780;                 % temperature top layer [deg C]
-T1       =  780;                 % temperature base layer [deg C]
+T0       =  800;                 % temperature top layer [deg C]
+T1       =  800;                 % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
 c0       =  0.70;                % major component top layer [wt SiO2]
 c1       =  0.70;                % major component base layer [wt SiO2]
@@ -71,7 +71,7 @@ fin      =  0;                   % ingassing factor (0 = no ingassing; 1 = free 
 fout     =  1;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
 tau_T    =  4*hr;                % wall cooling/assimilation time [s]
 tau_a    =  2*hr;                % wall cooling/assimilation time [s]
-Twall    =  1250;                % wall temperature [degC] (nan = insulating)
+Twall    =  1200;                % wall temperature [degC] (nan = insulating)
 cwall    =  0.49;                % wall major component [wt SiO2] (nan = no assimilation)
 vwall    =  0.04;                % wall volatile component [wt H2O] (nan = no assimilation)
 itwall   =  0.1;                 % wall incomp. tracer [wt ppm] (nan = no assimilation)
@@ -122,7 +122,7 @@ aTm      =  3e-5;                % melt thermal expansivity [1/K]
 aTx      =  1e-5;                % xtal thermal expansivity [1/K]
 aTf      =  1e-4;                % mvp  thermal expansivity [1/K]
 gCm      =  0.5;                 % melt compositional expansion [1/wt]
-gCx      =  0.6;                 % xtal compositional expansion [1/wt]
+gCx      =  0.5;                 % xtal compositional expansion [1/wt]
 bPf      =  1e-8;                % mvp compressibility [1/Pa]
 dx       =  1e-3;                % crystal size [m]
 df       =  1e-3;                % bubble size [m]
@@ -139,8 +139,8 @@ maxit    =  100;                 % maximum outer its
 alpha    =  0.80;                % iterative lag parameter equilibration
 beta     =  0.75;                % iterative lag parameter phase diagram
 delta    =  10;                  % smoothness of segregation speed
-etamin   =  1e1;                 % minimum viscosity for stabilisation
-etamax   =  1e8;                 % maximum viscosity for stabilisation
+etamin   =  1e2;                 % minimum viscosity for stabilisation
+etamax   =  1e9;                 % maximum viscosity for stabilisation
 TINY     =  1e-16;               % minimum cutoff phase, component fractions
 
 % create output directory
