@@ -39,7 +39,7 @@ aTm      =  3e-5;                % melt thermal expansivity [1/K]
 aTx      =  1e-5;                % xtal thermal expansivity [1/K]
 aTf      =  1e-4;                % mvp  thermal expansivity [1/K]
 gCm      =  0.5;                 % melt compositional expansion [1/wt]
-gCx      =  0.6;                 % xtal compositional expansion [1/wt]
+gCx      =  0.5;                 % xtal compositional expansion [1/wt]
 bPf      =  1e-8;                % mvp compressibility [1/Pa]
 dx       =  1e-3;                % crystal size [m]
 df       =  1e-3;                % bubble size [m]
@@ -48,8 +48,8 @@ g0       =  10.;                 % gravity [m/s2]
 
 % set ranges for control variables T, c, v, P
 T = linspace(500,1600,1e3);    % temperature range [degC]
-c = linspace(0.70,0.70,1e3);   % major component range [wt SiO2]
-v = linspace(0.02,0.02,1e3);   % volatile component range [wt H2O]
+c = linspace(0.50,0.50,1e3);   % major component range [wt SiO2]
+v = linspace(0.0,0.0,1e3);   % volatile component range [wt H2O]
 P = linspace(100,100,1e3)*1e6; % pressure range [Pa]
 
 % equilibrium phase fractions and compositions
