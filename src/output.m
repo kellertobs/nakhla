@@ -31,7 +31,7 @@ if plot_op
         plot(hist.time/hr,hist.rho(:,2),'k-','LineWidth',2); axis xy tight; box on;
         title('$\bar{\rho}$ [kg/m$^3$]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(5,1,2)
-        plot(hist.time/hr,log10(hist.eta(:,2)),'k-','LineWidth',2); axis xy tight; box on;
+        plot(hist.time/hr,log10(hist.etact(:,2)),'k-','LineWidth',2); axis xy tight; box on;
         title('$\bar{\eta}$ [log$_{10}$ Pas]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(5,1,3)
         plot(hist.time/hr,hist.Gx(:,2)./hist.rho(:,2)*hr*100.*(hist.chi(:,2)>1e-9),'k-','LineWidth',2); axis xy tight; box on;
@@ -104,7 +104,7 @@ if plot_op
         plot(mean(rho(2:end-1,2:end-1),2),Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
         title('$\bar{\rho}$ [kg/m$^3$]',TX{:},FS{:}); ylabel('Depth [km]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(1,5,2)
-        plot(mean(log10(eta(2:end-1,2:end-1)),2),Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
+        plot(mean(log10(etact(2:end-1,2:end-1)),2),Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
         title('$\bar{\eta}$ [log$_{10}$ Pas]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(1,5,3)
         plot(mean(Gx(2:end-1,2:end-1)./rho(2:end-1,2:end-1),2)*100*hr.*(mean(chi(2:end-1,2:end-1),2)>1e-9),Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
@@ -238,8 +238,8 @@ if plot_op
     imagesc(X(2:end-1),Z(2:end-1),T(2:end-1,2:end-1)     ); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$T [^\circ$C]'],TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:});
     axes(ax(22));
-    imagesc(X(2:end-1),Z(2:end-1),c(2:end-1,2:end-1).*100); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\bar{c}$ [wt\% SiO$_2$]'],TX{:},FS{:}); set(gca,'YTickLabel',[]); xlabel('Width [m]',TX{:},FS{:});
+    imagesc(X(2:end-1),Z(2:end-1),c(2:end-1,2:end-1)./(1-f(2:end-1,2:end-1)).*100); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\bar{c}/(1-f)$ [wt\% SiO$_2$]'],TX{:},FS{:}); set(gca,'YTickLabel',[]); xlabel('Width [m]',TX{:},FS{:});
     axes(ax(23));
     imagesc(X(2:end-1),Z(2:end-1),v(2:end-1,2:end-1).*100); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\bar{v}$ [wt\% H$_2$O]'],TX{:},FS{:}); set(gca,'YTickLabel',[]);
@@ -267,7 +267,7 @@ if plot_op
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\bar{\rho}$ [kg/m$^3$]'],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel('Depth [m]',TX{:},FS{:});
     text(L/2,0.9*D,['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','w','VerticalAlignment','middle','HorizontalAlignment','center');
     axes(ax(42));
-    imagesc(X(2:end-1),Z(2:end-1),log10(eta(2:end-1,2:end-1))); axis ij equal tight; box on; cb = colorbar;
+    imagesc(X(2:end-1),Z(2:end-1),log10(etact(2:end-1,2:end-1))); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\bar{\eta}$ [log$_{10}$ Pas]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
     axes(ax(43));
     imagesc(X(2:end-1),Z(2:end-1),-(chi(1:end-1,2:end-1)+chi(2:end,2:end-1))/2.*wx(:,2:end-1).*hr); axis ij equal tight; box on; cb = colorbar;
@@ -348,7 +348,7 @@ if plot_op
     
     % plot model history
     if plot_cv
-        fh9 = figure(9); clf;
+        figure(8); clf;
         subplot(4,1,1);
         plot(hist.time/hr,hist.DM./hist.sumM,'k-','LineWidth',2); hold on; axis tight; box on;
         ylabel('consv. $M$',TX{:},FS{:}); set(gca,TL{:},TS{:},'XTickLabel',[]);
@@ -363,7 +363,7 @@ if plot_op
         ylabel('consv. $V$',TX{:},FS{:}); set(gca,TL{:},TS{:});
         xlabel('Time [hr]',TX{:},FS{:});
         
-        fh10 = figure(10); clf;
+        figure(9); clf;
         subplot(4,1,1);
         plot(hist.time/hr,hist.EM,'k-','LineWidth',2); hold on; axis tight; box on;
         ylabel('error $M$',TX{:},FS{:}); set(gca,TL{:},TS{:},'XTickLabel',[]);
@@ -434,5 +434,5 @@ if save_op
     end
 end
 
-clear fh1 fh2 fh3 fh4 fh5 fh6 fh7 fh8 fh9 fh10
+clear fh1 fh2 fh3 fh4 fh5 fh6 fh7
     
