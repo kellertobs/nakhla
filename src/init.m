@@ -189,10 +189,13 @@ if restart
     time  = time+dt;
     step  = step+1;
 else
-    update;
-    fluidmech;
-    history; 
-    output;
+    % update coefficients and run initial fluidmech solve
+    if ~bnchm
+        update; 
+        fluidmech; 
+        history; 
+        output;
+    end
     time  = time+dt;
     step  = step+1;
 end

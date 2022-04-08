@@ -91,59 +91,60 @@ kTf      =  0.02;                % mvp  thermal conductivity [W/m/k]
 Cpm      =  1400;                % melt heat capacity [J/kg/K]
 Cpx      =  1000;                % xtal heat capacity [J/kg/K]
 Cpf      =  2000;                % mvp  heat capacity [J/kg/K]
-
-% set model phase equilibrium parameters
-cphs0    =  0.36;                % phase diagram lower bound composition [wt SiO2]
-cphs1    =  0.72;                % phase diagram upper bound composition [wt SiO2]
-Tphs0    =  750;                 % phase diagram lower bound temperature [degC]
-Tphs1    =  1750;                % phase diagram upper bound temperature [degC]
-PhDg     =  5.0;                 % Phase diagram curvature factor (> 1)
-perCm    =  0.51;                % peritectic liquidus composition [wt SiO2]
-perCx    =  0.48;                % peritectic solidus  composition [wt SiO2]
-perT     =  1100;                % peritectic temperature [degC]
-clap     =  1e-7;                % Clapeyron slope for P-dependence of melting T [degC/Pa]
-dTH2O    =  [1300,1000,300];     % solidus shift from water content [degC/wt^0.75]
-tau_r    =  60;                  % reaction time [s]
 Dsx      = -300;                 % entropy change of crystallisation [J/kg/K]
 Dsf      =  400;                 % entropy change of exsolution [J/kg/K]
 
+% set phase diagram parameters
+cphs0    =  0.43;                % phase diagram lower bound composition [wt SiO2]
+cphs1    =  0.78;                % phase diagram upper bound composition [wt SiO2]
+Tphs0    =  844;                 % phase diagram lower bound temperature [degC]
+Tphs1    =  1867;                % phase diagram upper bound temperature [degC]
+PhDg     =  [7.0,4.2,1.0,0.9];   % Phase diagram curvature factor (> 1)
+perCm    =  0.517;               % peritectic liquidus composition [wt SiO2]
+perCx    =  0.475;               % peritectic solidus  composition [wt SiO2]
+perT     =  1147;                % peritectic temperature [degC]
+clap     =  1e-7;                % Clapeyron slope for P-dependence of melting T [degC/Pa]
+dTH2O    =  [1200,1000,100];     % solidus shift from water content [degC/wt^0.75]
+tau_r    =  10;                  % reaction time [s]
+
 % set model rheology parameters
-etam0    =  100;                 % melt viscosity [Pas]
+etam0    =  300;                 % melt viscosity [Pas]
 etaf0    =  0.1;                 % fluid viscosity [Pas]
 etax0    =  1e15;                % crystal viscosity [Pas]
-Fmc      =  1e+4;                % major component weakening factor of melt viscosity [1]
-Fmv      =  0.5;                 % volatile component weakening factor of melt viscosity [1]
-Em       =  150e3;               % activation energy melt viscosity [J/mol]
+Fmc      =  5e+5;                % major component weakening factor of melt viscosity [1]
+Fmv      =  0.6;                 % volatile component weakening factor of melt viscosity [1]
+Em       =  175e3;               % activation energy melt viscosity [J/mol]
 AA       = [ 0.60, 0.25, 0.30; 0.20, 0.20, 0.20; 0.20, 0.20, 0.20; ];  % permission slopes
 BB       = [ 0.30, 0.15, 0.55; 0.48, 0.02, 0.50; 0.80, 0.08, 0.12; ];  % permission step locations
 CC       = [ 0.20, 0.20, 0.20; 0.60, 0.60, 0.12; 0.20, 0.25, 0.50; ];  % permission step widths
 
 % set model buoyancy parameters
-rhom0    =  2900;                % melt phase ref. density [kg/m3] (at T0,cphs0,Ptop)
-rhox0    =  3300;                % crystal phase ref. density [kg/m3] (at T0,cphs0,Ptop)
+rhom0    =  2750;                % melt phase ref. density [kg/m3] (at T0,cphs0,Ptop)
+rhox0    =  3050;                % crystal phase ref. density [kg/m3] (at T0,cphs0,Ptop)
 rhof0    =  500;                 % bubble phase ref. density [kg/m3] (at T0,cphs0,Ptop)
 aTm      =  3e-5;                % melt thermal expansivity [1/K]
 aTx      =  1e-5;                % xtal thermal expansivity [1/K]
 aTf      =  1e-4;                % mvp  thermal expansivity [1/K]
 gCm      =  0.5;                 % melt compositional expansion [1/wt]
-gCx      =  0.6;                 % xtal compositional expansion [1/wt]
+gCx      =  0.5;                 % xtal compositional expansion [1/wt]
 bPf      =  1e-8;                % mvp compressibility [1/Pa]
-dx       =  1e-9;                % crystal size [m]
-df       =  1e-9;                % bubble size [m]
-dm       =  1e-9;                % melt film size [m]
+dx       =  1e-3;                % crystal size [m]
+df       =  1e-3;                % bubble size [m]
+dm       =  1e-4;                % melt film size [m]
 g0       =  10.;                 % gravity [m/s2]
 
 % set numerical model parameters
-CFL      =  0.25;                % (physical) time stepping courant number (multiplies stable step) [0,1]
+CFL      =  0.5;                 % (physical) time stepping courant number (multiplies stable step) [0,1]
 ADVN     =  'FRM';               % advection scheme ('UPW2', 'UPW3', or 'FRM')
-rtol     =  1e-9;                % outer its relative tolerance
-atol     =  1e-6;                % outer its absolute tolerance
+theta    =  0.5;                 % time-stepping parameter (1 = 1st-order implicit; 1/2 = 2nd-order semi-implicit)
+rtol     =  1e-3;                % outer its relative tolerance
+atol     =  1e-7;                % outer its absolute tolerance
 maxit    =  100;                 % maximum outer its
-alpha    =  0.75;                % iterative lag parameter equilibration
-beta     =  0.50;                % iterative lag parameter phase diagram
-delta    =  20;                  % smoothness of segregation speed
+alpha    =  0.80;                % iterative lag parameter equilibration
+beta     =  0.75;                % iterative lag parameter phase diagram
+delta    =  10;                  % smoothness of segregation speed
 etamin   =  1e1;                 % minimum viscosity for stabilisation
-etamax   =  1e7;                 % maximum viscosity for stabilisation
+etamax   =  1e8;                 % maximum viscosity for stabilisation
 TINY     =  1e-16;               % minimum cutoff phase, component fractions
 
 % create output directory

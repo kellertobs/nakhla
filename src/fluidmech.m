@@ -142,7 +142,7 @@ RV = sparse(IIR,ones(size(IIR)),AAR);
 
 
 %% assemble coefficients for gradient operator
-if ~exist('GG','var')
+if ~exist('GG','var') || bnchm
     IIL  = [];       % equation indeces into A
     JJL  = [];       % variable indeces into A
     AAL  = [];       % coefficients for A
@@ -176,7 +176,7 @@ end
 
 
 %% assemble coefficients for divergence operator
-if ~exist('DD','var')
+if ~exist('DD','var') || bnchm
     IIL  = [];       % equation indeces into A
     JJL  = [];       % variable indeces into A
     AAL  = [];       % coefficients for A
@@ -200,7 +200,7 @@ end
 
 
 %% assemble coefficients for matrix pressure diagonal and right-hand side
-if ~exist('KP','var')
+if ~exist('KP','var') || bnchm
     IIL  = [];       % equation indeces into A
     JJL  = [];       % variable indeces into A
     AAL  = [];       % coefficients for A
