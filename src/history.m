@@ -122,9 +122,9 @@ hist.rho(stp,1) = min(min(rho(2:end-1,2:end-1)));
 hist.rho(stp,2) = mean(mean(rho(2:end-1,2:end-1)));
 hist.rho(stp,3) = max(max(rho(2:end-1,2:end-1)));
 
-hist.eta(stp,1) = min(min(eta(2:end-1,2:end-1)));
-hist.eta(stp,2) = geomean(geomean(eta(2:end-1,2:end-1)));
-hist.eta(stp,3) = max(max(eta(2:end-1,2:end-1)));
+hist.eta(stp,1) = min(min(etact(2:end-1,2:end-1)));
+hist.eta(stp,2) = geomean(geomean(etact(2:end-1,2:end-1)));
+hist.eta(stp,3) = max(max(etact(2:end-1,2:end-1)));
 
 hist.wx(stp,1) = min(min(-(chi(1:end-1,2:end-1)+chi(2:end,2:end-1))/2.*wx(:,2:end-1)));
 hist.wx(stp,2) = mean(mean(abs((chi(1:end-1,2:end-1)+chi(2:end,2:end-1))/2.*wx(:,2:end-1))));

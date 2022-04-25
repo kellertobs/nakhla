@@ -31,7 +31,7 @@ if plot_op
         plot(hist.time/hr,hist.rho(:,2),'k-','LineWidth',2); axis xy tight; box on;
         title('$\bar{\rho}$ [kg/m$^3$]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(5,1,2)
-        plot(hist.time/hr,log10(hist.etact(:,2)),'k-','LineWidth',2); axis xy tight; box on;
+        plot(hist.time/hr,log10(hist.eta(:,2)),'k-','LineWidth',2); axis xy tight; box on;
         title('$\bar{\eta}$ [log$_{10}$ Pas]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(5,1,3)
         plot(hist.time/hr,hist.Gx(:,2)./hist.rho(:,2)*hr*100.*(hist.chi(:,2)>1e-9),'k-','LineWidth',2); axis xy tight; box on;
