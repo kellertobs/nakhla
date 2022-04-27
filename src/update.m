@@ -39,16 +39,9 @@ Xf = sum(AA.*Sf,2).*FF + (1-sum(AA.*Sf,2)).*Sf;
 thtv = squeeze(prod(Mv.^Xf,2));
 
 % get effective viscosity
-eta    = squeeze(sum(ff.*kv.*thtv,1));                                                  
-eta    = (1./etamax + 1./eta).^-1 + etamin;                                % limit viscosity range
-eta    = log10(eta);
-for i = 1:round(delta/5)
-    eta(2:end-1,2:end-1) = eta(2:end-1,2:end-1) + diff(eta(:,2:end-1),2,1)./8 + diff(eta(2:end-1,:),2,2)./8;
-    eta([1 end],:) = eta([2 end-1],:);
-    eta(:,[1 end]) = eta(:,[2 end-1]);
-end
-etact  = 10.^eta;
-
+eta    = squeeze(sum(ff.*kv.*thtv,1));                                   
+eta    = (1./etamax + 1./eta).^-1 + etamin;
+etact  = eta;
 etaco  = (etact(1:end-1,1:end-1)+etact(2:end,1:end-1) ...                  % effective viscosity in cell corners
        +  etact(1:end-1,2:end  )+etact(2:end,2:end  ))./4;
 
@@ -91,24 +84,27 @@ tII(:,[1 end]) = tII(:,[2 end-1]);
 tII([1 end],:) = tII([2 end-1],:);
 
 % update phase segregation speeds
-wx = ((rhox(1:end-1,:)+rhox(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0.*((Csgr_x(1:end-1,:)+Csgr_x(2:end,:))/2); % crystal segregation speed
+wx = ((rhox(1:end-1,:)+rhox(2:end,:))/2-rhoref)*g0.*((Csgr_x(1:end-1,:)+Csgr_x(2:end,:))/2); % crystal segregation speed
+if top==1; wx(1  ,:) = 0; end
+if bot==1; wx(end,:) = 0; end
 for i = 1:round(delta)
     wx(2:end-1,2:end-1) = wx(2:end-1,2:end-1) + diff(wx(:,2:end-1),2,1)./8 + diff(wx(2:end-1,:),2,2)./8;
-    wx([1 end],:) = 0;
     wx(:,[1 end]) = -sds*wx(:,[2 end-1]);
 end
 
-wf = any(v(:)>1e-6).*((rhof(1:end-1,:)+rhof(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0.*((Csgr_f(1:end-1,:)+Csgr_f(2:end,:))/2); % fluid segregation speed
+wf = any(v(:)>1e-6).*((rhof(1:end-1,:)+rhof(2:end,:))/2-rhoref)*g0.*((Csgr_f(1:end-1,:)+Csgr_f(2:end,:))/2); % fluid segregation speed
+if top==1; wf(1  ,:) = fout.*wf(1  ,:); end
+if bot==1; wf(end,:) = fin .*wf(end,:); end
 for i = 1:round(delta)
     wf(2:end-1,2:end-1) = wf(2:end-1,2:end-1) + diff(wf(:,2:end-1),2,1)./8 + diff(wf(2:end-1,:),2,2)./8;
-    wf([1 end],:) = [fout;fin].*wf([2 end-1],:);
     wf(:,[1 end]) = -sds*wf(:,[2 end-1]);
 end
 
-wm = ((rhom(1:end-1,:)+rhom(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0.*((Csgr_m(1:end-1,:)+Csgr_m(2:end,:))/2); % melt segregation speed
+wm = ((rhom(1:end-1,:)+rhom(2:end,:))/2-rhoref)*g0.*((Csgr_m(1:end-1,:)+Csgr_m(2:end,:))/2); % melt segregation speed
+if top==1; wm(1  ,:) = 0; end
+if bot==1; wm(end,:) = 0; end
 for i = 1:round(delta)
     wm(2:end-1,2:end-1) = wm(2:end-1,2:end-1) + diff(wm(:,2:end-1),2,1)./8 + diff(wm(2:end-1,:),2,2)./8;
-    wm([1 end],:) = 0;
     wm(:,[1 end]) = -sds*wm(:,[2 end-1]);
 end
 
