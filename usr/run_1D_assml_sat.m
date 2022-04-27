@@ -66,7 +66,7 @@ HLRID    =  1e3*yr;              % radiogenic daughter isotope half-life [s]
 Ptop     =  1e8;                 % top pressure [Pa]
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls)
 bndinit  =  0;                   % switch on (1) to initialise with already established boundary layers
-dw       =  2*h;                 % boundary layer thickness for assimilation [m]
+dw       =  1*h;                 % boundary layer thickness for assimilation [m]
 fin      =  0;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
 fout     =  1;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
 tau_T    =  4*hr;                % wall cooling/assimilation time [s]
@@ -138,7 +138,7 @@ atol     =  1e-7;                % outer its absolute tolerance
 maxit    =  100;                 % maximum outer its
 alpha    =  0.80;                % iterative lag parameter equilibration
 beta     =  0.75;                % iterative lag parameter phase diagram
-delta    =  10;                  % smoothness of segregation speed
+delta    =  5;                  % smoothness of segregation speed
 etamin   =  1e1;                 % minimum viscosity for stabilisation
 etamax   =  1e8;                 % maximum viscosity for stabilisation
 TINY     =  1e-16;               % minimum cutoff phase, component fractions

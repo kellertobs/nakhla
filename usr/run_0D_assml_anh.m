@@ -66,7 +66,7 @@ HLRID    =  1e3*yr;              % radiogenic daughter isotope half-life [s]
 Ptop     =  1e8;                 % top pressure [Pa]
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls)
 bndinit  =  0;                   % switch on (1) to initialise with already established boundary layers
-dw       =  2*h;                 % boundary layer thickness for assimilation [m]
+dw       =  1*h;                 % boundary layer thickness for assimilation [m]
 fin      =  0;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
 fout     =  0;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
 tau_T    =  4*hr;                % wall cooling/assimilation time [s]
