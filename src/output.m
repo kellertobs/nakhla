@@ -15,7 +15,7 @@ if plot_op
         plot(hist.time/hr,hist.cx(:,2)*100,'b-',hist.time/hr,hist.cm(:,2)*100,'r-',hist.time/hr,hist.c(:,2)./(1-hist.f(:,2))*100,'k-','LineWidth',2); axis xy tight; box on;
         title('$\bar{c}/(1-f)$ [wt\% SiO$_2$]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(5,1,3)
-        semilogy(hist.time/hr,hist.vf(:,2)*100,'b-',max(1e-6,hist.vm(:,2)*100),'r-',hist.time/hr,max(1e-6,hist.v(:,2)./(1-hist.x(:,2))*100),'k-','LineWidth',2); axis xy tight; box on;
+        semilogy(hist.time/hr,max(1e-6,hist.vf(:,2)*100),'b-',hist.time/hr,max(1e-6,hist.vm(:,2)*100),'r-',hist.time/hr,max(1e-6,hist.v(:,2)./(1-hist.x(:,2))*100),'k-','LineWidth',2); axis xy tight; box on;
         title('$\bar{v}/(1-x)$ [wt\% H$_2$O]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(5,1,4)
         plot(hist.time/hr,hist.chi(:,2)*100.*(hist.chi(:,2)>1e-9),'k-','LineWidth',2); axis xy tight; box on;
