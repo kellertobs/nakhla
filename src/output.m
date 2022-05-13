@@ -15,7 +15,7 @@ if plot_op
         plot(hist.time/hr,hist.cx(:,2)*100,'b-',hist.time/hr,hist.cm(:,2)*100,'r-',hist.time/hr,hist.c(:,2)./(1-hist.f(:,2))*100,'k-','LineWidth',2); axis xy tight; box on;
         title('$\bar{c}/(1-f)$ [wt\% SiO$_2$]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(5,1,3)
-        plot(hist.time/hr,hist.vm(:,2)*100,'r-',hist.time/hr,hist.v(:,2)./(1-hist.x(:,2))*100,'k-','LineWidth',2); axis xy tight; box on;
+        semilogy(hist.time/hr,hist.vf(:,2)*100,'b-',max(1e-6,hist.vm(:,2)*100),'r-',hist.time/hr,max(1e-6,hist.v(:,2)./(1-hist.x(:,2))*100),'k-','LineWidth',2); axis xy tight; box on;
         title('$\bar{v}/(1-x)$ [wt\% H$_2$O]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(5,1,4)
         plot(hist.time/hr,hist.chi(:,2)*100.*(hist.chi(:,2)>1e-9),'k-','LineWidth',2); axis xy tight; box on;
@@ -73,7 +73,7 @@ if plot_op
         plot(mean(cx(2:end-1,2:end-1),2)*100,Z(2:end-1).','b-',mean(cm(2:end-1,2:end-1),2)*100,Z(2:end-1).','r-',mean(c(2:end-1,2:end-1)./(1-f(2:end-1,2:end-1)),2)*100,Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
         title('$\bar{c}/(1-f)$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(1,5,3)
-        plot(mean(vm(2:end-1,2:end-1),2)*100,Z(2:end-1).','r-',mean(v(2:end-1,2:end-1)./(1-x(2:end-1,2:end-1)),2)*100,Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
+        semilogx(mean(vf(2:end-1,2:end-1),2)*100,Z(2:end-1).','b-',mean(max(1e-6,vm(2:end-1,2:end-1)*100),2),Z(2:end-1).','r-',mean(max(1e-6,v(2:end-1,2:end-1)./(1-x(2:end-1,2:end-1))*100),2),Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
         title('$\bar{v}/(1-x)$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(1,5,4)
         plot(mean(chi(2:end-1,2:end-1),2)*100.*(mean(chi(2:end-1,2:end-1),2)>1e-9),Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
@@ -83,19 +83,16 @@ if plot_op
         title(['$\phi$ [vol\%]'],TX{:},FS{:}); set(gca,TL{:},TS{:});
  
         fh2 = figure(2); clf;
-        subplot(1,5,1)
+        subplot(1,4,1)
         plot(mean(-W(:,2:end-1),2)*hr,Zfc.','k-','LineWidth',2); axis ij tight; box on;
         title('$W$ [m/hr]',TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:}); set(gca,TL{:},TS{:});
-        subplot(1,5,2)
+        subplot(1,4,2)
         plot(mean(-(x(1:end-1,2:end-1)+x(2:end,2:end-1))/2.*wx(:,2:end-1),2)*hr,Zfc.','k-','LineWidth',2); axis ij tight; box on;
         title('$w_\Delta^x$ [m/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
-        subplot(1,5,3)
+        subplot(1,4,3)
         plot(mean(-(f(1:end-1,2:end-1)+f(2:end,2:end-1))/2.*wf(:,2:end-1),2)*hr,Zfc.','k-','LineWidth',2); axis ij tight; box on;
         title('$w_\Delta^f$ [m/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
-        subplot(1,5,4)
-        plot(mean(-(m(1:end-1,2:end-1)+m(2:end,2:end-1))/2.*wm(:,2:end-1),2)*hr,Zfc.','k-','LineWidth',2); axis ij tight; box on;
-        title('$w_\Delta^m$ [m/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
-        subplot(1,5,5)
+        subplot(1,4,4)
         plot(mean(P(2:end-1,2:end-1),2)/1e3,Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
         title('$P$ [kPa]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         
