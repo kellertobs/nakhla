@@ -7,32 +7,6 @@ holdfig   = 0;                           % set to 1 to hold figures, to 0 for ne
 linestyle = '-';                         % set line style for plots
 save_plot = 0;                           % turn on (1) to save output file in /out directory
 
-% set model rheology parameters
-etam0    =  100;                 % melt viscosity [Pas]
-etaf0    =  0.1;                 % fluid viscosity [Pas]
-etax0    =  1e15;                % crystal viscosity [Pas]
-Fmc      =  1e+4;                % major component weakening factor of melt viscosity [1]
-Fmv      =  0.5;                 % volatile component weakening factor of melt viscosity [1]
-Em       =  150e3;               % activation energy melt viscosity [J/mol]
-AA       = [ 0.60, 0.25, 0.30; 0.20, 0.20, 0.20; 0.20, 0.20, 0.20; ];  % permission slopes
-BB       = [ 0.30, 0.15, 0.55; 0.48, 0.02, 0.50; 0.80, 0.08, 0.12; ];  % permission step locations
-CC       = [ 0.20, 0.20, 0.20; 0.60, 0.60, 0.12; 0.20, 0.25, 0.50; ];  % permission step widths
-
-% set model buoyancy parameters
-rhom0    =  2860;                % melt phase ref. density [kg/m3] (at T0,cphs0,Ptop)
-rhox0    =  3300;                % crystal phase ref. density [kg/m3] (at T0,cphs0,Ptop)
-rhof0    =  500;                 % bubble phase ref. density [kg/m3] (at T0,cphs0,Ptop)
-aTm      =  3e-5;                % melt thermal expansivity [1/K]
-aTx      =  1e-5;                % xtal thermal expansivity [1/K]
-aTf      =  1e-4;                % mvp  thermal expansivity [1/K]
-gCm      =  0.5;                 % melt compositional expansion [1/wt]
-gCx      =  0.6;                 % xtal compositional expansion [1/wt]
-bPf      =  1e-8;                % mvp compressibility [1/Pa]
-dx       =  1e-3;                % crystal size [m]
-df       =  1e-3;                % bubble size [m]
-dm       =  1e-4;                % melt film size [m]
-g0       =  3.72;                % gravity [m/s2]
-
 % Load MELTS tables in csv format
 mars_mafic_liquid = load('./mars_mafic/Liquid_comp_tbl.csv');   % output file of MELTS for Krafla mafic comp
 mars_mafic_solid  = load('./mars_mafic/Solid_comp_tbl.csv');   % output file of MELTS for Krafla mafic comp
@@ -95,14 +69,14 @@ cphs1_bst  =  0.81;                % phase diagram upper bound composition [wt S
 Tphs0_bst  =  825;                 % phase diagram lower bound temperature [degC]
 Tphs1_bst  =  1742;                % phase diagram upper bound temperature [degC]
 PhDg_bst   =  [5.7,3.5,1.0,1.6];   % Phase diagram curvature factor (> 1)
-perCm_bst  =  0.51;                % peritectic liquidus composition [wt SiO2]
-perCx_bst  =  0.48;                % peritectic solidus  composition [wt SiO2]
+perCm_bst  =  0.515;                % peritectic liquidus composition [wt SiO2]
+perCx_bst  =  0.475;                % peritectic solidus  composition [wt SiO2]
 perT_bst   =  1106;                % peritectic temperature [degC]
 clap       =  1e-7;                % Clapeyron slope for P-dependence of melting T [degC/Pa]
 dTH2O      =  [1300,1100,0];        % solidus shift from water content [degC/wt^0.75]
 beta       =  0.9;                % iterative lag parameter phase diagram [1]
 
-misfit  = 1e3; tol = 1e-1;
+misfit  = 1e3; tol = 1e-0;
 bestfit = misfit;
 
 time0 = tic;
@@ -206,10 +180,10 @@ perCx = perCx_bst
 perT  = perT_bst
 
 % set ranges for control variables T, c, v, P - Krafla
-T = linspace(min(T_mafic)-100,max(T_mafic)+100,1e3);  % temperature range [degC]
-c = 0.514 * ones(size(T));                       % major component range [wt SiO2]
+T = linspace(800,1800,1e3);  % temperature range [degC]
+c = 0.49 * ones(size(T));                       % major component range [wt SiO2]
 v = 0.000 * ones(size(T));                       % volatile component range [wt H2O]
-P = 100e6 * ones(size(T));                       % pressure range [Pa]
+P = 15e6 * ones(size(T));                       % pressure range [Pa]
 
     % equilibrium phase fractions and compositions - Krafla
     [xq,cxq,cmq,fq,vfq,vmq]  =  equilibrium(ones(size(T)).*0.5,ones(size(T)).*0.0, ...
