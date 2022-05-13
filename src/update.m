@@ -16,8 +16,9 @@ rhoBF =    THETA .*(rho (2:end-2,2:end-1)+rho (3:end-1,2:end-1))/2 ...
 if Nx <= 10; rhoBF = repmat(mean(rhoBF,2),1,Nx-2); end
 
 % update thermal properties
+Lx    = (cx-cphs1)./(cphs0-cphs1).*Lx0 + (cx-cphs0)./(cphs1-cphs0).*Lx1;
 rhoCp = rho.*(m.*Cpm + x.*Cpx + f.*Cpf);
-rhoDs = rho.*(m.*0   + x.*Dsx + f.*Dsf);
+rhoLh = rho.*(m.*0   + x.*Lx  + f.*Lf );
 kT    = mu.*kTm + chi.*kTx + phi.*kTf;                                     % magma thermal conductivity
 
 % update effective viscosity
@@ -30,7 +31,7 @@ etax  = etax0.* ones(size(x));                                             % con
 kv = permute(cat(3,etax,etam,etaf),[3,1,2]);
 Mv = permute(repmat(kv,1,1,1,3),[4,1,2,3])./permute(repmat(kv,1,1,1,3),[1,4,2,3]);
  
-ff = max(1e-4,min(1-1e-4,permute(cat(3,chi,mu,phi),[3,1,2])));
+ff = max(1e-6,min(1-1e-6,permute(cat(3,chi,mu,phi),[3,1,2])));
 FF = permute(repmat(ff,1,1,1,3),[4,1,2,3]);
 Sf = (FF./BB).^(1./CC);  Sf = Sf./sum(Sf,2);
 Xf = sum(AA.*Sf,2).*FF + (1-sum(AA.*Sf,2)).*Sf;
@@ -46,11 +47,10 @@ etaco  = (etact(1:end-1,1:end-1)+etact(2:end,1:end-1) ...                  % eff
        +  etact(1:end-1,2:end  )+etact(2:end,2:end  ))./4;
 
 % get segregation coefficients
-Csgr = ((1-ff)./[dx;dm;df].^2.*kv.*thtv).^-1;
+Csgr = ((1-ff)./[dx;1e-16;df].^2.*kv.*thtv).^-1;
 
-Csgr_x = squeeze(Csgr(1,:,:)) + 1e-16;
-Csgr_m = squeeze(Csgr(2,:,:)) + 1e-16;
-Csgr_f = squeeze(Csgr(3,:,:)) + 1e-16;
+Csgr_x = squeeze(Csgr(1,:,:)) + 1e-18;
+Csgr_f = squeeze(Csgr(3,:,:)) + 1e-18;
 
 % update velocity divergence
 Div_V(2:end-1,2:end-1) = ddz(W(:,2:end-1),h) ...                           % get velocity divergence
@@ -84,7 +84,7 @@ tII(:,[1 end]) = tII(:,[2 end-1]);
 tII([1 end],:) = tII([2 end-1],:);
 
 % update phase segregation speeds
-wx = ((rhox(1:end-1,:)+rhox(2:end,:))/2-rhoref)*g0.*((Csgr_x(1:end-1,:)+Csgr_x(2:end,:))/2); % crystal segregation speed
+wx = ((rhox(1:end-1,:)+rhox(2:end,:))/2-rhoref)*g0.*((Csgr_x(1:end-1,:).*Csgr_x(2:end,:)).^0.5); % crystal segregation speed
 if top==1; wx(1  ,:) = 0; end
 if bot==1; wx(end,:) = 0; end
 for i = 1:round(delta)
@@ -92,7 +92,7 @@ for i = 1:round(delta)
     wx(:,[1 end]) = -sds*wx(:,[2 end-1]);
 end
 
-wf = any(v(:)>1e-6).*((rhof(1:end-1,:)+rhof(2:end,:))/2-rhoref)*g0.*((Csgr_f(1:end-1,:)+Csgr_f(2:end,:))/2); % fluid segregation speed
+wf = ((rhof(1:end-1,:)+rhof(2:end,:))/2-rhoref)*g0.*((Csgr_f(1:end-1,:).*Csgr_f(2:end,:)).^0.5); % fluid segregation speed
 if top==1; wf(1  ,:) = fout.*wf(1  ,:); end
 if bot==1; wf(end,:) = fin .*wf(end,:); end
 for i = 1:round(delta)
@@ -100,21 +100,12 @@ for i = 1:round(delta)
     wf(:,[1 end]) = -sds*wf(:,[2 end-1]);
 end
 
-wm = ((rhom(1:end-1,:)+rhom(2:end,:))/2-rhoref)*g0.*((Csgr_m(1:end-1,:)+Csgr_m(2:end,:))/2); % melt segregation speed
-if top==1; wm(1  ,:) = 0; end
-if bot==1; wm(end,:) = 0; end
-for i = 1:round(delta)
-    wm(2:end-1,2:end-1) = wm(2:end-1,2:end-1) + diff(wm(:,2:end-1),2,1)./8 + diff(wm(2:end-1,:),2,2)./8;
-    wm(:,[1 end]) = -sds*wm(:,[2 end-1]);
-end
-
 % update volume source
 Div_rhoV =  + advection(rho.*f,0.*U,wf,h,ADVN,'flx') ...
             + advection(rho.*x,0.*U,wx,h,ADVN,'flx') ...
-            + advection(rho.*m,0.*U,wm,h,ADVN,'flx') ...
             + advection(rho   ,U   ,W ,h,ADVN,'flx');
-% VolSrc  = ALPHA.*VolSrc + (1-ALPHA).* (-((rho-rhoo)./dt + THETA*(Div_rhoV - rho.*Div_V) + (1-THETA)*Div_rhoVo)./(THETA*rho));
-VolSrc  = ALPHA.*VolSrc + (1-ALPHA).* (-((rho-rhoo)./dt + Div_rhoV - rho.*Div_V)./rho);
+VolSrc =  -((rho-rhoo)./dt + THETA*(Div_rhoV - rho.*Div_V) + (1-THETA)*Div_rhoVo)./(THETA*rho);
+% VolSrc  = -((rho-rhoo)./dt + Div_rhoV - rho.*Div_V)./rho;
 
 UBG    = - mean(mean(VolSrc(2:end-1,2:end-1)))./2 .* (L/2-XXu);
 WBG    = - mean(mean(VolSrc(2:end-1,2:end-1)))./2 .* (D/2-ZZw);

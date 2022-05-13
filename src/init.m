@@ -130,7 +130,7 @@ ripm = rip./(m + x.*KRIP); ripx = rip./(m./KRIP + x);
 ridm = rid./(m + x.*KRID); ridx = rid./(m./KRID + x);
   
 % get bulk enthalpy, silica, volatile content densities
-H = (rhoCp + rhoDs).*T;
+H = rhoCp.*T + rhoLh;
 C = rho.*(m.*cm + x.*cx);
 V = rho.*(m.*vm + f.*vf);
 

@@ -4,9 +4,9 @@
 Ti = T; xi = x; fi = f;
 
 % update temperature
-advn_H = advection(rho.*m.*(Cpm + 0  ).*T,Um,Wm,h,ADVN,'flx') ...
-       + advection(rho.*x.*(Cpx + Dsx).*T,Ux,Wx,h,ADVN,'flx') ...
-       + advection(rho.*f.*(Cpf + Dsf).*T,Uf,Wf,h,ADVN,'flx');
+advn_H = advection(rho.*m.*(Cpm.*T + 0 ),Um,Wm,h,ADVN,'flx') ...
+       + advection(rho.*x.*(Cpx.*T + Lx),Ux,Wx,h,ADVN,'flx') ...
+       + advection(rho.*f.*(Cpf.*T + Lf),Uf,Wf,h,ADVN,'flx');
                            
 qTz    = - (kT(1:end-1,:)+kT(2:end,:))./2 .* ddz(T,h);                     % heat diffusion z-flux
 qTx    = - (kT(:,1:end-1)+kT(:,2:end))./2 .* ddx(T,h);                     % heat diffusion x-flux
@@ -26,8 +26,8 @@ H(:,[1 end]) = H(:,[2 end-1]);
 advn_C = advection(rho.*m.*cm,Um,Wm,h,ADVN,'flx') ...
        + advection(rho.*x.*cx,Ux,Wx,h,ADVN,'flx');
                           
-qcz   = - kc.*(rho(1:end-1,:)+rho(2:end,:))/2.*(m(1:end-1,:)+m(2:end,:))/2 .* ddz(c,h);  % major component diffusion z-flux
-qcx   = - kc.*(rho(:,1:end-1)+rho(:,2:end))/2.*(m(:,1:end-1)+m(:,2:end))/2 .* ddx(c,h);  % major component diffusion x-flux
+qcz   = - kc.*(m(1:end-1,:)+m(2:end,:))/2 .* ddz(c,h);  % major component diffusion z-flux
+qcx   = - kc.*(m(:,1:end-1)+m(:,2:end))/2 .* ddx(c,h);  % major component diffusion x-flux
 diff_c(2:end-1,2:end-1) = - ddz(qcz(:,2:end-1),h) ...                      % major component diffusion
                           - ddx(qcx(2:end-1,:),h);
     
@@ -36,7 +36,7 @@ if ~isnan(cwall); bndC = bndC + rho.*(cwall-c)./tau_a .* bndshape; end     % imp
 
 dCdt = - advn_C + diff_c + bndC;                                           % total rate of change
     
-C = Co + (THETA.*dCdt + (1-THETA).*dCdto).*dt;              % explicit update of major component density
+C = Co + (THETA.*dCdt + (1-THETA).*dCdto).*dt;                             % explicit update of major component density
 C = min(rho.*cphs1-TINY,max(rho.*cphs0+TINY, C ));
 C([1 end],:) = C([2 end-1],:);                                             % apply boundary conditions
 C(:,[1 end]) = C(:,[2 end-1]);  
@@ -47,8 +47,8 @@ if any([v0;v1;vwall;v(:)]>1e-6)
     advn_V = advection(rho.*m.*vm,Um,Wm,h,ADVN,'flx') ...
            + advection(rho.*f.*vf,Uf,Wf,h,ADVN,'flx');
     
-    qvz   = - kc.*(rho(1:end-1,:)+rho(2:end,:))/2.*(m(1:end-1,:)+m(2:end,:))/2 .* ddz(v,h);  % volatile component diffusion z-flux
-    qvx   = - kc.*(rho(:,1:end-1)+rho(:,2:end))/2.*(m(:,1:end-1)+m(:,2:end))/2 .* ddx(v,h);  % volatile component diffusion x-flux
+    qvz   = - kc.*(m(1:end-1,:)+m(2:end,:))/2 .* ddz(v,h);  % volatile component diffusion z-flux
+    qvx   = - kc.*(m(:,1:end-1)+m(:,2:end))/2 .* ddx(v,h);  % volatile component diffusion x-flux
     diff_v(2:end-1,2:end-1) = - ddz(qvz(:,2:end-1),h) ...                      % volatile component diffusion
         - ddx(qvx(2:end-1,:),h);
     
@@ -63,7 +63,7 @@ if any([v0;v1;vwall;v(:)]>1e-6)
 end
 
 % convert enthalpy and component densities to temperature and concentrations
-T = H./(rhoCp + rhoDs);
+T = (H - rhoLh)./rhoCp;
 c = C./rho;
 v = V./rho;
 
@@ -71,7 +71,7 @@ v = V./rho;
 %% *****  UPDATE PHASE PROPORTIONS  ***************************************
 
 % update local phase equilibrium
-if react
+if react && ~mod(iter-1,1)
     [xq,cxq,cmq,fq,vfq,vmq] = equilibrium(x,f,T,c,v,Pt,Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,beta);
 end
 
@@ -79,7 +79,13 @@ end
 if diseq || ~react
     
     if react
-        Gx = ALPHA.*Gx + (1-ALPHA).*((xq-x).*rho./max(4.*dt,tau_r));
+        Gxi = (xq-x).*rho./max(5.*dt,tau_r);
+        for i = 1:round(delta)
+            Gxi(2:end-1,2:end-1) = Gxi(2:end-1,2:end-1) + diff(Gxi(:,2:end-1),2,1)./8 + diff(Gxi(2:end-1,:),2,2)./8;
+            Gxi([1 end],:) = Gxi([2 end-1],:);
+            Gxi(:,[1 end]) = Gxi(:,[2 end-1]);
+        end
+        Gx = ALPHA.*Gx + (1-ALPHA).*Gxi;
     end
     
     advn_x = advection(rho.*x,Ux,Wx,h,ADVN,'flx');                         % get advection term
@@ -102,7 +108,7 @@ end
 if (diseq && any([v0;v1;vwall;v(:)]>1e-6)) || ~react
     
     if react
-        Gf = ALPHA.*Gf + (1-ALPHA).*((fq-f).*rho./max(4.*dt,tau_r));
+        Gf = max(-0.5,min(0.5,ALPHA.*Gf + (1-ALPHA).*((fq-f).*rho./max(5.*dt,tau_r))));
     end
     
     advn_f = advection(rho.*f,Uf,Wf,h,ADVN,'flx');                         % get advection term
@@ -137,6 +143,7 @@ if react && step>0
         Kf = vfq./vmq;
         vm = v./(m + f.*Kf);
         vf = v./(m./Kf + f);
+        vf(v<1e-6) = vfq(v<1e-6);
     end
 
 end
@@ -161,8 +168,8 @@ end
 advn_IT = advection(rho.*m.*itm,Um,Wm,h,ADVN,'flx') ...
         + advection(rho.*x.*itx,Ux,Wx,h,ADVN,'flx');
 
-qz   = - kc.*(rho(1:end-1,:)+rho(2:end,:))/2.*(m(1:end-1,:)+m(2:end,:))/2 .* ddz(it,h);
-qx   = - kc.*(rho(:,1:end-1)+rho(:,2:end))/2.*(m(:,1:end-1)+m(:,2:end))/2 .* ddx(it,h);
+qz   = - kc.*(m(1:end-1,:)+m(2:end,:))/2 .* ddz(it,h);
+qx   = - kc.*(m(:,1:end-1)+m(:,2:end))/2 .* ddx(it,h);
 diff_it(2:end-1,2:end-1) = - ddz(qz(:,2:end-1),h) ...                      % diffusion in melt
                            - ddx(qx(2:end-1,:),h);
 
@@ -189,8 +196,8 @@ end
 advn_CT = advection(rho.*m.*ctm,Um,Wm,h,ADVN,'flx') ...
         + advection(rho.*x.*ctx,Ux,Wx,h,ADVN,'flx');
 
-qz   = - kc.*(rho(1:end-1,:)+rho(2:end,:))/2.*(m(1:end-1,:)+m(2:end,:))/2 .* ddz(ct,h);
-qx   = - kc.*(rho(:,1:end-1)+rho(:,2:end))/2.*(m(:,1:end-1)+m(:,2:end))/2 .* ddx(ct,h);
+qz   = - kc.*(m(1:end-1,:)+m(2:end,:))/2 .* ddz(ct,h);
+qx   = - kc.*(m(:,1:end-1)+m(:,2:end))/2 .* ddx(ct,h);
 diff_ct(2:end-1,2:end-1) = - ddz(qz(:,2:end-1),h) ...                      % diffusion in melt
                            - ddx(qx(2:end-1,:),h);
 
@@ -213,8 +220,8 @@ trns_si = Gx.*(sim.*double(Gx<0) + six.*double(Gx>=0));
 % update stable isotope ratio in melt
 advn_sim = advection(rho.*m.*sim,Um,Wm,h,ADVN,'flx');
 
-qz   = - kc.*(rho(1:end-1,:)+rho(2:end,:))/2.*(m(1:end-1,:)+m(2:end,:))/2 .* ddz(sim,h);
-qx   = - kc.*(rho(:,1:end-1)+rho(:,2:end))/2.*(m(:,1:end-1)+m(:,2:end))/2 .* ddx(sim,h);
+qz   = - kc.*(m(1:end-1,:)+m(2:end,:))/2 .* ddz(sim,h);
+qx   = - kc.*(m(:,1:end-1)+m(:,2:end))/2 .* ddx(sim,h);
 diff_sim(2:end-1,2:end-1) = - ddz(qz(:,2:end-1),h) ...                     % diffusion in melt
                             - ddx(qx(2:end-1,:),h);
                        
@@ -225,7 +232,7 @@ dSImdt = - advn_sim + diff_sim + assim - trns_si;                          % tot
 
 SIm = SImo + (THETA.*dSImdt + (1-THETA).*dSImdto).*dt;      % explicit update
 SIm = min(max([max(0,siwall),si0-dsi,si1+dsi]).*rho.*m,max(min([min(0,siwall),si0-dsi,si1+dsi]).*rho.*m,SIm));
-SIm(m < TINY)  = 0;
+SIm(m <= TINY) = 0;
 SIm([1 end],:) = SIm([2 end-1],:);                                         % boundary conditions
 SIm(:,[1 end]) = SIm(:,[2 end-1]);
 
@@ -233,8 +240,8 @@ SIm(:,[1 end]) = SIm(:,[2 end-1]);
 % update stable isotope ratio in xtals
 advn_six = advection(rho.*x.*six,Ux,Wx,h,ADVN,'flx');
 
-qz   = - kc.*(rho(1:end-1,:)+rho(2:end,:))/2.*(m(1:end-1,:)+m(2:end,:))/2 .* ddz(six,h);
-qx   = - kc.*(rho(:,1:end-1)+rho(:,2:end))/2.*(m(:,1:end-1)+m(:,2:end))/2 .* ddx(six,h);
+qz   = - kc.*(m(1:end-1,:)+m(2:end,:))/2 .* ddz(six,h);
+qx   = - kc.*(m(:,1:end-1)+m(:,2:end))/2 .* ddx(six,h);
 diff_six(2:end-1,2:end-1) = - ddz(qz(:,2:end-1),h) ...                     % diffusion when melt present
                             - ddx(qx(2:end-1,:),h);
                        
@@ -245,7 +252,7 @@ dSIxdt = - advn_six + diff_six + assim + trns_si;                          % tot
 
 SIx = SIxo + (THETA.*dSIxdt + (1-THETA).*dSIxdto).*dt;      % explicit update
 SIx = min(max([max(0,siwall),si0-dsi,si1+dsi]).*rho.*x,max(min([min(0,siwall),si0-dsi,si1+dsi]).*rho.*x,SIx));
-SIx(x < TINY)  = 0;
+SIx(x <= TINY) = 0;
 SIx([1 end],:) = SIx([2 end-1],:);                                         % boundary conditions
 SIx(:,[1 end]) = SIx(:,[2 end-1]);
 
@@ -269,8 +276,8 @@ end
 advn_RIP = advection(rho.*m.*ripm,Um,Wm,h,ADVN,'flx') ...
          + advection(rho.*x.*ripx,Ux,Wx,h,ADVN,'flx');
 
-qz   = - kc.*(rho(1:end-1,:)+rho(2:end,:))/2.*(m(1:end-1,:)+m(2:end,:))/2 .* ddz(rip,h);
-qx   = - kc.*(rho(:,1:end-1)+rho(:,2:end))/2.*(m(:,1:end-1)+m(:,2:end))/2 .* ddx(rip,h);
+qz   = - kc.*(m(1:end-1,:)+m(2:end,:))/2 .* ddz(rip,h);
+qx   = - kc.*(m(:,1:end-1)+m(:,2:end))/2 .* ddx(rip,h);
 diff_rip(2:end-1,2:end-1) = - ddz(qz(:,2:end-1),h) ...                     % diffusion in melt
                             - ddx(qx(2:end-1,:),h);
 
@@ -279,7 +286,7 @@ if ~isnan(riwall); assim = assim + (riwall-rip).*rho./tau_a .* bndshape; end % i
                                        % secular equilibrium!
 dRIPdt = - advn_RIP + diff_rip + assim - dcy_rip + dcy_rip;                % total rate of change
                                        
-RIP = RIPo + (THETA.*dRIPdt + (1-THETA).*dRIPdto).*dt;      % explicit update
+RIP = RIPo + (THETA.*dRIPdt + (1-THETA).*dRIPdto).*dt;                     % explicit update
 RIP = max(0+TINY, RIP );
 RIP([1 end],:) = RIP([2 end-1],:);                                         % boundary conditions
 RIP(:,[1 end]) = RIP(:,[2 end-1]);
@@ -295,8 +302,8 @@ end
 advn_RID = advection(rho.*m.*ridm,Um,Wm,h,ADVN,'flx') ...
          + advection(rho.*x.*ridx,Ux,Wx,h,ADVN,'flx');
 
-qz   = - kc.*(rho(1:end-1,:)+rho(2:end,:))/2.*(m(1:end-1,:)+m(2:end,:))/2 .* ddz(rid,h);
-qx   = - kc.*(rho(:,1:end-1)+rho(:,2:end))/2.*(m(:,1:end-1)+m(:,2:end))/2 .* ddx(rid,h);
+qz   = - kc.*(m(1:end-1,:)+m(2:end,:))/2 .* ddz(rid,h);
+qx   = - kc.*(m(:,1:end-1)+m(:,2:end))/2 .* ddx(rid,h);
 diff_rid(2:end-1,2:end-1) = - ddz(qz(:,2:end-1),h) ...                     % diffusion in melt
                             - ddx(qx(2:end-1,:),h);
 
@@ -305,7 +312,7 @@ if ~isnan(riwall); assim = assim + (riwall.*HLRID./HLRIP-rid).*rho./tau_a .* bnd
     
 dRIDdt = - advn_RID + diff_rid + assim - dcy_rid + dcy_rip;                % total rate of change
 
-RID = RIDo + (THETA.*dRIDdt + (1-THETA).*dRIDdto).*dt;      % explicit update
+RID = RIDo + (THETA.*dRIDdt + (1-THETA).*dRIDdto).*dt;                     % explicit update
 RID = max(0+TINY, RID );
 RID([1 end],:) = RID([2 end-1],:);                                         % boundary conditions
 RID(:,[1 end]) = RID(:,[2 end-1]);
@@ -314,6 +321,6 @@ it  = IT./rho;
 ct  = CT./rho;
 sim = SIm./rho./max(TINY,m);
 six = SIx./rho./max(TINY,x);
-si  = SI./rho./max(TINY,1-f);
+si  = SI ./rho./max(TINY,1-f);
 rip = RIP./rho;
 rid = RID./rho;
