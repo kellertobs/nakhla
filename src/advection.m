@@ -60,21 +60,7 @@ switch scheme
         azm   = ( 2*ajp+3*acc-6*ajm+ajmm)/6/h;
         
         advn  = vxp.*axm + vxm.*axp + vzp.*azm + vzm.*azp + acc.*Div_v;
-        
-    case 'UPW23'  % third-order upwind scheme
-        
-        % get upwind gradients of advected field
-        axm =   ( 3.*acc-4.*aim+aimm)./4./h;
-        axp =   (-3.*acc+4.*aip-aipp)./4./h;
-        azm =   ( 3.*acc-4.*ajm+ajmm)./4./h;
-        azp =   (-3.*acc+4.*ajp-ajpp)./4./h;
-        axm =   axm + ( 2.*aip+3.*acc-6.*aim+aimm)./12./h;
-        axp =   axp + (-2.*aim-3.*acc+6.*aip-aipp)./12./h;
-        azm =   azm + ( 2.*ajp+3.*acc-6.*ajm+ajmm)./12./h;
-        azp =   azp + (-2.*ajm-3.*acc+6.*ajp-ajpp)./12./h;
-        
-        % get advection term (v . Grad a)
-        advn  =  vxp.*axm + vxm.*axp + vzp.*azm + vzm.*azp + acc.*Div_v;
+
 end
 
 if strcmp(type,'adv')
