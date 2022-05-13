@@ -215,13 +215,13 @@ CT(:,[1 end]) = CT(:,[2 end-1]);
 % *****  STABLE ISOTOPE RATIO  ********************************************
 
 % reactive transfer of stable isotope ratio
-trns_si = Gx.*(sim.*double(Gx<0) + six.*double(Gx>=0));
+trns_si = Gx.*(sim.*double(Gx<0) + six.*double(Gx>0));
 
 % update stable isotope ratio in melt
 advn_sim = advection(rho.*m.*sim,Um,Wm,h,ADVN,'flx');
 
-qz   = - kc.*(m(1:end-1,:)+m(2:end,:))/2 .* ddz(sim,h);
-qx   = - kc.*(m(:,1:end-1)+m(:,2:end))/2 .* ddx(sim,h);
+qz   = - kc.*(m(1:end-1,:)+m(2:end,:))/2.*(m(1:end-1,:)+m(2:end,:))/2 .* ddz(sim,h);
+qx   = - kc.*(m(:,1:end-1)+m(:,2:end))/2.*(m(:,1:end-1)+m(:,2:end))/2 .* ddx(sim,h);
 diff_sim(2:end-1,2:end-1) = - ddz(qz(:,2:end-1),h) ...                     % diffusion in melt
                             - ddx(qx(2:end-1,:),h);
                        
@@ -240,8 +240,8 @@ SIm(:,[1 end]) = SIm(:,[2 end-1]);
 % update stable isotope ratio in xtals
 advn_six = advection(rho.*x.*six,Ux,Wx,h,ADVN,'flx');
 
-qz   = - kc.*(m(1:end-1,:)+m(2:end,:))/2 .* ddz(six,h);
-qx   = - kc.*(m(:,1:end-1)+m(:,2:end))/2 .* ddx(six,h);
+qz   = - kc.*(x(1:end-1,:)+x(2:end,:))/2.*(m(1:end-1,:)+m(2:end,:))/2 .* ddz(six,h);
+qx   = - kc.*(x(:,1:end-1)+x(:,2:end))/2.*(m(:,1:end-1)+m(:,2:end))/2 .* ddx(six,h);
 diff_six(2:end-1,2:end-1) = - ddz(qz(:,2:end-1),h) ...                     % diffusion when melt present
                             - ddx(qx(2:end-1,:),h);
                        
