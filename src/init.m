@@ -62,7 +62,8 @@ if bndmode>=2;               bot = +1;      % no slip bot for 'bot only(2)', 'to
 else;                        bot = -1; end  % free slip for other types
 
 % initialise solution fields
-T   =  T0 + (T1-T0) .* (1+erf((ZZ/D-zlay)/wlay_T))/2 + dT.*rp;  if bndinit && ~isnan(Twall); T = T + (Twall-T).*bndshape; end % temperature
+T   =  T0 + (T1-T0) .* (1+erf((ZZ/D-zlay)/wlay_T))/2 + dT.*rp;  if bndinit && ~isnan(Twall); T = T + (Twall-T).*bndshape; end % temperature [C]
+T   =  T+273.15; % convert to [K]
 c   =  c0 + (c1-c0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dc.*rp;  if bndinit && ~isnan(cwall); c = c + (cwall-c).*bndshape; end % major component
 v   =  v0 + (v1-v0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dv.*rp;  if bndinit && ~isnan(vwall); v = v + (vwall-v).*bndshape; end % volatile component
 
@@ -102,7 +103,7 @@ res = 1;  tol = 1e-15;  x = ones(size(T));  f = v;
 while res > tol
     xi = x;  fi = f;
     
-    [xq,cxq,cmq,fq,vfq,vmq] = equilibrium(x,f,T,c,v,Pt,Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,beta);
+    [xq,cxq,cmq,fq,vfq,vmq] = equilibrium(x,f,T-273.15,c,v,Pt,Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,beta);
     mq = 1-xq-fq;
     
     x  = xq;  f = fq;  m = mq;
@@ -125,21 +126,18 @@ Pto     = Pt;
 % get geochemical phase compositions
 itm  = it./(m + x.*KIT); itx = it./(m./KIT + x);
 ctm  = ct./(m + x.*KCT); ctx = ct./(m./KCT + x);
-sim  = si;               six = si;
 ripm = rip./(m + x.*KRIP); ripx = rip./(m./KRIP + x);
 ridm = rid./(m + x.*KRID); ridx = rid./(m./KRID + x);
   
 % get bulk enthalpy, silica, volatile content densities
-H = rhoCp.*T + rhoLh;
+H = rho.*(Cp + Ds).*T;
 C = rho.*(m.*cm + x.*cx);
 V = rho.*(m.*vm + f.*vf);
 
 % get geochemical content densities
 IT  = rho.*(m.*itm + x.*itx);
 CT  = rho.*(m.*ctm + x.*ctx);
-SIm = rho.* m.*sim;  
-SIx = rho.* x.*six;
-SI  = SIm + SIx;
+SI  = rho.*(m.*si  + x.*si);
 RIP = rho.*(m.*ripm + x.*ripx);
 RID = rho.*(m.*ridm + x.*ridx);
 
@@ -154,8 +152,7 @@ dCdt   = 0.*c;  diff_c = 0.*c;
 dVdt   = 0.*v;  diff_v = 0.*v;  
 dfdt   = 0.*f;  diff_f = 0.*f;  
 dxdt   = 0.*x;  diff_x = 0.*x;  
-dSImdt = 0.*si;  diff_sim = 0.*sim;
-dSIxdt = 0.*si;  diff_six = 0.*SIx;
+dSIdt  = 0.*si;  diff_si  = 0.*SI;
 dITdt  = 0.*IT;  diff_it  = 0.*IT;
 dCTdt  = 0.*CT;  diff_ct  = 0.*CT;
 dRIPdt = 0.*RIP; diff_rip  = 0.*RIP;
@@ -178,7 +175,7 @@ if restart
     elseif restart > 0  % restart from specified continuation frame
         name = [opdir,'/',runID,'/',runID,'_',num2str(restart)];
     end
-    load(name,'U','W','P','Pt','f','x','m','phi','chi','mu','H','C','V','T','c','v','cm','cx','vm','vf','IT','CT','SIm','SIx','SI','RIP','RID','it','ct','sim','six','si','rip','rid','dHdt','dCdt','dVdt','dITdt','dCTdt','dSImdt','dSIxdt','dfdt','dxdt','Gf','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step','hist');
+    load(name,'U','W','P','Pt','f','x','m','phi','chi','mu','H','C','V','T','c','v','cm','cx','vm','vf','IT','CT','SI','RIP','RID','it','ct','si','rip','rid','dHdt','dCdt','dVdt','dITdt','dCTdt','dSIdt','dfdt','dxdt','Gf','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step','hist');
     
     Pscale = geomean(eta(:))/h;
     S = [W(:);U(:);P(:)/Pscale];

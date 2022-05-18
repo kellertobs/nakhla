@@ -98,7 +98,6 @@ Csgr_f = squeeze(Csgr(3,:,:)) + 1e-16;
 
 wx = chi.*Csgr_x .* (rhox-rho)*g0; % crystal segregation speed
 wf = phi.*Csgr_f .* (rhof-rho)*g0; % fluid segregation speed
-wm = mu .*Csgr_m .* (rhom-rho)*g0; % melt segregation speed
 
 % simplified mineral assemblage (ol+px+fs+qz)
 olv0 = perCx;  olv1 = cphs0; 
@@ -142,7 +141,6 @@ etam(ind) = [];
 eta (ind) = [];
 wx  (ind) = [];
 wf  (ind) = [];
-wm  (ind) = [];
 fq  (ind) = [];
 xq  (ind) = [];
 mq  (ind) = [];
@@ -230,7 +228,7 @@ ylabel('Viscosity [log$_{10}$ Pas]','Interpreter','latex','FontSize',15)
 
 % plot phase segregation speeds
 figure(7); if ~holdfig; clf; end
-semilogy(T,max(1e-12,abs(wx)).*3600,'k',T,max(1e-12,abs(wf)).*3600,'b',T,max(1e-12,abs(wm)).*3600,'r','LineStyle',linestyle,'LineWidth',2); hold on; box on; axis tight;
+semilogy(T,max(1e-12,abs(wx)).*3600,'k',T,max(1e-12,abs(wf)).*3600,'b',LineStyle',linestyle,'LineWidth',2); hold on; box on; axis tight;
 legend('crystals','fluid','melt','Interpreter','latex','FontSize',15,'box','off','location','best')
 set(gca,'TickLabelInterpreter','latex','FontSize',13)
 title('Phase segregation model','Interpreter','latex','FontSize',18)

@@ -4,10 +4,10 @@ clear all; close all;
 runID    =  '2D_fract_anh';      % run identifier
 opdir    =  '../out/';           % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
-nop      =  50;                  % output frame plotted/saved every 'nop' time steps
+nop      =  100;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot of results
 save_op  =  1;                   % switch on to save output to file
-plot_cv  =  1;                   % switch on to live plot iterative convergence
+plot_cv  =  0;                   % switch on to live plot iterative convergence
 react    =  1;                   % switch on reactive mode
 diseq    =  1;                   % switch on disequilibrium approac
 bnchm    =  0;                   % switch on to run manufactured solution benchmark on flui mechanics solver
@@ -15,7 +15,7 @@ bnchm    =  0;                   % switch on to run manufactured solution benchm
 % set model domain parameters
 D        =  10;                  % chamber depth [m]
 L        =  10;                  % chamber width [m]
-N        =  150 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
+N        =  200 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
 h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
@@ -80,16 +80,13 @@ siwall   =  nan;                 % wall stable isotope [delta] (nan = no assimil
 riwall   =  nan;                 % wall radiogenic isotope [wt ppm] (nan = no assimilation)
 
 % set thermo-chemical material parameters
-kc       =  1e-2;                % chemical diffusivity [kg/m/s]
+kc       =  1e-3;                % chemical diffusivity [kg/m/s]
 kTm      =  4;                   % melt thermal conductivity [W/m/K]
 kTx      =  1;                   % xtal thermal conductivity [W/m/K]
 kTf      =  0.02;                % mvp  thermal conductivity [W/m/K]
-Cpm      =  1400;                % melt heat capacity [J/kg/K]
-Cpx      =  1000;                % xtal heat capacity [J/kg/K]
-Cpf      =  2000;                % mvp  heat capacity [J/kg/K]
-Lx0      = -400e3;               % latent heat of crystallisation at cphs0 [J/kg]
-Lx1      = -300e3;               % latent heat of crystallisation at cphs1 [J/kg]
-Lf       =  500e3;               % latent heat of exsolution [J/kg]
+Cp       =  1300;                % heat capacity [J/kg/K]
+Dsx      = -300;                 % entropy change of crystallisation [J/kg]
+Dsf      =  600;                 % entropy change of exsolution [J/kg]
 
 % set phase diagram parameters
 cphs0    =  0.43;                % phase diagram lower bound composition [wt SiO2]
@@ -130,14 +127,14 @@ df       =  1e-3;                % bubble size [m]
 g0       =  10.;                 % gravity [m/s2]
 
 % set numerical model parameters
-CFL      =  0.125;               % (physical) time stepping courant number (multiplies stable step) [0,1]
+CFL      =  0.5;                 % (physical) time stepping courant number (multiplies stable step) [0,1]
 ADVN     =  'FRM';               % advection scheme ('UPW2', 'UPW3', or 'FRM')
 theta    =  0.5;                 % time-stepping parameter (1 = 1st-order implicit; 1/2 = 2nd-order semi-implicit)
 rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-7;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its
-alpha    =  0.75;                % iterative lag parameter equilibration
-beta     =  0.75;                % iterative lag parameter phase diagram
+alpha    =  0.5;                 % iterative lag parameter equilibration
+beta     =  0.5;                 % iterative lag parameter phase diagram
 delta    =  2;                   % smoothness of segregation speed
 etamin   =  1e1;                 % minimum viscosity for stabilisation
 etamax   =  1e8;                 % maximum viscosity for stabilisation

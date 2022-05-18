@@ -7,7 +7,7 @@ restart  =  0;                   % restart from file (0: new run; <1: restart fr
 nop      =  100;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot of results
 save_op  =  1;                   % switch on to save output to file
-plot_cv  =  1;                   % switch on to live plot iterative convergence
+plot_cv  =  0;                   % switch on to live plot iterative convergence
 react    =  1;                   % switch on reactive mode
 diseq    =  1;                   % switch on disequilibrium approac
 bnchm    =  0;                   % switch on to run manufactured solution benchmark on flui mechanics solver
@@ -22,7 +22,7 @@ h        =  D/(N-2);             % grid spacing (equal in both dimensions, do no
 M        =  5e4;                 % number of time steps to take
 hr       =  3600;                % conversion seconds to hours
 yr       =  24*365.25*hr;        % conversion seconds to years
-tend     =  8*hr;                % end time for simulation [s]
+tend     =  3*hr;                % end time for simulation [s]
 dt       =  10;                  % initial time step [s]
 dtmax    =  10;                  % maximum time step [s]
 
@@ -32,8 +32,8 @@ smth     =  (N/30)^2;            % regularisation of initial random perturbation
 zlay     =  0.5;                 % layer thickness (relative to domain depth D)
 wlay_T   =  1e-6;                % thickness of smooth layer boundary (relative to domain depth D)
 wlay_c   =  3*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
-T0       =  1375;                % temperature top layer [deg C]
-T1       =  1375;                % temperature base layer [deg C]
+T0       =  1400;                % temperature top layer [deg C]
+T1       =  1400;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
 c0       =  0.50;                % major component top layer [wt SiO2]
 c1       =  0.50;                % major component base layer [wt SiO2]
@@ -80,16 +80,13 @@ siwall   =  nan;                 % wall stable isotope [delta] (nan = no assimil
 riwall   =  nan;                 % wall radiogenic isotope [wt ppm] (nan = no assimilation)
 
 % set thermo-chemical material parameters
-kc       =  1e-2;                % chemical diffusivity [kg/m/s]
+kc       =  1e-4;                % chemical diffusivity [kg/m/s]
 kTm      =  4;                   % melt thermal conductivity [W/m/K]
 kTx      =  1;                   % xtal thermal conductivity [W/m/K]
 kTf      =  0.02;                % mvp  thermal conductivity [W/m/K]
-Cpm      =  1400;                % melt heat capacity [J/kg/K]
-Cpx      =  1000;                % xtal heat capacity [J/kg/K]
-Cpf      =  2000;                % mvp  heat capacity [J/kg/K]
-Lx0      = -400e3;               % latent heat of crystallisation at cphs0 [J/kg]
-Lx1      = -300e3;               % latent heat of crystallisation at cphs1 [J/kg]
-Lf       =  500e3;               % latent heat of exsolution [J/kg]
+Cp       =  1300;                % heat capacity [J/kg/K]
+Dsx      = -300;                 % entropy change of crystallisation [J/kg]
+Dsf      =  600;                 % entropy change of exsolution [J/kg]
 
 % set phase diagram parameters
 cphs0    =  0.43;                % phase diagram lower bound composition [wt SiO2]
@@ -136,8 +133,8 @@ theta    =  0.5;                 % time-stepping parameter (1 = 1st-order implic
 rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-7;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its
-alpha    =  0.75;                % iterative lag parameter equilibration
-beta     =  0.75;                % iterative lag parameter phase diagram
+alpha    =  0.5;                 % iterative lag parameter equilibration
+beta     =  0.5;                 % iterative lag parameter phase diagram
 delta    =  0;                   % smoothness of segregation speed
 etamin   =  1e1;                 % minimum viscosity for stabilisation
 etamax   =  1e16;                % maximum viscosity for stabilisation
