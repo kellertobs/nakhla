@@ -299,7 +299,14 @@ Ux   = U + 0.;                                                             % xtl
 Wm   = W + 0.;                                                             % mlt z-velocity
 Um   = U + 0.;                                                             % mlt x-velocity
 
+Wbar = (mu (1:end-1,:)+mu (2:end,:))/2 .* Wm ...
+     + (chi(1:end-1,:)+chi(2:end,:))/2 .* Wx ...
+     + (phi(1:end-1,:)+phi(2:end,:))/2 .* Wf;
+Ubar = (mu (:,1:end-1)+mu (:,2:end))/2 .* Um ...
+     + (chi(:,1:end-1)+chi(:,2:end))/2 .* Ux ...
+     + (phi(:,1:end-1)+phi(:,2:end))/2 .* Uf; 
 
+ 
 %% update time step
 dtk = min((h/2)^2./max([kT(:)./rhoCp(:);kc./rho(:)]))/2;                    % diffusive time step size
 dta = CFL*min(min(h/2/max(abs([Ux(:);Wx(:);Uf(:);Wf(:);Um(:);Wm(:)]+1e-16)))); % advective time step size

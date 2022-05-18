@@ -108,7 +108,13 @@ end
 if (diseq && any([v0;v1;vwall;v(:)]>1e-6)) || ~react
     
     if react
-        Gf = max(-0.5,min(0.5,ALPHA.*Gf + (1-ALPHA).*((fq-f).*rho./max(5.*dt,tau_r))));
+        Gfi = (fq-f).*rho./max(5.*dt,tau_r);
+        for i = 1:round(delta)
+            Gfi(2:end-1,2:end-1) = Gfi(2:end-1,2:end-1) + diff(Gfi(:,2:end-1),2,1)./8 + diff(Gfi(2:end-1,:),2,2)./8;
+            Gfi([1 end],:) = Gfi([2 end-1],:);
+            Gfi(:,[1 end]) = Gfi(:,[2 end-1]);
+        end
+        Gf = ALPHA.*Gf + (1-ALPHA).*Gfi;
     end
     
     advn_f = advection(rho.*f,Uf,Wf,h,ADVN,'flx');                         % get advection term
