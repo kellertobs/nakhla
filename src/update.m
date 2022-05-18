@@ -1,9 +1,9 @@
 %%*****  UPDATE PARAMETERS & AUXILIARY FIELDS  ****************************
 
 % update phase densities
-rhom = rhom0 .* (1 - aTm.*(T-perT) - gCm.*(cm-(perCx+perCm)/2));
-rhox = rhox0 .* (1 - aTx.*(T-perT) - gCx.*(cx-(perCx+perCm)/2));
-rhof = rhof0 .* (1 - aTf.*(T-perT) + bPf.*(Pt-Ptop ));
+rhom = rhom0 .* (1 - aTm.*(T-perT-273.15) - gCm.*(cm-(perCx+perCm)/2));
+rhox = rhox0 .* (1 - aTx.*(T-perT-273.15) - gCx.*(cx-(perCx+perCm)/2));
+rhof = rhof0 .* (1 - aTf.*(T-perT-273.15) + bPf.*(Pt-Ptop ));
 
 % convert weight to volume fraction, update bulk density
 rho   = 1./(m./rhom + x./rhox + f./rhof);  rho([1 end],:) = rho([2 end-1],:);  rho(:,[1 end]) = rho(:,[2 end-1]);
@@ -16,13 +16,11 @@ rhoBF =    THETA .*(rho (2:end-2,2:end-1)+rho (3:end-1,2:end-1))/2 ...
 if Nx <= 10; rhoBF = repmat(mean(rhoBF,2),1,Nx-2); end
 
 % update thermal properties
-Lx    = (cx-cphs1)./(cphs0-cphs1).*Lx0 + (cx-cphs0)./(cphs1-cphs0).*Lx1;
-rhoCp = rho.*(m.*Cpm + x.*Cpx + f.*Cpf);
-rhoLh = rho.*(m.*0   + x.*Lx  + f.*Lf );
+Ds    = x.*Dsx + f.*Dsf;
 kT    = mu.*kTm + chi.*kTx + phi.*kTf;                                     % magma thermal conductivity
 
 % update effective viscosity
-etam  = etam0 .* exp(Em./(8.3145.*(T+273.15))-Em./(8.3145.*(perT+273.15))) ...
+etam  = etam0 .* exp(Em./(8.3145.*T)-Em./(8.3145.*(perT+273.15))) ...
               .* Fmc.^((cm-(perCx+perCm)/2)./(cphs1-cphs0)) .* Fmv.^(vm./0.01);  % variable melt viscosity
 etaf  = etaf0.* ones(size(f));                                             % constant fluid viscosity
 etax  = etax0.* ones(size(x));                                             % constant crysta viscosity
@@ -84,7 +82,9 @@ tII(:,[1 end]) = tII(:,[2 end-1]);
 tII([1 end],:) = tII([2 end-1],:);
 
 % update phase segregation speeds
-wx = ((rhox(1:end-1,:)+rhox(2:end,:))/2-rhoref)*g0.*((Csgr_x(1:end-1,:).*Csgr_x(2:end,:)).^0.5); % crystal segregation speed
+% wx = ((rhox(1:end-1,:)+rhox(2:end,:))/2-rhoref)*g0.*(Csgr_x(1:end-1,:)+ Csgr_x(2:end,:)).*0.5; % crystal segregation speed
+wx = ((rhox(1:end-1,:)+rhox(2:end,:))/2-rhoref)*g0.*(Csgr_x(1:end-1,:).*Csgr_x(2:end,:)).^0.5; % crystal segregation speed
+% wx = ((rhox(1:end-1,:)+rhox(2:end,:))/2-rhoref)*g0.*(0.5./Csgr_x(1:end-1,:)+0.5./Csgr_x(2:end,:)).^-1; % crystal segregation speed
 if top==1; wx(1  ,:) = 0; end
 if bot==1; wx(end,:) = 0; end
 for i = 1:round(delta)

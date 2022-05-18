@@ -27,8 +27,8 @@ while time <= tend && step <= M
     mo      = m;
     ITo     = IT;
     CTo     = CT;
-    SImo    = SIm;
-    SIxo    = SIx;
+    SIo     = SI;
+%     SIxo    = SIx;
     RIPo    = RIP;
     RIDo    = RID;
     rhoo    = rho;
@@ -41,8 +41,8 @@ while time <= tend && step <= M
     dfdto   = dfdt;
     dITdto  = dITdt;
     dCTdto  = dCTdt;
-    dSImdto = dSImdt;
-    dSIxdto = dSIxdt;
+    dSIdto  = dSIdt;
+%     dSIxdto = dSIxdt;
     dRIPdto = dRIPdt;
     dRIDdto = dRIDdt;
     Pto     = Pt;

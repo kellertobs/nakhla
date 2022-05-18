@@ -7,7 +7,7 @@ restart  =  0;                   % restart from file (0: new run; <1: restart fr
 nop      =  100;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot of results
 save_op  =  1;                   % switch on to save output to file
-plot_cv  =  1;                   % switch on to live plot iterative convergence
+plot_cv  =  0;                   % switch on to live plot iterative convergence
 react    =  1;                   % switch on reactive mode
 diseq    =  1;                   % switch on disequilibrium approach
 bnchm    =  0;                   % switch on to run manufactured solution benchmark on flui mechanics solver
@@ -51,7 +51,7 @@ ct0      =  1;                   % compatible tracer top layer [wt ppm]
 ct1      =  1;                   % compatible tracer base layer [wt ppm]
 dct      =  -0.00;               % compatible tracer random noise [wt ppm]
 KCT      =  1e2;                 % compatible tracer partition coefficient
-si0      =  1;                   % stable isotope ratio top layer [delta]
+si0      = -1;                   % stable isotope ratio top layer [delta]
 si1      =  1;                   % stable isotope ratio base layer [delta]
 dsi      =  0.00;                % stable isotope ratio random noise [delta]
 ri0      =  1;                   % radiogenic isotope top layer [wt ppm]
@@ -80,16 +80,13 @@ siwall   =  nan;                 % wall stable isotope [delta] (nan = no assimil
 riwall   =  nan;                 % wall radiogenic isotope [wt ppm] (nan = no assimilation)
 
 % set thermo-chemical material parameters
-kc       =  1e-2;                % chemical diffusivity [kg/m/s]
+kc       =  1e-4;                % chemical diffusivity [kg/m/s]
 kTm      =  4;                   % melt thermal conductivity [W/m/K]
 kTx      =  1;                   % xtal thermal conductivity [W/m/K]
 kTf      =  0.02;                % mvp  thermal conductivity [W/m/K]
-Cpm      =  1400;                % melt heat capacity [J/kg/K]
-Cpx      =  1000;                % xtal heat capacity [J/kg/K]
-Cpf      =  2000;                % mvp  heat capacity [J/kg/K]
-Lx0      = -400e3;               % latent heat of crystallisation at cphs0 [J/kg]
-Lx1      = -300e3;               % latent heat of crystallisation at cphs1 [J/kg]
-Lf       =  500e3;               % latent heat of exsolution [J/kg]
+Cp       =  1300;                % heat capacity [J/kg/K]
+Dsx      = -300;                 % entropy change of crystallisation [J/kg]
+Dsf      =  600;                 % entropy change of exsolution [J/kg]
 
 % set phase diagram parameters
 cphs0    =  0.42;                % phase diagram lower bound composition [wt SiO2]
@@ -105,7 +102,7 @@ dTH2O    =  [1200,1000,100];     % solidus shift from water content [degC/wt^0.7
 tau_r    =  60;                  % reaction time [s]
 
 % set model rheology parameters
-etam0    =  200;                 % melt viscosity [Pas]
+etam0    =  300;                 % melt viscosity [Pas]
 etaf0    =  0.1;                 % fluid viscosity [Pas]
 etax0    =  1e15;                % crystal viscosity [Pas]
 Fmc      =  1e+5;                % major component weakening factor of melt viscosity [1]
@@ -127,7 +124,7 @@ gCx      =  0.8;                 % xtal compositional expansion [1/wt]
 bPf      =  1e-8;                % mvp compressibility [1/Pa]
 dx       =  1e-3;                % crystal size [m]
 df       =  1e-3;                % bubble size [m]
-g0       =  10.;                 % gravity [m/s2]
+g0       =  3.72;                % gravity [m/s2]
 
 % set numerical model parameters
 CFL      =  0.125;               % (physical) time stepping courant number (multiplies stable step) [0,1]
@@ -136,9 +133,9 @@ theta    =  0.5;                 % time-stepping parameter (1 = 1st-order implic
 rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-7;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its
-alpha    =  0.75;                % iterative lag parameter equilibration
-beta     =  0.75;                % iterative lag parameter phase diagram
-delta    =  2;                   % smoothness of segregation speed
+alpha    =  0.5;                 % iterative lag parameter equilibration
+beta     =  0.5;                 % iterative lag parameter phase diagram
+delta    =  0;                   % smoothness of segregation speed
 etamin   =  1e1;                 % minimum viscosity for stabilisation
 etamax   =  1e8;                 % maximum viscosity for stabilisation
 TINY     =  1e-16;               % minimum cutoff phase, component fractions

@@ -7,7 +7,7 @@ restart  =  0;                   % restart from file (0: new run; <1: restart fr
 nop      =  100;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot of results
 save_op  =  1;                   % switch on to save output to file
-plot_cv  =  1;                   % switch on to live plot iterative convergence
+plot_cv  =  0;                   % switch on to live plot iterative convergence
 react    =  1;                   % switch on reactive mode
 diseq    =  1;                   % switch on disequilibrium approac
 bnchm    =  0;                   % switch on to run manufactured solution benchmark on flui mechanics solver
@@ -19,19 +19,19 @@ N        =  200 + 2;             % number of grid points in z-direction (incl. 2
 h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
-M        =  5e4;                 % number of time steps to take
+M        =  1e5;                 % number of time steps to take
 hr       =  3600;                % conversion seconds to hours
 yr       =  24*365.25*hr;        % conversion seconds to years
-tend     =  48*hr;               % end time for simulation [s]
+tend     =  1*yr;                % end time for simulation [s]
 dt       =  10;                  % initial time step [s]
-dtmax    =  10;                  % maximum time step [s]
+dtmax    =  1e3;                 % maximum time step [s]
 
 % set initial thermo-chemical state
 seed     =  15;                  % random perturbation seed
 smth     =  (N/30)^2;            % regularisation of initial random perturbation
 zlay     =  0.5;                 % layer thickness (relative to domain depth D)
 wlay_T   =  1e-6;                % thickness of smooth layer boundary (relative to domain depth D)
-wlay_c   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
+wlay_c   =  3*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
 T0       =  1200;                % temperature top layer [deg C]
 T1       =  1200;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
@@ -67,10 +67,10 @@ Ptop     =  1e8;                 % top pressure [Pa]
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls)
 bndinit  =  0;                   % switch on (1) to initialise with already established boundary layers
 dw       =  1*h;                 % boundary layer thickness for assimilation [m]
-fin      =  0;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
+fin      =  1;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
 fout     =  1;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
-tau_T    =  4*hr;                % wall cooling/assimilation time [s]
-tau_a    =  8*hr;                % wall cooling/assimilation time [s]
+tau_T    =  2*hr;                % wall cooling/assimilation time [s]
+tau_a    =  2*hr;                % wall cooling/assimilation time [s]
 Twall    =  500;                 % wall temperature [degC] (nan = insulating)
 cwall    =  nan;                 % wall major component [wt SiO2] (nan = no assimilation)
 vwall    =  nan;                 % wall volatile component [wt H2O] (nan = no assimilation)
@@ -80,15 +80,13 @@ siwall   =  nan;                 % wall stable isotope [delta] (nan = no assimil
 riwall   =  nan;                 % wall radiogenic isotope [wt ppm] (nan = no assimilation)
 
 % set thermo-chemical material parameters
-kc       =  1e-7;                % chemical diffusivity [m^2/s]
-kTm      =  4;                   % melt thermal conductivity [W/m/k]
-kTx      =  1;                   % xtal thermal conductivity [W/m/k]
-kTf      =  0.02;                % mvp  thermal conductivity [W/m/k]
-Cpm      =  1400;                % melt heat capacity [J/kg/K]
-Cpx      =  1000;                % xtal heat capacity [J/kg/K]
-Cpf      =  2000;                % mvp  heat capacity [J/kg/K]
-Dsx      = -300;                 % entropy change of crystallisation [J/kg/K]
-Dsf      =  400;                 % entropy change of exsolution [J/kg/K]
+kc       =  1e-4;                % chemical diffusivity [kg/m/s]
+kTm      =  4;                   % melt thermal conductivity [W/m/K]
+kTx      =  1;                   % xtal thermal conductivity [W/m/K]
+kTf      =  0.02;                % mvp  thermal conductivity [W/m/K]
+Cp       =  1300;                % heat capacity [J/kg/K]
+Dsx      = -300;                 % entropy change of crystallisation [J/kg]
+Dsf      =  600;                 % entropy change of exsolution [J/kg]
 
 % set phase diagram parameters
 cphs0    =  0.43;                % phase diagram lower bound composition [wt SiO2]
@@ -101,13 +99,13 @@ perCx    =  0.475;               % peritectic solidus  composition [wt SiO2]
 perT     =  1147;                % peritectic temperature [degC]
 clap     =  1e-7;                % Clapeyron slope for P-dependence of melting T [degC/Pa]
 dTH2O    =  [1200,1000,100];     % solidus shift from water content [degC/wt^0.75]
-tau_r    =  10;                  % reaction time [s]
+tau_r    =  60;                  % reaction time [s]
 
 % set model rheology parameters
 etam0    =  300;                 % melt viscosity [Pas]
 etaf0    =  0.1;                 % fluid viscosity [Pas]
 etax0    =  1e15;                % crystal viscosity [Pas]
-Fmc      =  5e+5;                % major component weakening factor of melt viscosity [1]
+Fmc      =  1e+5;                % major component weakening factor of melt viscosity [1]
 Fmv      =  0.6;                 % volatile component weakening factor of melt viscosity [1]
 Em       =  175e3;               % activation energy melt viscosity [J/mol]
 AA       = [ 0.60, 0.25, 0.30; 0.20, 0.20, 0.20; 0.20, 0.20, 0.20; ];  % permission slopes
@@ -126,19 +124,18 @@ gCx      =  0.5;                 % xtal compositional expansion [1/wt]
 bPf      =  1e-8;                % mvp compressibility [1/Pa]
 dx       =  1e-3;                % crystal size [m]
 df       =  1e-3;                % bubble size [m]
-dm       =  1e-4;                % melt film size [m]
 g0       =  10.;                 % gravity [m/s2]
 
 % set numerical model parameters
-CFL      =  0.5;                 % (physical) time stepping courant number (multiplies stable step) [0,1]
+CFL      =  0.125;               % (physical) time stepping courant number (multiplies stable step) [0,1]
 ADVN     =  'FRM';               % advection scheme ('UPW2', 'UPW3', or 'FRM')
 theta    =  0.5;                 % time-stepping parameter (1 = 1st-order implicit; 1/2 = 2nd-order semi-implicit)
-rtol     =  1e-5;                % outer its relative tolerance
+rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-7;                % outer its absolute tolerance
-maxit    =  100;                 % maximum outer its
-alpha    =  0.80;                % iterative lag parameter equilibration
-beta     =  0.75;                % iterative lag parameter phase diagram
-delta    =  5;                   % smoothness of segregation speed
+maxit    =  20;                  % maximum outer its
+alpha    =  0.5;                 % iterative lag parameter equilibration
+beta     =  0.5;                 % iterative lag parameter phase diagram
+delta    =  0;                   % smoothness of segregation speed
 etamin   =  1e1;                 % minimum viscosity for stabilisation
 etamax   =  1e8;                 % maximum viscosity for stabilisation
 TINY     =  1e-16;               % minimum cutoff phase, component fractions

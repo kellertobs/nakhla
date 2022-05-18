@@ -9,7 +9,7 @@ if plot_op
             
         fh1 = figure(1); clf;
         subplot(5,1,1)
-        plot(hist.time/hr,hist.T(:,2),'k-','LineWidth',2); axis xy tight; box on;
+        plot(hist.time/hr,hist.T(:,2)-273.15,'k-','LineWidth',2); axis xy tight; box on;
         title('$T [^\circ$C]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(5,1,2)
         plot(hist.time/hr,hist.cx(:,2)*100,'b-',hist.time/hr,hist.cm(:,2)*100,'r-',hist.time/hr,hist.c(:,2)./(1-hist.f(:,2))*100,'k-','LineWidth',2); axis xy tight; box on;
@@ -67,7 +67,7 @@ if plot_op
         
         fh1 = figure(1); clf;
         subplot(1,5,1)
-        plot(mean(T(2:end-1,2:end-1),2),Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
+        plot(mean(T(2:end-1,2:end-1),2)-273.15,Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
         title('$T [^\circ$C]',TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(1,5,2)
         plot(mean(cx(2:end-1,2:end-1),2)*100,Z(2:end-1).','b-',mean(cm(2:end-1,2:end-1),2)*100,Z(2:end-1).','r-',mean(c(2:end-1,2:end-1)./(1-f(2:end-1,2:end-1)),2)*100,Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
@@ -98,10 +98,10 @@ if plot_op
         
         fh3 = figure(3); clf;
         subplot(1,5,1)
-        plot(mean(rho(2:end-1,2:end-1),2),Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
+        plot(mean(rhox(2:end-1,2:end-1),2),Z(2:end-1).','b-',mean(rhom(2:end-1,2:end-1),2),Z(2:end-1).','r-',mean(rho(2:end-1,2:end-1),2),Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
         title('$\bar{\rho}$ [kg/m$^3$]',TX{:},FS{:}); ylabel('Depth [km]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(1,5,2)
-        plot(mean(log10(etact(2:end-1,2:end-1)),2),Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
+        plot(mean(log10(min(etact(2:end-1,2:end-1),etam(2:end-1,2:end-1))),2),Z(2:end-1).','r-',mean(log10(etact(2:end-1,2:end-1)),2),Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
         title('$\bar{\eta}$ [log$_{10}$ Pas]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(1,5,3)
         plot(mean(Gx(2:end-1,2:end-1)./rho(2:end-1,2:end-1),2)*100*hr.*(mean(chi(2:end-1,2:end-1),2)>1e-9),Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
@@ -115,19 +115,19 @@ if plot_op
 
         fh4 = figure(4); clf;
         subplot(1,5,1)
-        plot(mean(it(2:end-1,2:end-1),2),Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
+        semilogx(mean(itx(2:end-1,2:end-1),2)*100,Z(2:end-1).','b-',mean(itm(2:end-1,2:end-1),2)*100,Z(2:end-1).','r-',mean(it(2:end-1,2:end-1)./(1-f(2:end-1,2:end-1)),2)*100,Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
         title('incomp. trace',TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(1,5,2)
-        plot(mean(ct(2:end-1,2:end-1),2),Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
+        semilogx(mean(ctx(2:end-1,2:end-1),2)*100,Z(2:end-1).','b-',mean(ctm(2:end-1,2:end-1),2)*100,Z(2:end-1).','r-',mean(ct(2:end-1,2:end-1)./(1-f(2:end-1,2:end-1)),2)*100,Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
         title('comp. trace',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(1,5,3)
         plot(mean(si(2:end-1,2:end-1),2),Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
         title('stable isotope',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(1,5,4)
-        plot(mean(rip(2:end-1,2:end-1),2),Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
+        semilogx(mean(ripx(2:end-1,2:end-1),2)*100,Z(2:end-1).','b-',mean(ripm(2:end-1,2:end-1),2)*100,Z(2:end-1).','r-',mean(rip(2:end-1,2:end-1)./(1-f(2:end-1,2:end-1)),2)*100,Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
         title(['radiogenic parent'],TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(1,5,5)
-        plot(mean(rid(2:end-1,2:end-1),2),Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
+        semilogx(mean(ridx(2:end-1,2:end-1),2)*100,Z(2:end-1).','b-',mean(ridm(2:end-1,2:end-1),2)*100,Z(2:end-1).','r-',mean(rid(2:end-1,2:end-1)./(1-f(2:end-1,2:end-1)),2)*100,Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
         title(['radiogenic daughter'],TX{:},FS{:}); set(gca,TL{:},TS{:});
         
     else % create 2D plots
@@ -233,7 +233,7 @@ if plot_op
     figure(2);
     sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
     axes(ax(21));
-    imagesc(X(2:end-1),Z(2:end-1),T(2:end-1,2:end-1)     ); axis ij equal tight; box on; cb = colorbar;
+    imagesc(X(2:end-1),Z(2:end-1),T(2:end-1,2:end-1)-273.15); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$T [^\circ$C]'],TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:});
     axes(ax(22));
     imagesc(X(2:end-1),Z(2:end-1),c(2:end-1,2:end-1)./(1-f(2:end-1,2:end-1)).*100); axis ij equal tight; box on; cb = colorbar;
@@ -335,7 +335,7 @@ if plot_op
     plot(CCx,TT,'k-','LineWidth',2); axis tight; hold on; box on;
     plot(CCm,TT,'k-','LineWidth',2);
     
-    Tplt = T - (Pt-Ptop)*clap;
+    Tplt = T-273.15 - (Pt-Ptop)*clap;
     cplt = c./(1-f);
     plot(cplt(2:end-1,2:end-1),Tplt(2:end-1,2:end-1),'k.',cx(2:end-1,2:end-1),Tplt(2:end-1,2:end-1),'b.',cm(2:end-1,2:end-1),Tplt(2:end-1,2:end-1),'r.','LineWidth',2,'MarkerSize',15);
     
@@ -421,9 +421,9 @@ if save_op
     end
     
     name = [opdir,'/',runID,'/',runID,'_',num2str(floor(step/nop))];
-    save(name,'U','W','P','Pt','f','x','m','phi','chi','mu','H','C','V','T','c','v','cm','cx','vm','vf','IT','CT','SIm','SIx','SI','RIP','RID','it','ct','sim','six','si','rip','rid','dHdt','dCdt','dVdt','dITdt','dCTdt','dSImdt','dSIxdt','dfdt','dxdt','Gf','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step','hist');
+    save(name,'U','W','P','Pt','f','x','m','phi','chi','mu','H','C','V','T','c','v','cm','cx','vm','vf','IT','CT','SI','RIP','RID','it','ct','si','rip','rid','dHdt','dCdt','dVdt','dITdt','dCTdt','dSIdt','dfdt','dxdt','Gf','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step','hist');
     name = [opdir,'/',runID,'/',runID,'_cont'];
-    save(name,'U','W','P','Pt','f','x','m','phi','chi','mu','H','C','V','T','c','v','cm','cx','vm','vf','IT','CT','SIm','SIx','SI','RIP','RID','it','ct','sim','six','si','rip','rid','dHdt','dCdt','dVdt','dITdt','dCTdt','dSImdt','dSIxdt','dfdt','dxdt','Gf','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step','hist');
+    save(name,'U','W','P','Pt','f','x','m','phi','chi','mu','H','C','V','T','c','v','cm','cx','vm','vf','IT','CT','SI','RIP','RID','it','ct','si','rip','rid','dHdt','dCdt','dVdt','dITdt','dCTdt','dSIdt','dfdt','dxdt','Gf','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step','hist');
     
     if step == 0
         logfile = [opdir,'/',runID,'/',runID,'.log'];
