@@ -90,21 +90,37 @@ hist.v(stp,1) = min(min(v(2:end-1,2:end-1)));
 hist.v(stp,2) = mean(mean(v(2:end-1,2:end-1)));
 hist.v(stp,3) = max(max(v(2:end-1,2:end-1)));
 
-hist.cx(stp,1) = min(min(cx(2:end-1,2:end-1)));
-hist.cx(stp,2) = mean(mean(cx(2:end-1,2:end-1)));
-hist.cx(stp,3) = max(max(cx(2:end-1,2:end-1)));
+indx = x>1e-6;
+if any(indx(:)>0)
+    hist.cx(stp,1) = min(min(cx(indx(2:end-1,2:end-1))));
+    hist.cx(stp,2) = sum(sum(cx(2:end-1,2:end-1).*x(2:end-1,2:end-1).*rho(2:end-1,2:end-1)))./sum(sum(x(2:end-1,2:end-1).*rho(2:end-1,2:end-1)));
+    hist.cx(stp,3) = max(max(cx(indx(2:end-1,2:end-1))));
+else
+    hist.cx(stp,1:3) = NaN;
+end
 
-hist.cm(stp,1) = min(min(cm(2:end-1,2:end-1)));
-hist.cm(stp,2) = mean(mean(cm(2:end-1,2:end-1)));
-hist.cm(stp,3) = max(max(cm(2:end-1,2:end-1)));
+indm = m>1e-6;
+if any(indm(:)>0)
+    hist.cm(stp,1) = min(min(cm(indm(2:end-1,2:end-1))));
+    hist.cm(stp,2) = sum(sum(cm(2:end-1,2:end-1).*m(2:end-1,2:end-1).*rho(2:end-1,2:end-1)))./sum(sum(m(2:end-1,2:end-1).*rho(2:end-1,2:end-1)));
+    hist.cm(stp,3) = max(max(cm(indm(2:end-1,2:end-1))));
+    
+    hist.vm(stp,1) = min(min(vm(indm(2:end-1,2:end-1))));
+    hist.vm(stp,2) = sum(sum(vm(2:end-1,2:end-1).*m(2:end-1,2:end-1).*rho(2:end-1,2:end-1)))./sum(sum(m(2:end-1,2:end-1).*rho(2:end-1,2:end-1)));
+    hist.vm(stp,3) = max(max(vm(indm(2:end-1,2:end-1))));
+else
+    hist.cm(stp,1:3) = NaN;
+    hist.vm(stp,1:3) = NaN;
+end
 
-hist.vf(stp,1) = min(min(vf(2:end-1,2:end-1)));
-hist.vf(stp,2) = mean(mean(vf(2:end-1,2:end-1)));
-hist.vf(stp,3) = max(max(vf(2:end-1,2:end-1)));
-
-hist.vm(stp,1) = min(min(vm(2:end-1,2:end-1)));
-hist.vm(stp,2) = mean(mean(vm(2:end-1,2:end-1)));
-hist.vm(stp,3) = max(max(vm(2:end-1,2:end-1)));
+indf = f>1e-6;
+if any(indf(:)>0)
+    hist.vf(stp,1) = min(min(vf(indf(2:end-1,2:end-1))));
+    hist.vf(stp,2) = sum(sum(vf(2:end-1,2:end-1).*f(2:end-1,2:end-1).*rho(2:end-1,2:end-1)))./sum(sum(f(2:end-1,2:end-1).*rho(2:end-1,2:end-1)));
+    hist.vf(stp,3) = max(max(vf(indf(2:end-1,2:end-1))));
+else
+    hist.vf(stp,1:3) = NaN;
+end
 
 hist.Gx(stp,1) = min(min(Gx(2:end-1,2:end-1)));
 hist.Gx(stp,2) = mean(mean(Gx(2:end-1,2:end-1)));
@@ -153,3 +169,54 @@ hist.rip(stp,3) = max(max(rip(2:end-1,2:end-1)));
 hist.rid(stp,1) = min(min(rid(2:end-1,2:end-1)));
 hist.rid(stp,2) = mean(mean(rid(2:end-1,2:end-1)));
 hist.rid(stp,3) = max(max(rid(2:end-1,2:end-1)));
+
+% fraction of magma suspension (mu>0.55)
+indmagma = max(0,min(1,(1+erf((mu-0.55)./0.05))/2));
+hist.Fmagma(stp) = sum(sum(rho(2:end-1,2:end-1).*indmagma(2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*h^2));
+hist.Cmagma(stp) = sum(sum(rho(2:end-1,2:end-1).*indmagma(2:end-1,2:end-1).*c(2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*indmagma(2:end-1,2:end-1).*h^2));
+
+% fraction of plutonic rock (mu<0.15)
+indpluton = max(0,min(1,(1+erf((chi-0.85)./0.05))/2));
+hist.Fpluton(stp) = sum(sum(rho(2:end-1,2:end-1).*indpluton(2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*h^2));
+hist.Cpluton(stp) = sum(sum(rho(2:end-1,2:end-1).*indpluton(2:end-1,2:end-1).*c(2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*indpluton(2:end-1,2:end-1).*h^2));
+
+% fraction of magma mush (0.15<mu<0.55)
+indmush = max(0,min(1,1-indmagma-indpluton));
+hist.Fmush(stp) = sum(sum(rho(2:end-1,2:end-1).*indmush(2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*h^2));
+hist.Cmush(stp) = sum(sum(rho(2:end-1,2:end-1).*indmush(2:end-1,2:end-1).*c(2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*indmush(2:end-1,2:end-1).*h^2));
+
+% fraction of felsic compositions (c > (perCm_cphs1)/2)
+indfelsic = max(0,min(1,(1+erf((c-(perCm+cphs1)/2)./0.005))/2));
+hist.Ffelsic(stp) = sum(sum(rho(2:end-1,2:end-1).*indfelsic(2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*h^2));
+hist.Xfelsic(stp) = sum(sum(rho(2:end-1,2:end-1).*indfelsic(2:end-1,2:end-1).*x(2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*indfelsic(2:end-1,2:end-1).*h^2));
+
+% fraction of intermediate compositions (perCm < c < (perCm_cphs1)/2)
+indinterm = max(0,min(1,(1+erf((c-perCm)./0.005))/2 .* (1-indfelsic)));
+hist.Finterm(stp) = sum(sum(rho(2:end-1,2:end-1).*indinterm(2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*h^2));
+hist.Xinterm(stp) = sum(sum(rho(2:end-1,2:end-1).*indinterm(2:end-1,2:end-1).*x(2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*indinterm(2:end-1,2:end-1).*h^2));
+
+% fraction of mafic compositions (perCx < c < perCm)
+indmafic = max(0,min(1,(1+erf((c-perCx)./0.005))/2 .* (1-indinterm-indfelsic)));
+hist.Fmafic(stp) = sum(sum(rho(2:end-1,2:end-1).*indmafic(2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*h^2));
+hist.Xmafic(stp) = sum(sum(rho(2:end-1,2:end-1).*indmafic(2:end-1,2:end-1).*x(2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*indmafic(2:end-1,2:end-1).*h^2));
+
+% fraction of ultramafic compositions (c < perCx)
+indultram = max(0,min(1,1-indmafic-indinterm-indfelsic));
+hist.Fultram(stp) = sum(sum(rho(2:end-1,2:end-1).*indultram(2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*h^2));
+hist.Xultram(stp) = sum(sum(rho(2:end-1,2:end-1).*indultram(2:end-1,2:end-1).*x(2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*indultram(2:end-1,2:end-1).*h^2));
+
+% differentiation index
+nobnd = bndshape<1e-2;
+if any(nobnd(:))
+    hist.Rdiff(stp) = (max(max(c(nobnd(2:end-1,2:end-1))))-min(min(c(nobnd(2:end-1,2:end-1)))))./(cphs1-cphs0);
+end
+
+% index of assimilation
+if step>1
+    hist.RaC (stp) = hist.RaC (stp-1) + sum(sum(bndC (2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*h^2)).*dt;
+    hist.RaV (stp) = hist.RaV (stp-1) + sum(sum(bndV (2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*h^2)).*dt;
+    hist.RaSI(stp) = hist.RaSI(stp-1) + sum(sum(bndSI(2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*h^2)).*dt;
+    hist.Ra  (stp) = hist.Ra  (stp-1) + sum(sum(bndshape(2:end-1,2:end-1).*rho(2:end-1,2:end-1)./tau_a.*h^2))./sum(sum(rho(2:end-1,2:end-1).*h^2)).*dt;
+else
+    hist.Ra(stp,1) = 0; hist.RaC(stp,1) = 0; hist.RaV(stp,1) = 0; hist.RaSI(stp,1) = 0;
+end
