@@ -6,7 +6,9 @@ rhox = rhox0 .* (1 - aTx.*(T-perT-273.15) - gCx.*(cx-(perCx+perCm)/2));
 rhof = rhof0 .* (1 - aTf.*(T-perT-273.15) + bPf.*(Pt-Ptop ));
 
 % convert weight to volume fraction, update bulk density
-rho   = 1./(m./rhom + x./rhox + f./rhof);  rho([1 end],:) = rho([2 end-1],:);  rho(:,[1 end]) = rho(:,[2 end-1]);
+rho   = 1./(m./rhom + x./rhox + f./rhof);  
+rho([1 end],:) = rho([2 end-1],:);  
+rho(:,[1 end]) = rho(:,[2 end-1]);
 
 chi   = x.*rho./rhox;
 phi   = f.*rho./rhof;
@@ -21,7 +23,8 @@ kT    = mu.*kTm + chi.*kTx + phi.*kTf;                                     % mag
 
 % update effective viscosity
 etam  = etam0 .* exp(Em./(8.3145.*T)-Em./(8.3145.*(perT+273.15))) ...
-              .* Fmc.^((cm-(perCx+perCm)/2)./(cphs1-cphs0)) .* Fmv.^(vm./0.01);  % variable melt viscosity
+              .* Fmc.^((cm-(perCx+perCm)/2)./(cphs1-cphs0)) ...
+              .* Fmv.^(vm./0.01);                                          % variable melt viscosity
 etaf  = etaf0.* ones(size(f));                                             % constant fluid viscosity
 etax  = etax0.* ones(size(x));                                             % constant crysta viscosity
 
@@ -82,9 +85,7 @@ tII(:,[1 end]) = tII(:,[2 end-1]);
 tII([1 end],:) = tII([2 end-1],:);
 
 % update phase segregation speeds
-% wx = ((rhox(1:end-1,:)+rhox(2:end,:))/2-rhoref)*g0.*(Csgr_x(1:end-1,:)+ Csgr_x(2:end,:)).*0.5; % crystal segregation speed
 wx = ((rhox(1:end-1,:)+rhox(2:end,:))/2-rhoref)*g0.*(Csgr_x(1:end-1,:).*Csgr_x(2:end,:)).^0.5; % crystal segregation speed
-% wx = ((rhox(1:end-1,:)+rhox(2:end,:))/2-rhoref)*g0.*(0.5./Csgr_x(1:end-1,:)+0.5./Csgr_x(2:end,:)).^-1; % crystal segregation speed
 if top==1; wx(1  ,:) = 0; end
 if bot==1; wx(end,:) = 0; end
 for i = 1:round(delta)

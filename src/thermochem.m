@@ -229,10 +229,10 @@ qx   = - kc.*(m(:,1:end-1)+m(:,2:end))/2 .* ddx(si,h);
 diff_si(2:end-1,2:end-1) = - ddz(qz(:,2:end-1),h) ...                      % diffusion in melt
                            - ddx(qx(2:end-1,:),h);
                        
-assim = zeros(size(si));
-if ~isnan(siwall); assim = assim + (siwall-si).*rho.*m./tau_a .* bndshape; end % impose wall assimilation
+bndSI = zeros(size(si));
+if ~isnan(siwall); bndSI = bndSI + (siwall-si).*rho.*m./tau_a .* bndshape; end % impose wall assimilation
 
-dSIdt = - advn_si + diff_si + assim;                                       % total rate of change
+dSIdt = - advn_si + diff_si + bndSI;                                       % total rate of change
 
 SI = SIo + (THETA.*dSIdt + (1-THETA).*dSIdto).*dt;                         % explicit update
 SI([1 end],:) = SI([2 end-1],:);                                           % boundary conditions

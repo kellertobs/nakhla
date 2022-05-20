@@ -15,7 +15,7 @@ if plot_op
         plot(hist.time/hr,hist.cx(:,2)*100,'b-',hist.time/hr,hist.cm(:,2)*100,'r-',hist.time/hr,hist.c(:,2)./(1-hist.f(:,2))*100,'k-','LineWidth',2); axis xy tight; box on;
         title('$\bar{c}/(1-f)$ [wt\% SiO$_2$]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(5,1,3)
-        semilogy(hist.time/hr,max(1e-6,hist.vf(:,2)*100),'b-',hist.time/hr,max(1e-6,hist.vm(:,2)*100),'r-',hist.time/hr,max(1e-6,hist.v(:,2)./(1-hist.x(:,2))*100),'k-','LineWidth',2); axis xy tight; box on;
+        semilogy(hist.time/hr,hist.vf(:,2)*100,'b-',hist.time/hr,hist.vm(:,2)*100,'r-',hist.time/hr,hist.v(:,2)./(1-hist.x(:,2))*100,'k-','LineWidth',2); axis xy tight; box on;
         title('$\bar{v}/(1-x)$ [wt\% H$_2$O]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(5,1,4)
         plot(hist.time/hr,hist.chi(:,2)*100.*(hist.chi(:,2)>1e-9),'k-','LineWidth',2); axis xy tight; box on;
@@ -115,19 +115,19 @@ if plot_op
 
         fh4 = figure(4); clf;
         subplot(1,5,1)
-        semilogx(mean(itx(2:end-1,2:end-1),2)*100,Z(2:end-1).','b-',mean(itm(2:end-1,2:end-1),2)*100,Z(2:end-1).','r-',mean(it(2:end-1,2:end-1)./(1-f(2:end-1,2:end-1)),2)*100,Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
+        semilogx(mean(max(1e-3,min(1e3,itx(2:end-1,2:end-1))),2)*100,Z(2:end-1).','b-',mean(max(1e-3,min(1e3,itm(2:end-1,2:end-1))),2)*100,Z(2:end-1).','r-',mean(max(1e-3,min(1e3,it(2:end-1,2:end-1)./(1-f(2:end-1,2:end-1)))),2)*100,Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
         title('incomp. trace',TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(1,5,2)
-        semilogx(mean(ctx(2:end-1,2:end-1),2)*100,Z(2:end-1).','b-',mean(ctm(2:end-1,2:end-1),2)*100,Z(2:end-1).','r-',mean(ct(2:end-1,2:end-1)./(1-f(2:end-1,2:end-1)),2)*100,Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
+        semilogx(mean(max(1e-3,min(1e3,ctx(2:end-1,2:end-1))),2)*100,Z(2:end-1).','b-',mean(max(1e-3,min(1e3,ctm(2:end-1,2:end-1))),2)*100,Z(2:end-1).','r-',mean(max(1e-3,min(1e3,ct(2:end-1,2:end-1)./(1-f(2:end-1,2:end-1)))),2)*100,Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
         title('comp. trace',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(1,5,3)
         plot(mean(si(2:end-1,2:end-1),2),Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
         title('stable isotope',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(1,5,4)
-        semilogx(mean(ripx(2:end-1,2:end-1),2)*100,Z(2:end-1).','b-',mean(ripm(2:end-1,2:end-1),2)*100,Z(2:end-1).','r-',mean(rip(2:end-1,2:end-1)./(1-f(2:end-1,2:end-1)),2)*100,Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
+        semilogx(mean(max(1e-3,min(1e3,ripx(2:end-1,2:end-1))),2)*100,Z(2:end-1).','b-',mean(max(1e-3,min(1e3,ripm(2:end-1,2:end-1))),2)*100,Z(2:end-1).','r-',mean(max(1e-3,min(1e3,rip(2:end-1,2:end-1)./(1-f(2:end-1,2:end-1)))),2)*100,Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
         title(['radiogenic parent'],TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(1,5,5)
-        semilogx(mean(ridx(2:end-1,2:end-1),2)*100,Z(2:end-1).','b-',mean(ridm(2:end-1,2:end-1),2)*100,Z(2:end-1).','r-',mean(rid(2:end-1,2:end-1)./(1-f(2:end-1,2:end-1)),2)*100,Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
+        semilogx(mean(max(1e-3,min(1e3,ridx(2:end-1,2:end-1))),2)*100,Z(2:end-1).','b-',mean(max(1e-3,min(1e3,ridm(2:end-1,2:end-1))),2)*100,Z(2:end-1).','r-',mean(max(1e-3,min(1e3,rid(2:end-1,2:end-1)./(1-f(2:end-1,2:end-1)))),2)*100,Z(2:end-1).','k-','LineWidth',2); axis ij tight; box on;
         title(['radiogenic daughter'],TX{:},FS{:}); set(gca,TL{:},TS{:});
         
     else % create 2D plots
@@ -323,7 +323,7 @@ if plot_op
     Tphs0s = Tphs0;
     Tphs1s = Tphs1;
     vv = 0.10*ones(size(TT));
-    for i = 1:10
+    for i = 1:5
         perTs  = perT -dTH2O(2)*mean(vv(abs(TT-Ptop*clap-perTs )<1)).^0.75;
         Tphs0s = Tphs0-dTH2O(1)*mean(vv(abs(TT-Ptop*clap-Tphs0s)<1)).^0.75;
         Tphs1s = Tphs1-dTH2O(3)*mean(vv(abs(TT-Ptop*clap-Tphs1s)<1)).^0.75;
@@ -421,9 +421,9 @@ if save_op
     end
     
     name = [opdir,'/',runID,'/',runID,'_',num2str(floor(step/nop))];
-    save(name,'U','W','P','Pt','f','x','m','phi','chi','mu','H','C','V','T','c','v','cm','cx','vm','vf','IT','CT','SI','RIP','RID','it','ct','si','rip','rid','dHdt','dCdt','dVdt','dITdt','dCTdt','dSIdt','dfdt','dxdt','Gf','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step','hist');
+    save(name,'U','W','P','Pt','f','x','m','phi','chi','mu','H','C','V','T','c','v','cm','cx','vm','vf','IT','CT','SI','RIP','RID','it','ct','si','rip','rid','dHdt','dCdt','dVdt','dITdt','dCTdt','dSIdt','dfdt','dxdt','Gf','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step','hist','VolSrc','wf','wx');
     name = [opdir,'/',runID,'/',runID,'_cont'];
-    save(name,'U','W','P','Pt','f','x','m','phi','chi','mu','H','C','V','T','c','v','cm','cx','vm','vf','IT','CT','SI','RIP','RID','it','ct','si','rip','rid','dHdt','dCdt','dVdt','dITdt','dCTdt','dSIdt','dfdt','dxdt','Gf','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step','hist');
+    save(name,'U','W','P','Pt','f','x','m','phi','chi','mu','H','C','V','T','c','v','cm','cx','vm','vf','IT','CT','SI','RIP','RID','it','ct','si','rip','rid','dHdt','dCdt','dVdt','dITdt','dCTdt','dSIdt','dfdt','dxdt','Gf','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step','hist','VolSrc','wf','wx');
     
     if step == 0
         logfile = [opdir,'/',runID,'/',runID,'.log'];
