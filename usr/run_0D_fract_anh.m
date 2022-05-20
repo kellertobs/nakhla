@@ -6,7 +6,7 @@ opdir    =  '../out/';           % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  100;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot of results
-save_op  =  1;                   % switch on to save output to file
+save_op  =  0;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
 react    =  1;                   % switch on reactive mode
 diseq    =  1;                   % switch on disequilibrium approac
@@ -19,19 +19,19 @@ N        =  1 + 2;               % number of grid points in z-direction (incl. 2
 h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
-M        =  5e4;                 % number of time steps to take
+M        =  1e5;                 % number of time steps to take
 hr       =  3600;                % conversion seconds to hours
 yr       =  24*365.25*hr;        % conversion seconds to years
-tend     =  3*hr;                % end time for simulation [s]
-dt       =  10;                  % initial time step [s]
-dtmax    =  10;                  % maximum time step [s]
+tend     =  8*hr;                % end time for simulation [s]
+dt       =  36;                  % initial time step [s]
+dtmax    =  36;                  % maximum time step [s]
 
 % set initial thermo-chemical state
 seed     =  15;                  % random perturbation seed
 smth     =  (N/30)^2;            % regularisation of initial random perturbation
 zlay     =  0.5;                 % layer thickness (relative to domain depth D)
-wlay_T   =  1e-6;                % thickness of smooth layer boundary (relative to domain depth D)
-wlay_c   =  3*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
+wlay_T   =  4*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
+wlay_c   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
 T0       =  1400;                % temperature top layer [deg C]
 T1       =  1400;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
@@ -49,18 +49,18 @@ dit      =  0.00;                % incompatible tracer random noise [wt ppm]
 KIT      =  1e-2;                % incompatible tracer partition coefficient
 ct0      =  1;                   % compatible tracer top layer [wt ppm]
 ct1      =  1;                   % compatible tracer base layer [wt ppm]
-dct      =  -0.00;               % compatible tracer random noise [wt ppm]
-KCT      =  1e2;                 % compatible tracer partition coefficient
-si0      =  -1;                  % stable isotope ratio top layer [delta]
+dct      = -0.00;                % compatible tracer random noise [wt ppm]
+KCT      =  1e+2;                % compatible tracer partition coefficient
+si0      =  1;                   % stable isotope ratio top layer [delta]
 si1      =  1;                   % stable isotope ratio base layer [delta]
 dsi      =  0.00;                % stable isotope ratio random noise [delta]
 ri0      =  1;                   % radiogenic isotope top layer [wt ppm]
 ri1      =  1;                   % radiogenic isotope base layer [wt ppm]
-dri      =  -0.00;               % radiogenic isotope random noise [wt ppm]
-KRIP     =  10;                  % radiogenic parent isotope partition coefficient
+dri      = -0.00;                % radiogenic isotope random noise [wt ppm]
+KRIP     =  10.;                 % radiogenic parent isotope partition coefficient
 KRID     =  0.1;                 % radiogenic daughter isotope partition coefficient
-HLRIP    =  1e3*yr;              % radiogenic parent isotope half-life [s]
-HLRID    =  1e2*yr;              % radiogenic daughter isotope half-life [s]
+HLRIP    =  100*yr;              % radiogenic parent isotope half-life [s]
+HLRID    =    1*yr;              % radiogenic daughter isotope half-life [s]
 
 % set thermo-chemical boundary parameters
 Ptop     =  1e8;                 % top pressure [Pa]
@@ -69,8 +69,8 @@ bndinit  =  0;                   % switch on (1) to initialise with already esta
 dw       =  1*h;                 % boundary layer thickness for assimilation [m]
 fin      =  0;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
 fout     =  0;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
-tau_T    =  2*hr;                % wall cooling/assimilation time [s]
-tau_a    =  2*hr;                % wall cooling/assimilation time [s]
+tau_T    =  4*hr;                % wall cooling/assimilation time [s]
+tau_a    =  4*hr;                % wall cooling/assimilation time [s]
 Twall    =  500;                 % wall temperature [degC] (nan = insulating)
 cwall    =  nan;                 % wall major component [wt SiO2] (nan = no assimilation)
 vwall    =  nan;                 % wall volatile component [wt H2O] (nan = no assimilation)
@@ -127,15 +127,15 @@ df       =  1e-3;                % bubble size [m]
 g0       =  10.;                 % gravity [m/s2]
 
 % set numerical model parameters
-CFL      =  0.5;                 % (physical) time stepping courant number (multiplies stable step) [0,1]
+CFL      =  0.25;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 ADVN     =  'FRM';               % advection scheme ('UPW2', 'UPW3', or 'FRM')
 theta    =  0.5;                 % time-stepping parameter (1 = 1st-order implicit; 1/2 = 2nd-order semi-implicit)
 rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-7;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its
-alpha    =  0.5;                 % iterative lag parameter equilibration
-beta     =  0.5;                 % iterative lag parameter phase diagram
-delta    =  0;                   % smoothness of segregation speed
+alpha    =  0.25;                % iterative lag parameter equilibration
+beta     =  0.75;                % iterative lag parameter phase diagram
+delta    =  2;                   % smoothness of segregation speed
 etamin   =  1e1;                 % minimum viscosity for stabilisation
 etamax   =  1e16;                % maximum viscosity for stabilisation
 TINY     =  1e-16;               % minimum cutoff phase, component fractions
