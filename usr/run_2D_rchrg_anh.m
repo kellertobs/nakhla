@@ -29,15 +29,15 @@ dtmax    =  1e3;                 % maximum time step [s]
 % set initial thermo-chemical state
 seed     =  15;                  % random perturbation seed
 smth     =  (N/30)^2;            % regularisation of initial random perturbation
-zlay     =  0.9;                 % layer thickness (relative to domain depth D)
+zlay     =  2.0;                 % layer thickness (relative to domain depth D)
 wlay_T   =  4*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
 wlay_c   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
-T0       =  780;                 % temperature top layer [deg C]
-T1       =  1300;                % temperature base layer [deg C]
+T0       =  785;                 % temperature top layer [deg C]
+T1       =  1250;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
 c0       =  0.70;                % major component top layer [wt SiO2]
 c1       =  0.50;                % major component base layer [wt SiO2]
-dc       =  1e-3;                % amplitude of random noise [wt SiO2]
+dc       =  1e-2;                % amplitude of random noise [wt SiO2]
 v0       =  0.02;                % volatile component top layer [wt H2O]
 v1       =  0.00;                % volatile component base layer [wt H2O]
 dv       =  0e-6;                % amplitude of random noise [wt H2O]
@@ -64,20 +64,20 @@ HLRID    =    1*yr;              % radiogenic daughter isotope half-life [s]
 
 % set thermo-chemical boundary parameters
 Ptop     =  1e8;                 % top pressure [Pa]
-bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls)
+bndmode  =  2;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls)
 bndinit  =  0;                   % switch on (1) to initialise with already established boundary layers
 dw       =  1*h;                 % boundary layer thickness for assimilation [m]
 fin      =  1;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
 fout     =  1;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
 tau_T    =  8*hr;                % wall cooling/assimilation time [s]
 tau_a    =  8*hr;                % wall cooling/assimilation time [s]
-Twall    =  780;                 % wall temperature [degC] (nan = insulating)
-cwall    =  nan;                 % wall major component [wt SiO2] (nan = no assimilation)
-vwall    =  nan;                 % wall volatile component [wt H2O] (nan = no assimilation)
-itwall   =  nan;                 % wall incomp. tracer [wt ppm] (nan = no assimilation)
-ctwall   =  nan;                 % wall comp. tracer [wt ppm] (nan = no assimilation)
-siwall   =  nan;                 % wall stable isotope [delta] (nan = no assimilation)
-riwall   =  nan;                 % wall radiogenic isotope [wt ppm] (nan = no assimilation)
+Twall    =  1250;                 % wall temperature [degC] (nan = insulating)
+cwall    =  0.5;                 % wall major component [wt SiO2] (nan = no assimilation)
+vwall    =  0.0;                 % wall volatile component [wt H2O] (nan = no assimilation)
+itwall   =  0.1;                 % wall incomp. tracer [wt ppm] (nan = no assimilation)
+ctwall   =  10.;                 % wall comp. tracer [wt ppm] (nan = no assimilation)
+siwall   =  5.0;                 % wall stable isotope [delta] (nan = no assimilation)
+riwall   =  2.0;                 % wall radiogenic isotope [wt ppm] (nan = no assimilation)
 
 % set thermo-chemical material parameters
 kc       =  3e-4;                % chemical diffusivity [kg/m/s]
@@ -127,16 +127,16 @@ df       =  1e-3;                % bubble size [m]
 g0       =  10.;                 % gravity [m/s2]
 
 % set numerical model parameters
-CFL      =  0.5;                 % (physical) time stepping courant number (multiplies stable step) [0,1]
+CFL      =  0.25;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 ADVN     =  'FRM';               % advection scheme ('UPW2', 'UPW3', or 'FRM')
 theta    =  0.5;                 % time-stepping parameter (1 = 1st-order implicit; 1/2 = 2nd-order semi-implicit)
 rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-7;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its
-alpha    =  0.25;                % iterative lag parameter equilibration
+alpha    =  0.50;                % iterative lag parameter equilibration
 beta     =  0.75;                % iterative lag parameter phase diagram
 delta    =  2;                   % smoothness of segregation speed
-etamin   =  1e2;                 % minimum viscosity for stabilisation
+etamin   =  1e3;                 % minimum viscosity for stabilisation
 etamax   =  1e8;                 % maximum viscosity for stabilisation
 TINY     =  1e-16;               % minimum cutoff phase, component fractions
 
