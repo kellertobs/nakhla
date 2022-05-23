@@ -95,8 +95,13 @@ if any(indx(:)>0)
     hist.cx(stp,1) = min(min(cx(indx(2:end-1,2:end-1))));
     hist.cx(stp,2) = sum(sum(cx(2:end-1,2:end-1).*x(2:end-1,2:end-1).*rho(2:end-1,2:end-1)))./sum(sum(x(2:end-1,2:end-1).*rho(2:end-1,2:end-1)));
     hist.cx(stp,3) = max(max(cx(indx(2:end-1,2:end-1))));
+    
+    hist.rhox(stp,1) = min(min(rhox(indx(2:end-1,2:end-1))));
+    hist.rhox(stp,2) = sum(sum(rhox(2:end-1,2:end-1).*x(2:end-1,2:end-1).*rho(2:end-1,2:end-1)))./sum(sum(x(2:end-1,2:end-1).*rho(2:end-1,2:end-1)));
+    hist.rhox(stp,3) = max(max(rhox(indx(2:end-1,2:end-1))));
 else
     hist.cx(stp,1:3) = NaN;
+    hist.rhox(stp,1:3) = NaN;
 end
 
 indm = m>1e-6;
@@ -108,9 +113,14 @@ if any(indm(:)>0)
     hist.vm(stp,1) = min(min(vm(indm(2:end-1,2:end-1))));
     hist.vm(stp,2) = sum(sum(vm(2:end-1,2:end-1).*m(2:end-1,2:end-1).*rho(2:end-1,2:end-1)))./sum(sum(m(2:end-1,2:end-1).*rho(2:end-1,2:end-1)));
     hist.vm(stp,3) = max(max(vm(indm(2:end-1,2:end-1))));
+    
+    hist.rhom(stp,1) = min(min(rhom(indm(2:end-1,2:end-1))));
+    hist.rhom(stp,2) = sum(sum(rhom(2:end-1,2:end-1).*m(2:end-1,2:end-1).*rho(2:end-1,2:end-1)))./sum(sum(m(2:end-1,2:end-1).*rho(2:end-1,2:end-1)));
+    hist.rhom(stp,3) = max(max(rhom(indm(2:end-1,2:end-1))));
 else
     hist.cm(stp,1:3) = NaN;
     hist.vm(stp,1:3) = NaN;
+    hist.rhom(stp,1:3) = NaN;
 end
 
 indf = f>1e-6;
@@ -118,8 +128,13 @@ if any(indf(:)>0)
     hist.vf(stp,1) = min(min(vf(indf(2:end-1,2:end-1))));
     hist.vf(stp,2) = sum(sum(vf(2:end-1,2:end-1).*f(2:end-1,2:end-1).*rho(2:end-1,2:end-1)))./sum(sum(f(2:end-1,2:end-1).*rho(2:end-1,2:end-1)));
     hist.vf(stp,3) = max(max(vf(indf(2:end-1,2:end-1))));
+    
+    hist.rhof(stp,1) = min(min(rhof(indf(2:end-1,2:end-1))));
+    hist.rhof(stp,2) = sum(sum(rhof(2:end-1,2:end-1).*f(2:end-1,2:end-1).*rho(2:end-1,2:end-1)))./sum(sum(f(2:end-1,2:end-1).*rho(2:end-1,2:end-1)));
+    hist.rhof(stp,3) = max(max(rhof(indf(2:end-1,2:end-1))));
 else
     hist.vf(stp,1:3) = NaN;
+    hist.rhof(stp,1:3) = NaN;
 end
 
 hist.Gx(stp,1) = min(min(Gx(2:end-1,2:end-1)));
