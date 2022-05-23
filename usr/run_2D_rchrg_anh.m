@@ -6,7 +6,7 @@ opdir    =  '../out/';           % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  100;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot of results
-save_op  =  0;                   % switch on to save output to file
+save_op  =  1;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
 react    =  1;                   % switch on reactive mode
 diseq    =  1;                   % switch on disequilibrium approac
@@ -33,29 +33,29 @@ zlay     =  2.0;                 % layer thickness (relative to domain depth D)
 wlay_T   =  4*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
 wlay_c   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
 T0       =  785;                 % temperature top layer [deg C]
-T1       =  1250;                % temperature base layer [deg C]
+T1       =  785;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
 c0       =  0.70;                % major component top layer [wt SiO2]
-c1       =  0.50;                % major component base layer [wt SiO2]
+c1       =  0.70;                % major component base layer [wt SiO2]
 dc       =  1e-2;                % amplitude of random noise [wt SiO2]
 v0       =  0.02;                % volatile component top layer [wt H2O]
-v1       =  0.00;                % volatile component base layer [wt H2O]
+v1       =  0.02;                % volatile component base layer [wt H2O]
 dv       =  0e-6;                % amplitude of random noise [wt H2O]
 
 % set model trace and isotope geochemistry parameters
 it0      =  10.;                 % incompatible tracer top layer [wt ppm]
-it1      =  0.1;                 % incompatible tracer base layer [wt ppm]
+it1      =  10.;                 % incompatible tracer base layer [wt ppm]
 dit      =  0.00;                % incompatible tracer random noise [wt ppm]
 KIT      =  1e-2;                % incompatible tracer partition coefficient
 ct0      =  0.1;                 % compatible tracer top layer [wt ppm]
-ct1      =  10.;                 % compatible tracer base layer [wt ppm]
+ct1      =  0.1;                 % compatible tracer base layer [wt ppm]
 dct      = -0.00;                % compatible tracer random noise [wt ppm]
 KCT      =  1e+2;                % compatible tracer partition coefficient
 si0      = -5.;                  % stable isotope ratio top layer [delta]
-si1      =  5.;                  % stable isotope ratio base layer [delta]
+si1      = -5.;                  % stable isotope ratio base layer [delta]
 dsi      =  0.00;                % stable isotope ratio random noise [delta]
 ri0      =  0.5;                 % radiogenic isotope top layer [wt ppm]
-ri1      =  2.0;                 % radiogenic isotope base layer [wt ppm]
+ri1      =  0.5;                 % radiogenic isotope base layer [wt ppm]
 dri      = -0.00;                % radiogenic isotope random noise [wt ppm]
 KRIP     =  10.;                 % radiogenic parent isotope partition coefficient
 KRID     =  0.1;                 % radiogenic daughter isotope partition coefficient
@@ -69,9 +69,9 @@ bndinit  =  0;                   % switch on (1) to initialise with already esta
 dw       =  1*h;                 % boundary layer thickness for assimilation [m]
 fin      =  1;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
 fout     =  1;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
-tau_T    =  8*hr;                % wall cooling/assimilation time [s]
-tau_a    =  8*hr;                % wall cooling/assimilation time [s]
-Twall    =  1250;                 % wall temperature [degC] (nan = insulating)
+tau_T    =  10*hr;               % wall cooling/assimilation time [s]
+tau_a    =  10*hr;               % wall cooling/assimilation time [s]
+Twall    =  1250;                % wall temperature [degC] (nan = insulating)
 cwall    =  0.5;                 % wall major component [wt SiO2] (nan = no assimilation)
 vwall    =  0.0;                 % wall volatile component [wt H2O] (nan = no assimilation)
 itwall   =  0.1;                 % wall incomp. tracer [wt ppm] (nan = no assimilation)
@@ -80,7 +80,7 @@ siwall   =  5.0;                 % wall stable isotope [delta] (nan = no assimil
 riwall   =  2.0;                 % wall radiogenic isotope [wt ppm] (nan = no assimilation)
 
 % set thermo-chemical material parameters
-kc       =  3e-4;                % chemical diffusivity [kg/m/s]
+kc       =  1e-4;                % chemical diffusivity [kg/m/s]
 kTm      =  4;                   % melt thermal conductivity [W/m/K]
 kTx      =  1;                   % xtal thermal conductivity [W/m/K]
 kTf      =  0.02;                % mvp  thermal conductivity [W/m/K]
@@ -133,7 +133,7 @@ theta    =  0.5;                 % time-stepping parameter (1 = 1st-order implic
 rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-7;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its
-alpha    =  0.50;                % iterative lag parameter equilibration
+alpha    =  0.25;                % iterative lag parameter equilibration
 beta     =  0.75;                % iterative lag parameter phase diagram
 delta    =  2;                   % smoothness of segregation speed
 etamin   =  1e3;                 % minimum viscosity for stabilisation

@@ -6,7 +6,7 @@ opdir    =  '../out/';           % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  100;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot of results
-save_op  =  0;                   % switch on to save output to file
+save_op  =  1;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
 react    =  1;                   % switch on reactive mode
 diseq    =  1;                   % switch on disequilibrium approac
@@ -32,15 +32,15 @@ smth     =  (N/30)^2;            % regularisation of initial random perturbation
 zlay     =  0.5;                 % layer thickness (relative to domain depth D)
 wlay_T   =  4*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
 wlay_c   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
-T0       =  1300;                % temperature top layer [deg C]
-T1       =  1300;                % temperature base layer [deg C]
+T0       =  1250;                % temperature top layer [deg C]
+T1       =  1250;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
 c0       =  0.50;                % major component top layer [wt SiO2]
 c1       =  0.50;                % major component base layer [wt SiO2]
 dc       =  1e-4;                % amplitude of random noise [wt SiO2]
 v0       =  0.00;                % volatile component top layer [wt H2O]
 v1       =  0.00;                % volatile component base layer [wt H2O]
-dv       =  0e-6;                % amplitude of random noise [wt H2O]
+dv       =  0e-4;                % amplitude of random noise [wt H2O]
 
 % set model trace and isotope geochemistry parameters
 it0      =  0.1;                 % incompatible tracer top layer [wt ppm]
@@ -80,7 +80,7 @@ siwall   =  -5;                  % wall stable isotope [delta] (nan = no assimil
 riwall   =  0.5;                 % wall radiogenic isotope [wt ppm] (nan = no assimilation)
 
 % set thermo-chemical material parameters
-kc       =  3e-4;                % chemical diffusivity [kg/m/s]
+kc       =  1e-4;                % chemical diffusivity [kg/m/s]
 kTm      =  4;                   % melt thermal conductivity [W/m/K]
 kTx      =  1;                   % xtal thermal conductivity [W/m/K]
 kTf      =  0.02;                % mvp  thermal conductivity [W/m/K]
@@ -127,7 +127,7 @@ df       =  1e-3;                % bubble size [m]
 g0       =  10.;                 % gravity [m/s2]
 
 % set numerical model parameters
-CFL      =  0.5;                 % (physical) time stepping courant number (multiplies stable step) [0,1]
+CFL      =  0.25;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 ADVN     =  'FRM';               % advection scheme ('UPW2', 'UPW3', or 'FRM')
 theta    =  0.5;                 % time-stepping parameter (1 = 1st-order implicit; 1/2 = 2nd-order semi-implicit)
 rtol     =  1e-4;                % outer its relative tolerance
