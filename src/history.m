@@ -185,40 +185,47 @@ hist.rid(stp,1) = min(min(rid(2:end-1,2:end-1)));
 hist.rid(stp,2) = mean(mean(rid(2:end-1,2:end-1)));
 hist.rid(stp,3) = max(max(rid(2:end-1,2:end-1)));
 
-% fraction of magma suspension (mu>0.55)
+% fraction, composition, and temperature of eruptible magma suspension (mu>0.55)
 indmagma = max(0,min(1,(1+erf((mu-0.55)./0.05))/2));
 hist.Fmagma(stp) = sum(sum(rho(2:end-1,2:end-1).*indmagma(2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*h^2));
 hist.Cmagma(stp) = sum(sum(rho(2:end-1,2:end-1).*indmagma(2:end-1,2:end-1).*c(2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*indmagma(2:end-1,2:end-1).*h^2));
+hist.Tmagma(stp) = sum(sum(rho(2:end-1,2:end-1).*indmagma(2:end-1,2:end-1).*T(2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*indmagma(2:end-1,2:end-1).*h^2));
 
-% fraction of plutonic rock (mu<0.15)
+% fraction, composition, and temperature of plutonic rock (mu<0.15)
 indpluton = max(0,min(1,(1+erf((chi-0.85)./0.05))/2));
 hist.Fpluton(stp) = sum(sum(rho(2:end-1,2:end-1).*indpluton(2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*h^2));
 hist.Cpluton(stp) = sum(sum(rho(2:end-1,2:end-1).*indpluton(2:end-1,2:end-1).*c(2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*indpluton(2:end-1,2:end-1).*h^2));
+hist.Tpluton(stp) = sum(sum(rho(2:end-1,2:end-1).*indpluton(2:end-1,2:end-1).*T(2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*indpluton(2:end-1,2:end-1).*h^2));
 
-% fraction of magma mush (0.15<mu<0.55)
+% fraction, composition, and temperature of magma mush (0.15<mu<0.55)
 indmush = max(0,min(1,1-indmagma-indpluton));
 hist.Fmush(stp) = sum(sum(rho(2:end-1,2:end-1).*indmush(2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*h^2));
 hist.Cmush(stp) = sum(sum(rho(2:end-1,2:end-1).*indmush(2:end-1,2:end-1).*c(2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*indmush(2:end-1,2:end-1).*h^2));
+hist.Tmush(stp) = sum(sum(rho(2:end-1,2:end-1).*indmush(2:end-1,2:end-1).*T(2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*indmush(2:end-1,2:end-1).*h^2));
 
-% fraction of felsic compositions (c > (perCm_cphs1)/2)
+% fraction, crystallinity, and temperature of felsic materials (c > (perCm_cphs1)/2)
 indfelsic = max(0,min(1,(1+erf((c-(perCm+cphs1)/2)./0.005))/2));
 hist.Ffelsic(stp) = sum(sum(rho(2:end-1,2:end-1).*indfelsic(2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*h^2));
 hist.Xfelsic(stp) = sum(sum(rho(2:end-1,2:end-1).*indfelsic(2:end-1,2:end-1).*x(2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*indfelsic(2:end-1,2:end-1).*h^2));
+hist.Tfelsic(stp) = sum(sum(rho(2:end-1,2:end-1).*indfelsic(2:end-1,2:end-1).*T(2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*indfelsic(2:end-1,2:end-1).*h^2));
 
-% fraction of intermediate compositions (perCm < c < (perCm_cphs1)/2)
+% fraction, crystallinity, and temperature of intermediate materials (perCm < c < (perCm_cphs1)/2)
 indinterm = max(0,min(1,(1+erf((c-perCm)./0.005))/2 .* (1-indfelsic)));
 hist.Finterm(stp) = sum(sum(rho(2:end-1,2:end-1).*indinterm(2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*h^2));
 hist.Xinterm(stp) = sum(sum(rho(2:end-1,2:end-1).*indinterm(2:end-1,2:end-1).*x(2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*indinterm(2:end-1,2:end-1).*h^2));
+hist.Tinterm(stp) = sum(sum(rho(2:end-1,2:end-1).*indinterm(2:end-1,2:end-1).*T(2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*indinterm(2:end-1,2:end-1).*h^2));
 
-% fraction of mafic compositions (perCx < c < perCm)
+% fraction, crystallinity, and temperature of mafic materials (perCx < c < perCm)
 indmafic = max(0,min(1,(1+erf((c-perCx)./0.005))/2 .* (1-indinterm-indfelsic)));
 hist.Fmafic(stp) = sum(sum(rho(2:end-1,2:end-1).*indmafic(2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*h^2));
 hist.Xmafic(stp) = sum(sum(rho(2:end-1,2:end-1).*indmafic(2:end-1,2:end-1).*x(2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*indmafic(2:end-1,2:end-1).*h^2));
+hist.Tmafic(stp) = sum(sum(rho(2:end-1,2:end-1).*indmafic(2:end-1,2:end-1).*T(2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*indmafic(2:end-1,2:end-1).*h^2));
 
-% fraction of ultramafic compositions (c < perCx)
+% fraction, crystallinity, and temperature of ultramafic materials (c < perCx)
 indultram = max(0,min(1,1-indmafic-indinterm-indfelsic));
 hist.Fultram(stp) = sum(sum(rho(2:end-1,2:end-1).*indultram(2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*h^2));
 hist.Xultram(stp) = sum(sum(rho(2:end-1,2:end-1).*indultram(2:end-1,2:end-1).*x(2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*indultram(2:end-1,2:end-1).*h^2));
+hist.Tultram(stp) = sum(sum(rho(2:end-1,2:end-1).*indultram(2:end-1,2:end-1).*T(2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*indultram(2:end-1,2:end-1).*h^2));
 
 % differentiation index
 nobnd = bndshape<1e-2;

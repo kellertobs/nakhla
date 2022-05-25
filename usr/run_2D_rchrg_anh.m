@@ -69,8 +69,8 @@ bndinit  =  0;                   % switch on (1) to initialise with already esta
 dw       =  1*h;                 % boundary layer thickness for assimilation [m]
 fin      =  1;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
 fout     =  1;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
-tau_T    =  10*hr;               % wall cooling/assimilation time [s]
-tau_a    =  10*hr;               % wall cooling/assimilation time [s]
+tau_T    =  8*hr;                % wall cooling/assimilation time [s]
+tau_a    =  8*hr;                % wall cooling/assimilation time [s]
 Twall    =  1250;                % wall temperature [degC] (nan = insulating)
 cwall    =  0.5;                 % wall major component [wt SiO2] (nan = no assimilation)
 vwall    =  0.0;                 % wall volatile component [wt H2O] (nan = no assimilation)
@@ -115,7 +115,7 @@ CC       = [ 0.20, 0.20, 0.20; 0.60, 0.60, 0.12; 0.20, 0.25, 0.50; ];  % permiss
 % set model buoyancy parameters
 rhom0    =  2750;                % melt phase ref. density [kg/m3] (at T0,cphs0,Ptop)
 rhox0    =  3050;                % crystal phase ref. density [kg/m3] (at T0,cphs0,Ptop)
-rhof0    =  500;                 % bubble phase ref. density [kg/m3] (at T0,cphs0,Ptop)
+rhof0    =  1000;                % bubble phase ref. density [kg/m3] (at T0,cphs0,Ptop)
 aTm      =  3e-5;                % melt thermal expansivity [1/K]
 aTx      =  1e-5;                % xtal thermal expansivity [1/K]
 aTf      =  1e-4;                % mvp  thermal expansivity [1/K]
@@ -134,7 +134,7 @@ rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-7;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its
 alpha    =  0.25;                % iterative lag parameter equilibration
-beta     =  0.75;                % iterative lag parameter phase diagram
+beta     =  0.10;                % iterative lag parameter phase diagram
 delta    =  2;                   % smoothness of segregation speed
 etamin   =  1e3;                 % minimum viscosity for stabilisation
 etamax   =  1e8;                 % maximum viscosity for stabilisation

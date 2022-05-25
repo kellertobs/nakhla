@@ -48,8 +48,8 @@ g0       =  10.;                 % gravity [m/s2]
 
 % set ranges for control variables T, c, v, P
 T = linspace(500,1600,1e3);    % temperature range [degC]
-c = linspace(0.50,0.50,1e3);   % major component range [wt SiO2]
-v = linspace(0.0,0.0,1e3);   % volatile component range [wt H2O]
+c = linspace(0.49,0.49,1e3);   % major component range [wt SiO2]
+v = linspace(0.04,0.04,1e3);   % volatile component range [wt H2O]
 P = linspace(100,100,1e3)*1e6; % pressure range [Pa]
 
 % equilibrium phase fractions and compositions
@@ -119,7 +119,7 @@ kfs = kfs./all;
 qtz = qtz./all;
 
 % block out values below solidus and above liquidus
-ind = xq<1e-12 | mq<1e-12;
+ind = xq<1e-9 | mq<1e-9;
 cxq (ind) = [];
 cmq (ind) = [];
 vfq (ind) = [];
@@ -150,24 +150,28 @@ if ~holdfig; close all; end
 
 % plot phase diagram
 figure(1); if ~holdfig; clf;
-TT = Tphs0+mean(P(:))*clap:1:Tphs1+mean(P(:))*clap;
-[~,CCx,~,~,~,~] = equilibrium(0*TT,0*TT,TT,cphs1*ones(size(TT)),0*TT,mean(P(:))*ones(size(TT)),Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,beta);
-[~,~,CCm,~,~,~] = equilibrium(0*TT,0*TT,TT,cphs0*ones(size(TT)),0*TT,mean(P(:))*ones(size(TT)),Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,beta);
+TT = linspace(Tphs0+mean(P(:))*clap,Tphs1+mean(P(:))*clap,500);
+cc = [linspace(cphs1,(perCx+perCm)/2,ceil((perT-Tphs0)./(Tphs1-Tphs0)*500)),linspace((perCx+perCm)/2,cphs0,floor((perT-Tphs1)./(Tphs0-Tphs1)*500))];
+[~,CCx,CCm,~,~,~] = equilibrium(0*TT,0*TT,TT,cc,0*TT,mean(P(:))*ones(size(TT)),Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,beta);
 plot(CCx.*100,TT,'k-','LineWidth',2); axis tight; hold on; box on;
 plot(CCm.*100,TT,'k-','LineWidth',2);
 perTs  = perT;
 Tphs0s = Tphs0;
 Tphs1s = Tphs1;
 vv = 0.10*ones(size(TT));
-for i = 1:10
-    perTs  = perT -dTH2O(2)*mean(vv(abs(TT-mean(P(:))*clap-perTs )<1)).^0.75;
-    Tphs0s = Tphs0-dTH2O(1)*mean(vv(abs(TT-mean(P(:))*clap-Tphs0s)<1)).^0.75;
-    Tphs1s = Tphs1-dTH2O(3)*mean(vv(abs(TT-mean(P(:))*clap-Tphs1s)<1)).^0.75;
-    TTi = Tphs0s+mean(P(:))*clap:1:Tphs1s+mean(P(:))*clap;
-    vv = interp1(TT,vv,TTi,'linear','extrap'); TT = TTi;
-    cc = [linspace(cphs1,(perCx+perCm)/2,round((perTs-Tphs0s)./(Tphs1s-Tphs0s)*length(TT))),linspace((perCx+perCm)/2,cphs0,round((perTs-Tphs1s)./(Tphs0s-Tphs1s)*length(TT)))];
-    [~,CCx,CCm,~,~,vv] = equilibrium(0*TT,0*TT,TT,cc,vv,mean(P(:))*ones(size(TT)),Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,beta);
+xx = 0.50*ones(size(TT));
+ff = 0.05*ones(size(TT));
+for i = 1:5
+    TT = linspace(Tphs0s+mean(P(:))*clap,Tphs1s+mean(P(:))*clap,500);
+    cc = [linspace(cphs1,(perCx+perCm)/2,ceil((perTs-Tphs0s)./(Tphs1s-Tphs0s)*500)),linspace((perCx+perCm)/2,cphs0,floor((perTs-Tphs1s)./(Tphs0s-Tphs1s)*500))];
+    vmq_c0 = (4.7773e-7.*mean(P(:)).^0.6 + 1e-11.*mean(P(:))) .* exp(2565*(1./(TT+273.15)-1./(perT+273.15))); % Katz et al., 2003; Moore et al., 1998
+    vmq_c1 = (3.5494e-3.*mean(P(:)).^0.5 + 9.623e-8.*mean(P(:)) - 1.5223e-11.*mean(P(:)).^1.5)./(TT+273.15) + 1.2436e-14.*mean(P(:)).^1.5; % Liu et al., 2015
+    vmq0   = (1-cc).*vmq_c0 + cc.*vmq_c1;
+    perTs  = perT -dTH2O(2).*vmq0(round((perTs-Tphs1s)./(Tphs0s-Tphs1s)*500)).^0.75;
+    Tphs0s = Tphs0-dTH2O(1).*vmq0(1).^0.75;
+    Tphs1s = Tphs1-dTH2O(3).*vmq0(end).^0.75;
 end
+[~,CCx,CCm,~,~,~] = equilibrium(0*TT,0*TT,TT,cc,vmq0,mean(P(:))*ones(size(TT)),Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,0.5);
 plot(CCx.*100,TT,'k-','LineWidth',2); axis tight; hold on; box on;
 plot(CCm.*100,TT,'k-','LineWidth',2);
 end
@@ -228,8 +232,8 @@ ylabel('Viscosity [log$_{10}$ Pas]','Interpreter','latex','FontSize',15)
 
 % plot phase segregation speeds
 figure(7); if ~holdfig; clf; end
-semilogy(T,max(1e-12,abs(wx)).*3600,'k',T,max(1e-12,abs(wf)).*3600,'b',LineStyle',linestyle,'LineWidth',2); hold on; box on; axis tight;
-legend('crystals','fluid','melt','Interpreter','latex','FontSize',15,'box','off','location','best')
+semilogy(T,max(1e-12,abs(wx)).*3600,'k',T,max(1e-12,abs(wf)).*3600,'b','LineStyle',linestyle,'LineWidth',2); hold on; box on; axis tight;
+legend('crystals','fluid','Interpreter','latex','FontSize',15,'box','off','location','best')
 set(gca,'TickLabelInterpreter','latex','FontSize',13)
 title('Phase segregation model','Interpreter','latex','FontSize',18)
 xlabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',15)

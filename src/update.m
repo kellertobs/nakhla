@@ -43,9 +43,8 @@ thtv = squeeze(prod(Mv.^Xf,2));
 % get effective viscosity
 eta    = squeeze(sum(ff.*kv.*thtv,1));                                   
 eta    = (1./etamax + 1./eta).^-1 + etamin;
-etact  = eta;
-etaco  = (etact(1:end-1,1:end-1)+etact(2:end,1:end-1) ...                  % effective viscosity in cell corners
-       +  etact(1:end-1,2:end  )+etact(2:end,2:end  ))./4;
+etaco  = (eta(1:end-1,1:end-1)+eta(2:end,1:end-1) ...                      % effective viscosity in cell corners
+       +  eta(1:end-1,2:end  )+eta(2:end,2:end  ))./4;
 
 % get segregation coefficients
 Csgr = ((1-ff)./[dx;1e-16;df].^2.*kv.*thtv).^-1;
@@ -69,8 +68,8 @@ ezz(:,[1 end]) = ezz(:,[2 end-1]);
 exz            = 1/2.*(diff(U,1,1)./h+diff(W,1,2)./h);                     % shear strain rate
 
 % update stresses
-txx = etact .* exx;                                                        % x-normal stress
-tzz = etact .* ezz;                                                        % z-normal stress
+txx = eta .* exx;                                                        % x-normal stress
+tzz = eta .* ezz;                                                        % z-normal stress
 txz = etaco .* exz;                                                        % xz-shear stress
 
 % update tensor magnitudes

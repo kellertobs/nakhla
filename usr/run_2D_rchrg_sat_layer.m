@@ -1,7 +1,7 @@
 clear all; close all;
 
 % set run parameters
-runID    =  '0D_assml_anh';      % run identifier
+runID    =  '2D_rchrg_sat_layer';      % run identifier
 opdir    =  '../out/';           % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  100;                 % output frame plotted/saved every 'nop' time steps
@@ -15,46 +15,46 @@ bnchm    =  0;                   % switch on to run manufactured solution benchm
 % set model domain parameters
 D        =  10;                  % chamber depth [m]
 L        =  10;                  % chamber width [m]
-N        =  1 + 2;               % number of grid points in z-direction (incl. 2 ghosts)
+N        =  200 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
 h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
 M        =  1e5;                 % number of time steps to take
 hr       =  3600;                % conversion seconds to hours
 yr       =  24*365.25*hr;        % conversion seconds to years
-tend     =  8*hr;                % end time for simulation [s]
-dt       =  36;                  % initial time step [s]
-dtmax    =  36;                  % maximum time step [s]
+tend     =  1*yr;                % end time for simulation [s]
+dt       =  100;                 % initial time step [s]
+dtmax    =  1e3;                 % maximum time step [s]
 
 % set initial thermo-chemical state
 seed     =  15;                  % random perturbation seed
 smth     =  (N/30)^2;            % regularisation of initial random perturbation
-zlay     =  0.5;                 % layer thickness (relative to domain depth D)
+zlay     =  0.8;                 % layer thickness (relative to domain depth D)
 wlay_T   =  4*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
 wlay_c   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
-T0       =  1300;                % temperature top layer [deg C]
-T1       =  1300;                % temperature base layer [deg C]
+T0       =  785;                 % temperature top layer [deg C]
+T1       =  1250;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
-c0       =  0.50;                % major component top layer [wt SiO2]
-c1       =  0.50;                % major component base layer [wt SiO2]
-dc       =  0e-4;                % amplitude of random noise [wt SiO2]
-v0       =  0.00;                % volatile component top layer [wt H2O]
-v1       =  0.00;                % volatile component base layer [wt H2O]
-dv       =  0e-6;                % amplitude of random noise [wt H2O]
+c0       =  0.70;                % major component top layer [wt SiO2]
+c1       =  0.49;                % major component base layer [wt SiO2]
+dc       =  1e-3;                % amplitude of random noise [wt SiO2]
+v0       =  0.02;                % volatile component top layer [wt H2O]
+v1       =  0.04;                % volatile component base layer [wt H2O]
+dv       =  1e-3;                % amplitude of random noise [wt H2O]
 
 % set model trace and isotope geochemistry parameters
-it0      =  0.1;                 % incompatible tracer top layer [wt ppm]
+it0      =  10.;                 % incompatible tracer top layer [wt ppm]
 it1      =  0.1;                 % incompatible tracer base layer [wt ppm]
 dit      =  0.00;                % incompatible tracer random noise [wt ppm]
 KIT      =  1e-2;                % incompatible tracer partition coefficient
-ct0      =  10.;                 % compatible tracer top layer [wt ppm]
+ct0      =  0.1;                 % compatible tracer top layer [wt ppm]
 ct1      =  10.;                 % compatible tracer base layer [wt ppm]
 dct      = -0.00;                % compatible tracer random noise [wt ppm]
 KCT      =  1e+2;                % compatible tracer partition coefficient
-si0      =  5.;                  % stable isotope ratio top layer [delta]
+si0      = -5.;                  % stable isotope ratio top layer [delta]
 si1      =  5.;                  % stable isotope ratio base layer [delta]
 dsi      =  0.00;                % stable isotope ratio random noise [delta]
-ri0      =  2.0;                 % radiogenic isotope top layer [wt ppm]
+ri0      =  0.5;                 % radiogenic isotope top layer [wt ppm]
 ri1      =  2.0;                 % radiogenic isotope base layer [wt ppm]
 dri      = -0.00;                % radiogenic isotope random noise [wt ppm]
 KRIP     =  10.;                 % radiogenic parent isotope partition coefficient
@@ -67,17 +67,17 @@ Ptop     =  1e8;                 % top pressure [Pa]
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls)
 bndinit  =  0;                   % switch on (1) to initialise with already established boundary layers
 dw       =  1*h;                 % boundary layer thickness for assimilation [m]
-fin      =  0;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
-fout     =  0;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
-tau_T    =  4*hr;                % wall cooling/assimilation time [s]
-tau_a    =  4*hr;                % wall cooling/assimilation time [s]
-Twall    =  500;                 % wall temperature [degC] (nan = insulating)
-cwall    =  0.70;                % wall major component [wt SiO2] (nan = no assimilation)
-vwall    =  0.02;                % wall volatile component [wt H2O] (nan = no assimilation)
-itwall   =  10;                  % wall incomp. tracer [wt ppm] (nan = no assimilation)
-ctwall   =  0.1;                 % wall comp. tracer [wt ppm] (nan = no assimilation)
-siwall   =  -5;                  % wall stable isotope [delta] (nan = no assimilation)
-riwall   =  0.5;                 % wall radiogenic isotope [wt ppm] (nan = no assimilation)
+fin      =  1;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
+fout     =  1;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
+tau_T    =  8*hr;                % wall cooling/assimilation time [s]
+tau_a    =  8*hr;                % wall cooling/assimilation time [s]
+Twall    =  785;                 % wall temperature [degC] (nan = insulating)
+cwall    =  nan;                 % wall major component [wt SiO2] (nan = no assimilation)
+vwall    =  nan;                 % wall volatile component [wt H2O] (nan = no assimilation)
+itwall   =  nan;                 % wall incomp. tracer [wt ppm] (nan = no assimilation)
+ctwall   =  nan;                 % wall comp. tracer [wt ppm] (nan = no assimilation)
+siwall   =  nan;                 % wall stable isotope [delta] (nan = no assimilation)
+riwall   =  nan;                 % wall radiogenic isotope [wt ppm] (nan = no assimilation)
 
 % set thermo-chemical material parameters
 kc       =  1e-4;                % chemical diffusivity [kg/m/s]
@@ -105,7 +105,7 @@ tau_r    =  60;                  % reaction time [s]
 etam0    =  300;                 % melt viscosity [Pas]
 etaf0    =  0.1;                 % fluid viscosity [Pas]
 etax0    =  1e15;                % crystal viscosity [Pas]
-Fmc      =  1e+5;                % major component weakening factor of melt viscosity [1]
+Fmc      =  1e+4;                % major component weakening factor of melt viscosity [1]
 Fmv      =  0.6;                 % volatile component weakening factor of melt viscosity [1]
 Em       =  175e3;               % activation energy melt viscosity [J/mol]
 AA       = [ 0.60, 0.25, 0.30; 0.20, 0.20, 0.20; 0.20, 0.20, 0.20; ];  % permission slopes
@@ -136,8 +136,8 @@ maxit    =  20;                  % maximum outer its
 alpha    =  0.25;                % iterative lag parameter equilibration
 beta     =  0.10;                % iterative lag parameter phase diagram
 delta    =  2;                   % smoothness of segregation speed
-etamin   =  1e1;                 % minimum viscosity for stabilisation
-etamax   =  1e16;                % maximum viscosity for stabilisation
+etamin   =  1e3;                 % minimum viscosity for stabilisation
+etamax   =  1e8;                 % maximum viscosity for stabilisation
 TINY     =  1e-16;               % minimum cutoff phase, component fractions
 
 % create output directory

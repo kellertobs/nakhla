@@ -40,7 +40,7 @@ IIR = [IIR; ii(:)]; AAR = [AAR; aa(:)];
 % internal points
 ii    = MapW(2:end-1,2:end-1);
 EtaC1 = etaco(2:end-1,1:end-1); EtaC2 = etaco(2:end-1,2:end  );
-EtaP1 = etact(2:end-2,2:end-1); EtaP2 = etact(3:end-1,2:end-1);
+EtaP1 = eta  (2:end-2,2:end-1); EtaP2 = eta  (3:end-1,2:end-1);
 
 % coefficients multiplying z-velocities W
 %             top          ||         bottom          ||           left            ||          right
@@ -105,7 +105,7 @@ IIR = [IIR; ii(:)]; AAR = [AAR; aa(:)];
 % internal points
 ii    = MapU(2:end-1,2:end-1);
 EtaC1 = etaco(1:end-1,2:end-1); EtaC2 = etaco(2:end  ,2:end-1);
-EtaP1 = etact(2:end-1,2:end-2); EtaP2 = etact(2:end-1,3:end-1);
+EtaP1 = eta  (2:end-1,2:end-2); EtaP2 = eta  (2:end-1,3:end-1);
 
 % coefficients multiplying x-velocities U
 %            left          ||          right          ||           top             ||          bottom
@@ -248,7 +248,7 @@ IIR = [IIR; ii(:)]; AAR = [AAR; rr(:)];
 RP = sparse(IIR,ones(size(IIR)),AAR,NP,1);
 
 % get pressure scaling factor
-Pscale = sqrt(geomean(etact(:))/h^2);
+Pscale = sqrt(geomean(eta(:))/h^2);
 
 nzp = round((Nz-2)/2)+1;
 nxp = round((Nx-2)/2)+1;

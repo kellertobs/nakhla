@@ -82,8 +82,8 @@ if plot_op
         plot(mean(rho (2:end-1,2:end-1),2),Z(2:end-1).',CL{[1,2]},LW{:});
         title('$\bar{\rho}$ [kg/m$^3$]',TX{:},FS{:}); ylabel('Depth [km]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(1,5,2)
-        semilogx(geomean(min(etact(2:end-1,2:end-1),etam(2:end-1,2:end-1)),2),Z(2:end-1).',CL{[1,3]},LW{:}); axis ij tight; box on; hold on;
-        semilogx(geomean(etact(2:end-1,2:end-1),2),Z(2:end-1).',CL{[1,2]},LW{:});
+        semilogx(geomean(min(eta(2:end-1,2:end-1),etam(2:end-1,2:end-1)),2),Z(2:end-1).',CL{[1,3]},LW{:}); axis ij tight; box on; hold on;
+        semilogx(geomean(eta(2:end-1,2:end-1),2),Z(2:end-1).',CL{[1,2]},LW{:});
         title('$\bar{\eta}$ [Pas]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(1,5,3)
         plot(mean(    Gx(2:end-1,2:end-1)./rho(2:end-1,2:end-1),2)*hr.*(mean(chi(2:end-1,2:end-1),2)>1e-9),Z(2:end-1).',CL{[1,4]},LW{:}); axis ij tight; box on; hold on;
@@ -256,7 +256,7 @@ if plot_op
     imagesc(X(2:end-1),Z(2:end-1),      rho(2:end-1,2:end-1) ); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\bar{\rho}$ [kg/m$^3$]'],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel('Depth [m]',TX{:},FS{:});
     axes(ax(42));
-    imagesc(X(2:end-1),Z(2:end-1),log10(etact(2:end-1,2:end-1))); axis ij equal tight; box on; cb = colorbar;
+    imagesc(X(2:end-1),Z(2:end-1),log10(eta(2:end-1,2:end-1))); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\bar{\eta}$ [log$_{10}$ Pas]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
     axes(ax(43));
     imagesc(X(2:end-1),Z(2:end-1),-(chi(1:end-1,2:end-1)+chi(2:end,2:end-1))/2.*wx(:,2:end-1).*hr); axis ij equal tight; box on; cb = colorbar;
@@ -305,8 +305,8 @@ if plot_op
     
     % plot phase diagram
     fh7 = figure(7); clf;
-    TT = linspace(Tphs0+Ptop*clap,Tphs1+Ptop*clap,1e3);
-    cc = [linspace(cphs1,(perCx+perCm)/2,ceil((perT-Tphs0)./(Tphs1-Tphs0)*1e3)),linspace((perCx+perCm)/2,cphs0,floor((perT-Tphs1)./(Tphs0-Tphs1)*1e3))];
+    TT = linspace(Tphs0+Ptop*clap,Tphs1+Ptop*clap,500);
+    cc = [linspace(cphs1,(perCx+perCm)/2,ceil((perT-Tphs0)./(Tphs1-Tphs0)*500)),linspace((perCx+perCm)/2,cphs0,floor((perT-Tphs1)./(Tphs0-Tphs1)*500))];
     [~,CCx,CCm,~,~,~] = equilibrium(0*TT,0*TT,TT,cc,0*TT,Ptop*ones(size(TT)),Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,beta);
     plot(CCx,TT,'k-',LW{:}); axis tight; hold on; box on;
     plot(CCm,TT,'k-',LW{:});
@@ -314,18 +314,22 @@ if plot_op
     Tphs0s = Tphs0;
     Tphs1s = Tphs1;
     vv = 0.10*ones(size(TT));
+    xx = 0.50*ones(size(TT));
+    ff = 0.05*ones(size(TT));
     for i = 1:5
-        perTs  = perT -dTH2O(2)*mean(vv(abs(TT-Ptop*clap-perTs )<1)).^0.75;
-        Tphs0s = Tphs0-dTH2O(1)*mean(vv(abs(TT-Ptop*clap-Tphs0s)<1)).^0.75;
-        Tphs1s = Tphs1-dTH2O(3)*mean(vv(abs(TT-Ptop*clap-Tphs1s)<1)).^0.75;
-        TTi = Tphs0s+Ptop*clap:1:Tphs1s+Ptop*clap;
-        vv = interp1(TT,vv,TTi,'linear','extrap'); TT = TTi;
-        cc = [linspace(cphs1,(perCx+perCm)/2,round((perTs-Tphs0s)./(Tphs1s-Tphs0s)*length(TT))),linspace((perCx+perCm)/2,cphs0,round((perTs-Tphs1s)./(Tphs0s-Tphs1s)*length(TT)))];
-        [~,CCx,CCm,~,~,vv] = equilibrium(0*TT,0*TT,TT,cc,vv,Ptop*ones(size(TT)),Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,beta);
+        TT = linspace(Tphs0s+Ptop*clap,Tphs1s+Ptop*clap,500);
+        cc = [linspace(cphs1,(perCx+perCm)/2,ceil((perTs-Tphs0s)./(Tphs1s-Tphs0s)*500)),linspace((perCx+perCm)/2,cphs0,floor((perTs-Tphs1s)./(Tphs0s-Tphs1s)*500))];
+        vmq_c0 = (4.7773e-7.*Ptop.^0.6 + 1e-11.*Ptop) .* exp(2565*(1./(TT+273.15)-1./(perT+273.15))); % Katz et al., 2003; Moore et al., 1998
+        vmq_c1 = (3.5494e-3.*Ptop.^0.5 + 9.623e-8.*Ptop - 1.5223e-11.*Ptop.^1.5)./(TT+273.15) + 1.2436e-14.*Ptop.^1.5; % Liu et al., 2015
+        vmq0   = (1-cc).*vmq_c0 + cc.*vmq_c1;
+        perTs  = perT -dTH2O(2).*vmq0(round((perTs-Tphs1s)./(Tphs0s-Tphs1s)*500)).^0.75;
+        Tphs0s = Tphs0-dTH2O(1).*vmq0(1).^0.75;
+        Tphs1s = Tphs1-dTH2O(3).*vmq0(end).^0.75;
     end
+    [~,CCx,CCm,~,~,~] = equilibrium(0*TT,0*TT,TT,cc,vmq0,Ptop*ones(size(TT)),Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,0.5);
     plot(CCx,TT,'k-',LW{:}); axis tight; hold on; box on;
     plot(CCm,TT,'k-',LW{:});
-    
+
     Tplt = T-273.15 - (Pt-Ptop)*clap;
     cplt = c./(1-f);
     plot(cplt(2:end-1,2:end-1),Tplt(2:end-1,2:end-1),'.',CL{[1,2]},LW{:},'MarkerSize',15);
