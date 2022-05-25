@@ -50,7 +50,7 @@ if any([v0;v1;vwall;v(:)]>1e-6)
     qvz   = - kc.*(m(1:end-1,:)+m(2:end,:))/2 .* ddz(v,h);                 % volatile component diffusion z-flux
     qvx   = - kc.*(m(:,1:end-1)+m(:,2:end))/2 .* ddx(v,h);                 % volatile component diffusion x-flux
     diff_v(2:end-1,2:end-1) = - ddz(qvz(:,2:end-1),h) ...                  % volatile component diffusion
-        - ddx(qvx(2:end-1,:),h);
+                              - ddx(qvx(2:end-1,:),h);
     
     if ~isnan(vwall); bndV = bndV + rho.*(vwall-v)./tau_a .* bndshape; end % impose boundary layer
     
