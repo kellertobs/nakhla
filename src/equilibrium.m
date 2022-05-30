@@ -37,9 +37,9 @@ while resnorm > tol && iter < maxit
         dresf_df = TINY;
     end
     
-    fq = max(TINY,min(1   -TINY, fi - (1-beta)*resf./dresf_df ));
     xq = max(TINY,min(1-fq-TINY, xi - (1-beta)*resx./dresx_dx ));
-    
+    fq = max(TINY,min(1-xq-TINY, fi - (1-beta)*resf./dresf_df ));
+
     resnorm = (norm(resx(:),2) + norm(resf(:),2))./sqrt(length(xq(:)));
     
     iter    = iter+1;
@@ -72,7 +72,7 @@ TINY = 1e-16;
 
 if any(v(:)>0)
     vfq = ones(size(v));
-    vmq = max(0,min(1,min(v./(1-xq+1e-6),vmq0)));
+    vmq = min(v./(1-xq),vmq0);
     
     Tphs0 = Tphs0d - dTH2O(1).*vmq.^0.75;
     Tphs1 = Tphs1d - dTH2O(3).*vmq.^0.75;
@@ -105,7 +105,7 @@ cmq(T< perT) = cm2(T< perT);
 cxq = min(c./(1-fq),cphs0 + cxq.*(cphs1-cphs0));
 cmq = max(c./(1-fq),cphs0 + cmq.*(cphs1-cphs0));
 
-resf = fq - max(TINY,min(1   -TINY, (v-(1-xq).*vmq)./(vfq-vmq) ));
 resx = xq - max(TINY,min(1-fq-TINY, (c-(1-fq).*cmq)./(cxq-cmq) ));
+resf = fq - max(TINY,min(1-xq-TINY, (v-(1-xq).*vmq)./(vfq-vmq) ));
 
 end

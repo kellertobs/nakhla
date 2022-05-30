@@ -252,8 +252,8 @@ Pscale = sqrt(geomean(eta(:))/h^2);
 
 nzp = round((Nz-2)/2)+1;
 nxp = round((Nx-2)/2)+1;
-KP(MapP(nzp,nxp),:) = 0;
 DD(MapP(nzp,nxp),:) = 0;
+KP(MapP(nzp,nxp),:) = 0;
 KP(MapP(nzp,nxp),MapP(nzp,nxp)) = 1;
 RP(MapP(nzp,nxp),:) = 0;
 if bnchm; RP(MapP(nzp,nxp),:) = P_mms(nzp,nxp); end

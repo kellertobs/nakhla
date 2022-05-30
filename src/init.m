@@ -104,9 +104,8 @@ while res > tol
     xi = x;  fi = f;
     
     [xq,cxq,cmq,fq,vfq,vmq] = equilibrium(x,f,T-273.15,c,v,Pt,Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,beta);
-    mq = 1-xq-fq;
     
-    x  = xq;  f = fq;  m = mq;
+    x  = xq;  f = fq;  m = 1-x-f;
     cm = cmq; cx = cxq;
     vm = vmq; vf = vfq;
 

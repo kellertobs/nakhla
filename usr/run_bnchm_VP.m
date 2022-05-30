@@ -68,7 +68,7 @@ HLRID    =    1*yr;              % radiogenic daughter isotope half-life [s]
 
 % set thermo-chemical boundary parameters
 Ptop     =  1e8;                 % top pressure [Pa]
-bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls)
+bndmode  =  0;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls)
 bndinit  =  0;                   % switch on (1) to initialise with already established boundary layers
 dw       =  1*h;                 % boundary layer thickness for assimilation [m]
 fin      =  0;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
@@ -175,9 +175,9 @@ errP = norm(P(2:end-1,2:end-1)-P_mms(2:end-1,2:end-1),2)./norm(P_mms(2:end-1,2:e
 
 % plot error convergence
 fh18 = figure(18); 
-p1 = loglog(h,errW,'r+','MarkerSize',8,'LineWidth',2); axis xy tight; hold on; box on; 
-p2 = loglog(h,errU,'g+','MarkerSize',8,'LineWidth',2); axis xy tight; hold on; box on; 
-p3 = loglog(h,errP,'b+','MarkerSize',8,'LineWidth',2); axis xy tight; hold on; box on; 
+p1 = loglog(h,errW,'rs','MarkerSize',8,'LineWidth',2); axis xy tight; hold on; box on; 
+p2 = loglog(h,errU,'go','MarkerSize',8,'LineWidth',2); axis xy tight; hold on; box on; 
+p3 = loglog(h,errP,'bv','MarkerSize',8,'LineWidth',2); axis xy tight; hold on; box on; 
 set(gca,'TicklabelInterpreter','latex','FontSize',12)
 xlabel('grid spacing [m]','Interpreter','latex')
 ylabel('numerical error [1]','Interpreter','latex')

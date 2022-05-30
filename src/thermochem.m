@@ -37,7 +37,7 @@ if ~isnan(cwall); bndC = bndC + rho.*(cwall-c)./tau_a .* bndshape; end     % imp
 dCdt = - advn_C + diff_c + bndC;                                           % total rate of change
     
 C = Co + (THETA.*dCdt + (1-THETA).*dCdto).*dt;                             % explicit update of major component density
-C = min(rho.*cphs1-TINY,max(rho.*cphs0+TINY, C ));
+C = max(cphs0*rho+TINY,min(cphs1*rho-TINY,C));
 C([1 end],:) = C([2 end-1],:);                                             % apply boundary conditions
 C(:,[1 end]) = C(:,[2 end-1]);  
     
@@ -57,7 +57,7 @@ if any([v0;v1;vwall;v(:)]>1e-6)
     dVdt = - advn_V + diff_v + bndV;                                       % total rate of change
     
     V = Vo + (THETA.*dVdt + (1-THETA).*dVdto).*dt;                         % explicit update of volatile component density
-    V = min(rho.*1-TINY,max(rho.*0+TINY, V ));
+    V = max(0*rho+TINY,min(1*rho-TINY,V));
     V([1 end],:) = V([2 end-1],:);                                         % apply boundary conditions
     V(:,[1 end]) = V(:,[2 end-1]);
 end
@@ -122,7 +122,7 @@ if (diseq && any([v0;v1;vwall;v(:)]>1e-6)) || ~react
     dfdt   = - advn_f + Gf;                                                % total rate of change
     
     f = (rhoo.*fo + (THETA.*dfdt + (1-THETA).*dfdto).*dt)./rho;            % explicit update of bubble fraction
-    f = min(1-TINY,max(TINY,f));                                           % enforce [0,1-x] limit
+    f = min(1-x-TINY,max(TINY,f));                                           % enforce [0,1-x] limit
     f([1 end],:) = f([2 end-1],:);                                         % apply boundary conditions
     f(:,[1 end]) = f(:,[2 end-1]);
     
@@ -143,12 +143,12 @@ if react && step>0
     Kc = cxq./cmq;
     cm = c./(m + x.*Kc);
     cx = c./(m./Kc + x);
-    
+
     % volatile component
     if any([v0;v1;vwall;v(:)]>1e-6)
         Kf = vfq./vmq;
-        vm = v./(m + f.*Kf + 1e-6);
-        vf = v./(m./Kf + f + 1e-6);
+        vm = v./(m + f.*Kf);
+        vf = v./(m./Kf + f);
         vf(v<1e-6) = vfq(v<1e-6);
     end
 
