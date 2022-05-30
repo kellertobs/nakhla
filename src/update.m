@@ -87,18 +87,18 @@ tII([1 end],:) = tII([2 end-1],:);
 
 % update phase segregation speeds
 wx = ((rhox(1:end-1,:)+rhox(2:end,:))/2-rhoref)*g0.*(Csgr_x(1:end-1,:).*Csgr_x(2:end,:)).^0.5; % crystal segregation speed
-if top==1; wx(1  ,:) = 0; end
-if bot==1; wx(end,:) = 0; end
 for i = 1:round(delta)
     wx(2:end-1,2:end-1) = wx(2:end-1,2:end-1) + diff(wx(:,2:end-1),2,1)./8 + diff(wx(2:end-1,:),2,2)./8;
+    wx(1  ,:)     = (1-top).*wx(2    ,:);
+    wx(end,:)     = (1-bot).*wx(end-1,:);
     wx(:,[1 end]) = -sds*wx(:,[2 end-1]);
 end
 
 wf = ((rhof(1:end-1,:)+rhof(2:end,:))/2-rhoref)*g0.*((Csgr_f(1:end-1,:).*Csgr_f(2:end,:)).^0.5); % fluid segregation speed
-if top==1; wf(1  ,:) = fout.*wf(1  ,:); end
-if bot==1; wf(end,:) = fin .*wf(end,:); end
 for i = 1:round(delta)
     wf(2:end-1,2:end-1) = wf(2:end-1,2:end-1) + diff(wf(:,2:end-1),2,1)./8 + diff(wf(2:end-1,:),2,2)./8;
+    wf(1  ,:) = min(1,1-top+fout).*wf(2    ,:);
+    wf(end,:) = min(1,1-bot+fin ).*wf(end-1,:);
     wf(:,[1 end]) = -sds*wf(:,[2 end-1]);
 end
 
