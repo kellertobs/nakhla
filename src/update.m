@@ -43,6 +43,8 @@ thtv = squeeze(prod(Mv.^Xf,2));
 % get effective viscosity
 eta    = squeeze(sum(ff.*kv.*thtv,1));                                   
 eta    = (1./etamax + 1./eta).^-1 + etamin;
+eta([1 end],:) = eta([2 end-1],:);  
+eta(:,[1 end]) = eta(:,[2 end-1]);
 etaco  = (eta(1:end-1,1:end-1)+eta(2:end,1:end-1) ...                      % effective viscosity in cell corners
        +  eta(1:end-1,2:end  )+eta(2:end,2:end  ))./4;
 

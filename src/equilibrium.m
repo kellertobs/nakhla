@@ -72,7 +72,7 @@ TINY = 1e-16;
 
 if any(v(:)>0)
     vfq = ones(size(v));
-    vmq = max(0,min(1,min(v./(1-xq+TINY),vmq0)));
+    vmq = max(0,min(1,min(v./(1-xq+1e-6),vmq0)));
     
     Tphs0 = Tphs0d - dTH2O(1).*vmq.^0.75;
     Tphs1 = Tphs1d - dTH2O(3).*vmq.^0.75;

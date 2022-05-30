@@ -147,8 +147,8 @@ if react && step>0
     % volatile component
     if any([v0;v1;vwall;v(:)]>1e-6)
         Kf = vfq./vmq;
-        vm = v./(m + f.*Kf);
-        vf = v./(m./Kf + f);
+        vm = v./(m + f.*Kf + 1e-6);
+        vf = v./(m./Kf + f + 1e-6);
         vf(v<1e-6) = vfq(v<1e-6);
     end
 
