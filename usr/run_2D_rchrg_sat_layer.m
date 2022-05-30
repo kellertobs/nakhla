@@ -86,7 +86,7 @@ kTx      =  1;                   % xtal thermal conductivity [W/m/K]
 kTf      =  0.02;                % mvp  thermal conductivity [W/m/K]
 Cp       =  1300;                % heat capacity [J/kg/K]
 Dsx      = -300;                 % entropy change of crystallisation [J/kg]
-Dsf      =  600;                 % entropy change of exsolution [J/kg]
+Dsf      =  500;                 % entropy change of exsolution [J/kg]
 
 % set phase diagram parameters
 cphs0    =  0.43;                % phase diagram lower bound composition [wt SiO2]
