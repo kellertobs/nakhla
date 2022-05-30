@@ -2,7 +2,7 @@
 clear x z;
 syms U_mms(x,z) W_mms(x,z) P_mms(x,z) eta_mms(x,z) rho_mms(x,z) src_mms(x,z)
 
-fprintf(1,'  ***  compose manufactured solution\n\n');
+fprintf(1,'\n\n  ***  compose manufactured solution\n\n');
 
 % compose manufactured solution variables
 W_mms(x,z) = 5.00e-5.*(cos(4*(x)*pi/L).*sin(4*(z)*pi/L));
@@ -47,9 +47,9 @@ subplot(2,3,1); fcontour( -W_mms*hr  ,[0,L],'LineWidth',1.5); axis ij equal tigh
 subplot(2,3,2); fcontour(  U_mms*hr  ,[0,L],'LineWidth',1.5); axis ij equal tight; colorbar('TicklabelInterpreter','latex'); box on; title('manufact. $U$ [m/hr]','Interpreter','latex'); set(gca,'TicklabelInterpreter','latex')
 subplot(2,3,3); fcontour(  P_mms/1e3 ,[0,L],'LineWidth',1.5); axis ij equal tight; colorbar('TicklabelInterpreter','latex'); box on; title('manufact. $P$ [kPa]','Interpreter','latex'); set(gca,'TicklabelInterpreter','latex')
 fprintf(1,' . ');
-subplot(2,3,4); fcontour(      rho_mms ,[0,L],'LineWidth',1.5); axis ij equal tight; colorbar('TicklabelInterpreter','latex'); box on; title('manufact. $\rho$ [kg/m$^3$]','Interpreter','latex'); set(gca,'TicklabelInterpreter','latex')
+subplot(2,3,4); fcontour(      rho_mms ,[0,L],'LineWidth',1.5); axis ij equal tight; colorbar('TicklabelInterpreter','latex'); box on; title('manufact. $\Delta \rho$ [kg/m$^3$]','Interpreter','latex'); set(gca,'TicklabelInterpreter','latex')
 subplot(2,3,5); fcontour(log10(eta_mms),[0,L],'LineWidth',1.5); axis ij equal tight; colorbar('TicklabelInterpreter','latex'); box on; title('manufact. $\eta$ [log$_{10}$ Pas]','Interpreter','latex'); set(gca,'TicklabelInterpreter','latex')
-subplot(2,3,6); fcontour(      src_mms ,[0,L],'LineWidth',1.5); axis ij equal tight; colorbar('TicklabelInterpreter','latex'); box on; title('manufact. $V_\mathrm{src} [1/s]$','Interpreter','latex'); set(gca,'TicklabelInterpreter','latex')
+subplot(2,3,6); fcontour(      src_mms ,[0,L],'LineWidth',1.5); axis ij equal tight; colorbar('TicklabelInterpreter','latex'); box on; title('manufact. $\dot{V} [1/s]$','Interpreter','latex'); set(gca,'TicklabelInterpreter','latex')
 drawnow;
 fprintf(1,' . \n');
 
@@ -90,7 +90,7 @@ rhoBF  = rhoBF(2:end-1,2:end-1);
 U_mms  = double(subs(U_mms)); fprintf(1,' . ');
 [x,z]  = meshgrid(x_mms,z_mms);
 P_mms  = double(subs(P_mms)); fprintf(1,' . ');
-etact  = double(subs(eta_mms)); fprintf(1,' . ');
+eta    = double(subs(eta_mms)); fprintf(1,' . ');
 VolSrc = double(subs(src_mms)); fprintf(1,' . ');
 [x,z]  = meshgrid(xu_mms,zw_mms);
 etaco  = double(subs(eta_mms)); fprintf(1,' . ');

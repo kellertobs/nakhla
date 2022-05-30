@@ -253,14 +253,15 @@ Pscale = sqrt(geomean(eta(:))/h^2);
 nzp = round((Nz-2)/2)+1;
 nxp = round((Nx-2)/2)+1;
 KP(MapP(nzp,nxp),:) = 0;
+DD(MapP(nzp,nxp),:) = 0;
 KP(MapP(nzp,nxp),MapP(nzp,nxp)) = 1;
 RP(MapP(nzp,nxp),:) = 0;
 if bnchm; RP(MapP(nzp,nxp),:) = P_mms(nzp,nxp); end
 
 
 %% assemble global coefficient matrix and right-hand side vector
-LL = [ KV  -GG ; ...
-      -DD  KP ];
+LL = [ KV  -GG  ; ...
+      -DD   KP ];
 
 RR = [RV; RP];
 
@@ -284,6 +285,7 @@ LL = SS*LL*SS;
 RR = SS*RR;
 
 S = SS*(LL\RR);  % update solution
+
 
 % map solution vector to 2D arrays
 W  = full(reshape(S(MapW(:))        ,(Nz-1), Nx   ));                      % matrix z-velocity
