@@ -18,7 +18,7 @@ perCx  =  0.475;               % peritectic solidus  composition [wt SiO2]
 perT   =  1147;                % peritectic temperature [degC]
 clap   =  1e-7;                % Clapeyron slope for P-dependence of melting T [degC/Pa]
 dTH2O  =  [1200,1000,100];     % solidus shift from water content [degC/wt^0.75]
-beta   =  0.80;                % iterative lag parameter phase diagram [1]
+TINY   =  1e-16;
 
 % set model rheology parameters
 etam0    =  300;                 % melt viscosity [Pas]
@@ -55,7 +55,7 @@ P = linspace(100,100,1e3)*1e6; % pressure range [Pa]
 % equilibrium phase fractions and compositions
 [xq,cxq,cmq,fq,vfq,vmq]  =  equilibrium(ones(size(T)).*0.5,ones(size(T)).*0.0, ...
                                         T, c, v, P, ...
-                                        Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,beta);
+                                        Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,TINY);
 mq = 1-fq-xq;  
 
 % phase densities and rheology
@@ -152,7 +152,7 @@ if ~holdfig; close all; end
 figure(1); if ~holdfig; clf;
 TT = linspace(Tphs0+mean(P(:))*clap,Tphs1+mean(P(:))*clap,500);
 cc = [linspace(cphs1,(perCx+perCm)/2,ceil((perT-Tphs0)./(Tphs1-Tphs0)*500)),linspace((perCx+perCm)/2,cphs0,floor((perT-Tphs1)./(Tphs0-Tphs1)*500))];
-[~,CCx,CCm,~,~,~] = equilibrium(0*TT,0*TT,TT,cc,0*TT,mean(P(:))*ones(size(TT)),Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,beta);
+[~,CCx,CCm,~,~,~] = equilibrium(0*TT,0*TT,TT,cc,0*TT,mean(P(:))*ones(size(TT)),Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,TINY);
 plot(CCx.*100,TT,'k-','LineWidth',2); axis tight; hold on; box on;
 plot(CCm.*100,TT,'k-','LineWidth',2);
 perTs  = perT;
@@ -171,7 +171,7 @@ for i = 1:5
     Tphs0s = Tphs0-dTH2O(1).*vmq0(1).^0.75;
     Tphs1s = Tphs1-dTH2O(3).*vmq0(end).^0.75;
 end
-[~,CCx,CCm,~,~,~] = equilibrium(0*TT,0*TT,TT,cc,vmq0,mean(P(:))*ones(size(TT)),Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,0.5);
+[~,CCx,CCm,~,~,~] = equilibrium(0*TT,0*TT,TT,cc,vmq0,mean(P(:))*ones(size(TT)),Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,TINY);
 plot(CCx.*100,TT,'k-','LineWidth',2); axis tight; hold on; box on;
 plot(CCm.*100,TT,'k-','LineWidth',2);
 end

@@ -134,11 +134,9 @@ rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-7;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its
 alpha    =  0.25;                % iterative lag parameter equilibration
-beta     =  0.10;                % iterative lag parameter phase diagram
 delta    =  2;                   % smoothness of segregation speed
 etamin   =  1e3;                 % minimum viscosity for stabilisation
 etamax   =  1e8;                 % maximum viscosity for stabilisation
-TINY     =  1e-16;               % minimum cutoff phase, component fractions
 
 % create output directory
 if ~isfolder([opdir,'/',runID])
