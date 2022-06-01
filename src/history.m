@@ -11,10 +11,10 @@ stp = max(1,step);
 hist.time(stp) = time;
 
 % record total mass, heat, component mass in model (assume hy = 1, unit length in third dimension)
-hist.sumM(stp) = sum(sum(rho(2:end-1,2:end-1)*h*h*1))+TINY;  % [kg]
-hist.sumH(stp) = sum(sum(  H(2:end-1,2:end-1)*h*h*1))+TINY;  % [J]
-hist.sumC(stp) = sum(sum(  C(2:end-1,2:end-1)*h*h*1))+TINY;  % [kg]
-hist.sumV(stp) = sum(sum(  V(2:end-1,2:end-1)*h*h*1))+TINY;  % [kg]
+hist.sumM(stp) = sum(sum(rho(2:end-1,2:end-1)*h*h*1));  % [kg]
+hist.sumH(stp) = sum(sum(  H(2:end-1,2:end-1)*h*h*1));  % [J]
+hist.sumC(stp) = sum(sum(  C(2:end-1,2:end-1)*h*h*1));  % [kg]
+hist.sumV(stp) = sum(sum(  V(2:end-1,2:end-1)*h*h*1));  % [kg]
 
 % record expected rates of change by volume change and imposed boundaries layers
 dsumMdt = sum(rho(2,2:end-1).*W(1,2:end-1)*h*1) - sum(rho(end-1,2:end-1).*W(end,2:end-1)*h*1) ...
@@ -39,7 +39,7 @@ if step>1; hist.DV(stp) = hist.DV(stp-1) + (THETA*dsumVdt + (1-THETA)*dsumVdto).
 hist.EM(stp) = (hist.sumM(stp) - hist.DM(stp))./hist.sumM(1) - 1;  % [kg/kg]
 hist.EH(stp) = (hist.sumH(stp) - hist.DH(stp))./hist.sumH(1) - 1;  % [J /J ]
 hist.EC(stp) = (hist.sumC(stp) - hist.DC(stp))./hist.sumC(1) - 1;  % [kg/kg]
-hist.EV(stp) = (hist.sumV(stp) - hist.DV(stp))./hist.sumV(1) - 1;  % [kg/kg]
+hist.EV(stp) = ((hist.sumV(stp) - hist.DV(stp))./hist.sumV(1) - 1).*any(v(:)>1e-6);  % [kg/kg]
 
 % record variable and coefficient diagnostics
 hist.W(stp,1) = min(min(-W(:,2:end-1)));
@@ -86,9 +86,13 @@ hist.c(stp,1) = min(min(c(2:end-1,2:end-1)));
 hist.c(stp,2) = mean(mean(c(2:end-1,2:end-1)));
 hist.c(stp,3) = max(max(c(2:end-1,2:end-1)));
 
-hist.v(stp,1) = min(min(v(2:end-1,2:end-1)));
-hist.v(stp,2) = mean(mean(v(2:end-1,2:end-1)));
-hist.v(stp,3) = max(max(v(2:end-1,2:end-1)));
+if any(v(:)>1e-6)
+    hist.v(stp,1) = min(min(v(2:end-1,2:end-1)));
+    hist.v(stp,2) = mean(mean(v(2:end-1,2:end-1)));
+    hist.v(stp,3) = max(max(v(2:end-1,2:end-1)));
+else
+    hist.v(stp,1:3) = NaN;
+end
 
 indx = x>1e-6;
 if any(indx(:)>0)
@@ -110,9 +114,13 @@ if any(indm(:)>0)
     hist.cm(stp,2) = sum(sum(cm(2:end-1,2:end-1).*m(2:end-1,2:end-1).*rho(2:end-1,2:end-1)))./sum(sum(m(2:end-1,2:end-1).*rho(2:end-1,2:end-1)));
     hist.cm(stp,3) = max(max(cm(indm(2:end-1,2:end-1))));
     
-    hist.vm(stp,1) = min(min(vm(indm(2:end-1,2:end-1))));
-    hist.vm(stp,2) = sum(sum(vm(2:end-1,2:end-1).*m(2:end-1,2:end-1).*rho(2:end-1,2:end-1)))./sum(sum(m(2:end-1,2:end-1).*rho(2:end-1,2:end-1)));
-    hist.vm(stp,3) = max(max(vm(indm(2:end-1,2:end-1))));
+    if any(v(:)>1e-6)
+        hist.vm(stp,1) = min(min(vm(indm(2:end-1,2:end-1))));
+        hist.vm(stp,2) = sum(sum(vm(2:end-1,2:end-1).*m(2:end-1,2:end-1).*rho(2:end-1,2:end-1)))./sum(sum(m(2:end-1,2:end-1).*rho(2:end-1,2:end-1)));
+        hist.vm(stp,3) = max(max(vm(indm(2:end-1,2:end-1))));
+    else
+        hist.vm(stp,1:3) = NaN;
+    end
     
     hist.rhom(stp,1) = min(min(rhom(indm(2:end-1,2:end-1))));
     hist.rhom(stp,2) = sum(sum(rhom(2:end-1,2:end-1).*m(2:end-1,2:end-1).*rho(2:end-1,2:end-1)))./sum(sum(m(2:end-1,2:end-1).*rho(2:end-1,2:end-1)));

@@ -1,8 +1,6 @@
 % calculate phase equilibrium
 
-function [xq,cxq,cmq,fq,vfq,vmq]  =  equilibrium(xq,fq,T0,c,v,P,Tphs0d,Tphs1d,cphs0,cphs1,perTd,perCx,perCm,clap,dTH2O,PhDg,beta)
-
-TINY  = 1e-16;
+function [xq,cxq,cmq,fq,vfq,vmq]  =  equilibrium(xq,fq,T0,c,v,P,Tphs0d,Tphs1d,cphs0,cphs1,perTd,perCx,perCm,clap,dTH2O,PhDg,TINY)
 
 perCm = (perCm-cphs0 )./(cphs1-cphs0  );
 perCx = (perCx-cphs0 )./(cphs1-cphs0  );
@@ -10,7 +8,7 @@ perCx = (perCx-cphs0 )./(cphs1-cphs0  );
 iter    = 0;
 maxit   = 1e2;
 resnorm = 1;
-tol     = 1e-14;
+tol     = 1e-12;
 eps     = 1e-6;
 
 vmq_c0 = (4.7773e-7.*P.^0.6 + 1e-11.*P) .* exp(2565*(1./(T0+273.15)-1./(perTd+273.15))); % Katz et al., 2003; Moore et al., 1998
@@ -18,34 +16,35 @@ vmq_c1 = (3.5494e-3.*P.^0.5 + 9.623e-8.*P - 1.5223e-11.*P.^1.5)./(T0+273.15) + 1
 vmq0   = (1-c).*vmq_c0 + c.*vmq_c1;
 
 while resnorm > tol && iter < maxit
-    xi  = xq;  fi = fq;
+   
+    beta = max(0.01,0.9-iter./200);
+
+    [resx ,resf ] = res_xf(xq,fq,T0,c,v,P,Tphs0d,Tphs1d,cphs0,cphs1,perTd,perCx,perCm,clap,dTH2O,vmq0,PhDg,TINY);
     
-    [resx ,resf ] = res_xf(xq,fq,T0,c,v,P,Tphs0d,Tphs1d,cphs0,cphs1,perTd,perCx,perCm,clap,dTH2O,vmq0,PhDg);
-    
-    [resx_xp,~,~,~,~,~] = res_xf(xq+eps,fq,T0,c,v,P,Tphs0d,Tphs1d,cphs0,cphs1,perTd,perCx,perCm,clap,dTH2O,vmq0,PhDg);
-    [resx_xm,~,~,~,~,~] = res_xf(xq-eps,fq,T0,c,v,P,Tphs0d,Tphs1d,cphs0,cphs1,perTd,perCx,perCm,clap,dTH2O,vmq0,PhDg);
+    [resx_xp,~,~,~,~,~] = res_xf(xq+eps,fq,T0,c,v,P,Tphs0d,Tphs1d,cphs0,cphs1,perTd,perCx,perCm,clap,dTH2O,vmq0,PhDg,TINY);
+    [resx_xm,~,~,~,~,~] = res_xf(xq-eps,fq,T0,c,v,P,Tphs0d,Tphs1d,cphs0,cphs1,perTd,perCx,perCm,clap,dTH2O,vmq0,PhDg,TINY);
     
     dresx_dx = (resx_xp-resx_xm)/2/eps;
     
-    if any(v(:)>0)
-        [~,resf_fp,~,~,~,~] = res_xf(xq,fq+eps,T0,c,v,P,Tphs0d,Tphs1d,cphs0,cphs1,perTd,perCx,perCm,clap,dTH2O,vmq0,PhDg);
-        [~,resf_fm,~,~,~,~] = res_xf(xq,fq-eps,T0,c,v,P,Tphs0d,Tphs1d,cphs0,cphs1,perTd,perCx,perCm,clap,dTH2O,vmq0,PhDg);
+    if any(v(:)>10*TINY)
+        [~,resf_fp,~,~,~,~] = res_xf(xq,fq+eps,T0,c,v,P,Tphs0d,Tphs1d,cphs0,cphs1,perTd,perCx,perCm,clap,dTH2O,vmq0,PhDg,TINY);
+        [~,resf_fm,~,~,~,~] = res_xf(xq,fq-eps,T0,c,v,P,Tphs0d,Tphs1d,cphs0,cphs1,perTd,perCx,perCm,clap,dTH2O,vmq0,PhDg,TINY);
         
         dresf_df = (resf_fp-resf_fm)/2/eps;
     else
-        resf     = 0*fq;
-        dresf_df = TINY;
+        resf     = fq - TINY;
+        dresf_df = ones(size(fq));
     end
     
-    xq = max(TINY,min(1-fq-TINY, xi - (1-beta)*resx./dresx_dx ));
-    fq = max(TINY,min(1-xq-TINY, fi - (1-beta)*resf./dresf_df ));
+    xq = xq - beta*resx./dresx_dx;
+    fq = fq - beta*resf./dresf_df;
 
-    resnorm = (norm(resx(:),2) + norm(resf(:),2))./sqrt(length(xq(:)));
+    resnorm = (norm(resx(:),2) + norm(resf(:),2))/sqrt(length(xq(:)));
     
     iter    = iter+1;
 end
 
-[~,~,cxq,cmq,vfq,vmq] = res_xf(xq,fq,T0,c,v,P,Tphs0d,Tphs1d,cphs0,cphs1,perTd,perCx,perCm,clap,dTH2O,vmq0,PhDg);
+[~,~,cxq,cmq,vfq,vmq] = res_xf(xq,fq,T0,c,v,P,Tphs0d,Tphs1d,cphs0,cphs1,perTd,perCx,perCm,clap,dTH2O,vmq0,PhDg,TINY);
 
 if size(xq,1)>1
     xq([1 end],:) = xq([2 end-1],:);
@@ -66,20 +65,18 @@ end
 
 end
 
-function [resx,resf,cxq,cmq,vfq,vmq] = res_xf(xq,fq,T0,c,v,P,Tphs0d,Tphs1d,cphs0,cphs1,perTd,perCx,perCm,clap,dTH2O,vmq0,PhDg)
+function [resx,resf,cxq,cmq,vfq,vmq] = res_xf(xq,fq,T0,c,v,P,Tphs0d,Tphs1d,cphs0,cphs1,perTd,perCx,perCm,clap,dTH2O,vmq0,PhDg,TINY)
 
-TINY = 1e-16;
-
-if any(v(:)>0)
+if any(v(:)>10*TINY)
     vfq = ones(size(v));
-    vmq = min(v./(1-xq),vmq0);
+    vmq = max(TINY,min(v./(1-xq),vmq0));
     
     Tphs0 = Tphs0d - dTH2O(1).*vmq.^0.75;
     Tphs1 = Tphs1d - dTH2O(3).*vmq.^0.75;
     perT  = (perTd - dTH2O(2).*vmq.^0.75 -Tphs0)./(Tphs1-Tphs0);
 else
-    vfq = ones(size(v));
-    vmq = zeros(size(v));
+    vfq =  ones(size(v));
+    vmq = zeros(size(v))+TINY;
     
     Tphs0 = Tphs0d;
     Tphs1 = Tphs1d;
@@ -105,7 +102,7 @@ cmq(T< perT) = cm2(T< perT);
 cxq = min(c./(1-fq),cphs0 + cxq.*(cphs1-cphs0));
 cmq = max(c./(1-fq),cphs0 + cmq.*(cphs1-cphs0));
 
-resx = xq - max(TINY,min(1-fq-TINY, (c-(1-fq).*cmq)./(cxq-cmq) ));
-resf = fq - max(TINY,min(1-xq-TINY, (v-(1-xq).*vmq)./(vfq-vmq) ));
+resx = xq - max(TINY,min(1-TINY, (c-(1-fq).*cmq)./(cxq-cmq) ));
+resf = fq - max(TINY,min(1-TINY, (v-(1-xq).*vmq)./(vfq-vmq) ));
 
 end

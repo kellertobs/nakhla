@@ -37,13 +37,12 @@ if ~isnan(cwall); bndC = bndC + rho.*(cwall-c)./tau_a .* bndshape; end     % imp
 dCdt = - advn_C + diff_c + bndC;                                           % total rate of change
     
 C = Co + (THETA.*dCdt + (1-THETA).*dCdto).*dt;                             % explicit update of major component density
-C = max(cphs0*rho+TINY,min(cphs1*rho-TINY,C));
 C([1 end],:) = C([2 end-1],:);                                             % apply boundary conditions
 C(:,[1 end]) = C(:,[2 end-1]);  
     
 % update volatile component
 bndV = zeros(size(v));
-if any([v0;v1;vwall;v(:)]>1e-6)
+if any([v0;v1;vwall;v(:)]>10*TINY)
     advn_V = advection(rho.*m.*vm,Um,Wm,h,ADVN,'flx') ...
            + advection(rho.*f.*vf,Uf,Wf,h,ADVN,'flx');
     
@@ -57,7 +56,7 @@ if any([v0;v1;vwall;v(:)]>1e-6)
     dVdt = - advn_V + diff_v + bndV;                                       % total rate of change
     
     V = Vo + (THETA.*dVdt + (1-THETA).*dVdto).*dt;                         % explicit update of volatile component density
-    V = max(0*rho+TINY,min(1*rho-TINY,V));
+    V = max(TINY,V);
     V([1 end],:) = V([2 end-1],:);                                         % apply boundary conditions
     V(:,[1 end]) = V(:,[2 end-1]);
 end
@@ -72,14 +71,14 @@ v = V./rho;
 
 % update local phase equilibrium
 if react && ~mod(iter-1,1)
-    [xq,cxq,cmq,fq,vfq,vmq] = equilibrium(x,f,T-273.15,c,v,Pt,Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,beta);
+    [xq,cxq,cmq,fq,vfq,vmq] = equilibrium(x,f,T-273.15,c,v,Pt,Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,TINY);
 end
 
 % update crystal fraction
 if diseq || ~react
     
     if react
-        Gxi = (xq-x).*rho./max(5.*dt,tau_r);
+        Gxi = (xq-x).*rho./max(4.*dt,tau_r);
         for i = 1:round(delta)
             Gxi(2:end-1,2:end-1) = Gxi(2:end-1,2:end-1) + diff(Gxi(:,2:end-1),2,1)./8 + diff(Gxi(2:end-1,:),2,2)./8;
             Gxi([1 end],:) = Gxi([2 end-1],:);
@@ -105,10 +104,10 @@ else
 end
 
 % update bubble fraction
-if (diseq && any([v0;v1;vwall;v(:)]>1e-6)) || ~react
+if (diseq && any([v0;v1;vwall;v(:)]>10*TINY)) || ~react
     
     if react
-        Gfi = (fq-f).*rho./max(5.*dt,tau_r);
+        Gfi = (fq-f).*rho./max(4.*dt,tau_r);
         for i = 1:round(delta)
             Gfi(2:end-1,2:end-1) = Gfi(2:end-1,2:end-1) + diff(Gfi(:,2:end-1),2,1)./8 + diff(Gfi(2:end-1,:),2,2)./8;
             Gfi([1 end],:) = Gfi([2 end-1],:);
@@ -143,21 +142,23 @@ if react && step>0
     Kc = cxq./cmq;
     cm = c./(m + x.*Kc);
     cx = c./(m./Kc + x);
-
+    
     % volatile component
-    if any([v0;v1;vwall;v(:)]>1e-6)
-        Kf = vfq./vmq;
-        vm = v./(m + f.*Kf);
-        vf = v./(m./Kf + f);
-        vf(v<1e-6) = vfq(v<1e-6);
-    end
-
+    Kf = vfq./vmq;
+    vf = vfq;
+    vm = max(TINY,(v - f)./m);
+    
+    if iter<=2; im = m<1e-4; end
+    x(im)  = xq(im);  cx(im) = cxq(im);  cm(im) = cmq(im);
+    f(im)  = fq(im);  vf(im) = vfq(im);  vm(im) = vmq(im);
+    m(im)  = max(TINY,1-x(im)-f(im));
+    
 end
 
 % get residual of thermochemical equations from iterative update
 resnorm_TC = norm(T - Ti,2)./(norm(T,2)+TINY) ...
-           + norm((x - xi).*(x>1e-6),2)./(norm(x,2)+TINY) ...
-           + norm((f - fi).*(f>1e-6),2)./(norm(f,2)+TINY);
+           + norm((x - xi).*(x>10*TINY),2)./(norm(x,2)+TINY) ...
+           + norm((f - fi).*(f>10*TINY),2)./(norm(f,2)+TINY);
 
 
 %% ***** TRACE & ISOTOPE GEOCHEMISTRY  ************************************

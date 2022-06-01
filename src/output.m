@@ -307,7 +307,7 @@ if plot_op
     fh7 = figure(7); clf;
     TT = linspace(Tphs0+Ptop*clap,Tphs1+Ptop*clap,500);
     cc = [linspace(cphs1,(perCx+perCm)/2,ceil((perT-Tphs0)./(Tphs1-Tphs0)*500)),linspace((perCx+perCm)/2,cphs0,floor((perT-Tphs1)./(Tphs0-Tphs1)*500))];
-    [~,CCx,CCm,~,~,~] = equilibrium(0*TT,0*TT,TT,cc,0*TT,Ptop*ones(size(TT)),Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,beta);
+    [~,CCx,CCm,~,~,~] = equilibrium(0*TT,0*TT,TT,cc,0*TT,Ptop*ones(size(TT)),Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,TINY);
     plot(CCx,TT,'k-',LW{:}); axis tight; hold on; box on;
     plot(CCm,TT,'k-',LW{:});
     perTs  = perT;
@@ -326,7 +326,7 @@ if plot_op
         Tphs0s = Tphs0-dTH2O(1).*vmq0(1).^0.75;
         Tphs1s = Tphs1-dTH2O(3).*vmq0(end).^0.75;
     end
-    [~,CCx,CCm,~,~,~] = equilibrium(0*TT,0*TT,TT,cc,vmq0,Ptop*ones(size(TT)),Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,0.5);
+    [~,CCx,CCm,~,~,~] = equilibrium(0*TT,0*TT,TT,cc,vmq0,Ptop*ones(size(TT)),Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,TINY);
     plot(CCx,TT,'k-',LW{:}); axis tight; hold on; box on;
     plot(CCm,TT,'k-',LW{:});
 

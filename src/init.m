@@ -1,5 +1,8 @@
 load ocean;  % load custom colormap
 
+% minimum cutoff phase, component fractions
+TINY     =  1e-16;               
+
 % get coordinate arrays
 X         = -h/2:h:L+h/2;
 Z         = -h/2:h:D+h/2;
@@ -103,7 +106,7 @@ res = 1;  tol = 1e-15;  x = ones(size(T))./2;  f = v;
 while res > tol
     xi = x;  fi = f;
     
-    [xq,cxq,cmq,fq,vfq,vmq] = equilibrium(x,f,T-273.15,c,v,Pt,Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,beta);
+    [xq,cxq,cmq,fq,vfq,vmq] = equilibrium(x,f,T-273.15,c,v,Pt,Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,TINY);
     
     x  = xq;  f = fq;  m = 1-x-f;
     cm = cmq; cx = cxq;
