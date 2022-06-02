@@ -60,9 +60,9 @@ if plot_op
         plot(mean(c(2:end-1,2:end-1)./(1-f(2:end-1,2:end-1)),2)*100,Z(2:end-1).',CL{[1,2]},LW{:});
         title('$\bar{c}/(1-f)$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(1,5,3)
-        semilogx(mean(max(1e-6,vf(2:end-1,2:end-1)*100),2),Z(2:end-1).',CL{[1,5]},LW{:}); axis ij tight; box on; hold on;
-        semilogx(mean(max(1e-6,vm(2:end-1,2:end-1)*100),2),Z(2:end-1).',CL{[1,3]},LW{:});
-        semilogx(mean(max(1e-6,v(2:end-1,2:end-1)./(1-x(2:end-1,2:end-1))*100),2),Z(2:end-1).',CL{[1,2]},LW{:});
+        semilogx(mean(max(1e-6,vf(2:end-1,2:end-1)*100),2).*any(v(:)>10*TINY),Z(2:end-1).',CL{[1,5]},LW{:}); axis ij tight; box on; hold on;
+        semilogx(mean(max(1e-6,vm(2:end-1,2:end-1)*100),2).*any(v(:)>10*TINY),Z(2:end-1).',CL{[1,3]},LW{:});
+        semilogx(mean(max(1e-6,v(2:end-1,2:end-1)./(1-x(2:end-1,2:end-1))*100).*any(v(:)>10*TINY),2),Z(2:end-1).',CL{[1,2]},LW{:});
         title('$\bar{v}/(1-x)$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(1,5,4)
         plot(mean(mu (2:end-1,2:end-1),2)*100.*(mean(mu (2:end-1,2:end-1),2)>1e-9),Z(2:end-1).',CL{[1,3]},LW{:}); axis ij tight; box on; hold on;
