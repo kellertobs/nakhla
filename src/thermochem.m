@@ -70,21 +70,15 @@ v = V./rho;
 %% *****  UPDATE PHASE PROPORTIONS  ***************************************
 
 % update local phase equilibrium
-if react && ~mod(iter-1,1)
-    [xq,cxq,cmq,fq,vfq,vmq] = equilibrium(x,f,T-273.15,c,v,Pt,Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,TINY);
+if react
+    [xq,cxq,cmq,fq,vfq,vmq] = equilibrium(xq,fq,T-273.15,c,v,Pt,Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,TINY);
 end
 
 % update crystal fraction
 if diseq || ~react
     
     if react
-        Gxi = (xq-x).*rho./max(4.*dt,tau_r);
-        for i = 1:round(delta)
-            Gxi(2:end-1,2:end-1) = Gxi(2:end-1,2:end-1) + diff(Gxi(:,2:end-1),2,1)./8 + diff(Gxi(2:end-1,:),2,2)./8;
-            Gxi([1 end],:) = Gxi([2 end-1],:);
-            Gxi(:,[1 end]) = Gxi(:,[2 end-1]);
-        end
-        Gx = ALPHA.*Gx + (1-ALPHA).*Gxi;
+        Gx = ALPHA.*Gx + (1-ALPHA) .* (xq-x).*rho./max(3.*dt,tau_r);
     end
     
     advn_x = advection(rho.*x,Ux,Wx,h,ADVN,'flx');                         % get advection term
@@ -92,7 +86,7 @@ if diseq || ~react
     dxdt   = - advn_x + Gx;                                                % total rate of change
     
     x = (rhoo.*xo + (THETA.*dxdt + (1-THETA).*dxdto).*dt)./rho;            % explicit update of crystal fraction
-    x = min(1-f-TINY,max(TINY,x));                                         % enforce [0,1] limit
+    x = min(1-TINY,max(TINY,x));                                         % enforce [0,1] limit
     x([1 end],:) = x([2 end-1],:);                                         % apply boundary conditions
     x(:,[1 end]) = x(:,[2 end-1]);
     
@@ -107,13 +101,7 @@ end
 if (diseq && any([v0;v1;vwall;v(:)]>10*TINY)) || ~react
     
     if react
-        Gfi = (fq-f).*rho./max(4.*dt,tau_r);
-        for i = 1:round(delta)
-            Gfi(2:end-1,2:end-1) = Gfi(2:end-1,2:end-1) + diff(Gfi(:,2:end-1),2,1)./8 + diff(Gfi(2:end-1,:),2,2)./8;
-            Gfi([1 end],:) = Gfi([2 end-1],:);
-            Gfi(:,[1 end]) = Gfi(:,[2 end-1]);
-        end
-        Gf = ALPHA.*Gf + (1-ALPHA).*Gfi;
+        Gf = ALPHA.*Gf + (1-ALPHA) .* (fq-f).*rho./max(3.*dt,tau_r);
     end
     
     advn_f = advection(rho.*f,Uf,Wf,h,ADVN,'flx');                         % get advection term
@@ -121,7 +109,7 @@ if (diseq && any([v0;v1;vwall;v(:)]>10*TINY)) || ~react
     dfdt   = - advn_f + Gf;                                                % total rate of change
     
     f = (rhoo.*fo + (THETA.*dfdt + (1-THETA).*dfdto).*dt)./rho;            % explicit update of bubble fraction
-    f = min(1-x-TINY,max(TINY,f));                                           % enforce [0,1-x] limit
+    f = min(1-TINY,max(TINY,f));                                           % enforce [0,1-x] limit
     f([1 end],:) = f([2 end-1],:);                                         % apply boundary conditions
     f(:,[1 end]) = f(:,[2 end-1]);
     
@@ -137,7 +125,7 @@ m = min(1-x-TINY,max(TINY,1-f-x));
 
 % update phase compositions
 if react && step>0
-
+    
     % major component
     Kc = cxq./cmq;
     cm = c./(m + x.*Kc);
@@ -146,12 +134,7 @@ if react && step>0
     % volatile component
     Kf = vfq./vmq;
     vf = vfq;
-    vm = max(TINY,(v - f)./m);
-    
-    if iter<=2; im = m<1e-4; end
-    x(im)  = xq(im);  cx(im) = cxq(im);  cm(im) = cmq(im);
-    f(im)  = fq(im);  vf(im) = vfq(im);  vm(im) = vmq(im);
-    m(im)  = max(TINY,1-x(im)-f(im));
+    vm = max(0.9.*vmq,min(1.1.*vmq,(v - f)./m));
     
 end
 

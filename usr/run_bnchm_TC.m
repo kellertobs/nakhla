@@ -1,6 +1,6 @@
 clear; close all;
 
-DT = [8,4,2];
+DT = [4,2,1];
 
 for dt = DT
     
@@ -8,7 +8,7 @@ for dt = DT
 runID    =  'bnchm_TC';          % run identifier
 opdir    =  '../out/';           % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
-nop      = 10;                   % output frame plotted/saved every 'nop' time steps
+nop      =  4;                   % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot of results
 save_op  =  0;                   % switch on to save output to file
 plot_cv  =  1;                   % switch on to live plot iterative convergence
@@ -23,7 +23,7 @@ N        =  50 + 2;              % number of grid points in z-direction (incl. 2
 h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
-M        =  10/dt*DT(1);         % number of time steps to take
+M        =  4/dt*DT(1);         % number of time steps to take
 hr       =  3600;                % conversion seconds to hours
 yr       =  24*365.25*hr;        % conversion seconds to years
 tend     =  1*yr;                % end time for simulation [s]
@@ -156,9 +156,12 @@ end
 run('../src/main')
 
 % plot convergence
-EH = abs(hist.EH(end));
-EC = abs(hist.EC(end));
-EV = abs(hist.EV(end));
+% EH = abs(hist.EH(end));
+% EC = abs(hist.EC(end));
+% EV = abs(hist.EV(end));
+EH = norm(diff(hist.EH(2:end)),2)./length(diff(hist.EH(2:end)));
+EC = norm(diff(hist.EC(2:end)),2)./length(diff(hist.EC(2:end)));
+EV = norm(diff(hist.EV(2:end)),2)./length(diff(hist.EV(2:end)));
 
 fh15 = figure(15);
 p1 = loglog(dt,EH,'rs','MarkerSize',8,'LineWidth',2); hold on; box on;

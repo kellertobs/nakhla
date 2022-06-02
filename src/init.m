@@ -102,7 +102,7 @@ if Nx<=10; Pt = mean(mean(Pt(2:end-1,2:end-1))).*ones(size(Pt)); end
 % get volume fractions and bulk density
 ALPHA  =  1.0;
 THETA  =  1.0;
-res = 1;  tol = 1e-15;  x = ones(size(T))./2;  f = v;
+res = 1;  tol = 1e-15;  x = ones(size(T))./10;  f = v/2;
 while res > tol
     xi = x;  fi = f;
     
@@ -179,6 +179,7 @@ if restart
     end
     load(name,'U','W','P','Pt','f','x','m','phi','chi','mu','H','C','V','T','c','v','cm','cx','vm','vf','IT','CT','SI','RIP','RID','it','ct','si','rip','rid','dHdt','dCdt','dVdt','dITdt','dCTdt','dSIdt','dfdt','dxdt','Gf','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step','hist','VolSrc','wf','wx');
     
+    xq = x; fq = f;
     S = [W(:);U(:);P(:)];
     dcy_rip = rho.*rip./HLRIP.*log(2);
     dcy_rid = rho.*rid./HLRID.*log(2);
