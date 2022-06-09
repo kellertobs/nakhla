@@ -14,8 +14,6 @@ chi   = x.*rho./rhox;
 phi   = f.*rho./rhof;
 mu    = m.*rho./rhom;
 
-if Nx <= 10; rhoBF = repmat(mean(rhoBF,2),1,Nx-2); end
-
 % update thermal properties
 Ds    = x.*Dsx + f.*Dsf;
 kT    = mu.*kTm + chi.*kTx + phi.*kTf;                                     % magma thermal conductivity

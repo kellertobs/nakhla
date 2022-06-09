@@ -36,9 +36,6 @@ while resnorm > tol && iter < maxit
         dresf_df = ones(size(fq));
     end
     
-%     xq = max(TINY,min(1-fq-TINY, xq - beta*(resx./dresx_dx) ));
-%     fq = max(TINY,min(1-xq-TINY, fq - beta*(resf./dresf_df) ));
-    
     xq = xq - beta*(resx./dresx_dx);
     fq = fq - beta*(resf./dresf_df);
     
@@ -86,30 +83,35 @@ else
     
     Tphs0 = Tphs0d;
     Tphs1 = Tphs1d;
-    perT  = (perTd-Tphs0)./(Tphs1-Tphs0);
+    perT  = (perTd-Tphs0)./(Tphs1-Tphs0).*ones(size(v));
 end
+
+a = 10;
 
 T   = max(0,min(1,(T0 - P*clap -Tphs0)./(Tphs1-Tphs0)));
 
 cx1 = max(TINY,min(1-TINY,          perCx .*erfc(PhDg(1).*(T-perT)./(1-perT))));
-cx2 = max(TINY,min(1-TINY, perCx+(1-perCx).*erfc(PhDg(2).*(T     )./   perT) ));
+cx2 = max(TINY,min(1-TINY, perCx+(1-perCx).*erfc(PhDg(2).*(T-   0)./   perT) ));
+
+dcdT = -2*perCx*PhDg(1)/sqrt(pi)./(1-perT);
+cx1(T<perT) = perCx + dcdT(T<perT).*(T(T<perT)-perT(T<perT));
 
 cxq = zeros(size(T));
-cxq(T>=perT) = cx1(T>=perT);
-cxq(T< perT) = cx2(T< perT);
+cxq(T>=1.25*perT) = cx1(T>=1.25*perT);
+cxq(T< 0.75*perT) = cx2(T< 0.75*perT);
+cxq(T>=0.75*perT & T<1.25*perT) = (cx1(T>=0.75*perT & T<1.25*perT).^-a+cx2(T>=0.75*perT & T<1.25*perT).^-a).^-(1/a);
 
 cm1 = max(TINY,min(1-TINY,          perCm .*erf(PhDg(3).*(1   -T)./(1-perT))./erf(PhDg(3))));
 cm2 = max(TINY,min(1-TINY, perCm+(1-perCm).*erf(PhDg(4).*(perT-T)./(  perT))./erf(PhDg(4))));
 
 cmq = zeros(size(T));
-cmq(T>=perT) = cm1(T>=perT);
-cmq(T< perT) = cm2(T< perT);
+cmq(T>=1.25*perT) = cm1(T>=1.25*perT);
+cmq(T< 0.75*perT) = cm2(T< 0.75*perT);
+cmq(T>=0.75*perT & T<1.25*perT) = (cm1(T>=0.75*perT & T<1.25*perT).^a+cm2(T>=0.75*perT & T<1.25*perT).^a).^(1/a);
 
 cxq = min(min(cphs1,c./(1-fq)),cphs0 + cxq.*(cphs1-cphs0));
 cmq = max(min(cphs1,c./(1-fq)),cphs0 + cmq.*(cphs1-cphs0));
 
-% resx = xq - max(TINY,min(1-TINY, (c-(1-fq).*cmq)./(cxq-cmq) ));
-% resf = fq - max(TINY,min(1-TINY, (v-(1-xq).*vmq)./(vfq-vmq) ));
 resx = c - (xq.*cxq + (1-xq-fq).*cmq);
 resf = v - (fq.*vfq + (1-xq-fq).*vmq);
 
