@@ -11,7 +11,7 @@ P_mms(x,z) = 2.00e+4.*(sin(4*(x)*pi/L).*sin(4*(z)*pi/L));
 
 % compose manufactured material coefficients and volume source
 eta_mms(x,z) = 1e+3-8e+2.*(cos(4*(x)*pi/L).*sin(4*(z)*pi/L));
-rho_mms(x,z) =     -1e+1.*(cos(4*(x)*pi/L).*sin(4*(z)*pi/L));
+rho_mms(x,z) = 3e+3-1e+1.*(cos(4*(x)*pi/L).*sin(4*(z)*pi/L)); rhoref = 3e+3;
 src_mms(x,z) =     -1e-4.*(sin(4*(x)*pi/L).*sin(4*(z)*pi/L));
 
 fprintf(1,'       W   = %s \n',char(W_mms));
@@ -35,7 +35,7 @@ txz_mms(x,z) = eta_mms .* exz_mms;                                         % xz-
 fprintf(1,' . ');
 
 % manufactured solution residuals
-res_W_mms = (diff(tzz_mms,z) + diff(txz_mms,x)) - diff(P_mms,z) + rho_mms(x,z)*g0;
+res_W_mms = (diff(tzz_mms,z) + diff(txz_mms,x)) - diff(P_mms,z) + (rho_mms(x,z)-rhoref)*g0;
 res_U_mms = (diff(txx_mms,x) + diff(txz_mms,z)) - diff(P_mms,x);
 res_P_mms =-(diff(  W_mms,z) + diff(  U_mms,x))                 + src_mms(x,z);
 fprintf(1,' . ');
@@ -84,12 +84,11 @@ drawnow;
 % evaluate analytical solution on appropriate coordinate grids
 [x,z]  = meshgrid(x_mms,zw_mms);
 W_mms  = double(subs(W_mms)); fprintf(1,' . ');
-rhoBF  = double(subs(rho_mms)); fprintf(1,' . ');
-rhoBF  = rhoBF(2:end-1,2:end-1);
 [x,z]  = meshgrid(xu_mms,z_mms);
 U_mms  = double(subs(U_mms)); fprintf(1,' . ');
 [x,z]  = meshgrid(x_mms,z_mms);
 P_mms  = double(subs(P_mms)); fprintf(1,' . ');
+rho    = double(subs(rho_mms)); fprintf(1,' . ');
 eta    = double(subs(eta_mms)); fprintf(1,' . ');
 VolSrc = double(subs(src_mms)); fprintf(1,' . ');
 [x,z]  = meshgrid(xu_mms,zw_mms);

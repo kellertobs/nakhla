@@ -13,8 +13,7 @@ rho(:,[1 end]) = rho(:,[2 end-1]);
 chi   = x.*rho./rhox;
 phi   = f.*rho./rhof;
 mu    = m.*rho./rhom;
-rhoBF =    THETA .*(rho (2:end-2,2:end-1)+rho (3:end-1,2:end-1))/2 ...
-      + (1-THETA).*(rhoo(2:end-2,2:end-1)+rhoo(3:end-1,2:end-1))/2 - rhoref;
+
 if Nx <= 10; rhoBF = repmat(mean(rhoBF,2),1,Nx-2); end
 
 % update thermal properties
@@ -41,7 +40,8 @@ Xf = sum(AA.*Sf,2).*FF + (1-sum(AA.*Sf,2)).*Sf;
 thtv = squeeze(prod(Mv.^Xf,2));
 
 % get effective viscosity
-eta    = squeeze(sum(ff.*kv.*thtv,1));                                   
+eta    = squeeze(sum(ff.*kv.*thtv,1));
+% etadmp = max(0,-gradient(rho.').').*g0.*h^3./(kT./rho./Cp)./100;
 eta    = (1./etamax + 1./eta).^-1 + etamin;
 eta([1 end],:) = eta([2 end-1],:);  
 eta(:,[1 end]) = eta(:,[2 end-1]);
@@ -109,5 +109,5 @@ Div_rhoV =  + advection(rho.*f,0.*U,wf,h,ADVN,'flx') ...
 % VolSrc =  -((rho-rhoo)./dt + THETA*(Div_rhoV - rho.*Div_V) + (1-THETA)*Div_rhoVo)./(THETA*rho);
 VolSrc  = -((rho-rhoo)./dt + Div_rhoV - rho.*Div_V)./rho;
 
-UBG    = - mean(mean(VolSrc(2:end-1,2:end-1)))./2 .* (L/2-XXu);
-WBG    = - mean(mean(VolSrc(2:end-1,2:end-1)))./2 .* (D/2-ZZw);
+UBG    = - 2*mean(mean(VolSrc(2:end-1,2:end-1)))./2 .* (L/2-XXu);
+WBG    = - 0*mean(mean(VolSrc(2:end-1,2:end-1)))./2 .* (D/2-ZZw);
