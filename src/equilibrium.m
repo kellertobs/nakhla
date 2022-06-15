@@ -86,7 +86,7 @@ else
     perT  = (perTd-Tphs0)./(Tphs1-Tphs0).*ones(size(v));
 end
 
-a = 10;
+a = 15;
 
 T   = max(0,min(1,(T0 - P*clap -Tphs0)./(Tphs1-Tphs0)));
 
