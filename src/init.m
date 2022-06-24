@@ -173,26 +173,38 @@ dsumVdt = 0;
 % overwrite fields from file if restarting run
 if restart
     if     restart < 0  % restart from last continuation frame
-        name = [opdir,'/',runID,'/',runID,'_cont'];
+        name = [opdir,'/',runID,'/',runID,'_cont.mat'];
     elseif restart > 0  % restart from specified continuation frame
-        name = [opdir,'/',runID,'/',runID,'_',num2str(restart)];
+        name = [opdir,'/',runID,'/',runID,'_',num2str(restart),'.mat'];
     end
-    load(name,'U','W','P','Pt','f','x','m','phi','chi','mu','H','C','V','T','c','v','cm','cx','vm','vf','IT','CT','SI','RIP','RID','it','ct','si','rip','rid','dHdt','dCdt','dVdt','dITdt','dCTdt','dSIdt','dfdt','dxdt','Gf','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step','hist','VolSrc','wf','wx');
-    
-    xq = x; fq = f;
-    S = [W(:);U(:);P(:)];
-    dcy_rip = rho.*rip./HLRIP.*log(2);
-    dcy_rid = rho.*rid./HLRID.*log(2);
-    Pto = Pt; etao = eta; rhoo = rho; Div_rhoVo = Div_rhoV;
-    update; output;
-    time  = time+dt;
-    step  = step+1;
+    if exist(name,'file')
+        load(name,'U','W','P','Pt','f','x','m','phi','chi','mu','H','C','V','T','c','v','cm','cx','vm','vf','IT','CT','SI','RIP','RID','it','ct','si','rip','rid','dHdt','dCdt','dVdt','dITdt','dCTdt','dSIdt','dfdt','dxdt','Gf','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step','hist','VolSrc','wf','wx');
+        
+        xq = x; fq = f;
+        S = [W(:);U(:);P(:)];
+        dcy_rip = rho.*rip./HLRIP.*log(2);
+        dcy_rid = rho.*rid./HLRID.*log(2);
+        Pto = Pt; etao = eta; rhoo = rho; Div_rhoVo = Div_rhoV;
+        update; output;
+        time  = time+dt;
+        step  = step+1;
+    else % continuation file does not exist, start from scratch
+        % update coefficients and run initial fluidmech solve
+        if ~bnchm
+            update;
+            fluidmech;
+            history;
+            output;
+        end
+        time  = time+dt;
+        step  = step+1;
+    end
 else
     % update coefficients and run initial fluidmech solve
     if ~bnchm
-        update; 
-        fluidmech; 
-        history; 
+        update;
+        fluidmech;
+        history;
         output;
     end
     time  = time+dt;
