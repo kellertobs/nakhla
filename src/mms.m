@@ -94,8 +94,8 @@ VolSrc = double(subs(src_mms)); fprintf(1,' . ');
 [x,z]  = meshgrid(xu_mms,zw_mms);
 etaco  = double(subs(eta_mms)); fprintf(1,' . ');
 theta  = 1;
-WBG    = 0.*WBG;
-UBG    = 0.*UBG;
+WBG    = 0.*W_mms;
+UBG    = 0.*U_mms;
 
 fprintf(1,' . \n');
    

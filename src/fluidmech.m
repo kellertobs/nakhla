@@ -272,7 +272,7 @@ RR = [RV; RP];
 
 %% get residual
 % get non-linear residual
-FF         = LL*S - RR;
+FF         = LL*SOL - RR;
 resnorm_VP = norm(FF(:),2)./(norm(RR(:),2)+TINY);
 
 % map residual vector to 2D arrays
@@ -282,19 +282,20 @@ res_P  = full(reshape(FF(MapP(:)+(NW+NU)), Nz   , Nx   ));  % dynamic pressure
         
 
 %% Solve linear system of equations for vx, vz, P
-SS = sqrt(abs(diag(LL)));
-SS = diag(sparse(1./(SS+1)));
+SCL = sqrt(abs(diag(LL)));
+SCL = diag(sparse(1./(SCL+1)));
 
-LL = SS*LL*SS;
-RR = SS*RR;
+LL  = SCL*LL*SCL;
+RR  = SCL*RR;
 
-S = SS*(LL\RR);  % update solution
+SOL = SCL*(LL\RR);  % update solution
 
 
 % map solution vector to 2D arrays
-W  = full(reshape(S(MapW(:))        ,(Nz-1), Nx   ));                      % matrix z-velocity
-U  = full(reshape(S(MapU(:))        , Nz   ,(Nx-1)));                      % matrix x-velocity
-P  = full(reshape(S(MapP(:)+(NW+NU)), Nz   , Nx   ));                      % matrix dynamic pressure
+W  = full(reshape(SOL(MapW(:))        ,(Nz-1), Nx   ));                    % matrix z-velocity
+U  = full(reshape(SOL(MapU(:))        , Nz   ,(Nx-1)));                    % matrix x-velocity
+P  = full(reshape(SOL(MapP(:)+(NW+NU)), Nz   , Nx   ));                    % matrix dynamic pressure
+Pt = P + rhoref.*g0.*ZZ + Ptop;                                            % total pressure
 
 
 % update phase velocities
@@ -314,6 +315,6 @@ Ubar = (mu (:,1:end-1)+mu (:,2:end))/2 .* Um ...
 
  
 %% update time step
-dtk = min((h/2)^2./max([kT(:)./rho(:)./Cp;kc./rho(:)]))/2;                    % diffusive time step size
+dtk = min((h/2)^2./max([kT(:)./rho(:)./cP;kc./rho(:)]))/2;                    % diffusive time step size
 dta = CFL*min(min(h/2/max(abs([Ux(:);Wx(:);Uf(:);Wf(:);Um(:);Wm(:)]+1e-16)))); % advective time step size
 dt  = min([2*dto,dtmax,min(dtk,dta)]);                                     % physical time step size

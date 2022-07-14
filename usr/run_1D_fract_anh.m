@@ -1,14 +1,13 @@
 clear all; close all;
 
 % set run parameters
-runID    =  '1D_fract_anh';      % run identifier
+runID    =  '1D_fract_anh_Drho';      % run identifier
 opdir    =  '../out/';           % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  200;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot of results
 save_op  =  1;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
-react    =  1;                   % switch on reactive mode
 diseq    =  1;                   % switch on disequilibrium approac
 bnchm    =  0;                   % switch on to run manufactured solution benchmark on flui mechanics solver
 
@@ -84,7 +83,7 @@ kc       =  1e-4;                % chemical diffusivity [kg/m/s]
 kTm      =  4;                   % melt thermal conductivity [W/m/K]
 kTx      =  1;                   % xtal thermal conductivity [W/m/K]
 kTf      =  0.02;                % mvp  thermal conductivity [W/m/K]
-Cp       =  1300;                % heat capacity [J/kg/K]
+cP       =  1300;                % heat capacity [J/kg/K]
 Dsx      = -300;                 % entropy change of crystallisation [J/kg]
 Dsf      =  500;                 % entropy change of exsolution [J/kg]
 
@@ -116,25 +115,22 @@ CC       = [ 0.20, 0.20, 0.20; 0.60, 0.60, 0.12; 0.20, 0.25, 0.50; ];  % permiss
 rhom0    =  2750;                % melt phase ref. density [kg/m3] (at T0,cphs0,Ptop)
 rhox0    =  3050;                % crystal phase ref. density [kg/m3] (at T0,cphs0,Ptop)
 rhof0    =  1000;                % bubble phase ref. density [kg/m3] (at T0,cphs0,Ptop)
-aTm      =  3e-5;                % melt thermal expansivity [1/K]
-aTx      =  1e-5;                % xtal thermal expansivity [1/K]
-aTf      =  1e-4;                % mvp  thermal expansivity [1/K]
-gCm      =  0.5;                 % melt compositional expansion [1/wt]
-gCx      =  0.5;                 % xtal compositional expansion [1/wt]
-bPf      =  1e-8;                % mvp compressibility [1/Pa]
+aT       =  4e-5;                % thermal expansivity [1/K]
+gC       =  0.5;                 % compositional expansivity [1/wt]
+bP       =  1e-8;                % mvp compressibility [1/Pa]
 dx       =  1e-3;                % crystal size [m]
 df       =  1e-3;                % bubble size [m]
 g0       =  10.;                 % gravity [m/s2]
 
 % set numerical model parameters
-CFL      =  0.25;                % (physical) time stepping courant number (multiplies stable step) [0,1]
+CFL      =  0.1;                 % (physical) time stepping courant number (multiplies stable step) [0,1]
 ADVN     =  'FRM';               % advection scheme ('UPW2', 'UPW3', or 'FRM')
 theta    =  0.5;                 % time-stepping parameter (1 = 1st-order implicit; 1/2 = 2nd-order semi-implicit)
-rtol     =  1e-4;                % outer its relative tolerance
-atol     =  1e-7;                % outer its absolute tolerance
+rtol     =  1e-3;                % outer its relative tolerance
+atol     =  1e-6;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its
 alpha    =  0.25;                % iterative lag parameter equilibration
-delta    =  2;                   % smoothness of segregation speed
+delta    =  0;                   % smoothness of segregation speed
 etamin   =  1e2;                 % minimum viscosity for stabilisation
 etamax   =  1e8;                 % maximum viscosity for stabilisation
 

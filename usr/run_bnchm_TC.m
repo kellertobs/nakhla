@@ -1,6 +1,6 @@
 clear; close all;
 
-DT = [4,2,1];
+DT = [1,1/2,1/4];
 
 for dt = DT
     
@@ -8,11 +8,10 @@ for dt = DT
 runID    =  'bnchm_TC';          % run identifier
 opdir    =  '../out/';           % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
-nop      =  4;                   % output frame plotted/saved every 'nop' time steps
+nop      =  100;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot of results
 save_op  =  0;                   % switch on to save output to file
 plot_cv  =  1;                   % switch on to live plot iterative convergence
-react    =  1;                   % switch on reactive mode
 diseq    =  1;                   % switch on disequilibrium approac
 bnchm    =  0;                   % switch on to run manufactured solution benchmark on flui mechanics solver
 
@@ -23,7 +22,7 @@ N        =  50 + 2;              % number of grid points in z-direction (incl. 2
 h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
-M        =  4/dt*DT(1);         % number of time steps to take
+M        =  5/dt*DT(1);          % number of time steps to take
 hr       =  3600;                % conversion seconds to hours
 yr       =  24*365.25*hr;        % conversion seconds to years
 tend     =  1*yr;                % end time for simulation [s]
@@ -87,7 +86,7 @@ kc       =  1e-4;                % chemical diffusivity [kg/m/s]
 kTm      =  4;                   % melt thermal conductivity [W/m/K]
 kTx      =  1;                   % xtal thermal conductivity [W/m/K]
 kTf      =  0.02;                % mvp  thermal conductivity [W/m/K]
-Cp       =  1300;                % heat capacity [J/kg/K]
+cP       =  1300;                % heat capacity [J/kg/K]
 Dsx      = -300;                 % entropy change of crystallisation [J/kg]
 Dsf      =  500;                 % entropy change of exsolution [J/kg]
 
@@ -119,25 +118,22 @@ CC       = [ 0.20, 0.20, 0.20; 0.60, 0.60, 0.12; 0.20, 0.25, 0.50; ];  % permiss
 rhom0    =  2750;                % melt phase ref. density [kg/m3] (at T0,cphs0,Ptop)
 rhox0    =  3050;                % crystal phase ref. density [kg/m3] (at T0,cphs0,Ptop)
 rhof0    =  1000;                % bubble phase ref. density [kg/m3] (at T0,cphs0,Ptop)
-aTm      =  3e-5;                % melt thermal expansivity [1/K]
-aTx      =  1e-5;                % xtal thermal expansivity [1/K]
-aTf      =  1e-4;                % mvp  thermal expansivity [1/K]
-gCm      =  0.5;                 % melt compositional expansion [1/wt]
-gCx      =  0.5;                 % xtal compositional expansion [1/wt]
-bPf      =  1e-8;                % mvp compressibility [1/Pa]
+aT       =  4e-5;                % thermal expansivity [1/K]
+gC       =  0.5;                 % compositional expansivity [1/wt]
+bP       =  1e-8;                % mvp compressibility [1/Pa]
 dx       =  1e-3;                % crystal size [m]
 df       =  1e-3;                % bubble size [m]
 g0       =  10.;                 % gravity [m/s2]
 
 % set numerical model parameters
-CFL      =  1.0;                 % (physical) time stepping courant number (multiplies stable step) [0,1]
+CFL      =  1.00;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 ADVN     =  'FRM';               % advection scheme ('UPW2', 'UPW3', or 'FRM')
-theta    =  0.5;                 % time-stepping parameter (1 = 1st-order implicit; 1/2 = 2nd-order semi-implicit)
-rtol     =  1e-5;                % outer its relative tolerance
+theta    =  1.0;                 % time-stepping parameter (1 = 1st-order implicit; 1/2 = 2nd-order semi-implicit)
+rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-7;                % outer its absolute tolerance
-maxit    =  50;                  % maximum outer its
-alpha    =  0.25;                % iterative lag parameter equilibration
-delta    =  2;                   % smoothness of segregation speed
+maxit    =  10;                  % maximum outer its
+alpha    =  0.00;                % iterative lag parameter equilibration
+delta    =  0;                   % smoothness of segregation speed
 etamin   =  1e2;                 % minimum viscosity for stabilisation
 etamax   =  1e8;                 % maximum viscosity for stabilisation
 
@@ -155,16 +151,18 @@ end
 % run code
 run('../src/main')
 
+run('../src/output')
+
 % plot convergence
 % EH = abs(hist.EH(end));
 % EC = abs(hist.EC(end));
 % EV = abs(hist.EV(end));
-EH = norm(diff(hist.EH(2:end)),2)./length(diff(hist.EH(2:end)));
+ES = norm(diff(hist.ES(2:end)),2)./length(diff(hist.ES(2:end)));
 EC = norm(diff(hist.EC(2:end)),2)./length(diff(hist.EC(2:end)));
 EV = norm(diff(hist.EV(2:end)),2)./length(diff(hist.EV(2:end)));
 
 fh15 = figure(15);
-p1 = loglog(dt,EH,'rs','MarkerSize',8,'LineWidth',2); hold on; box on;
+p1 = loglog(dt,ES,'rs','MarkerSize',8,'LineWidth',2); hold on; box on;
 p2 = loglog(dt,EC,'go','MarkerSize',8,'LineWidth',2);
 p3 = loglog(dt,EV,'bv','MarkerSize',8,'LineWidth',2);
 set(gca,'TicklabelInterpreter','latex','FontSize',12)
@@ -173,14 +171,13 @@ ylabel('rel. numerical error [1]','Interpreter','latex','FontSize',16)
 title('Numerical convergence in time','Interpreter','latex','FontSize',20)
 
 if dt == DT(1)
-    p4 = loglog(DT,mean([EH,EC,EV]).*(DT./DT(1)).^1,'k-' ,'LineWidth',2);  % plot trends for comparison
-    p5 = loglog(DT,mean([EH,EC,EV]).*(DT./DT(1)).^2,'k--' ,'LineWidth',2);  % plot trends for comparison
+    p4 = loglog(DT,mean([ES,EC,EV]).*(DT./DT(1)).^2,'k-' ,'LineWidth',2);  % plot trend for comparison
 end
 if dt == DT(end)
-    legend([p1,p2,p3,p4,p5],{'error $H$','error $C$','error $V$','linear','quadratic'},'Interpreter','latex','box','on','location','southeast')
+    legend([p1,p2,p3,p4],{'error $S$','error $C$','error $V$','quadratic'},'Interpreter','latex','box','on','location','southeast')
 end
 
 end
 
 name = [opdir,'/',runID,'/',runID,'_bnchm'];
-print(fh15,name,'-dpng','-r300','-opengl');
+print(fh15,name,'-dpng','-r300','-image');

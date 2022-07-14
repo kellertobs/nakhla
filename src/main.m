@@ -16,12 +16,15 @@ while time <= tend && step <= M
     if step==1; THETA = 1;  else;  THETA = theta; end
     
     % store previous solution
+    So      = S;
     Ho      = H;
     Co      = C;
     Vo      = V;
     To      = T;
     co      = c;
     vo      = v;
+    Xo      = X;
+    Fo      = F;
     xo      = x;
     fo      = f;
     mo      = m;
@@ -33,11 +36,12 @@ while time <= tend && step <= M
     rhoo    = rho;
     Div_rhoVo =  Div_rhoV;
     etao    = eta;
+    dSdto   = dSdt;
     dHdto   = dHdt;
     dCdto   = dCdt;
     dVdto   = dVdt;
-    dxdto   = dxdt;
-    dfdto   = dfdt;
+    dXdto   = dXdt;
+    dFdto   = dFdt;
     dITdto  = dITdt;
     dCTdto  = dCTdt;
     dSIdto  = dSIdt;
@@ -52,10 +56,10 @@ while time <= tend && step <= M
     iter     = 1;
     
     % non-linear iteration loop
-    while resnorm/resnorm0 >= rtol && resnorm >= atol && iter <= maxit || iter < 2
+    while resnorm/resnorm0 >= rtol && resnorm >= atol && iter <= maxit
         
-        if step==1;  ALPHA = max(alpha,1-iter/50); else;  ALPHA = alpha; end
-
+%         if step==1;  ALPHA = max(alpha,1-iter/20); else;  ALPHA = alpha; end
+        
         % solve thermo-chemical equations
         thermochem;
                 
@@ -67,6 +71,9 @@ while time <= tend && step <= M
         
         % report convergence
         report;
+
+        % update geochemical evolution
+        geochem;
 
         iter = iter+1;
     end
