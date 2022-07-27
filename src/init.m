@@ -188,10 +188,10 @@ if restart
         name = [opdir,'/',runID,'/',runID,'_',num2str(restart),'.mat'];
     end
     if exist(name,'file')
-        load(name,'U','W','P','Pt','f','x','m','phi','chi','mu','X','F','H','C','V','T','c','v','cm','cx','vm','vf','IT','CT','SI','RIP','RID','it','ct','si','rip','rid','dHdt','dCdt','dVdt','dITdt','dCTdt','dSIdt','dFdt','dXdt','Gf','Gx','rho','eta','eII','tII','dt','time','step','hist','VolSrc','wf','wx');
+        load(name,'U','W','P','Pt','f','x','m','phi','chi','mu','X','F','S','C','V','T','s','c','v','sm','sx','sf','cm','cx','vm','vf','IT','CT','SI','RIP','RID','it','ct','si','rip','rid','dSdt','dCdt','dVdt','dITdt','dCTdt','dSIdt','dFdt','dXdt','Gf','Gx','rho','eta','eII','tII','dt','time','step','hist','VolSrc','wf','wx');
         
         xq = x; fq = f;
-        S = [W(:);U(:);P(:)];
+        SOL = [W(:);U(:);P(:)];
         dcy_rip = rho.*rip./HLRIP.*log(2);
         dcy_rid = rho.*rid./HLRID.*log(2);
         Pto = Pt; etao = eta; rhoo = rho; Div_rhoVo = Div_rhoV;
