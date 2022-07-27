@@ -4,9 +4,40 @@
 Ti = T; xi = x; fi = f;
 
 % update heat content (entropy)
-advn_S = - advection(rho.*m.*sm,Um,Wm,h,ADVN,'flx') ...                    % heat advection
-         - advection(rho.*x.*sx,Ux,Wx,h,ADVN,'flx') ...
-         - advection(rho.*f.*sf,Uf,Wf,h,ADVN,'flx');
+if RK3
+    S1 = So;
+    sm = S1./rhoo - xo.*Dsx - fo.*Dsf;
+    sx = sm + Dsx;
+    sf = sm + Dsf;
+
+    advn_S1 = - advection(rho.*m.*sm,Um,Wm,h,ADVN,'flx') ...                    % heat advection
+              - advection(rho.*x.*sx,Ux,Wx,h,ADVN,'flx') ...
+              - advection(rho.*f.*sf,Uf,Wf,h,ADVN,'flx');
+
+    S2 = So + advn_S1/2.*dt;
+    sm = S2./rho - x.*Dsx - f.*Dsf;
+    sx = sm + Dsx;
+    sf = sm + Dsf;
+
+    advn_S2 = - advection(rho.*m.*sm,Um,Wm,h,ADVN,'flx') ...                    % heat advection
+              - advection(rho.*x.*sx,Ux,Wx,h,ADVN,'flx') ...
+              - advection(rho.*f.*sf,Uf,Wf,h,ADVN,'flx');
+
+    S3 = So + (2.*advn_S2 - advn_S1).*dt;
+    sm = S3./rho - x.*Dsx - f.*Dsf;
+    sx = sm + Dsx;
+    sf = sm + Dsf;
+
+    advn_S3 = - advection(rho.*m.*sm,Um,Wm,h,ADVN,'flx') ...                    % heat advection
+              - advection(rho.*x.*sx,Ux,Wx,h,ADVN,'flx') ...
+              - advection(rho.*f.*sf,Uf,Wf,h,ADVN,'flx');
+
+    advn_S = (advn_S1 + 4.*advn_S2 + advn_S3)./6;
+else
+    advn_S = - advection(rho.*m.*sm,Um,Wm,h,ADVN,'flx') ...                    % heat advection
+             - advection(rho.*x.*sx,Ux,Wx,h,ADVN,'flx') ...
+             - advection(rho.*f.*sf,Uf,Wf,h,ADVN,'flx');
+end
 
 qTz    = - (kT(1:end-1,:)+kT(2:end,:))./2 .* ddz(T,h);                     % heat diffusion z-flux
 qTx    = - (kT(:,1:end-1)+kT(:,2:end))./2 .* ddx(T,h);                     % heat diffusion x-flux
@@ -27,9 +58,34 @@ S(:,[1 end]) = S(:,[2 end-1]);
 
     
 % update major component
-advn_C = advection(rho.*m.*cm,Um,Wm,h,ADVN,'flx') ...
-       + advection(rho.*x.*cx,Ux,Wx,h,ADVN,'flx');
-                          
+if RK3
+    C1 = Co;
+    cm = C1./rhoo./(mo + xo.*Kc);
+    cx = C1./rhoo./(mo./Kc + xo);
+
+    advn_C1 = - advection(rho.*m.*cm,Um,Wm,h,ADVN,'flx') ...
+              - advection(rho.*x.*cx,Ux,Wx,h,ADVN,'flx');
+
+    C2 = Co + advn_C1./2.*dt;
+    cm = C2./rho./(m + x.*Kc);
+    cx = C2./rho./(m./Kc + x);
+
+    advn_C2 = - advection(rho.*m.*cm,Um,Wm,h,ADVN,'flx') ...
+              - advection(rho.*x.*cx,Ux,Wx,h,ADVN,'flx');
+
+    C3 = Co + (2.*advn_C2 - advn_C1).*dt;
+    cm = C3./rho./(m + x.*Kc);
+    cx = C3./rho./(m./Kc + x);
+
+    advn_C3 = - advection(rho.*m.*cm,Um,Wm,h,ADVN,'flx') ...
+              - advection(rho.*x.*cx,Ux,Wx,h,ADVN,'flx');
+
+    advn_C = (advn_C1 + 4.*advn_C2 + advn_C3)./6;
+else
+    advn_C = - advection(rho.*m.*cm,Um,Wm,h,ADVN,'flx') ...
+             - advection(rho.*x.*cx,Ux,Wx,h,ADVN,'flx');
+end
+
 qcz   = - kc.*(m(1:end-1,:)+m(2:end,:))/2 .* ddz(c,h);                     % major component diffusion z-flux
 qcx   = - kc.*(m(:,1:end-1)+m(:,2:end))/2 .* ddx(c,h);                     % major component diffusion x-flux
 diff_c(2:end-1,2:end-1) = - ddz(qcz(:,2:end-1),h) ...                      % major component diffusion
@@ -38,7 +94,7 @@ diff_c(2:end-1,2:end-1) = - ddz(qcz(:,2:end-1),h) ...                      % maj
 bndC = zeros(size(c));
 if ~isnan(cwall); bndC = bndC + rho.*(cwall-c)./tau_a .* bndshape; end     % impose boundary layer
 
-dCdt = - advn_C + diff_c + bndC;                                           % total rate of change
+dCdt = advn_C + diff_c + bndC;                                             % total rate of change
     
 C = Co + (THETA.*dCdt + (1-THETA).*dCdto).*dt;                             % explicit update of major component density
 C([1 end],:) = C([2 end-1],:);                                             % apply boundary conditions
@@ -47,8 +103,8 @@ C(:,[1 end]) = C(:,[2 end-1]);
 % update volatile component
 bndV = zeros(size(v));
 if any([v0;v1;vwall;v(:)]>10*TINY)
-    advn_V = advection(rho.*m.*vm,Um,Wm,h,ADVN,'flx') ...
-           + advection(rho.*f.*vf,Uf,Wf,h,ADVN,'flx');
+    advn_V = - advection(rho.*m.*vm,Um,Wm,h,ADVN,'flx') ...
+             - advection(rho.*f.*vf,Uf,Wf,h,ADVN,'flx');
     
     qvz   = - kc.*(m(1:end-1,:)+m(2:end,:))/2 .* ddz(v,h);                 % volatile component diffusion z-flux
     qvx   = - kc.*(m(:,1:end-1)+m(:,2:end))/2 .* ddx(v,h);                 % volatile component diffusion x-flux
@@ -57,7 +113,7 @@ if any([v0;v1;vwall;v(:)]>10*TINY)
     
     if ~isnan(vwall); bndV = bndV + rho.*(vwall-v)./tau_a .* bndshape; end % impose boundary layer
     
-    dVdt = - advn_V + diff_v + bndV;                                       % total rate of change
+    dVdt = advn_V + diff_v + bndV;                                         % total rate of change
     
     V = Vo + (THETA.*dVdt + (1-THETA).*dVdto).*dt;                         % explicit update of volatile component density
     V = max(TINY,V);
@@ -80,10 +136,29 @@ v = V./rho;
 if diseq
     
     Gx = ALPHA.*Gx + (1-ALPHA) .* (xq-x).*rho./max(3.*dt,tau_r);
-    
-    advn_x = - advection(rho.*x,Ux,Wx,h,ADVN,'flx');                       % get advection term
-    
-    dXdt   = advn_x + Gx;                                                  % total rate of change
+        
+    if RK3
+        X1 = Xo;
+        x  = X1./rhoo;
+
+        advn_X1 = - advection(rho.*x.*cx,Ux,Wx,h,ADVN,'flx');
+
+        X2 = Xo + advn_X1./2.*dt;
+        x  = X2./rho;
+
+        advn_X2 = - advection(rho.*x.*cx,Ux,Wx,h,ADVN,'flx');
+
+        X3 = Xo + (2.*advn_X2 - advn_X1).*dt;
+        x  = X3./rho;
+
+        advn_X3 = - advection(rho.*x.*cx,Ux,Wx,h,ADVN,'flx');
+
+        advn_X = (advn_X1 + 4.*advn_X2 + advn_X3)./6;
+    else
+        advn_X = - advection(rho.*x.*cx,Ux,Wx,h,ADVN,'flx');
+    end
+
+    dXdt   = advn_X + Gx;                                                  % total rate of change
     
     X = Xo + (THETA.*dXdt + (1-THETA).*dXdto).*dt;                         % explicit update of crystal fraction
     X = min(rho-TINY,max(TINY,X));                                         % enforce [0,1] limit
