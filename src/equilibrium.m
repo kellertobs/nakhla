@@ -19,7 +19,7 @@ while resnorm > tol && iter < maxit
    
     beta = 1-exp(-iter/10);
 
-    [resx ,resf ] = res_xf(xq,fq,T0,c,v,P,Tphs0d,Tphs1d,cphs0,cphs1,perTd,perCx,perCm,clap,dTH2O,vmq0,PhDg,TINY);
+    [resx,resf,~,cmq,~,~] = res_xf(xq,fq,T0,c,v,P,Tphs0d,Tphs1d,cphs0,cphs1,perTd,perCx,perCm,clap,dTH2O,vmq0,PhDg,TINY);
     
     [resx_xp,~,~,~,~,~] = res_xf(xq+eps,fq,T0,c,v,P,Tphs0d,Tphs1d,cphs0,cphs1,perTd,perCx,perCm,clap,dTH2O,vmq0,PhDg,TINY);
     [resx_xm,~,~,~,~,~] = res_xf(xq-eps,fq,T0,c,v,P,Tphs0d,Tphs1d,cphs0,cphs1,perTd,perCx,perCm,clap,dTH2O,vmq0,PhDg,TINY);
@@ -27,6 +27,8 @@ while resnorm > tol && iter < maxit
     dresx_dx = (resx_xp-resx_xm)/2/eps;
 
     if any(v(:)>10*TINY)
+        vmq0   = (1-cmq).*vmq_c0 + cmq.*vmq_c1;
+
         [~,resf_fp,~,~,~,~] = res_xf(xq,fq+eps,T0,c,v,P,Tphs0d,Tphs1d,cphs0,cphs1,perTd,perCx,perCm,clap,dTH2O,vmq0,PhDg,TINY);
         [~,resf_fm,~,~,~,~] = res_xf(xq,fq-eps,T0,c,v,P,Tphs0d,Tphs1d,cphs0,cphs1,perTd,perCx,perCm,clap,dTH2O,vmq0,PhDg,TINY);
         
