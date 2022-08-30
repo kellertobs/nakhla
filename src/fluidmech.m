@@ -39,8 +39,10 @@ IIR = [IIR; ii(:)]; AAR = [AAR; aa(:)];
 
 % internal points
 ii    = MapW(2:end-1,2:end-1);
-EtaC1 = etaco(2:end-1,1:end-1); EtaC2 = etaco(2:end-1,2:end  );
-EtaP1 = eta  (2:end-2,2:end-1); EtaP2 = eta  (3:end-1,2:end-1);
+ EtaC1 = etaco(2:end-1,1:end-1); EtaC2 = etaco(2:end-1,2:end  );
+ EtaP1 = eta  (2:end-2,2:end-1); EtaP2 = eta  (3:end-1,2:end-1);
+ZetaP1 = zeta(2:end-2,2:end-1);
+ZetaP2 = zeta(3:end-1,2:end-1);
 
 % coefficients multiplying z-velocities W
 %             top          ||         bottom          ||           left            ||          right
@@ -61,10 +63,10 @@ IIL = [IIL; ii(:)]; JJL = [JJL;  ii(:)];   AAL = [AAL; aa(:)];
 %         top left         ||        bottom left          ||       top right       ||       bottom right
 jj1 = MapU(2:end-2,1:end-1); jj2 = MapU(3:end-1,1:end-1); jj3 = MapU(2:end-2,2:end); jj4 = MapU(3:end-1,2:end);
 
-IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; (1/2*EtaC1(:)-1/3*EtaP1(:))/h^2];  % W one to the top and left
-IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL;-(1/2*EtaC1(:)-1/3*EtaP2(:))/h^2];  % W one to the bottom and left
-IIL = [IIL; ii(:)]; JJL = [JJL; jj3(:)];   AAL = [AAL;-(1/2*EtaC2(:)-1/3*EtaP1(:))/h^2];  % W one to the top and right
-IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL; (1/2*EtaC2(:)-1/3*EtaP2(:))/h^2];  % W one to the bottom and right
+IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; (1/2*EtaC1(:)-1/3*EtaP1(:)+ZetaP1(:))/h^2];  % W one to the top and left
+IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL;-(1/2*EtaC1(:)-1/3*EtaP2(:)+ZetaP2(:))/h^2];  % W one to the bottom and left
+IIL = [IIL; ii(:)]; JJL = [JJL; jj3(:)];   AAL = [AAL;-(1/2*EtaC2(:)-1/3*EtaP1(:)+ZetaP1(:))/h^2];  % W one to the top and right
+IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL; (1/2*EtaC2(:)-1/3*EtaP2(:)+ZetaP2(:))/h^2];  % W one to the bottom and right
 
 
 % z-RHS vector
@@ -108,8 +110,10 @@ IIR = [IIR; ii(:)]; AAR = [AAR; aa(:)];
 
 % internal points
 ii    = MapU(2:end-1,2:end-1);
-EtaC1 = etaco(1:end-1,2:end-1); EtaC2 = etaco(2:end  ,2:end-1);
-EtaP1 = eta  (2:end-1,2:end-2); EtaP2 = eta  (2:end-1,3:end-1);
+ EtaC1 = etaco(1:end-1,2:end-1); EtaC2 = etaco(2:end  ,2:end-1);
+ EtaP1 = eta  (2:end-1,2:end-2); EtaP2 = eta  (2:end-1,3:end-1);
+ZetaP1 = zeta(2:end-1,2:end-2);
+ZetaP2 = zeta(2:end-1,3:end-1);
 
 % coefficients multiplying x-velocities U
 %            left          ||          right          ||           top             ||          bottom
@@ -126,10 +130,10 @@ IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL; 1/2*EtaC2(:)/h^2];      %
 %         top left         ||        top right          ||       bottom left       ||       bottom right
 jj1 = MapW(1:end-1,2:end-2); jj2 = MapW(1:end-1,3:end-1); jj3 = MapW(2:end,2:end-2); jj4 = MapW(2:end,3:end-1);
 
-IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; (1/2*EtaC1(:)-1/3*EtaP1(:))/h^2];  % W one to the top and left
-IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL;-(1/2*EtaC1(:)-1/3*EtaP2(:))/h^2];  % W one to the top and right
-IIL = [IIL; ii(:)]; JJL = [JJL; jj3(:)];   AAL = [AAL;-(1/2*EtaC2(:)-1/3*EtaP1(:))/h^2];  % W one to the bottom and left
-IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL; (1/2*EtaC2(:)-1/3*EtaP2(:))/h^2];  % W one to the bottom and right
+IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; (1/2*EtaC1(:)-1/3*EtaP1(:)+ZetaP1(:))/h^2];  % W one to the top and left
+IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL;-(1/2*EtaC1(:)-1/3*EtaP2(:)+ZetaP2(:))/h^2];  % W one to the top and right
+IIL = [IIL; ii(:)]; JJL = [JJL; jj3(:)];   AAL = [AAL;-(1/2*EtaC2(:)-1/3*EtaP1(:)+ZetaP1(:))/h^2];  % W one to the bottom and left
+IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL; (1/2*EtaC2(:)-1/3*EtaP2(:)+ZetaP2(:))/h^2];  % W one to the bottom and right
 
 
 % x-RHS vector
@@ -303,7 +307,7 @@ Wf   = W + wf;                                                             % mvp
 Uf   = U + 0.;                                                             % mvp x-velocity
 Wx   = W + wx;                                                             % xtl z-velocity
 Ux   = U + 0.;                                                             % xtl x-velocity
-Wm   = W + 0.;                                                             % mlt z-velocity
+Wm   = W + wm;                                                             % mlt z-velocity
 Um   = U + 0.;                                                             % mlt x-velocity
 
 Wbar = (mu (1:end-1,:)+mu (2:end,:))/2 .* Wm ...
@@ -315,6 +319,6 @@ Ubar = (mu (:,1:end-1)+mu (:,2:end))/2 .* Um ...
 
  
 %% update time step
-dtk = min((h/2)^2./max([kT(:)./rho(:)./cP;kc./rho(:)]))/2;                    % diffusive time step size
+dtk = min((h/2)^2./max([kT(:)./rho(:)./cP;kc./rho(:)]))/2;                 % diffusive time step size
 dta = CFL*min(min(h/2/max(abs([Ux(:);Wx(:);Uf(:);Wf(:);Um(:);Wm(:)]+1e-16)))); % advective time step size
 dt  = min([2*dto,dtmax,min(dtk,dta)]);                                     % physical time step size

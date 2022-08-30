@@ -5,7 +5,7 @@ runID    =  '1D_fract_sat';      % run identifier
 opdir    =  '../out/';           % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  200;                 % output frame plotted/saved every 'nop' time steps
-plot_op  =  1;                   % switch on to live plot of results
+plot_op  =  1;                   % switch on to live plot results
 save_op  =  1;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
 diseq    =  1;                   % switch on disequilibrium approac
@@ -13,8 +13,8 @@ bnchm    =  0;                   % switch on to run manufactured solution benchm
 
 % set model domain parameters
 D        =  10;                  % chamber depth [m]
-L        =  10/200;              % chamber width [m]
-N        =  200 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
+L        =  10/400;              % chamber width [m]
+N        =  400 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
 h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
@@ -50,8 +50,8 @@ ct0      =  1;                   % compatible tracer top layer [wt ppm]
 ct1      =  1;                   % compatible tracer base layer [wt ppm]
 dct      = -0.00;                % compatible tracer random noise [wt ppm]
 KCT      =  1e+2;                % compatible tracer partition coefficient
-si0      =  1;                   % stable isotope ratio top layer [delta]
-si1      =  1;                   % stable isotope ratio base layer [delta]
+si0      =  0;                   % stable isotope ratio top layer [delta]
+si1      =  0;                   % stable isotope ratio base layer [delta]
 dsi      =  0.00;                % stable isotope ratio random noise [delta]
 ri0      =  1;                   % radiogenic isotope top layer [wt ppm]
 ri1      =  1;                   % radiogenic isotope base layer [wt ppm]
@@ -68,8 +68,8 @@ bndinit  =  0;                   % switch on (1) to initialise with already esta
 dw       =  1*h;                 % boundary layer thickness for assimilation [m]
 fin      =  1;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
 fout     =  1;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
-tau_T    =  4*hr;                % wall cooling/assimilation time [s]
-tau_a    =  4*hr;                % wall cooling/assimilation time [s]
+tau_T    =  5*hr;                % wall cooling/assimilation time [s]
+tau_a    =  5*hr;                % wall cooling/assimilation time [s]
 Twall    =  500;                 % wall temperature [degC] (nan = insulating)
 cwall    =  nan;                 % wall major component [wt SiO2] (nan = no assimilation)
 vwall    =  nan;                 % wall volatile component [wt H2O] (nan = no assimilation)
@@ -79,13 +79,13 @@ siwall   =  nan;                 % wall stable isotope [delta] (nan = no assimil
 riwall   =  nan;                 % wall radiogenic isotope [wt ppm] (nan = no assimilation)
 
 % set thermo-chemical material parameters
-kc       =  1e-3;                % chemical diffusivity [kg/m/s]
+kc       =  3e-4;                % chemical diffusivity [kg/m/s]
 kTm      =  4;                   % melt thermal conductivity [W/m/K]
 kTx      =  1;                   % xtal thermal conductivity [W/m/K]
 kTf      =  0.02;                % mvp  thermal conductivity [W/m/K]
 cP       =  1300;                % heat capacity [J/kg/K]
 Dsx      = -300;                 % entropy change of crystallisation [J/kg]
-Dsf      =  500;                 % entropy change of exsolution [J/kg]
+Dsf      =  400;                 % entropy change of exsolution [J/kg]
 
 % set phase diagram parameters
 cphs0    =  0.43;                % phase diagram lower bound composition [wt SiO2]
@@ -93,7 +93,7 @@ cphs1    =  0.78;                % phase diagram upper bound composition [wt SiO
 Tphs0    =  844;                 % phase diagram lower bound temperature [degC]
 Tphs1    =  1867;                % phase diagram upper bound temperature [degC]
 PhDg     =  [7.0,4.2,1.0,0.9];   % Phase diagram curvature factor (> 1)
-perCm    =  0.517;               % peritectic liquidus composition [wt SiO2]
+perCm    =  0.514;               % peritectic liquidus composition [wt SiO2]
 perCx    =  0.475;               % peritectic solidus  composition [wt SiO2]
 perT     =  1147;                % peritectic temperature [degC]
 clap     =  1e-7;                % Clapeyron slope for P-dependence of melting T [degC/Pa]
@@ -120,17 +120,17 @@ gC       =  0.5;                 % compositional expansivity [1/wt]
 bP       =  1e-8;                % mvp compressibility [1/Pa]
 dx       =  1e-3;                % crystal size [m]
 df       =  1e-3;                % bubble size [m]
+dm       =  1e-3;                % melt film size [m]
 g0       =  10.;                 % gravity [m/s2]
 
 % set numerical model parameters
-CFL      =  0.1;                 % (physical) time stepping courant number (multiplies stable step) [0,1]
+CFL      =  0.25;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 ADVN     =  'FRM';               % advection scheme ('UPW2', 'UPW3', or 'FRM')
-theta    =  0.5;                 % time-stepping parameter (1 = 1st-order implicit; 1/2 = 2nd-order semi-implicit)
-rtol     =  1e-4;                % outer its relative tolerance
-atol     =  1e-7;                % outer its absolute tolerance
+theta    =  1/2;                 % time-stepping parameter (1 = 1st-order implicit; 1/2 = 2nd-order semi-implicit)
+rtol     =  1e-3;                % outer its relative tolerance
+atol     =  1e-6;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its
-alpha    =  0.25;                % iterative lag parameter equilibration
-delta    =  0;                   % smoothness of segregation speed
+alpha    =  0.50;                % iterative lag parameter equilibration
 etamin   =  1e2;                 % minimum viscosity for stabilisation
 etamax   =  1e8;                 % maximum viscosity for stabilisation
 
