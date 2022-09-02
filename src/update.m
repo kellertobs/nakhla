@@ -45,9 +45,6 @@ eta(:,[1 end]) = eta(:,[2 end-1]);
 etaco  = (eta(1:end-1,1:end-1)+eta(2:end,1:end-1) ...
        +  eta(1:end-1,2:end  )+eta(2:end,2:end  ))./4;
 
-zeta   = squeeze(sum(ff.*kv.*thtv./(1-ff),1));
-zeta   = (1./(1e3.*eta) + 1./zeta).^-1 + 4/3.*eta;
-
 % get segregation coefficients
 Csgr = ((1-ff)./[dx;dm;df].^2.*kv.*thtv).^-1 + 1e-18;
 

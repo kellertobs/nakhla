@@ -88,7 +88,7 @@ elseif Nx <= 10  % create 1D plots
 
     if ~exist('fh2','var'); fh2 = figure(VIS{:});
     else; set(0, 'CurrentFigure', fh2); clf;
-    end
+    end 
     subplot(1,5,1)
     plot(rhox(2:end-1,2:end-1),Zc(2:end-1).',CL{[1,4]},LW{:}); axis ij tight; box on; hold on;
     plot(rhom(2:end-1,2:end-1),Zc(2:end-1).',CL{[1,3]},LW{:});
@@ -111,7 +111,7 @@ elseif Nx <= 10  % create 1D plots
 
     if ~exist('fh3','var'); fh3 = figure(VIS{:});
     else; set(0, 'CurrentFigure', fh3); clf;
-    end
+    end 
     subplot(1,5,1)
     semilogx(max(1e-3,min(1e3,itx(2:end-1,2:end-1)))*100,Zc(2:end-1).',CL{[1,4]},LW{:}); axis ij tight; box on; hold on;
     semilogx(max(1e-3,min(1e3,itm(2:end-1,2:end-1)))*100,Zc(2:end-1).',CL{[1,3]},LW{:});
@@ -146,84 +146,75 @@ else % create 2D plots
 
     % initialize figures and axes
     if ~exist('fh1','var'); fh1 = figure(VIS{:});
-        colormap(ocean);
-        fh = axb + 2*axh + 1*avs + axt;
-        fw = axl + 2*axw + 1*ahs + axr;
-        set(fh1,UN{:},'Position',[1 1 fw fh]);
-        set(fh1,'PaperUnits','Centimeters','PaperPosition',[0 0 fw fh],'PaperSize',[fw fh]);
-        set(fh1,'Color','w','InvertHardcopy','off','Resize','off');
-        ax(11) = axes(UN{:},'position',[axl+0*axw+0*ahs axb+1*axh+1*avs axw axh]);
-        ax(12) = axes(UN{:},'position',[axl+1*axw+1*ahs axb+1*axh+1*avs axw axh]);
-        ax(13) = axes(UN{:},'position',[axl+0*axw+0*ahs axb+0*axh+0*avs axw axh]);
-        ax(14) = axes(UN{:},'position',[axl+1*axw+1*ahs axb+0*axh+0*avs axw axh]);
-    end
+    else; set(0, 'CurrentFigure', fh1); clf;
+    end 
+    colormap(ocean);
+    fh = axb + 2*axh + 1*avs + axt;
+    fw = axl + 2*axw + 1*ahs + axr;
+    set(fh1,UN{:},'Position',[1 1 fw fh]);
+    set(fh1,'PaperUnits','Centimeters','PaperPosition',[0 0 fw fh],'PaperSize',[fw fh]);
+    set(fh1,'Color','w','InvertHardcopy','off','Resize','off');
+    ax(11) = axes(UN{:},'position',[axl+0*axw+0*ahs axb+1*axh+1*avs axw axh]);
+    ax(12) = axes(UN{:},'position',[axl+1*axw+1*ahs axb+1*axh+1*avs axw axh]);
+    ax(13) = axes(UN{:},'position',[axl+0*axw+0*ahs axb+0*axh+0*avs axw axh]);
+    ax(14) = axes(UN{:},'position',[axl+1*axw+1*ahs axb+0*axh+0*avs axw axh]);
 
     if ~exist('fh2','var'); fh2 = figure(VIS{:});
-        colormap(ocean);
-        fh = axb + 1*axh + 0*avs + axt;
-        fw = axl + 3*axw + 2*ahs + axr;
-        set(fh2,UN{:},'Position',[3 3 fw fh]);
-        set(fh2,'PaperUnits','Centimeters','PaperPosition',[0 0 fw fh],'PaperSize',[fw fh]);
-        set(fh2,'Color','w','InvertHardcopy','off','Resize','off');
-        ax(21) = axes(UN{:},'position',[axl+0*axw+0*ahs axb+0*axh+0*avs axw axh]);
-        ax(22) = axes(UN{:},'position',[axl+1*axw+1*ahs axb+0*axh+0*avs axw axh]);
-        ax(23) = axes(UN{:},'position',[axl+2*axw+2*ahs axb+0*axh+0*avs axw axh]);
-    end
+    else; set(0, 'CurrentFigure', fh2); clf;
+    end 
+    colormap(ocean);
+    fh = axb + 1*axh + 0*avs + axt;
+    fw = axl + 3*axw + 2*ahs + axr;
+    set(fh2,UN{:},'Position',[3 3 fw fh]);
+    set(fh2,'PaperUnits','Centimeters','PaperPosition',[0 0 fw fh],'PaperSize',[fw fh]);
+    set(fh2,'Color','w','InvertHardcopy','off','Resize','off');
+    ax(21) = axes(UN{:},'position',[axl+0*axw+0*ahs axb+0*axh+0*avs axw axh]);
+    ax(22) = axes(UN{:},'position',[axl+1*axw+1*ahs axb+0*axh+0*avs axw axh]);
+    ax(23) = axes(UN{:},'position',[axl+2*axw+2*ahs axb+0*axh+0*avs axw axh]);
 
     if ~exist('fh3','var'); fh3 = figure(VIS{:});
-        colormap(ocean);
-        fh = axb + 2*axh + 1*avs + axt;
-        fw = axl + 2*axw + 1*ahs + axr;
-        set(fh3,UN{:},'Position',[5 5 fw fh]);
-        set(fh3,'PaperUnits','Centimeters','PaperPosition',[0 0 fw fh],'PaperSize',[fw fh]);
-        set(fh3,'Color','w','InvertHardcopy','off','Resize','off');
-        ax(31) = axes(UN{:},'position',[axl+0*axw+0*ahs axb+1*axh+1*avs axw axh]);
-        ax(32) = axes(UN{:},'position',[axl+1*axw+1*ahs axb+1*axh+1*avs axw axh]);
-        ax(33) = axes(UN{:},'position',[axl+0*axw+0*ahs axb+0*axh+0*avs axw axh]);
-        ax(34) = axes(UN{:},'position',[axl+1*axw+1*ahs axb+0*axh+0*avs axw axh]);
-    end
+    else; set(0, 'CurrentFigure', fh3); clf;
+    end 
+    colormap(ocean);
+    fh = axb + 2*axh + 1*avs + axt;
+    fw = axl + 2*axw + 1*ahs + axr;
+    set(fh3,UN{:},'Position',[5 5 fw fh]);
+    set(fh3,'PaperUnits','Centimeters','PaperPosition',[0 0 fw fh],'PaperSize',[fw fh]);
+    set(fh3,'Color','w','InvertHardcopy','off','Resize','off');
+    ax(31) = axes(UN{:},'position',[axl+0*axw+0*ahs axb+1*axh+1*avs axw axh]);
+    ax(32) = axes(UN{:},'position',[axl+1*axw+1*ahs axb+1*axh+1*avs axw axh]);
+    ax(33) = axes(UN{:},'position',[axl+0*axw+0*ahs axb+0*axh+0*avs axw axh]);
+    ax(34) = axes(UN{:},'position',[axl+1*axw+1*ahs axb+0*axh+0*avs axw axh]);
 
     if ~exist('fh4','var'); fh4 = figure(VIS{:});
-        colormap(ocean);
-        fh = axb + 2*axh + 1*avs + axt;
-        fw = axl + 2*axw + 1*ahs + axr;
-        set(fh4,UN{:},'Position',[7 7 fw fh]);
-        set(fh4,'PaperUnits','Centimeters','PaperPosition',[0 0 fw fh],'PaperSize',[fw fh]);
-        set(fh4,'Color','w','InvertHardcopy','off','Resize','off');
-        ax(41) = axes(UN{:},'position',[axl+0*axw+0*ahs axb+1*axh+1*avs axw axh]);
-        ax(42) = axes(UN{:},'position',[axl+1*axw+1*ahs axb+1*axh+1*avs axw axh]);
-        ax(43) = axes(UN{:},'position',[axl+0*axw+0*ahs axb+0*axh+0*avs axw axh]);
-        ax(44) = axes(UN{:},'position',[axl+1*axw+1*ahs axb+0*axh+0*avs axw axh]);
-    end
+    else; set(0, 'CurrentFigure', fh4); clf;
+    end 
+    colormap(ocean);
+    fh = axb + 2*axh + 1*avs + axt;
+    fw = axl + 2*axw + 1*ahs + axr;
+    set(fh4,UN{:},'Position',[7 7 fw fh]);
+    set(fh4,'PaperUnits','Centimeters','PaperPosition',[0 0 fw fh],'PaperSize',[fw fh]);
+    set(fh4,'Color','w','InvertHardcopy','off','Resize','off');
+    ax(41) = axes(UN{:},'position',[axl+0*axw+0*ahs axb+1*axh+1*avs axw axh]);
+    ax(42) = axes(UN{:},'position',[axl+1*axw+1*ahs axb+1*axh+1*avs axw axh]);
+    ax(43) = axes(UN{:},'position',[axl+0*axw+0*ahs axb+0*axh+0*avs axw axh]);
+    ax(44) = axes(UN{:},'position',[axl+1*axw+1*ahs axb+0*axh+0*avs axw axh]);
 
     if ~exist('fh5','var'); fh5 = figure(VIS{:});
-        colormap(ocean);
-        fh = axb + 2*axh + 1*avs + axt;
-        fw = axl + 3*axw + 2*ahs + axr;
-        set(fh5,UN{:},'Position',[9 9 fw fh]);
-        set(fh5,'PaperUnits','Centimeters','PaperPosition',[0 0 fw fh],'PaperSize',[fw fh]);
-        set(fh5,'Color','w','InvertHardcopy','off','Resize','off');
-        ax(51) = axes(UN{:},'position',[axl+0*axw+0*ahs axb+1*axh+1*avs axw axh]);
-        ax(52) = axes(UN{:},'position',[axl+1*axw+1*ahs axb+1*axh+1*avs axw axh]);
-        ax(53) = axes(UN{:},'position',[axl+2*axw+2*ahs axb+1*axh+1*avs axw axh]);
-        ax(54) = axes(UN{:},'position',[axl+0*axw+0*ahs axb+0*axh+0*avs axw axh]);
-        ax(55) = axes(UN{:},'position',[axl+1*axw+1*ahs axb+0*axh+0*avs axw axh]);
-        ax(56) = axes(UN{:},'position',[axl+2*axw+2*ahs axb+0*axh+0*avs axw axh]);
-    end
-
-    if plot_cv
-        if ~exist('fh6','var'); fh6 = figure(VIS{:});
-            colormap(ocean);
-            fh = axb + 1*axh + 0*avs + axt;
-            fw = axl + 3*axw + 2*ahs + axr;
-            set(fh6,UN{:},'Position',[11 11 fw fh]);
-            set(fh6,'PaperUnits','Centimeters','PaperPosition',[0 0 fw fh],'PaperSize',[fw fh]);
-            set(fh6,'Color','w','InvertHardcopy','off','Resize','off');
-            ax(61) = axes(UN{:},'position',[axl+0*axw+0*ahs axb+0*axh+0*avs axw axh]);
-            ax(62) = axes(UN{:},'position',[axl+1*axw+1*ahs axb+0*axh+0*avs axw axh]);
-            ax(63) = axes(UN{:},'position',[axl+2*axw+2*ahs axb+0*axh+0*avs axw axh]);
-        end
-    end
+    else; set(0, 'CurrentFigure', fh5); clf;
+    end 
+    colormap(ocean);
+    fh = axb + 2*axh + 1*avs + axt;
+    fw = axl + 3*axw + 2*ahs + axr;
+    set(fh5,UN{:},'Position',[9 9 fw fh]);
+    set(fh5,'PaperUnits','Centimeters','PaperPosition',[0 0 fw fh],'PaperSize',[fw fh]);
+    set(fh5,'Color','w','InvertHardcopy','off','Resize','off');
+    ax(51) = axes(UN{:},'position',[axl+0*axw+0*ahs axb+1*axh+1*avs axw axh]);
+    ax(52) = axes(UN{:},'position',[axl+1*axw+1*ahs axb+1*axh+1*avs axw axh]);
+    ax(53) = axes(UN{:},'position',[axl+2*axw+2*ahs axb+1*axh+1*avs axw axh]);
+    ax(54) = axes(UN{:},'position',[axl+0*axw+0*ahs axb+0*axh+0*avs axw axh]);
+    ax(55) = axes(UN{:},'position',[axl+1*axw+1*ahs axb+0*axh+0*avs axw axh]);
+    ax(56) = axes(UN{:},'position',[axl+2*axw+2*ahs axb+0*axh+0*avs axw axh]);
 
     % plot velocity-pressure solution in Fig. 1
     set(0,'CurrentFigure',fh1)
@@ -308,21 +299,6 @@ else % create 2D plots
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['radiogen. disequilibrium'],TX{:},FS{:}); set(gca,'YTickLabel',[]);
     sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
 
-    if plot_cv && iter > 0
-        % plot residual fields in Fig. 6
-        set(0,'CurrentFigure',fh6)
-        set(fh6,'CurrentAxes',ax(61));
-        imagesc(Xc(2:end-1),Zc(2:end-1),-res_W(:      ,2:end-1)); axis ij equal tight; box on; cb = colorbar;
-        set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['res. $W$'],TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:});
-        set(fh6,'CurrentAxes',ax(62));
-        imagesc(Xc(2:end-1),Zc(2:end-1), res_U(2:end-1,:      )); axis ij equal tight; box on; cb = colorbar;
-        set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['res. $U$'],TX{:},FS{:}); set(gca,'YTickLabel',[]); xlabel('Width [m]',TX{:},FS{:});
-        set(fh6,'CurrentAxes',ax(63));
-        imagesc(Xc(2:end-1),Zc(2:end-1), res_P(2:end-1,2:end-1)); axis ij equal tight; box on; cb = colorbar;
-        set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['res. $P$'],TX{:},FS{:}); set(gca,'YTickLabel',[]);
-        sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
-    end
-
 end
 
 % plot phase diagram
@@ -369,7 +345,7 @@ ylabel('Temperature','Interpreter','latex','FontSize',18)
 if plot_cv
     if ~exist('fh8','var'); fh8 = figure(VIS{:});
     else; set(0, 'CurrentFigure', fh8); clf;
-    end
+    end 
     subplot(4,1,1);
     plot(hist.time/hr,hist.DM./hist.sumM,'k-',LW{:}); hold on; axis tight; box on;
     ylabel('consv. $M$',TX{:},FS{:}); set(gca,TL{:},TS{:},'XTickLabel',[]);
@@ -386,7 +362,7 @@ if plot_cv
 
     if ~exist('fh9','var'); fh9 = figure(VIS{:});
     else; set(0, 'CurrentFigure', fh9); clf;
-    end
+    end 
     subplot(4,1,1);
     plot(hist.time/hr,hist.EM,'k-',LW{:}); hold on; axis tight; box on;
     ylabel('error $M$',TX{:},FS{:}); set(gca,TL{:},TS{:},'XTickLabel',[]);
@@ -448,3 +424,4 @@ if save_op
         diary(logfile)
     end
 end
+    

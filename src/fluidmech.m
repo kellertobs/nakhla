@@ -1,4 +1,9 @@
+% store previous iteration
+Wi = W; Ui = U; Pi = P;
+
+
 %% assemble coefficients for matrix velocity diagonal and right-hand side
+
 IIL  = [];       % equation indeces into L
 JJL  = [];       % variable indeces into L
 AAL  = [];       % coefficients for L
@@ -39,10 +44,8 @@ IIR = [IIR; ii(:)]; AAR = [AAR; aa(:)];
 
 % internal points
 ii    = MapW(2:end-1,2:end-1);
- EtaC1 = etaco(2:end-1,1:end-1); EtaC2 = etaco(2:end-1,2:end  );
- EtaP1 = eta  (2:end-2,2:end-1); EtaP2 = eta  (3:end-1,2:end-1);
-ZetaP1 = zeta(2:end-2,2:end-1);
-ZetaP2 = zeta(3:end-1,2:end-1);
+EtaC1 = etaco(2:end-1,1:end-1);  EtaC2 = etaco(2:end-1,2:end  );
+EtaP1 = eta  (2:end-2,2:end-1);  EtaP2 = eta  (3:end-1,2:end-1);
 
 % coefficients multiplying z-velocities W
 %             top          ||         bottom          ||           left            ||          right
@@ -63,10 +66,10 @@ IIL = [IIL; ii(:)]; JJL = [JJL;  ii(:)];   AAL = [AAL; aa(:)];
 %         top left         ||        bottom left          ||       top right       ||       bottom right
 jj1 = MapU(2:end-2,1:end-1); jj2 = MapU(3:end-1,1:end-1); jj3 = MapU(2:end-2,2:end); jj4 = MapU(3:end-1,2:end);
 
-IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; (1/2*EtaC1(:)-1/3*EtaP1(:)+ZetaP1(:))/h^2];  % W one to the top and left
-IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL;-(1/2*EtaC1(:)-1/3*EtaP2(:)+ZetaP2(:))/h^2];  % W one to the bottom and left
-IIL = [IIL; ii(:)]; JJL = [JJL; jj3(:)];   AAL = [AAL;-(1/2*EtaC2(:)-1/3*EtaP1(:)+ZetaP1(:))/h^2];  % W one to the top and right
-IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL; (1/2*EtaC2(:)-1/3*EtaP2(:)+ZetaP2(:))/h^2];  % W one to the bottom and right
+IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; (1/2*EtaC1(:)-1/3*EtaP1(:))/h^2];  % U one to the top and left
+IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL;-(1/2*EtaC1(:)-1/3*EtaP2(:))/h^2];  % U one to the bottom and left
+IIL = [IIL; ii(:)]; JJL = [JJL; jj3(:)];   AAL = [AAL;-(1/2*EtaC2(:)-1/3*EtaP1(:))/h^2];  % U one to the top and right
+IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL; (1/2*EtaC2(:)-1/3*EtaP2(:))/h^2];  % U one to the bottom and right
 
 
 % z-RHS vector
@@ -110,10 +113,8 @@ IIR = [IIR; ii(:)]; AAR = [AAR; aa(:)];
 
 % internal points
 ii    = MapU(2:end-1,2:end-1);
- EtaC1 = etaco(1:end-1,2:end-1); EtaC2 = etaco(2:end  ,2:end-1);
- EtaP1 = eta  (2:end-1,2:end-2); EtaP2 = eta  (2:end-1,3:end-1);
-ZetaP1 = zeta(2:end-1,2:end-2);
-ZetaP2 = zeta(2:end-1,3:end-1);
+EtaC1 = etaco(1:end-1,2:end-1);  EtaC2 = etaco(2:end  ,2:end-1);
+EtaP1 = eta  (2:end-1,2:end-2);  EtaP2 = eta  (2:end-1,3:end-1);
 
 % coefficients multiplying x-velocities U
 %            left          ||          right          ||           top             ||          bottom
@@ -130,10 +131,10 @@ IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL; 1/2*EtaC2(:)/h^2];      %
 %         top left         ||        top right          ||       bottom left       ||       bottom right
 jj1 = MapW(1:end-1,2:end-2); jj2 = MapW(1:end-1,3:end-1); jj3 = MapW(2:end,2:end-2); jj4 = MapW(2:end,3:end-1);
 
-IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; (1/2*EtaC1(:)-1/3*EtaP1(:)+ZetaP1(:))/h^2];  % W one to the top and left
-IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL;-(1/2*EtaC1(:)-1/3*EtaP2(:)+ZetaP2(:))/h^2];  % W one to the top and right
-IIL = [IIL; ii(:)]; JJL = [JJL; jj3(:)];   AAL = [AAL;-(1/2*EtaC2(:)-1/3*EtaP1(:)+ZetaP1(:))/h^2];  % W one to the bottom and left
-IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL; (1/2*EtaC2(:)-1/3*EtaP2(:)+ZetaP2(:))/h^2];  % W one to the bottom and right
+IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; (1/2*EtaC1(:)-1/3*EtaP1(:))/h^2];  % W one to the top and left
+IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL;-(1/2*EtaC1(:)-1/3*EtaP2(:))/h^2];  % W one to the top and right
+IIL = [IIL; ii(:)]; JJL = [JJL; jj3(:)];   AAL = [AAL;-(1/2*EtaC2(:)-1/3*EtaP1(:))/h^2];  % W one to the bottom and left
+IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL; (1/2*EtaC2(:)-1/3*EtaP2(:))/h^2];  % W one to the bottom and right
 
 
 % x-RHS vector
@@ -150,6 +151,7 @@ RV = sparse(IIR,ones(size(IIR)),AAR);
 
 
 %% assemble coefficients for gradient operator
+
 if ~exist('GG','var') || bnchm
     IIL  = [];       % equation indeces into A
     JJL  = [];       % variable indeces into A
@@ -184,6 +186,7 @@ end
 
 
 %% assemble coefficients for divergence operator
+
 if ~exist('DD','var') || bnchm
     IIL  = [];       % equation indeces into A
     JJL  = [];       % variable indeces into A
@@ -208,6 +211,7 @@ end
 
 
 %% assemble coefficients for matrix pressure diagonal and right-hand side
+
 if ~exist('KP','var') || bnchm
     IIL  = [];       % equation indeces into A
     JJL  = [];       % variable indeces into A
@@ -255,9 +259,6 @@ IIR = [IIR; ii(:)]; AAR = [AAR; rr(:)];
 % assemble right-hand side vector
 RP = sparse(IIR,ones(size(IIR)),AAR,NP,1);
 
-% get pressure scaling factor
-Pscale = sqrt(geomean(eta(:))/h^2);
-
 nzp = round((Nz-2)/2)+1;
 nxp = round((Nx-2)/2)+1;
 DD(MapP(nzp,nxp),:) = 0;
@@ -267,30 +268,21 @@ RP(MapP(nzp,nxp),:) = 0;
 if bnchm; RP(MapP(nzp,nxp),:) = P_mms(nzp,nxp); end
 
 
-%% assemble global coefficient matrix and right-hand side vector
+%% assemble and scale global coefficient matrix and right-hand side vector
+
 LL = [ KV  -GG  ; ...
       -DD   KP ];
 
 RR = [RV; RP];
 
-
-%% get residual
-% get non-linear residual
-FF         = LL*SOL - RR;
-resnorm_VP = norm(FF(:),2)./(norm(RR(:),2)+TINY);
-
-% map residual vector to 2D arrays
-res_W  = full(reshape(FF(MapW(:))        ,(Nz-1), Nx   ));  % z-velocity
-res_U  = full(reshape(FF(MapU(:))        , Nz   ,(Nx-1)));  % x-velocity
-res_P  = full(reshape(FF(MapP(:)+(NW+NU)), Nz   , Nx   ));  % dynamic pressure
-        
-
-%% Solve linear system of equations for vx, vz, P
 SCL = sqrt(abs(diag(LL)));
 SCL = diag(sparse(1./(SCL+1)));
 
 LL  = SCL*LL*SCL;
 RR  = SCL*RR;
+
+
+%% Solve linear system of equations for vx, vz, P
 
 SOL = SCL*(LL\RR);  % update solution
 
@@ -301,6 +293,10 @@ U  = full(reshape(SOL(MapU(:))        , Nz   ,(Nx-1)));                    % mat
 P  = full(reshape(SOL(MapP(:)+(NW+NU)), Nz   , Nx   ));                    % matrix dynamic pressure
 Pt = P + rhoref.*g0.*ZZ + Ptop;                                            % total pressure
 
+% get residual of fluid mechanics equations from iterative update
+resnorm_VP = norm(W - Wi,2)./(norm(W,2)+TINY) ...
+           + norm(U - Ui,2)./(norm(U,2)+TINY) ...
+           + norm(P - Pi,2)./(norm(P,2)+TINY);
 
 % update phase velocities
 Wf   = W + wf;                                                             % mvp z-velocity
@@ -310,6 +306,7 @@ Ux   = U + 0.;                                                             % xtl
 Wm   = W + wm;                                                             % mlt z-velocity
 Um   = U + 0.;                                                             % mlt x-velocity
 
+% update mixture volume flux
 Wbar = (mu (1:end-1,:)+mu (2:end,:))/2 .* Wm ...
      + (chi(1:end-1,:)+chi(2:end,:))/2 .* Wx ...
      + (phi(1:end-1,:)+phi(2:end,:))/2 .* Wf;
@@ -319,6 +316,7 @@ Ubar = (mu (:,1:end-1)+mu (:,2:end))/2 .* Um ...
 
  
 %% update time step
+
 dtk = min((h/2)^2./max([kT(:)./rho(:)./cP;kc./rho(:)]))/2;                 % diffusive time step size
 dta = CFL*min(min(h/2/max(abs([Ux(:);Wx(:);Uf(:);Wf(:);Um(:);Wm(:)]+1e-16)))); % advective time step size
 dt  = min([2*dto,dtmax,min(dtk,dta)]);                                     % physical time step size
