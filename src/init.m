@@ -1,4 +1,5 @@
 load ocean;  % load custom colormap
+run(['../cal/cal_',calID]);
 
 % minimum cutoff phase, component fractions
 TINY     =  1e-16;               
@@ -34,6 +35,24 @@ MapP = reshape(1:NP,Nz  ,Nx  );
 MapW = reshape(1:NW,Nz-1,Nx  );
 MapU = reshape(1:NU,Nz  ,Nx-1) + NW;
 
+if bndinit
+    switch bndmode
+        case 0  % none
+            bndinit = zeros(size(ZZ));
+        case 1  % top only
+            bndinit = (1+erf( ( -ZZ+dw)/(dw/5)))/2;
+        case 2  % bot only
+            bndinit = (1+erf(-(D-ZZ-dw)/(dw/5)))/2;
+        case 3  % top/bot only
+            bndinit = (1+erf( ( -ZZ+dw)/(dw/5)))/2 ...
+                    + (1+erf(-(D-ZZ-dw)/(dw/5)))/2;
+        case 4 % all walls
+            bndinit = (1+erf( ( -ZZ+dw)/(dw/5)))/2 ...
+                    + (1+erf(-(D-ZZ-dw)/(dw/5)))/2 ...
+                    + (1+erf( ( -XX+dw)/(dw/5)))/2 ...
+                    + (1+erf(-(L-XX-dw)/(dw/5)))/2;
+    end
+end
 switch bndmode
     case 0  % none
         bndshape = zeros(size(ZZ));
@@ -43,12 +62,12 @@ switch bndmode
         bndshape = exp(-(D-ZZ-h/2)/dw);
     case 3  % top/bot only
         bndshape = exp( ( -ZZ+h/2)/dw) ...
-                 + exp(-(D-ZZ-h/2)/dw);
+            + exp(-(D-ZZ-h/2)/dw);
     case 4 % all walls
         bndshape = exp( ( -ZZ+h/2)/dw) ...
-                 + exp(-(D-ZZ-h/2)/dw) ...
-                 + exp( ( -XX+h/2)/dw) ...
-                 + exp(-(L-XX-h/2)/dw);
+            + exp(-(D-ZZ-h/2)/dw) ...
+            + exp( ( -XX+h/2)/dw) ...
+            + exp(-(L-XX-h/2)/dw);
 end
 bndshape = max(0,min(1,bndshape));
 bndshape([1 end],:) = bndshape([2 end-1],:);
@@ -65,14 +84,14 @@ if bndmode>=2;               bot = +1;      % no slip bot for 'bot only(2)', 'to
 else;                        bot = -1; end  % free slip for other types
 
 % initialise solution fields
-Tp  =  T0 + (T1-T0) .* (1+erf((ZZ/D-zlay)/wlay_T))/2 + dT.*rp;  if bndinit && ~isnan(Twall); T = T + (Twall-T).*bndshape; end % potential temperature [C]
-c   =  c0 + (c1-c0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dc.*rp;  if bndinit && ~isnan(cwall); c = c + (cwall-c).*bndshape; end % major component
-v   =  v0 + (v1-v0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dv.*rp;  if bndinit && ~isnan(vwall); v = v + (vwall-v).*bndshape; end % volatile component
+Tp  =  T0 + (T1-T0) .* (1+erf((ZZ/D-zlay)/wlay_T))/2 + dT.*rp;  if any(bndinit(:)) && ~isnan(Twall); Tp = Tp + (Twall-Tp).*bndinit; end % potential temperature [C]
+c   =  c0 + (c1-c0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dc.*rp;  if any(bndinit(:)) && ~isnan(cwall); c  = c  + (cwall-c ).*bndinit; end % major component
+v   =  v0 + (v1-v0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dv.*rp;  if any(bndinit(:)) && ~isnan(vwall); v  = v  + (vwall-v ).*bndinit; end % volatile component
 
-it  =  it0 + (it1-it0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dit.*rp;  if bndinit && ~isnan(itwall); it  = it  + (itwall-it ).*bndshape; end % incompatible trace element
-ct  =  ct0 + (ct1-ct0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dct.*rp;  if bndinit && ~isnan(ctwall); ct  = ct  + (ctwall-ct ).*bndshape; end % compatible trace element
-si  =  si0 + (si1-si0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dsi.*rp;  if bndinit && ~isnan(siwall); si  = si  + (siwall-si ).*bndshape; end % stable isotope ratio
-rip =  ri0 + (ri1-ri0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dri.*rp;  if bndinit && ~isnan(riwall); rip = rip + (riwall-rip).*bndshape; end % radiogenic isotope parent
+it  =  it0 + (it1-it0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dit.*rp;  if any(bndinit(:)) && ~isnan(itwall); it  = it  + (itwall-it ).*bndinit; end % incompatible trace element
+ct  =  ct0 + (ct1-ct0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dct.*rp;  if any(bndinit(:)) && ~isnan(ctwall); ct  = ct  + (ctwall-ct ).*bndinit; end % compatible trace element
+si  =  si0 + (si1-si0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dsi.*rp;  if any(bndinit(:)) && ~isnan(siwall); si  = si  + (siwall-si ).*bndinit; end % stable isotope ratio
+rip =  ri0 + (ri1-ri0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dri.*rp;  if any(bndinit(:)) && ~isnan(riwall); rip = rip + (riwall-rip).*bndinit; end % radiogenic isotope parent
 rid =  rip.*HLRID./HLRIP;                                           % radiogenic isotope daughter
 
 U   =  zeros(size((XX(:,1:end-1)+XX(:,2:end))));  Ui = U;  res_U = 0.*U;
@@ -92,19 +111,18 @@ txx    =  0.*P;  tzz = 0.*P;  txz = zeros(Nz-1,Nx-1);  tII = 0.*P;
 VolSrc =  0.*P;  MassErr = 0;  drhodt = 0.*P;  drhodto = 0.*P;
 
 rhoo =  rhom0.*ones(size(Tp)); rhoref = rhom0;  %#ok<NASGU>
-etao =  etam0.*ones(size(Tp));                  %#ok<NASGU>
 dto  =  dt;
 Pt   =  rhoref.*g0.*ZZ + Ptop;  
 if Nx<=10; Pt = mean(mean(Pt(2:end-1,2:end-1))).*ones(size(Pt)); end
 T    =  (Tp+273.15).*exp(aT./rhoref./cP.*Pt); % real temperature [K]
 
 % get volume fractions and bulk density
-THETA  =  1.0;  ALPHA = alpha;  step  =  0;
-res = 1;  tol = 1e-15;  x = ones(size(T))./10;  f = v/2;
+step = 0;
+res  = 1;  tol = 1e-15;  x = ones(size(T))./10;  f = v/2;
 while res > tol
     xi = x;  fi = f;
     
-    [xq,cxq,cmq,fq,vfq,vmq] = equilibrium(x,f,T-273.15,c,v,Pt,Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,TINY);
+    [xq,cxq,cmq,fq,vfq,vmq] = equilibrium(x,f,T-273.15,c,v,Pt,cal,TINY);
     
     x  = xq;  f = fq;  m = 1-x-f;
     cm = cmq; cx = cxq;
@@ -124,7 +142,6 @@ while res > tol
 end
 rhoBF   = (rho(2:end-2,2:end-1)+rho(3:end-1,2:end-1))/2 - rhoref;
 rhoo    = rho;
-etao    = eta;
 Pto     = Pt;
 
 % get geochemical phase compositions
@@ -135,7 +152,6 @@ ridm = rid./(m + x.*KRID); ridx = rid./(m./KRID + x);
   
 % get bulk enthalpy, silica, volatile content densities
 S = rho.*(cP.*log(T/(T0+273.15)) + x.*Dsx + f.*Dsf - aT./rhoref.*(Pt-Ptop));  
-H = rho.*(cP + Ds).*T;
 C = rho.*(m.*cm + x.*cx);
 V = rho.*(m.*vm + f.*vf);
 X = rho.*x;
@@ -159,7 +175,7 @@ dcy_rip = rho.*rip./HLRIP.*log(2);
 dcy_rid = rho.*rid./HLRID.*log(2);
 
 % initialise auxiliary variables 
-dHdt   = 0.*T;  dSdt   = 0.*T;  diff_T = 0.*T;  diss_h = 0.*T;
+dSdt   = 0.*T;  diff_T = 0.*T;  diss_h = 0.*T;
 dCdt   = 0.*c;  diff_c = 0.*c;
 dVdt   = 0.*v;  diff_v = 0.*v;  
 dFdt   = 0.*f;  diff_f = 0.*f;  
@@ -188,7 +204,7 @@ if restart
         name = [opdir,'/',runID,'/',runID,'_',num2str(restart),'.mat'];
     end
     if exist(name,'file')
-        load(name,'U','W','P','Pt','f','x','m','phi','chi','mu','X','F','S','C','V','T','s','c','v','sm','sx','sf','cm','cx','vm','vf','IT','CT','SI','RIP','RID','it','ct','si','rip','rid','dSdt','dCdt','dVdt','dITdt','dCTdt','dSIdt','dFdt','dXdt','Gf','Gx','rho','eta','eII','tII','dt','time','step','hist','VolSrc','wf','wx');
+        load(name,'U','W','P','Pt','f','x','m','phi','chi','mu','X','F','S','C','V','T','c','v','cm','cx','vm','vf','IT','CT','SI','RIP','RID','it','ct','si','rip','rid','dSdt','dCdt','dVdt','dITdt','dCTdt','dSIdt','dFdt','dXdt','Gf','Gx','rho','eta','eII','tII','dt','time','step','hist','VolSrc','wf','wx');
         
         xq = x; fq = f;
         SOL = [W(:);U(:);P(:)];

@@ -20,7 +20,7 @@ if ~isnan(itwall); assim = assim + (itwall-it).*rho./tau_a .* bndshape; end% imp
     
 dITdt = - advn_IT + diff_it + assim;                                       % total rate of change
 
-IT = ITo + (THETA.*dITdt + (1-THETA).*dITdto).*dt;                         % explicit update
+IT = ITo + (theta.*dITdt + (1-theta).*dITdto).*dt;                         % explicit update
 IT = max(0+TINY, IT );
 IT([1 end],:) = IT([2 end-1],:);                                           % boundary conditions
 IT(:,[1 end]) = IT(:,[2 end-1]);
@@ -46,7 +46,7 @@ if ~isnan(ctwall); assim = assim + (ctwall-ct).*rho./tau_a .* bndshape; end% imp
 
 dCTdt = - advn_CT + diff_ct + assim;                                       % total rate of change
 
-CT = CTo + (THETA.*dCTdt + (1-THETA).*dCTdto).*dt;                         % explicit update
+CT = CTo + (theta.*dCTdt + (1-theta).*dCTdto).*dt;                         % explicit update
 CT = max(0+TINY, CT );
 CT([1 end],:) = CT([2 end-1],:);                                           % boundary conditions
 CT(:,[1 end]) = CT(:,[2 end-1]);
@@ -69,7 +69,7 @@ if ~isnan(siwall); bndSI = bndSI + (siwall-si).*rho.*m./tau_a .* bndshape; end %
 
 dSIdt = - advn_si + diff_si + bndSI;                                       % total rate of change
 
-SI = SIo + (THETA.*dSIdt + (1-THETA).*dSIdto).*dt;                         % explicit update
+SI = SIo + (theta.*dSIdt + (1-theta).*dSIdto).*dt;                         % explicit update
 SI([1 end],:) = SI([2 end-1],:);                                           % boundary conditions
 SI(:,[1 end]) = SI(:,[2 end-1]);
 
@@ -98,7 +98,7 @@ if ~isnan(riwall); assim = assim + (riwall-rip).*rho./tau_a .* bndshape; end % i
                                        % secular equilibrium!
 dRIPdt = - advn_RIP + diff_rip + assim - dcy_rip + dcy_rip;                % total rate of change
                                        
-RIP = RIPo + (THETA.*dRIPdt + (1-THETA).*dRIPdto).*dt;                     % explicit update
+RIP = RIPo + (theta.*dRIPdt + (1-theta).*dRIPdto).*dt;                     % explicit update
 RIP = max(0+TINY, RIP );
 RIP([1 end],:) = RIP([2 end-1],:);                                         % boundary conditions
 RIP(:,[1 end]) = RIP(:,[2 end-1]);
@@ -122,7 +122,7 @@ if ~isnan(riwall); assim = assim + (riwall.*HLRID./HLRIP-rid).*rho./tau_a .* bnd
     
 dRIDdt = - advn_RID + diff_rid + assim - dcy_rid + dcy_rip;                % total rate of change
 
-RID = RIDo + (THETA.*dRIDdt + (1-THETA).*dRIDdto).*dt;                     % explicit update
+RID = RIDo + (theta.*dRIDdt + (1-theta).*dRIDdto).*dt;                     % explicit update
 RID = max(0+TINY, RID );
 RID([1 end],:) = RID([2 end-1],:);                                         % boundary conditions
 RID(:,[1 end]) = RID(:,[2 end-1]);

@@ -8,8 +8,8 @@ advn_S = - advection(rho.*m.*sm,Um,Wm,h,ADVN,'flx') ...                    % hea
          - advection(rho.*x.*sx,Ux,Wx,h,ADVN,'flx') ...
          - advection(rho.*f.*sf,Uf,Wf,h,ADVN,'flx');
 
-qTz    = - (kT(1:end-1,:)+kT(2:end,:))./2 .* ddz(T,h);                     % heat diffusion z-flux
-qTx    = - (kT(:,1:end-1)+kT(:,2:end))./2 .* ddx(T,h);                     % heat diffusion x-flux
+qTz    = - (ks(1:end-1,:)+ks(2:end,:))./2 .* ddz(T,h);                     % heat diffusion z-flux
+qTx    = - (ks(:,1:end-1)+ks(:,2:end))./2 .* ddx(T,h);                     % heat diffusion x-flux
 diff_T(2:end-1,2:end-1) = (- ddz(qTz(:,2:end-1),h)  ...                    % heat diffusion
                            - ddx(qTx(2:end-1,:),h));
 
@@ -21,7 +21,7 @@ bndS = rho.*cP.*bndT./T;
 
 dSdt = advn_S + diff_T + diss_h + bndS;                                    % total rate of change
 
-S = So + (THETA.*dSdt + (1-THETA).*dSdto).*dt;                             % explicit update of major component density
+S = So + (theta.*dSdt + (1-theta).*dSdto).*dt;                             % explicit update of major component density
 S([1 end],:) = S([2 end-1],:);                                             % apply zero flux boundary conditions
 S(:,[1 end]) = S(:,[2 end-1]);
 
@@ -40,7 +40,7 @@ if ~isnan(cwall); bndC = bndC + rho.*(cwall-c)./tau_a .* bndshape; end     % imp
 
 dCdt = advn_C + diff_c + bndC;                                             % total rate of change
     
-C = Co + (THETA.*dCdt + (1-THETA).*dCdto).*dt;                             % explicit update of major component density
+C = Co + (theta.*dCdt + (1-theta).*dCdto).*dt;                             % explicit update of major component density
 C([1 end],:) = C([2 end-1],:);                                             % apply boundary conditions
 C(:,[1 end]) = C(:,[2 end-1]);  
     
@@ -59,7 +59,7 @@ if any([v0;v1;vwall;v(:)]>10*TINY)
     
     dVdt = advn_V + diff_v + bndV;                                         % total rate of change
     
-    V = Vo + (THETA.*dVdt + (1-THETA).*dVdto).*dt;                         % explicit update of volatile component density
+    V = Vo + (theta.*dVdt + (1-theta).*dVdto).*dt;                         % explicit update of volatile component density
     V = max(TINY,V);
     V([1 end],:) = V([2 end-1],:);                                         % apply boundary conditions
     V(:,[1 end]) = V(:,[2 end-1]);
@@ -74,18 +74,18 @@ v = V./rho;
 %% *****  UPDATE PHASE PROPORTIONS  ***************************************
 
 % update local phase equilibrium
-[xq,cxq,cmq,fq,vfq,vmq] = equilibrium(xq,fq,T-273.15,c,v,Pt,Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,TINY);
+[xq,cxq,cmq,fq,vfq,vmq] = equilibrium(xq,fq,T-273.15,c,v,Pt,cal,TINY);
 
 % update crystal fraction
 if diseq
     
-    Gx = ALPHA.*Gx + (1-ALPHA) .* (xq-x).*rho./max(4.*dt,tau_r);
+    Gx = lambda.*Gx + (1-lambda) .* (xq-x).*rho./max(4.*dt,tau_r);
         
     advn_X = - advection(rho.*x.*cx,Ux,Wx,h,ADVN,'flx');
 
     dXdt   = advn_X + Gx;                                                  % total rate of change
     
-    X = Xo + (THETA.*dXdt + (1-THETA).*dXdto).*dt;                         % explicit update of crystal fraction
+    X = Xo + (theta.*dXdt + (1-theta).*dXdto).*dt;                         % explicit update of crystal fraction
     X = min(rho-TINY,max(TINY,X));                                         % enforce [0,1] limit
     X([1 end],:) = X([2 end-1],:);                                         % apply boundary conditions
     X(:,[1 end]) = X(:,[2 end-1]);
@@ -94,7 +94,7 @@ if diseq
     
 else
     
-    x  =  ALPHA.*x + (1-ALPHA).*xq;
+    x  =  lambda.*x + (1-lambda).*xq;
     Gx = (rho.*x-rhoo.*xo)./dt + advection(rho.*x,Ux,Wx,h,ADVN,'flx');     % reconstruct crystallisation rate
     
 end
@@ -102,13 +102,13 @@ end
 % update bubble fraction
 if (diseq && any([v0;v1;vwall;v(:)]>10*TINY))
     
-    Gf = ALPHA.*Gf + (1-ALPHA) .* (fq-f).*rho./max(4.*dt,tau_r);
+    Gf = lambda.*Gf + (1-lambda) .* (fq-f).*rho./max(4.*dt,tau_r);
     
     advn_f = - advection(rho.*f,Uf,Wf,h,ADVN,'flx');                       % get advection term
                           
     dFdt   = advn_f + Gf;                                                  % total rate of change
     
-    F = Fo + (THETA.*dFdt + (1-THETA).*dFdto).*dt;                         % explicit update of bubble fraction
+    F = Fo + (theta.*dFdt + (1-theta).*dFdto).*dt;                         % explicit update of bubble fraction
     F = min(rho-TINY,max(TINY,F));                                         % enforce [0,1-x] limit
     F([1 end],:) = F([2 end-1],:);                                         % apply boundary conditions
     F(:,[1 end]) = F(:,[2 end-1]);
@@ -117,7 +117,7 @@ if (diseq && any([v0;v1;vwall;v(:)]>10*TINY))
 
 else
     
-    f  =  ALPHA.*f + (1-ALPHA).*fq;
+    f  =  lambda.*f + (1-lambda).*fq;
     Gf = (rho.*f-rhoo.*fo)./dt + advection(rho.*f,Uf,Wf,h,ADVN,'flx');     % reconstruct exsolution rate
     
 end

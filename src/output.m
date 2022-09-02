@@ -27,7 +27,7 @@ if Nx <= 10 && Nz <= 10  % create 0D plots
     subplot(4,1,3)
     semilogy(hist.time/hr,hist.vf(:,2)*100,CL{[1,4]},LW{:}); axis xy tight; box on; hold on;
     semilogy(hist.time/hr,hist.vm(:,2)*100,CL{[1,3]},LW{:});
-    semilogy(hist.time/hr,hist.v(:,2)./(1-hist.Xc(:,2))*100,CL{[1,2]},LW{:});
+    semilogy(hist.time/hr,hist.v(:,2)./(1-hist.x(:,2))*100,CL{[1,2]},LW{:});
     title('$\bar{v}/(1-x)$ [wt\% H$_2$O]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(4,1,4)
     plot(hist.time/hr,hist.mu (:,2)*100.*(hist.mu (:,2)>1e-9),CL{[1,3]},LW{:}); axis xy tight; box on; hold on;
@@ -45,8 +45,9 @@ if Nx <= 10 && Nz <= 10  % create 0D plots
     plot(hist.time/hr,hist.rho (:,2),'-',CL{[1,2]},LW{:});
     title('$\bar{\rho}$ [kg/m$^3$]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(4,1,2)
-    semilogy(hist.time/hr,hist.eta(:,2),'k-',LW{:}); axis xy tight; box on;
-    title('$\bar{\eta}$ [Pas]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+    semilogy(hist.time/hr,hist.eta (:,2),'k-',LW{:}); axis xy tight; box on; hold on
+    semilogy(hist.time/hr,hist.etam(:,2),'r-',LW{:});
+    title('$\eta^m,\bar{\eta}$ [Pas]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(4,1,3)
     plot(hist.time/hr,    hist.Gx(:,2)./hist.rho(:,2)*hr.*(hist.chi(:,2)>1e-9),CL{[1,4]},LW{:}); axis xy tight; box on; hold on;
     plot(hist.time/hr,10.*hist.Gf(:,2)./hist.rho(:,2)*hr.*(hist.phi(:,2)>1e-9),CL{[1,5]},LW{:});
@@ -305,32 +306,34 @@ end
 if ~exist('fh7','var'); fh7 = figure(VIS{:});
 else; set(0, 'CurrentFigure', fh7); clf;
 end
-TT = linspace(Tphs0+Ptop*clap,Tphs1+Ptop*clap,500);
-cc = [linspace(cphs1,(perCx+perCm)/2,ceil((perT-Tphs0)./(Tphs1-Tphs0)*500)),linspace((perCx+perCm)/2,cphs0,floor((perT-Tphs1)./(Tphs0-Tphs1)*500))];
-[~,CCx,CCm,~,~,~] = equilibrium(0*TT,0*TT,TT,cc,0*TT,Ptop*ones(size(TT)),Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,TINY);
+TT = linspace(cal.Tphs0+Ptop*cal.clap,cal.Tphs1+Ptop*cal.clap,500);
+cc = [linspace(cal.cphs1,(cal.perCx+cal.perCm)/2, ceil((cal.perT-cal.Tphs0)./(cal.Tphs1-cal.Tphs0)*500)), ...
+      linspace((cal.perCx+cal.perCm)/2,cal.cphs0,floor((cal.perT-cal.Tphs1)./(cal.Tphs0-cal.Tphs1)*500))];
+[~,CCx,CCm,~,~,~] = equilibrium(0*TT,0*TT,TT,cc,0*TT,Ptop*ones(size(TT)),cal,TINY);
 plot(CCx,TT,'k-',LW{:}); axis tight; hold on; box on;
 plot(CCm,TT,'k-',LW{:});
-perTs  = perT;
-Tphs0s = Tphs0;
-Tphs1s = Tphs1;
+perTs  = cal.perT;
+Tphs0s = cal.Tphs0;
+Tphs1s = cal.Tphs1;
 vv = 0.10*ones(size(TT));
 xx = 0.50*ones(size(TT));
 ff = 0.05*ones(size(TT));
 for i = 1:5
-    TT = linspace(Tphs0s+Ptop*clap,Tphs1s+Ptop*clap,500);
-    cc = [linspace(cphs1,(perCx+perCm)/2,ceil((perTs-Tphs0s)./(Tphs1s-Tphs0s)*500)),linspace((perCx+perCm)/2,cphs0,floor((perTs-Tphs1s)./(Tphs0s-Tphs1s)*500))];
-    vmq_c0 = (4.7773e-7.*Ptop.^0.6 + 1e-11.*Ptop) .* exp(2565*(1./(TT+273.15)-1./(perT+273.15))); % Katz et al., 2003; Moore et al., 1998
+    TT = linspace(Tphs0s+Ptop*cal.clap,Tphs1s+Ptop*cal.clap,500);
+    cc = [linspace(cal.cphs1,(cal.perCx+cal.perCm)/2, ceil((perTs-Tphs0s)./(Tphs1s-Tphs0s)*500)), ...
+          linspace((cal.perCx+cal.perCm)/2,cal.cphs0,floor((perTs-Tphs1s)./(Tphs0s-Tphs1s)*500))];
+    vmq_c0 = (4.7773e-7.*Ptop.^0.6 + 1e-11.*Ptop) .* exp(2565*(1./(TT+273.15)-1./(cal.perT+273.15))); % Katz et al., 2003; Moore et al., 1998
     vmq_c1 = (3.5494e-3.*Ptop.^0.5 + 9.623e-8.*Ptop - 1.5223e-11.*Ptop.^1.5)./(TT+273.15) + 1.2436e-14.*Ptop.^1.5; % Liu et al., 2015
     vmq0   = (1-cc).*vmq_c0 + cc.*vmq_c1;
-    perTs  = perT -dTH2O(2).*vmq0(round((perTs-Tphs1s)./(Tphs0s-Tphs1s)*500)).^0.75;
-    Tphs0s = Tphs0-dTH2O(1).*vmq0(1).^0.75;
-    Tphs1s = Tphs1-dTH2O(3).*vmq0(end).^0.75;
+    perTs  = cal.perT -cal.dTH2O(2).*vmq0(round((perTs-Tphs1s)./(Tphs0s-Tphs1s)*500)).^0.75;
+    Tphs0s = cal.Tphs0-cal.dTH2O(1).*vmq0(1  ).^0.75;
+    Tphs1s = cal.Tphs1-cal.dTH2O(3).*vmq0(end).^0.75;
 end
-[~,CCx,CCm,~,~,~] = equilibrium(0*TT,0*TT,TT,cc,vmq0,Ptop*ones(size(TT)),Tphs0,Tphs1,cphs0,cphs1,perT,perCx,perCm,clap,dTH2O,PhDg,TINY);
+[~,CCx,CCm,~,~,~] = equilibrium(0*TT,0*TT,TT,cc,vmq0,Ptop*ones(size(TT)),cal,TINY);
 plot(CCx,TT,'k-',LW{:}); axis tight; hold on; box on;
 plot(CCm,TT,'k-',LW{:});
 
-Tplt = T-273.15 - (Pt-Ptop)*clap;
+Tplt = T-273.15 - (Pt-Ptop)*cal.clap;
 cplt = c./(1-f);
 plot(cplt(2:end-1,2:end-1),Tplt(2:end-1,2:end-1),'.',CL{[1,2]},LW{:},'MarkerSize',15);
 plot(cx  (2:end-1,2:end-1),Tplt(2:end-1,2:end-1),'.',CL{[1,4]},LW{:},'MarkerSize',15);
@@ -414,9 +417,9 @@ if save_op
     end
 
     name = [opdir,'/',runID,'/',runID,'_',num2str(floor(step/nop))];
-    save(name,'U','W','P','Pt','f','x','m','phi','chi','mu','X','F','H','C','V','T','c','v','cm','cx','vm','vf','IT','CT','SI','RIP','RID','it','ct','si','rip','rid','dHdt','dCdt','dVdt','dITdt','dCTdt','dSIdt','dFdt','dXdt','Gf','Gx','rho','eta','eII','tII','dt','time','step','hist','VolSrc','wf','wx');
+    save(name,'U','W','P','Pt','f','x','m','phi','chi','mu','X','F','S','C','V','T','c','v','cm','cx','vm','vf','IT','CT','SI','RIP','RID','it','ct','si','rip','rid','dSdt','dCdt','dVdt','dITdt','dCTdt','dSIdt','dFdt','dXdt','Gf','Gx','rho','eta','eII','tII','dt','time','step','hist','VolSrc','wf','wx');
     name = [opdir,'/',runID,'/',runID,'_cont'];
-    save(name,'U','W','P','Pt','f','x','m','phi','chi','mu','X','F','H','C','V','T','c','v','cm','cx','vm','vf','IT','CT','SI','RIP','RID','it','ct','si','rip','rid','dHdt','dCdt','dVdt','dITdt','dCTdt','dSIdt','dFdt','dXdt','Gf','Gx','rho','eta','eII','tII','dt','time','step','hist','VolSrc','wf','wx');
+    save(name,'U','W','P','Pt','f','x','m','phi','chi','mu','X','F','S','C','V','T','c','v','cm','cx','vm','vf','IT','CT','SI','RIP','RID','it','ct','si','rip','rid','dSdt','dCdt','dVdt','dITdt','dCTdt','dSIdt','dFdt','dXdt','Gf','Gx','rho','eta','eII','tII','dt','time','step','hist','VolSrc','wf','wx');
 
     if step == 0
         logfile = [opdir,'/',runID,'/',runID,'.log'];

@@ -1,9 +1,26 @@
 %%*****  UPDATE PARAMETERS & AUXILIARY FIELDS  ****************************
 
+% update phase oxide compositions
+wt0 = (cal.perCm-cx)./(cal.perCm-cal.cphs0);
+wt1 = (cal.cphs1-cx)./(cal.cphs1-cal.perCm);
+cx_oxds = reshape((wt0(:) .* cal.oxds(1,:) + (1-wt0(:)) .* cal.oxds(2,:)) .* (cx(:)<=cal.perCm) ...
+                + (wt1(:) .* cal.oxds(2,:) + (1-wt1(:)) .* cal.oxds(3,:)) .* (cx(:)> cal.perCm) ...
+                  ,Nz,Nx,length(cal.oxds));
+wt0 = (cal.perCm-cm)./(cal.perCm-cal.cphs0);
+wt1 = (cal.cphs1-cm)./(cal.cphs1-cal.perCm);
+cm_oxds = reshape((wt0(:) .* cal.oxds(1,:) + (1-wt0(:)) .* cal.oxds(2,:)) .* (cm(:)<=cal.perCm) ...
+                + (wt1(:) .* cal.oxds(2,:) + (1-wt1(:)) .* cal.oxds(3,:)) .* (cm(:)> cal.perCm) ...
+                  ,Nz,Nx,length(cal.oxds));
+wt0 = (cal.perCm-c)./(cal.perCm-cal.cphs0);
+wt1 = (cal.cphs1-c)./(cal.cphs1-cal.perCm);
+c_oxds = reshape((wt0(:) .* cal.oxds(1,:) + (1-wt0(:)) .* cal.oxds(2,:)) .* (c(:)<=cal.perCm) ...
+               + (wt1(:) .* cal.oxds(2,:) + (1-wt1(:)) .* cal.oxds(3,:)) .* (c(:)> cal.perCm) ...
+                 ,Nz,Nx,length(cal.oxds));
+
 % update phase densities
-rhom = rhom0 .* (1 - aT.*(T-perT-273.15) - gC.*(cm-(perCx+perCm)/2));
-rhox = rhox0 .* (1 - aT.*(T-perT-273.15) - gC.*(cx-(perCx+perCm)/2));
-rhof = rhof0 .* (1 - aT.*(T-perT-273.15) + bP.*(Pt-Ptop ));
+rhom = rhom0 .* (1 - aT.*(T-cal.perT-273.15) - gC.*(cm-(cal.perCx+cal.perCm)/2));
+rhox = rhox0 .* (1 - aT.*(T-cal.perT-273.15) - gC.*(cx-(cal.perCx+cal.perCm)/2));
+rhof = rhof0 .* (1 - aT.*(T-cal.perT-273.15) + bP.*(Pt-Ptop ));
 
 % convert weight to volume fraction, update bulk density
 rho  = 1./(m./rhom + x./rhox + f./rhof);  
@@ -14,14 +31,21 @@ chi   = x.*rho./rhox;
 phi   = f.*rho./rhof;
 mu    = m.*rho./rhom;
 
-% update thermal properties
-Ds    = x.*Dsx + f.*Dsf;
-kT    = (mu.*kTm + chi.*kTx + phi.*kTf)./T;                                % magma thermal conductivity
+% entropy diffusion flux parameter
+ks = kT./T;                                    
 
 % update effective viscosity
-etam  = etam0 .* exp(Em./(8.3145.*T)-Em./(8.3145.*(perT+273.15))) ...
-              .* Fmc.^((cm-(perCx+perCm)/2)./(cphs1-cphs0)) ...
-              .* Fmv.^(vm./0.01);                                          % variable melt viscosity
+wtm      = zeros(Nz*Nx,12);
+wtm(:, 1) = reshape(cm_oxds(:,:,1),Nz*Nx,1); % SiO2
+wtm(:, 3) = reshape(cm_oxds(:,:,2),Nz*Nx,1); % Al2O3
+wtm(:, 4) = reshape(cm_oxds(:,:,3),Nz*Nx,1); % FeO
+wtm(:, 6) = reshape(cm_oxds(:,:,4),Nz*Nx,1); % MgO
+wtm(:, 7) = reshape(cm_oxds(:,:,5),Nz*Nx,1); % CaO
+wtm(:, 8) = reshape(cm_oxds(:,:,6),Nz*Nx,1); % Na2O
+wtm(:, 8) = reshape(cm_oxds(:,:,7),Nz*Nx,1); % K2O
+wtm(:,11) = reshape(100.*vm(:,:  ),Nz*Nx,1); % H2O
+etam     = reshape(grdmodel08(wtm,T(:)-273.15),Nz,Nx);
+
 etaf  = etaf0.* ones(size(f));                                             % constant fluid viscosity
 etax  = etax0.* ones(size(x));                                             % constant crysta viscosity
 
@@ -38,8 +62,9 @@ Xf = sum(AA.*Sf,2).*FF + (1-sum(AA.*Sf,2)).*Sf;
 thtv = squeeze(prod(Mv.^Xf,2));
 
 % get effective viscosity
+if exist('eta','var'); etamax = 1e+6.*min(eta (:)); else; etamax = etax.*etareg; end
 eta    = squeeze(sum(ff.*kv.*thtv,1));
-eta    = (1./etamax + 1./eta).^-1 + etamin;
+eta    = (1./etamax + 1./(eta.*etareg)).^-1;
 eta([1 end],:) = eta([2 end-1],:);  
 eta(:,[1 end]) = eta(:,[2 end-1]);
 etaco  = (eta(1:end-1,1:end-1)+eta(2:end,1:end-1) ...
@@ -110,7 +135,7 @@ diss =  exx(2:end-1,2:end-1).*txx(2:end-1,2:end-1) ...
      +  mu (2:end-1,2:end-1)./Csgr_m(2:end-1,2:end-1) .* ((wm(1:end-1,2:end-1)+wm(2:end,2:end-1))./2).^2 ...
      +  chi(2:end-1,2:end-1)./Csgr_x(2:end-1,2:end-1) .* ((wx(1:end-1,2:end-1)+wx(2:end,2:end-1))./2).^2 ...
      +  phi(2:end-1,2:end-1)./Csgr_f(2:end-1,2:end-1) .* ((wf(1:end-1,2:end-1)+wf(2:end,2:end-1))./2).^2 ...
-     +  kT(2:end-1,2:end-1).*(grdTz(2:end-1,2:end-1).^2 + grdTx(2:end-1,2:end-1).^2);
+     +  ks(2:end-1,2:end-1).*(grdTz(2:end-1,2:end-1).^2 + grdTx(2:end-1,2:end-1).^2);
 
 % update volume source
 Div_rhoV =  + advection(rho.*f,0.*U,wf,h,ADVN,'flx') ...

@@ -1,6 +1,17 @@
 % calculate phase equilibrium
 
-function [xq,cxq,cmq,fq,vfq,vmq]  =  equilibrium(xq,fq,T0,c,v,P,Tphs0d,Tphs1d,cphs0,cphs1,perTd,perCx,perCm,clap,dTH2O,PhDg,TINY)
+function [xq,cxq,cmq,fq,vfq,vmq]  =  equilibrium(xq,fq,T0,c,v,P,cal,TINY)
+
+Tphs0d = cal.Tphs0;
+Tphs1d = cal.Tphs1;
+cphs0  = cal.cphs0;
+cphs1  = cal.cphs1;
+perTd  = cal.perT;
+perCx  = cal.perCx;
+perCm  = cal.perCm;
+clap   = cal.clap;
+dTH2O  = cal.dTH2O;
+PhDg   = cal.PhDg;
 
 perCm = (perCm-cphs0)./(cphs1-cphs0);
 perCx = (perCx-cphs0)./(cphs1-cphs0);
@@ -8,7 +19,7 @@ perCx = (perCx-cphs0)./(cphs1-cphs0);
 iter    = 1;
 maxit   = 50;
 resnorm = 1;
-tol     = 1e-14;
+tol     = 1e-12;
 eps     = 1e-6;
 
 vmq_c0 = (4.7773e-7.*P.^0.6 + 1e-11.*P) .* exp(2565*(1./(T0+273.15)-1./(perTd+273.15))); % Katz et al., 2003; Moore et al., 1998

@@ -42,9 +42,9 @@ dsumVdt = sum(sum(bndV(2:end-1,2:end-1)*h*h*1)) ...
         + sum(  rho(2:end-1,2).*m(2:end-1,2).*vm(2:end-1,2).*Um(2:end-1,1)*h*1) - sum(  rho(2:end-1,end-1).*m(2:end-1,end-1).*vm(2:end-1,end-1).*Um(2:end-1,end)*h*1);  % [kg/s]
 
 if step>1; hist.DM(stp) = hist.DM(stp-1) + dsumMdt.*dt; else; hist.DM(stp) = 0; end  % [kg]
-if step>1; hist.DS(stp) = hist.DS(stp-1) + (THETA.*dsumSdt + (1-THETA).*dsumSdto).*dt; else; hist.DS(stp) = 0; end  % [J ]
-if step>1; hist.DC(stp) = hist.DC(stp-1) + (THETA.*dsumCdt + (1-THETA).*dsumCdto).*dt; else; hist.DC(stp) = 0; end  % [kg]
-if step>1; hist.DV(stp) =(hist.DV(stp-1) + (THETA.*dsumVdt + (1-THETA).*dsumVdto).*dt).*any(v(:)>1e-6); else; hist.DV(stp) = 0; end  % [kg]
+if step>1; hist.DS(stp) = hist.DS(stp-1) + (theta.*dsumSdt + (1-theta).*dsumSdto).*dt; else; hist.DS(stp) = 0; end  % [J ]
+if step>1; hist.DC(stp) = hist.DC(stp-1) + (theta.*dsumCdt + (1-theta).*dsumCdto).*dt; else; hist.DC(stp) = 0; end  % [kg]
+if step>1; hist.DV(stp) =(hist.DV(stp-1) + (theta.*dsumVdt + (1-theta).*dsumVdto).*dt).*any(v(:)>1e-6); else; hist.DV(stp) = 0; end  % [kg]
 
 % record conservation error of mass M, heat H, major component C, volatile component V
 hist.EM(stp) = (hist.sumM(stp) - hist.DM(stp))./hist.sumM(1) - 1;  % [kg/kg]
@@ -135,12 +135,17 @@ if any(indm(:)>0)
     end
     
     hist.rhom(stp,1) = min(min(rhom(indm(2:end-1,2:end-1))));
-    hist.rhom(stp,2) = sum(sum(rhom(2:end-1,2:end-1).*m(2:end-1,2:end-1).*rho(2:end-1,2:end-1)))./sum(sum(m(2:end-1,2:end-1).*rho(2:end-1,2:end-1)));
+    hist.rhom(stp,2) = sum(sum(rhom(2:end-1,2:end-1).*m(2:end-1,2:end-1)))./sum(sum(m(2:end-1,2:end-1)));
     hist.rhom(stp,3) = max(max(rhom(indm(2:end-1,2:end-1))));
+
+    hist.etam(stp,1) = min(min(etam(indm(2:end-1,2:end-1))));
+    hist.etam(stp,2) = sum(sum(etam(2:end-1,2:end-1).*m(2:end-1,2:end-1)))./sum(sum(m(2:end-1,2:end-1)));
+    hist.etam(stp,3) = max(max(etam(indm(2:end-1,2:end-1))));
 else
     hist.cm(stp,1:3) = NaN;
     hist.vm(stp,1:3) = NaN;
     hist.rhom(stp,1:3) = NaN;
+    hist.etam(stp,1:3) = NaN;
 end
 
 indf = f>1e-6;
@@ -224,19 +229,19 @@ hist.Cmush(stp) = sum(sum(rho(2:end-1,2:end-1).*indmush(2:end-1,2:end-1).*c(2:en
 hist.Tmush(stp) = sum(sum(rho(2:end-1,2:end-1).*indmush(2:end-1,2:end-1).*T(2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*indmush(2:end-1,2:end-1).*h^2));
 
 % fraction, crystallinity, and temperature of felsic materials (c > (perCm_cphs1)/2)
-indfelsic = max(0,min(1,(1+erf((c-(perCm+cphs1)/2)./0.005))/2));
+indfelsic = max(0,min(1,(1+erf((c-(cal.perCm+cal.cphs1)/2)./0.005))/2));
 hist.Ffelsic(stp) = sum(sum(rho(2:end-1,2:end-1).*indfelsic(2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*h^2));
 hist.Xfelsic(stp) = sum(sum(rho(2:end-1,2:end-1).*indfelsic(2:end-1,2:end-1).*x(2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*indfelsic(2:end-1,2:end-1).*h^2));
 hist.Tfelsic(stp) = sum(sum(rho(2:end-1,2:end-1).*indfelsic(2:end-1,2:end-1).*T(2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*indfelsic(2:end-1,2:end-1).*h^2));
 
 % fraction, crystallinity, and temperature of intermediate materials (perCm < c < (perCm_cphs1)/2)
-indinterm = max(0,min(1,(1+erf((c-perCm)./0.005))/2 .* (1-indfelsic)));
+indinterm = max(0,min(1,(1+erf((c-cal.perCm)./0.005))/2 .* (1-indfelsic)));
 hist.Finterm(stp) = sum(sum(rho(2:end-1,2:end-1).*indinterm(2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*h^2));
 hist.Xinterm(stp) = sum(sum(rho(2:end-1,2:end-1).*indinterm(2:end-1,2:end-1).*x(2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*indinterm(2:end-1,2:end-1).*h^2));
 hist.Tinterm(stp) = sum(sum(rho(2:end-1,2:end-1).*indinterm(2:end-1,2:end-1).*T(2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*indinterm(2:end-1,2:end-1).*h^2));
 
 % fraction, crystallinity, and temperature of mafic materials (perCx < c < perCm)
-indmafic = max(0,min(1,(1+erf((c-perCx)./0.005))/2 .* (1-indinterm-indfelsic)));
+indmafic = max(0,min(1,(1+erf((c-cal.perCx)./0.005))/2 .* (1-indinterm-indfelsic)));
 hist.Fmafic(stp) = sum(sum(rho(2:end-1,2:end-1).*indmafic(2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*h^2));
 hist.Xmafic(stp) = sum(sum(rho(2:end-1,2:end-1).*indmafic(2:end-1,2:end-1).*x(2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*indmafic(2:end-1,2:end-1).*h^2));
 hist.Tmafic(stp) = sum(sum(rho(2:end-1,2:end-1).*indmafic(2:end-1,2:end-1).*T(2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*indmafic(2:end-1,2:end-1).*h^2));
@@ -250,7 +255,7 @@ hist.Tultram(stp) = sum(sum(rho(2:end-1,2:end-1).*indultram(2:end-1,2:end-1).*T(
 % differentiation index
 nobnd = bndshape<1e-2;
 if any(nobnd(:))
-    hist.Rdiff(stp) = (max(max(c(nobnd(2:end-1,2:end-1))))-min(min(c(nobnd(2:end-1,2:end-1)))))./(cphs1-cphs0);
+    hist.Rdiff(stp) = (max(max(c(nobnd(2:end-1,2:end-1))))-min(min(c(nobnd(2:end-1,2:end-1)))))./(cal.cphs1-cal.cphs0);
 end
 
 % index of assimilation
