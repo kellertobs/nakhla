@@ -109,7 +109,6 @@ g0       =  10.;                 % gravity [m/s2]
 % set numerical model parameters
 CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 ADVN     =  'FRM';               % advection scheme ('UPW2', 'UPW3', or 'FRM')
-theta    =  0.50;                % time-stepping parameter (1 = 1st-order implicit; 1/2 = 2nd-order semi-implicit)
 rtol     =  1e-3;                % outer its relative tolerance
 atol     =  1e-6;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its

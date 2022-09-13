@@ -13,6 +13,8 @@ while time <= tend && step <= M
     fprintf(1,'\n\n\n*****  step %d;  dt = %4.4e;  time = %4.4e [hr]\n\n',step,dt./3600,time./3600);
     tic;
 
+    if step==1; theta = 1; else; theta = 0.5; end
+
     % store previous solution
     So      = S;
     Co      = C;
