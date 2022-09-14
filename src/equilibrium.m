@@ -19,7 +19,7 @@ perCx = (perCx-cphs0)./(cphs1-cphs0);
 iter    = 1;
 maxit   = 50;
 resnorm = 1;
-tol     = 1e-12;
+tol     = 1e-9;
 eps     = 1e-6;
 
 vmq_c0 = (4.7773e-7.*P.^0.6 + 1e-11.*P) .* exp(2565*(1./(T0+273.15)-1./(perTd+273.15))); % Katz et al., 2003; Moore et al., 1998
@@ -99,9 +99,12 @@ else
     perT  = (perTd-Tphs0)./(Tphs1-Tphs0).*ones(size(v));
 end
 
-a = 15;
-
 T   = max(0,min(1,(T0 - P*clap -Tphs0)./(Tphs1-Tphs0)));
+
+a = 20;
+ind1 = T>=perT+0.02;
+ind2 = T< perT-0.02;
+ind3 = T>=perT-0.02 & T<perT+0.02;
 
 cx1 = max(TINY,min(1-TINY,          perCx .*erfc(PhDg(1).*(T-perT)./(1-perT))));
 cx2 = max(TINY,min(1-TINY, perCx+(1-perCx).*erfc(PhDg(2).*(T-   0)./   perT) ));
@@ -110,17 +113,17 @@ dcdT = -2*perCx*PhDg(1)/sqrt(pi)./(1-perT);
 cx1(T<perT) = perCx + dcdT(T<perT).*(T(T<perT)-perT(T<perT));
 
 cxq = zeros(size(T));
-cxq(T>=1.25*perT) = cx1(T>=1.25*perT);
-cxq(T< 0.75*perT) = cx2(T< 0.75*perT);
-cxq(T>=0.75*perT & T<1.25*perT) = (cx1(T>=0.75*perT & T<1.25*perT).^-a+cx2(T>=0.75*perT & T<1.25*perT).^-a).^-(1/a);
+cxq(ind1) =  cx1(ind1);
+cxq(ind2) =  cx2(ind2);
+cxq(ind3) = (cx1(ind3).^-a+cx2(ind3).^-a).^-(1/a);
 
 cm1 = max(TINY,min(1-TINY,          perCm .*erf(PhDg(3).*(1   -T)./(1-perT))./erf(PhDg(3))));
 cm2 = max(TINY,min(1-TINY, perCm+(1-perCm).*erf(PhDg(4).*(perT-T)./(  perT))./erf(PhDg(4))));
 
 cmq = zeros(size(T));
-cmq(T>=1.25*perT) = cm1(T>=1.25*perT);
-cmq(T< 0.75*perT) = cm2(T< 0.75*perT);
-cmq(T>=0.75*perT & T<1.25*perT) = (cm1(T>=0.75*perT & T<1.25*perT).^a+cm2(T>=0.75*perT & T<1.25*perT).^a).^(1/a);
+cmq(ind1) =  cm1(ind1);
+cmq(ind2) =  cm2(ind2);
+cmq(ind3) = (cm1(ind3).^a+cm2(ind3).^a).^(1/a);
 
 cxq = min(min(cphs1,c./(1-fq)),cphs0 + cxq.*(cphs1-cphs0));
 cmq = max(min(cphs1,c./(1-fq)),cphs0 + cmq.*(cphs1-cphs0));
