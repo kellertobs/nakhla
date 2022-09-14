@@ -42,7 +42,7 @@ wtm(:, 4) = reshape(cm_oxds(:,:,3),Nz*Nx,1); % FeO
 wtm(:, 6) = reshape(cm_oxds(:,:,4),Nz*Nx,1); % MgO
 wtm(:, 7) = reshape(cm_oxds(:,:,5),Nz*Nx,1); % CaO
 wtm(:, 8) = reshape(cm_oxds(:,:,6),Nz*Nx,1); % Na2O
-wtm(:, 8) = reshape(cm_oxds(:,:,7),Nz*Nx,1); % K2O
+wtm(:, 9) = reshape(cm_oxds(:,:,7),Nz*Nx,1); % K2O
 wtm(:,11) = reshape(100.*vm(:,:  ),Nz*Nx,1); % H2O
 etam      = reshape(grdmodel08(wtm,T(:)-273.15),Nz,Nx);
 
@@ -79,17 +79,17 @@ Csgr_f = squeeze(Csgr(3,:,:));  Csgr_f([1 end],:) = Csgr_f([2 end-1],:);  Csgr_f
 
 
 % update phase segregation speeds
-wm = ((rhom(1:end-1,:)+rhom(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*2./(1./Csgr_m(1:end-1,:)+1./Csgr_m(2:end,:)).*((chi(1:end-1,:)+chi(2:end,:))./2).^2; % melt segregation speed
+wm = ((rhom(1:end-1,:)+rhom(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*min(Csgr_m(1:end-1,:),Csgr_m(2:end,:)).*((chi(1:end-1,:)+chi(2:end,:))./2).^2; % melt segregation speed
 wm(1  ,:)     = min(1,1-top).*wm(1  ,:);
 wm(end,:)     = min(1,1-bot).*wm(end,:);
 wm(:,[1 end]) = -sds*wm(:,[2 end-1]);
 
-wx = (((rhox(1:end-1,:)+rhox(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0).*2./(1./Csgr_x(1:end-1,:)+1./Csgr_x(2:end,:)); % crystal segregation speed
+wx = (((rhox(1:end-1,:)+rhox(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0).*min(Csgr_x(1:end-1,:),Csgr_x(2:end,:)); % crystal segregation speed
 wx(1  ,:)     = min(1,1-top).*wx(1  ,:);
 wx(end,:)     = min(1,1-bot).*wx(end,:);
 wx(:,[1 end]) = -sds*wx(:,[2 end-1]);
 
-wf = (((rhof(1:end-1,:)+rhof(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0).*2./(1./Csgr_f(1:end-1,:)+1./Csgr_f(2:end,:)); % fluid segregation speed
+wf = (((rhof(1:end-1,:)+rhof(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0).*min(Csgr_f(1:end-1,:),Csgr_f(2:end,:)); % fluid segregation speed
 wf(1  ,:)     = min(1,1-top+fout).*wf(1  ,:);
 wf(end,:)     = min(1,1-bot+fin ).*wf(end,:);
 wf(:,[1 end]) = -sds*wf(:,[2 end-1]);
