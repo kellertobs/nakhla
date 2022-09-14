@@ -44,7 +44,7 @@ wtm(:, 7) = reshape(cm_oxds(:,:,5),Nz*Nx,1); % CaO
 wtm(:, 8) = reshape(cm_oxds(:,:,6),Nz*Nx,1); % Na2O
 wtm(:, 8) = reshape(cm_oxds(:,:,7),Nz*Nx,1); % K2O
 wtm(:,11) = reshape(100.*vm(:,:  ),Nz*Nx,1); % H2O
-etam     = reshape(grdmodel08(wtm,T(:)-273.15),Nz,Nx);
+etam      = reshape(grdmodel08(wtm,T(:)-273.15),Nz,Nx);
 
 etaf  = etaf0.* ones(size(f));                                             % constant fluid viscosity
 etax  = etax0.* ones(size(x));                                             % constant crysta viscosity

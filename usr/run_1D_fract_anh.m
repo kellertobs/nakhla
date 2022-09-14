@@ -1,7 +1,7 @@
 clear all; close all;
 
 % set run parameters
-runID    =  '1D_fract_anh_lowgrav';      % run identifier
+runID    =  '1D_fract_anh';      % run identifier
 opdir    =  '../out/';           % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  100;                 % output frame plotted/saved every 'nop' time steps
@@ -104,7 +104,7 @@ bP       =  1e-8;                % mvp compressibility [1/Pa]
 dx       =  0.75e-3;             % crystal size [m]
 df       =  0.75e-3;             % bubble size [m]
 dm       =  0.75e-3;             % melt film size [m]
-g0       =  0.1;                 % gravity [m/s2]
+g0       =  10.;                 % gravity [m/s2]
 
 % set numerical model parameters
 CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
