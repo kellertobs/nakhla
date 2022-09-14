@@ -1,16 +1,22 @@
 % initialise model run
 init;
 
-% run manufactured solution benchmark on fluid mechanics solver if specified
 if bnchm
+    % run manufactured solution benchmark on fluid mechanics solver if specified
     mms;
     return;
+else
+    % complete, plot, and save initial condition
+    update;
+    fluidmech;
+    history;
+    output;
 end
     
 % physical time stepping loop
 while time <= tend && step <= M
         
-    fprintf(1,'\n\n\n*****  step %d;  dt = %4.4e;  time = %4.4e [hr]\n\n',step,dt./3600,time./3600);
+    fprintf(1,'*****  step %d;  dt = %4.4e;  time = %4.4e [hr]\n\n',step,dt./3600,time./3600);
     tic;
 
     if step==1; theta = 1; else; theta = 0.5; end

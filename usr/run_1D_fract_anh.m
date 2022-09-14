@@ -1,10 +1,11 @@
+% prep workspace
 clear all; close all;
 
 % set run parameters
 runID    =  '1D_fract_anh';      % run identifier
 opdir    =  '../out/';           % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
-nop      =  100;                 % output frame plotted/saved every 'nop' time steps
+nop      =  200;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot results
 save_op  =  1;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
@@ -68,8 +69,8 @@ bndinit  =  0;                   % switch on (1) to initialise with internal bou
 dw       =  1*h;                 % boundary layer thickness [m]
 fin      =  1;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
 fout     =  1;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
-tau_T    =  6*hr;                % wall cooling/assimilation time [s]
-tau_a    =  6*hr;                % wall cooling/assimilation time [s]
+tau_T    =  10*hr;               % wall cooling/assimilation time [s]
+tau_a    =  10*hr;               % wall cooling/assimilation time [s]
 Twall    =  300;                 % wall temperature [degC] (nan = insulating)
 cwall    =  nan;                 % wall major component [wt SiO2] (nan = no assimilation)
 vwall    =  nan;                 % wall volatile component [wt H2O] (nan = no assimilation)
@@ -101,9 +102,9 @@ rhof0    =  1000;                % bubble phase ref. density [kg/m3] (at T0,cphs
 aT       =  4e-5;                % thermal expansivity [1/K]
 gC       =  0.5;                 % compositional expansivity [1/wt]
 bP       =  1e-8;                % mvp compressibility [1/Pa]
-dx       =  0.75e-3;             % crystal size [m]
-df       =  0.75e-3;             % bubble size [m]
-dm       =  0.75e-3;             % melt film size [m]
+dx       =  5e-4;                % crystal size [m]
+df       =  5e-4;                % bubble size [m]
+dm       =  5e-4;                % melt film size [m]
 g0       =  10.;                 % gravity [m/s2]
 
 % set numerical model parameters
@@ -112,19 +113,11 @@ ADVN     =  'FRM';               % advection scheme ('UPW2', 'UPW3', or 'FRM')
 rtol     =  1e-3;                % outer its relative tolerance
 atol     =  1e-6;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its
-lambda   =  0.50;                % iterative lag parameter equilibration
+lambda   =  0.25;                % iterative lag parameter equilibration
 etareg   =  1e0;                 % viscosity regularisation parameter
 
-% create output directory
-if ~isfolder([opdir,'/',runID])
-    mkdir([opdir,'/',runID]);
-end
 
-% save input parameters and runtime options (unless restarting)
-if restart == 0 
-    parfile = [opdir,'/',runID,'/',runID,'_par'];
-    save(parfile);
-end
-
-% run code
+%*****  RUN NAKHLA MODEL  *************************************************
 run('../src/main')
+%**************************************************************************
+

@@ -1,8 +1,89 @@
-load ocean;  % load custom colormap
-run(['../cal/cal_',calID]);
+% create output directory
+if ~isfolder([opdir,'/',runID])
+    mkdir([opdir,'/',runID]);
+end
+
+% save input parameters and runtime options (unless restarting)
+if restart == 0 
+    parfile = [opdir,'/',runID,'/',runID,'_par'];
+    save(parfile);
+end
+
+fprintf('\n\n')
+fprintf('*************************************************************\n');
+fprintf('*****  RUN NAKHLA MODEL | %s  *************\n',datetime('now'));
+fprintf('*************************************************************\n');
+fprintf('\n   run ID: %s \n\n',runID);
+
+load ocean;                  % load custom colormap
+run(['../cal/cal_',calID]);  % load melt model calibration
 
 % minimum cutoff phase, component fractions
-TINY     =  1e-16;               
+TINY     =  1e-16;   
+
+% calculate dimensionless numbers characterising the system dynamics
+[x0,cx0,cm0,f0,vf0,vm0] = equilibrium(0,0,T0,c0,v0,Ptop,cal,TINY);
+
+wt0 = (cal.perCm-cm0)./(cal.perCm-cal.cphs0);
+wt1 = (cal.cphs1-cm0)./(cal.cphs1-cal.perCm);
+cm0_oxds = (wt0(:) .* cal.oxds(1,:) + (1-wt0(:)) .* cal.oxds(2,:)) .* (cm0(:)<=cal.perCm) ...
+         + (wt1(:) .* cal.oxds(2,:) + (1-wt1(:)) .* cal.oxds(3,:)) .* (cm0(:)> cal.perCm);
+
+wtm([1 3 4 6 7 8 9 11 12]) = [cm0_oxds,100.*vm0,0]; % SiO2
+etam0     = grdmodel08(wtm,T0);
+
+DrhoT = aT*max([abs(T0-Twall),abs(T0-T1),T0/100]);
+Drhoc = gC*max([abs(c0-cwall),abs(c0-c1),c0/100]); 
+Drhox = x0/100*abs(rhox0-rhom0);
+Drhof = f0/100*abs(rhof0-rhom0);
+Drho0 = DrhoT + Drhoc + Drhox + Drhof;
+
+uT    = DrhoT*g0*(D/10)^2/etam0/etareg;
+uc    = Drhoc*g0*(D/10)^2/etam0/etareg;
+ux    = Drhox*g0*(D/10)^2/etam0/etareg;
+uf    = Drhof*g0*(D/10)^2/etam0/etareg .* (max([v0,v1,vwall])>TINY);
+u0    = Drho0*g0*(D/10)^2/etam0/etareg;
+
+wx0   = abs(rhox0-rhom0)*g0*dx^2/etam0;
+wf0   = abs(rhof0-rhom0)*g0*df^2/etam0 .* (max([v0,v1,vwall])>TINY);
+
+ud0   = kT/rhom0/cP/(D/10);
+
+uwT   = dw/tau_T; 
+uwc   = dw/tau_a; 
+
+RaT   = uT/ud0;
+Rac   = uc/ud0;
+Rax   = ux/ud0;
+Raf   = uf/ud0;
+Ra    = u0/ud0;
+
+Rux   = wx0/u0;
+Ruf   = wf0/u0;
+
+RwT   = uwT/u0;
+Rwc   = uwc/u0;
+
+Re    = u0*rhom0*(D/10)/etam0/etareg;
+Rex   = wx0*rhom0*dx/etam0;
+Ref   = wf0*rhom0*df/etam0;
+
+fprintf('    crystal Re: %1.3e \n'  ,Rex);
+fprintf('     bubble Re: %1.3e \n'  ,Ref);
+fprintf('     system Re: %1.3e \n\n',Re );
+
+fprintf('    thermal Ra: %1.3e \n'  ,RaT);
+fprintf('   chemical Ra: %1.3e \n'  ,Rac);
+fprintf('    crystal Ra: %1.3e \n'  ,Rax);
+fprintf('     bubble Ra: %1.3e \n'  ,Raf);
+fprintf('   combined Ra: %1.3e \n\n',Ra );
+
+fprintf('    crystal Ru: %1.3e \n'  ,Rux);
+fprintf('     bubble Ru: %1.3e \n\n',Ruf);
+
+fprintf('    thermal Rw: %1.3e \n'  ,RwT);
+fprintf('   chemical Rw: %1.3e \n\n',Rwc);
+
 
 % get coordinate arrays
 Xc        = -h/2:h:L+h/2;
@@ -197,6 +278,9 @@ dsumCdt = 0;
 dsumVdt = 0;
 
 % overwrite fields from file if restarting run
+% update coefficients and run initial fluidmech solve
+time  = time+dt;
+step  = step+1;
 if restart
     if     restart < 0  % restart from last continuation frame
         name = [opdir,'/',runID,'/',runID,'_cont.mat'];
@@ -204,6 +288,7 @@ if restart
         name = [opdir,'/',runID,'/',runID,'_',num2str(restart),'.mat'];
     end
     if exist(name,'file')
+        fprintf('\n   restart from %s \n\n',name);
         load(name,'U','W','P','Pt','f','x','m','phi','chi','mu','X','F','S','C','V','T','c','v','cm','cx','vm','vf','IT','CT','SI','RIP','RID','it','ct','si','rip','rid','dSdt','dCdt','dVdt','dITdt','dCTdt','dSIdt','dFdt','dXdt','Gf','Gx','rho','eta','eII','tII','dt','time','step','hist','VolSrc','wf','wx');
         
         xq = x; fq = f;
@@ -215,24 +300,6 @@ if restart
         time  = time+dt;
         step  = step+1;
     else % continuation file does not exist, start from scratch
-        % update coefficients and run initial fluidmech solve
-        if ~bnchm
-            update;
-            fluidmech;
-            history;
-            output;
-        end
-        time  = time+dt;
-        step  = step+1;
+        fprintf('\n   !!! restart file does not exist !!! \n   => starting run from scratch %s \n\n',name);
     end
-else
-    % update coefficients and run initial fluidmech solve
-    if ~bnchm
-        update;
-        fluidmech;
-        history;
-        output;
-    end
-    time  = time+dt;
-    step  = step+1;
 end
