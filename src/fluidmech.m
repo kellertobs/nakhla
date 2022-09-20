@@ -286,12 +286,11 @@ RR  = SCL*RR;
 
 SOL = SCL*(LL\RR);  % update solution
 
-
 % map solution vector to 2D arrays
 W  = full(reshape(SOL(MapW(:))        ,(Nz-1), Nx   ));                    % matrix z-velocity
 U  = full(reshape(SOL(MapU(:))        , Nz   ,(Nx-1)));                    % matrix x-velocity
 P  = full(reshape(SOL(MapP(:)+(NW+NU)), Nz   , Nx   ));                    % matrix dynamic pressure
-Pt = P + rhoref.*g0.*ZZ + Ptop;                                            % total pressure
+% Pt = P + rhoref.*g0.*ZZ + Ptop;                                            % total pressure
 
 % get residual of fluid mechanics equations from iterative update
 resnorm_VP = norm(W - Wi,2)./(norm(W,2)+TINY) ...

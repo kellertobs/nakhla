@@ -278,7 +278,6 @@ dsumCdt = 0;
 dsumVdt = 0;
 
 % overwrite fields from file if restarting run
-% update coefficients and run initial fluidmech solve
 time  = time+dt;
 step  = step+1;
 if restart
