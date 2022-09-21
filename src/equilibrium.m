@@ -102,9 +102,9 @@ end
 T   = max(0,min(1,(T0 - P*clap -Tphs0)./(Tphs1-Tphs0)));
 
 a = 20;
-ind1 = T>=perT+0.02;
-ind2 = T< perT-0.02;
-ind3 = T>=perT-0.02 & T<perT+0.02;
+ind1 = T>=perT+0.025;
+ind2 = T< perT-0.025;
+ind3 = T>=perT-0.025 & T<perT+0.025;
 
 cx1 = max(TINY,min(1-TINY,          perCx .*erfc(PhDg(1).*(T-perT)./(1-perT))));
 cx2 = max(TINY,min(1-TINY, perCx+(1-perCx).*erfc(PhDg(2).*(T-   0)./   perT) ));

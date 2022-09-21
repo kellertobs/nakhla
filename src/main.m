@@ -5,12 +5,6 @@ if bnchm
     % run manufactured solution benchmark on fluid mechanics solver if specified
     mms;
     return;
-else
-    % complete, plot, and save initial condition
-    update;
-    fluidmech;
-    history;
-    output;
 end
     
 % physical time stepping loop

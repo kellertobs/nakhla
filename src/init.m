@@ -154,7 +154,7 @@ bndshape = max(0,min(1,bndshape));
 bndshape([1 end],:) = bndshape([2 end-1],:);
 bndshape(:,[1 end]) = bndshape(:,[2 end-1]);
 
-bndS = 0.*bndshape;  bndC =  0.*bndshape;  bndV =  0.*bndshape;
+bndS = 0.*bndshape;  bndC =  0.*bndshape;  bndV =  0.*bndshape;  bndSI =  0.*bndshape;
 
 % set specified boundaries to no slip, else to free slip
 if bndmode==4;               sds = +1;      % no slip sides for 'all sides(4)'
@@ -298,7 +298,15 @@ if restart
         update; output;
         time  = time+dt;
         step  = step+1;
+        theta = 0.5;
     else % continuation file does not exist, start from scratch
         fprintf('\n   !!! restart file does not exist !!! \n   => starting run from scratch %s \n\n',name);
     end
+else
+    % complete, plot, and save initial condition
+    update;
+    fluidmech;
+    history;
+    output;
+    step = step+1;
 end

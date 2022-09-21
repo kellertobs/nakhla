@@ -30,10 +30,10 @@ if Nx <= 10 && Nz <= 10  % create 0D plots
     semilogy(hist.time/hr,hist.v(:,2)./(1-hist.x(:,2))*100,CL{[1,2]},LW{:});
     title('$\bar{v}/(1-x)$ [wt\% H$_2$O]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(4,1,4)
-    plot(hist.time/hr,hist.mu (:,2)*100.*(hist.mu (:,2)>1e-9),CL{[1,3]},LW{:}); axis xy tight; box on; hold on;
-    plot(hist.time/hr,hist.phi(:,2)*100.*(hist.phi(:,2)>1e-9),CL{[1,5]},LW{:});
-    plot(hist.time/hr,hist.chi(:,2)*100.*(hist.chi(:,2)>1e-9),CL{[1,4]},LW{:});
-    title('$\mu$, $\chi$, $\phi$ [vol\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+    plot(hist.time/hr,hist.mu (:,2)*100.*(hist.mu (:,2)>1e-9)    ,CL{[1,3]},LW{:}); axis xy tight; box on; hold on;
+    plot(hist.time/hr,hist.chi(:,2)*100.*(hist.chi(:,2)>1e-9)    ,CL{[1,4]},LW{:});
+    plot(hist.time/hr,hist.phi(:,2)*100.*(hist.phi(:,2)>1e-9).*10,CL{[1,5]},LW{:});
+    title('$\mu$, $\chi$, $10 \times \phi$ [vol\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     xlabel('Time [hr]',TX{:},FS{:});
 
     if ~exist('fh2','var'); fh2 = figure(VIS{:});
