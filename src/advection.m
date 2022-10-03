@@ -26,7 +26,7 @@ aip = agh(3:end-2,4:end-1);  aipp = agh(3:end-2,5:end-0);
 aim = agh(3:end-2,2:end-3);  aimm = agh(3:end-2,1:end-4);
 
 switch scheme
-    case 'FRM'
+    case 'FRM'  % Fromm scheme
         
         advn = +     up .*(-(aipp-aip)./h./8 + (aip + acc)./h./2 + (acc-aim )./h./8) ...
                - abs(up).*(-(aipp-aip)./h./8 + (aip - acc)./h./4 - (acc-aim )./h./8) ...
@@ -37,12 +37,12 @@ switch scheme
                -     wm .*(-(ajp -acc)./h./8 + (acc + ajm)./h./2 + (ajm-ajmm)./h./8) ...
                + abs(wm).*(-(ajp -acc)./h./8 + (acc - ajm)./h./4 - (ajm-ajmm)./h./8);
              
-    case 'FLXDIV'
+    case 'CFD'  % central finite-difference
         
         advn = ((ajp+acc)./2.*wp - (ajm+acc)./2.*wm)./h ...
              + ((aip+acc)./2.*up - (aim+acc)./2.*um)./h;
            
-    case 'UPW2'
+    case 'UPW2' % 2nd-order upwind
         
         axp   = (-3*acc+4*aip-aipp)/2/h;
         axm   = ( 3*acc-4*aim+aimm)/2/h;
@@ -52,7 +52,7 @@ switch scheme
         advn  = vxp.*axm + vxm.*axp + vzp.*azm + vzm.*azp + acc.*Div_v;
         
         
-    case 'UPW3'
+    case 'UPW3'  % 3rd-order upwind
         
         axp   = (-2*aim-3*acc+6*aip-aipp)/6/h;
         axm   = ( 2*aip+3*acc-6*aim+aimm)/6/h;
