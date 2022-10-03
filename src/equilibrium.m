@@ -62,7 +62,7 @@ fq = max(TINY,min(1-xq-TINY,fq));
 
 [~,~,cxq,cmq,vfq,vmq] = res_xf(xq,fq,T0,c,v,P,Tphs0d,Tphs1d,cphs0,cphs1,perTd,perCx,perCm,clap,dTH2O,vmq0,PhDg,TINY);
 
-if size(xq,1)>1
+if ~any(size(xq)==1)
     xq([1 end],:) = xq([2 end-1],:);
     xq(:,[1 end]) = xq(:,[2 end-1]);
     fq([1 end],:) = fq([2 end-1],:);
@@ -125,8 +125,11 @@ cmq(ind1) =  cm1(ind1);
 cmq(ind2) =  cm2(ind2);
 cmq(ind3) = (cm1(ind3).^a+cm2(ind3).^a).^(1/a);
 
-cxq = min(min(cphs1,c./(1-fq)),cphs0 + cxq.*(cphs1-cphs0));
-cmq = max(min(cphs1,c./(1-fq)),cphs0 + cmq.*(cphs1-cphs0));
+cxq = min(c./(1-fq),cphs0 + cxq.*(cphs1-cphs0));
+cmq = max(c./(1-fq),cphs0 + cmq.*(cphs1-cphs0));
+
+% cxq = cphs0 + cxq.*(cphs1-cphs0);
+% cmq = cphs0 + cmq.*(cphs1-cphs0);
 
 resx = c - (xq.*cxq + (1-xq-fq).*cmq);
 resf = v - (fq.*vfq + (1-xq-fq).*vmq);

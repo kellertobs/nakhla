@@ -1,7 +1,7 @@
 %% *****  THERMO-CHEMICAL EVOLUTION  **************************************
 
 % store previous iteration
-Ti = T; xi = x; fi = f;
+Ti = T; ci = c; vi = v; xi = x; fi = f;
 
 % update heat content (entropy)
 advn_S = - advection(rho.*m.*sm,Um,Wm,h,ADVN,'flx') ...                    % heat advection
@@ -25,13 +25,12 @@ S = So + (theta.*dSdt + (1-theta).*dSdto).*dt;                             % exp
 S([1 end],:) = S([2 end-1],:);                                             % apply zero flux boundary conditions
 S(:,[1 end]) = S(:,[2 end-1]);
 
-    
 % update major component
 advn_C = - advection(rho.*m.*cm,Um,Wm,h,ADVN,'flx') ...
          - advection(rho.*x.*cx,Ux,Wx,h,ADVN,'flx');
 
-qcz   = - kc.*(m(1:end-1,:)+m(2:end,:))/2 .* ddz(c,h);                     % major component diffusion z-flux
-qcx   = - kc.*(m(:,1:end-1)+m(:,2:end))/2 .* ddx(c,h);                     % major component diffusion x-flux
+qcz   = - (kc(1:end-1,:)+kc(2:end,:))/2 .* ddz(c,h);                       % major component diffusion z-flux
+qcx   = - (kc(:,1:end-1)+kc(:,2:end))/2 .* ddx(c,h);                       % major component diffusion x-flux
 diff_c(2:end-1,2:end-1) = - ddz(qcz(:,2:end-1),h) ...                      % major component diffusion
                           - ddx(qcx(2:end-1,:),h);
     
@@ -41,6 +40,7 @@ if ~isnan(cwall); bndC = bndC + rho.*(cwall-c)./tau_a .* bndshape; end     % imp
 dCdt = advn_C + diff_c + bndC;                                             % total rate of change
     
 C = Co + (theta.*dCdt + (1-theta).*dCdto).*dt;                             % explicit update of major component density
+C = max(rho.*(1-f).*cx,min(rho.*(1-f).*cm,C));
 C([1 end],:) = C([2 end-1],:);                                             % apply boundary conditions
 C(:,[1 end]) = C(:,[2 end-1]);  
     
@@ -50,8 +50,8 @@ if any([v0;v1;vwall;v(:)]>10*TINY)
     advn_V = - advection(rho.*m.*vm,Um,Wm,h,ADVN,'flx') ...
              - advection(rho.*f.*vf,Uf,Wf,h,ADVN,'flx');
     
-    qvz   = - kc.*(m(1:end-1,:)+m(2:end,:))/2 .* ddz(v,h);                 % volatile component diffusion z-flux
-    qvx   = - kc.*(m(:,1:end-1)+m(:,2:end))/2 .* ddx(v,h);                 % volatile component diffusion x-flux
+    qvz   = - (kc(1:end-1,:)+kc(2:end,:))/2 .* ddz(v,h);                   % volatile component diffusion z-flux
+    qvx   = - (kc(:,1:end-1)+kc(:,2:end))/2 .* ddx(v,h);                   % volatile component diffusion x-flux
     diff_v(2:end-1,2:end-1) = - ddz(qvz(:,2:end-1),h) ...                  % volatile component diffusion
                               - ddx(qvx(2:end-1,:),h);
     
@@ -79,14 +79,19 @@ v = V./rho;
 % update crystal fraction
 if diseq
     
-    Gx = lambda.*Gx + (1-lambda) .* (xq-x).*rho./max(4.*dt,tau_r);
+    Gx = lambda.*Gx + (1-lambda) .* (xq-x).*rho./(4*dt);
         
-    advn_X = - advection(rho.*x.*cx,Ux,Wx,h,ADVN,'flx');
+    advn_X = - advection(rho.*x,Ux,Wx,h,ADVN,'flx');
 
-    dXdt   = advn_X + Gx;                                                  % total rate of change
+    qxz   = - (kx(1:end-1,:)+kx(2:end,:))/2 .* ddz(x,h);                   % crystal fraction diffusion z-flux
+    qxx   = - (kx(:,1:end-1)+kx(:,2:end))/2 .* ddx(x,h);                   % crystal fraction diffusion x-flux
+    diff_x(2:end-1,2:end-1) = - ddz(qxz(:,2:end-1),h) ...                  % crystal fraction diffusion
+                              - ddx(qxx(2:end-1,:),h);
+
+    dXdt   = advn_X + diff_x + Gx;                                         % total rate of change
     
     X = Xo + (theta.*dXdt + (1-theta).*dXdto).*dt;                         % explicit update of crystal fraction
-    X = min(rho-TINY,max(TINY,X));                                         % enforce [0,1] limit
+    X = min(rho.*(1-TINY),max(rho.*TINY,X));                               % enforce [0,1] limit
     X([1 end],:) = X([2 end-1],:);                                         % apply boundary conditions
     X(:,[1 end]) = X(:,[2 end-1]);
     
@@ -102,14 +107,19 @@ end
 % update bubble fraction
 if (diseq && any([v0;v1;vwall;v(:)]>10*TINY))
     
-    Gf = lambda.*Gf + (1-lambda) .* (fq-f).*rho./max(4.*dt,tau_r);
+    Gf = lambda.*Gf + (1-lambda) .* (fq-f).*rho./(4*dt);
     
     advn_f = - advection(rho.*f,Uf,Wf,h,ADVN,'flx');                       % get advection term
-                          
-    dFdt   = advn_f + Gf;                                                  % total rate of change
+                
+    qfz   = - (kf(1:end-1,:)+kf(2:end,:))/2 .* ddz(f,h);                   % bubble fraction diffusion z-flux
+    qfx   = - (kf(:,1:end-1)+kf(:,2:end))/2 .* ddx(f,h);                   % bubble fraction diffusion x-flux
+    diff_f(2:end-1,2:end-1) = - ddz(qfz(:,2:end-1),h) ...                  % bubble fraction diffusion
+                              - ddx(qfx(2:end-1,:),h);
+
+    dFdt   = advn_f + diff_f + Gf;                                         % total rate of change
     
     F = Fo + (theta.*dFdt + (1-theta).*dFdto).*dt;                         % explicit update of bubble fraction
-    F = min(rho-TINY,max(TINY,F));                                         % enforce [0,1-x] limit
+    F = min(rho.*(1-TINY),max(rho.*TINY,F));                               % enforce [0,1] limit
     F([1 end],:) = F([2 end-1],:);                                         % apply boundary conditions
     F(:,[1 end]) = F(:,[2 end-1]);
     
@@ -124,7 +134,6 @@ end
 
 % update melt fraction
 m = min(1-x-TINY,max(TINY,1-f-x));
-
 
 if step>0
 
@@ -148,5 +157,7 @@ end
 
 % get residual of thermochemical equations from iterative update
 resnorm_TC = norm( T - Ti,              2)./(norm(T,2)+TINY) ...
+           + norm((c - ci).*(x>10*TINY),2)./(norm(c,2)+TINY) ...
+           + norm((v - vi).*(x>10*TINY),2)./(norm(v,2)+TINY) ...
            + norm((x - xi).*(x>10*TINY),2)./(norm(x,2)+TINY) ...
            + norm((f - fi).*(f>10*TINY),2)./(norm(f,2)+TINY);

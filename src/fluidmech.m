@@ -1,6 +1,5 @@
 % store previous iteration
-Wi = W; Ui = U; Pi = P;
-
+SOLi = SOL; %Wi = W; Ui = U; Pi = P;
 
 %% assemble coefficients for matrix velocity diagonal and right-hand side
 
@@ -293,9 +292,7 @@ P  = full(reshape(SOL(MapP(:)+(NW+NU)), Nz   , Nx   ));                    % mat
 % Pt = P + rhoref.*g0.*ZZ + Ptop;                                            % total pressure
 
 % get residual of fluid mechanics equations from iterative update
-resnorm_VP = norm(W - Wi,2)./(norm(W,2)+TINY) ...
-           + norm(U - Ui,2)./(norm(U,2)+TINY) ...
-           + norm(P - Pi,2)./(norm(P,2)+TINY);
+resnorm_VP = norm(SOL - SOLi,2)./(norm(SOL,2)+TINY);
 
 % update phase velocities
 Wf   = W + wf;                                                             % mvp z-velocity
@@ -316,6 +313,6 @@ Ubar = (mu (:,1:end-1)+mu (:,2:end))/2 .* Um ...
  
 %% update time step
 
-dtk = min((h/2)^2./max([kT./rho(:)./cP;kc./rho(:)]));                   % diffusive time step size
+dtk = min((h/2)^2./max(kT./rho(:)./cP));                                   % diffusive time step size
 dta = CFL*min(min(h/2/max(abs([Ux(:);Wx(:);Uf(:);Wf(:);Um(:);Wm(:)]+1e-16)))); % advective time step size
 dt  = min([2*dto,dtmax,min(dtk,dta)]);                                     % physical time step size

@@ -4,7 +4,7 @@ clear all; close all;
 % set run parameters
 runID    =  '1D_fract_anh';      % run identifier
 opdir    =  '../out';            % output directory
-restart  =  -1;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
+restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  500;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot results
 save_op  =  1;                   % switch on to save output to file
@@ -23,20 +23,20 @@ M        =  1e6;                 % number of time steps to take
 hr       =  3600;                % conversion seconds to hours
 yr       =  24*365.25*hr;        % conversion seconds to years
 tend     =  1*yr;                % end time for simulation [s]
-dt       =  100;                 % initial time step [s]
+dt       =  10;                  % initial time step [s]
 dtmax    =  1e3;                 % maximum time step [s]
 
 % set initial thermo-chemical state
 seed     =  15;                  % random perturbation seed
 smth     =  (N/30)^2;            % regularisation of initial random perturbation
 zlay     =  0.5;                 % layer thickness (relative to domain depth D)
-wlay_T   =  4*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
+wlay_T   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
 wlay_c   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
-T0       =  1250;                % temperature top layer [deg C]
-T1       =  1250;                % temperature base layer [deg C]
+T0       =  1185;                % temperature top layer [deg C]
+T1       =  1185;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
-c0       =  0.50;                % major component top layer [wt SiO2]
-c1       =  0.50;                % major component base layer [wt SiO2]
+c0       =  0.51;                % major component top layer [wt SiO2]
+c1       =  0.51;                % major component base layer [wt SiO2]
 dc       =  0e-4;                % amplitude of random noise [wt SiO2]
 v0       =  0.00;                % volatile component top layer [wt H2O]
 v1       =  0.00;                % volatile component base layer [wt H2O]
@@ -81,7 +81,6 @@ riwall   =  nan;                 % wall radiogenic isotope [wt ppm] (nan = no as
 
 % set thermo-chemical material parameters
 calID    =  'krafla';            % phase diagram calibration
-kc       =  4e-4;                % chemical diffusivity [kg/m/s]
 kT       =  4;                   % thermal conductivity [W/m/K]
 cP       =  1200;                % heat capacity [J/kg/K]
 Dsx      = -300;                 % entropy change of crystallisation [J/kg]
@@ -102,16 +101,16 @@ rhof0    =  1000;                % bubble phase ref. density [kg/m3] (at T0,cphs
 aT       =  4e-5;                % thermal expansivity [1/K]
 gC       =  0.5;                 % compositional expansivity [1/wt]
 bP       =  1e-8;                % mvp compressibility [1/Pa]
-dx       =  5e-4;                % crystal size [m]
-df       =  5e-4;                % bubble size [m]
-dm       =  5e-4;                % melt film size [m]
+dx       =  1e-3;                % crystal size [m]
+df       =  1e-3;                % bubble size [m]
+dm       =  1e-3;                % melt film size [m]
 g0       =  10.;                 % gravity [m/s2]
 
 % set numerical model parameters
-CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
-ADVN     =  'FRM';               % advection scheme ('UPW2', 'UPW3', or 'FRM')
-rtol     =  1e-3;                % outer its relative tolerance
-atol     =  1e-6;                % outer its absolute tolerance
+CFL      =  0.25;                % (physical) time stepping courant number (multiplies stable step) [0,1]
+ADVN     =  'FRM';               % advection scheme ('CFD', 'UPW2', 'UPW3', or 'FRM')
+rtol     =  1e-4;                % outer its relative tolerance
+atol     =  1e-7;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its
 lambda   =  0.25;                % iterative lag parameter equilibration
 etareg   =  1e0;                 % viscosity regularisation parameter

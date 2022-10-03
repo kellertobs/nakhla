@@ -3,7 +3,7 @@ clear all; close all;
 
 % set run parameters
 runID    =  '0D_fract_anh';      % run identifier
-opdir    =  '../out/';           % output directory
+opdir    =  '../out';            % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  100;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot results
@@ -22,7 +22,7 @@ h        =  D/(N-2);             % grid spacing (equal in both dimensions, do no
 M        =  1e6;                 % number of time steps to take
 hr       =  3600;                % conversion seconds to hours
 yr       =  24*365.25*hr;        % conversion seconds to years
-tend     =  12*hr;               % end time for simulation [s]
+tend     =  11*hr;               % end time for simulation [s]
 dt       =  36;                  % initial time step [s]
 dtmax    =  36;                  % maximum time step [s]
 
@@ -32,11 +32,11 @@ smth     =  (N/30)^2;            % regularisation of initial random perturbation
 zlay     =  0.5;                 % layer thickness (relative to domain depth D)
 wlay_T   =  4*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
 wlay_c   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
-T0       =  1350;                % temperature top layer [deg C]
-T1       =  1350;                % temperature base layer [deg C]
+T0       =  1150;                % temperature top layer [deg C]
+T1       =  1150;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
-c0       =  0.50;                % major component top layer [wt SiO2]
-c1       =  0.50;                % major component base layer [wt SiO2]
+c0       =  0.51;                % major component top layer [wt SiO2]
+c1       =  0.51;                % major component base layer [wt SiO2]
 dc       =  0e-4;                % amplitude of random noise [wt SiO2]
 v0       =  0.04;                % volatile component top layer [wt H2O]
 v1       =  0.04;                % volatile component base layer [wt H2O]
@@ -86,7 +86,6 @@ kT       =  4;                   % thermal conductivity [W/m/K]
 cP       =  1200;                % heat capacity [J/kg/K]
 Dsx      = -300;                 % entropy change of crystallisation [J/kg]
 Dsf      =  400;                 % entropy change of exsolution [J/kg]
-tau_r    =  60;                  % reaction time [s]
 
 % set model rheology parameters
 etaf0    =  0.1;                 % fluid viscosity [Pas]
@@ -113,7 +112,7 @@ ADVN     =  'FRM';               % advection scheme ('UPW2', 'UPW3', or 'FRM')
 rtol     =  1e-5;                % outer its relative tolerance
 atol     =  1e-8;                % outer its absolute tolerance
 maxit    =  50;                  % maximum outer its
-lambda   =  0.75;                % iterative lag parameter equilibration
+lambda   =  0.5;                 % iterative lag parameter equilibration
 etareg   =  1e0;                 % viscosity regularisation parameter
 
 

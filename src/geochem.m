@@ -10,8 +10,8 @@ itx = it./(m./KIT + x);
 advn_IT = advection(rho.*m.*itm,Um,Wm,h,ADVN,'flx') ...
         + advection(rho.*x.*itx,Ux,Wx,h,ADVN,'flx');
 
-qz   = - kc.*(m(1:end-1,:)+m(2:end,:))/2 .* ddz(it,h);
-qx   = - kc.*(m(:,1:end-1)+m(:,2:end))/2 .* ddx(it,h);
+qz   = - (kc(1:end-1,:)+kc(2:end,:))/2 .* ddz(it,h);
+qx   = - (kc(:,1:end-1)+kc(:,2:end))/2 .* ddx(it,h);
 diff_it(2:end-1,2:end-1) = - ddz(qz(:,2:end-1),h) ...                      % diffusion in melt
                            - ddx(qx(2:end-1,:),h);
 
@@ -36,8 +36,8 @@ ctx = ct./(m./KCT + x);
 advn_CT = advection(rho.*m.*ctm,Um,Wm,h,ADVN,'flx') ...
         + advection(rho.*x.*ctx,Ux,Wx,h,ADVN,'flx');
 
-qz   = - kc.*(m(1:end-1,:)+m(2:end,:))/2 .* ddz(ct,h);
-qx   = - kc.*(m(:,1:end-1)+m(:,2:end))/2 .* ddx(ct,h);
+qz   = - (kc(1:end-1,:)+kc(2:end,:))/2 .* ddz(ct,h);
+qx   = - (kc(:,1:end-1)+kc(:,2:end))/2 .* ddx(ct,h);
 diff_ct(2:end-1,2:end-1) = - ddz(qz(:,2:end-1),h) ...                      % diffusion in melt
                            - ddx(qx(2:end-1,:),h);
 
@@ -59,8 +59,8 @@ advn_si = advection(rho.*m.*si,Um,Wm,h,ADVN,'flx') ...
         + advection(rho.*x.*si,Ux,Wx,h,ADVN,'flx') ...
         + advection(rho.*f.*si,Uf,Wf,h,ADVN,'flx');
 
-qz   = - kc.*(m(1:end-1,:)+m(2:end,:))/2 .* ddz(si,h);
-qx   = - kc.*(m(:,1:end-1)+m(:,2:end))/2 .* ddx(si,h);
+qz   = - (kc(1:end-1,:)+kc(2:end,:))/2 .* ddz(si,h);
+qx   = - (kc(:,1:end-1)+kc(:,2:end))/2 .* ddx(si,h);
 diff_si(2:end-1,2:end-1) = - ddz(qz(:,2:end-1),h) ...                      % diffusion in melt
                            - ddx(qx(2:end-1,:),h);
                        
@@ -88,8 +88,8 @@ ripx = rip./(m./KRIP + x);
 advn_RIP = advection(rho.*m.*ripm,Um,Wm,h,ADVN,'flx') ...
          + advection(rho.*x.*ripx,Ux,Wx,h,ADVN,'flx');
 
-qz   = - kc.*(m(1:end-1,:)+m(2:end,:))/2 .* ddz(rip,h);
-qx   = - kc.*(m(:,1:end-1)+m(:,2:end))/2 .* ddx(rip,h);
+qz   = - (kc(1:end-1,:)+kc(2:end,:))/2 .* ddz(rip,h);
+qx   = - (kc(:,1:end-1)+kc(:,2:end))/2 .* ddx(rip,h);
 diff_rip(2:end-1,2:end-1) = - ddz(qz(:,2:end-1),h) ...                     % diffusion in melt
                             - ddx(qx(2:end-1,:),h);
 
@@ -112,8 +112,8 @@ ridx = rid./(m./KRID + x);
 advn_RID = advection(rho.*m.*ridm,Um,Wm,h,ADVN,'flx') ...
          + advection(rho.*x.*ridx,Ux,Wx,h,ADVN,'flx');
 
-qz   = - kc.*(m(1:end-1,:)+m(2:end,:))/2 .* ddz(rid,h);
-qx   = - kc.*(m(:,1:end-1)+m(:,2:end))/2 .* ddx(rid,h);
+qz   = - (kc(1:end-1,:)+kc(2:end,:))/2 .* ddz(rid,h);
+qx   = - (kc(:,1:end-1)+kc(:,2:end))/2 .* ddx(rid,h);
 diff_rid(2:end-1,2:end-1) = - ddz(qz(:,2:end-1),h) ...                     % diffusion in melt
                             - ddx(qx(2:end-1,:),h);
 

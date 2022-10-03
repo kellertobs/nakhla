@@ -17,9 +17,8 @@ fprintf('\n   run ID: %s \n\n',runID);
 
 load ocean;                  % load custom colormap
 run(['../cal/cal_',calID]);  % load melt model calibration
-
-% minimum cutoff phase, component fractions
-TINY     =  1e-16;   
+calibrt =  0;                % not in calibrate mode
+TINY    =  1e-12;            % minimum cutoff phase, component fractions
 
 % calculate dimensionless numbers characterising the system dynamics
 [x0,cx0,cm0,f0,vf0,vm0] = equilibrium(0,0,T0,c0,v0,Ptop,cal,TINY);
@@ -199,7 +198,7 @@ T    =  (Tp+273.15).*exp(aT./rhoref./cP.*Pt); % real temperature [K]
 
 % get volume fractions and bulk density
 step = 0;
-res  = 1;  tol = 1e-15;  x = ones(size(T))./10;  f = v/2;
+res  = 1;  tol = 1e-12;  x = ones(size(T))./10;  f = v/2;
 while res > tol
     xi = x;  fi = f;
     
@@ -215,7 +214,7 @@ while res > tol
     
     rhoref  = mean(mean(rho(2:end-1,2:end-1)));
     Pt      = Ptop + rhoref.*g0.*ZZ;
-    if Nx<=10; Pt = mean(mean(Pt(2:end-1,2:end-1))); end
+    if Nz<=10; Pt = mean(mean(Pt(2:end-1,2:end-1))); end
     
     T    =  (Tp+273.15).*exp(aT./rhoref./cP.*Pt);
 
@@ -256,7 +255,7 @@ dcy_rip = rho.*rip./HLRIP.*log(2);
 dcy_rid = rho.*rid./HLRID.*log(2);
 
 % initialise auxiliary variables 
-dSdt   = 0.*T;  diff_T = 0.*T;  diss_h = 0.*T;
+dSdt   = 0.*T;  dTdt   = 0.*T;  diff_T = 0.*T;  diss_h = 0.*T;
 dCdt   = 0.*c;  diff_c = 0.*c;
 dVdt   = 0.*v;  diff_v = 0.*v;  
 dFdt   = 0.*f;  diff_f = 0.*f;  
@@ -278,8 +277,6 @@ dsumCdt = 0;
 dsumVdt = 0;
 
 % overwrite fields from file if restarting run
-time  = time+dt;
-step  = step+1;
 if restart
     if     restart < 0  % restart from last continuation frame
         name = [opdir,'/',runID,'/',runID,'_cont.mat'];
@@ -308,5 +305,6 @@ else
     fluidmech;
     history;
     output;
-    step = step+1;
+    time  = time+dt;
+    step  = step+1;
 end

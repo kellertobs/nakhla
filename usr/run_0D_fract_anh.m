@@ -31,11 +31,11 @@ smth     =  (N/30)^2;            % regularisation of initial random perturbation
 zlay     =  0.5;                 % layer thickness (relative to domain depth D)
 wlay_T   =  4*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
 wlay_c   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
-T0       =  1350;                % temperature top layer [deg C]
-T1       =  1350;                % temperature base layer [deg C]
+T0       =  1250;                % temperature top layer [deg C]
+T1       =  1250;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
-c0       =  0.50;                % major component top layer [wt SiO2]
-c1       =  0.50;                % major component base layer [wt SiO2]
+c0       =  0.51;                % major component top layer [wt SiO2]
+c1       =  0.51;                % major component base layer [wt SiO2]
 dc       =  0e-4;                % amplitude of random noise [wt SiO2]
 v0       =  0.00;                % volatile component top layer [wt H2O]
 v1       =  0.00;                % volatile component base layer [wt H2O]
@@ -85,7 +85,6 @@ kT       =  4;                   % thermal conductivity [W/m/K]
 cP       =  1200;                % heat capacity [J/kg/K]
 Dsx      = -300;                 % entropy change of crystallisation [J/kg]
 Dsf      =  400;                 % entropy change of exsolution [J/kg]
-tau_r    =  60;                  % reaction time [s]
 
 % set model rheology parameters
 etaf0    =  0.1;                 % fluid viscosity [Pas]

@@ -24,15 +24,10 @@ rhof = rhof0 .* (1 - aT.*(T-cal.perT-273.15) + bP.*(Pt-Ptop ));
 
 % convert weight to volume fraction, update bulk density
 rho  = 1./(m./rhom + x./rhox + f./rhof);  
-rho([1 end],:) = rho([2 end-1],:);  
-rho(:,[1 end]) = rho(:,[2 end-1]);
 
 chi   = x.*rho./rhox;
 phi   = f.*rho./rhof;
-mu    = m.*rho./rhom;
-
-% entropy diffusion flux parameter
-ks = kT./T;                                    
+mu    = m.*rho./rhom;                                  
 
 % update effective viscosity
 wtm      = zeros(Nz*Nx,12);
@@ -53,7 +48,7 @@ etax  = etax0.* ones(size(x));                                             % con
 kv = permute(cat(3,etax,etam,etaf),[3,1,2]);
 Mv = permute(repmat(kv,1,1,1,3),[4,1,2,3])./permute(repmat(kv,1,1,1,3),[1,4,2,3]);
  
-ff = max(1e-6,min(1-1e-6,permute(cat(3,chi,mu,phi),[3,1,2])));
+ff = max(1e-9,min(1-1e-9,permute(cat(3,chi,mu,phi),[3,1,2])));
 FF = permute(repmat(ff,1,1,1,3),[4,1,2,3]);
 Sf = (FF./BB).^(1./CC);  Sf = Sf./sum(Sf,2);
 Xf = sum(AA.*Sf,2).*FF + (1-sum(AA.*Sf,2)).*Sf;
@@ -62,34 +57,47 @@ Xf = sum(AA.*Sf,2).*FF + (1-sum(AA.*Sf,2)).*Sf;
 thtv = squeeze(prod(Mv.^Xf,2));
 
 % get effective viscosity
-if exist('eta','var'); etamax = 1e+6.*min(eta (:)); else; etamax = etax.*etareg; end
-eta    = squeeze(sum(ff.*kv.*thtv,1));
+eta    = squeeze(sum(ff.*kv.*thtv,1));  if size(eta,1)~=size(T,1); eta = eta.'; end
+if ~calibrt; etamax = 1e+6.*min(eta(:)); else; etamax = 1e3.*etax0; end
 eta    = (1./etamax + 1./(eta.*etareg)).^-1;
-eta([1 end],:) = eta([2 end-1],:);  
-eta(:,[1 end]) = eta(:,[2 end-1]);
 etaco  = (eta(1:end-1,1:end-1)+eta(2:end,1:end-1) ...
        +  eta(1:end-1,2:end  )+eta(2:end,2:end  ))./4;
 
 % get segregation coefficients
 Csgr = ((1-ff)./[dx;dm;df].^2.*kv.*thtv).^-1 + 1e-18;
 
-Csgr_x = squeeze(Csgr(1,:,:));  Csgr_x([1 end],:) = Csgr_x([2 end-1],:);  Csgr_x(:,[1 end]) = Csgr_x(:,[2 end-1]);
-Csgr_m = squeeze(Csgr(2,:,:));  Csgr_m([1 end],:) = Csgr_m([2 end-1],:);  Csgr_m(:,[1 end]) = Csgr_m(:,[2 end-1]);
-Csgr_f = squeeze(Csgr(3,:,:));  Csgr_f([1 end],:) = Csgr_f([2 end-1],:);  Csgr_f(:,[1 end]) = Csgr_f(:,[2 end-1]);
+Csgr_x = squeeze(Csgr(1,:,:)); if size(Csgr_x,1)~=size(T,1); Csgr_x = Csgr_x.'; end
+Csgr_f = squeeze(Csgr(3,:,:)); if size(Csgr_f,1)~=size(T,1); Csgr_f = Csgr_f.'; end
+Csgr_m = squeeze(Csgr(2,:,:)); if size(Csgr_m,1)~=size(T,1); Csgr_m = Csgr_m.'; end
+Csgr_m = Csgr_m.*chi.^2; % dampen melt segregation at low crystallinity
 
+if ~calibrt % skip the following if called from calibration script
+
+% diffusion parameters
+ks = kT./T;
+kc = kT./cP./10.*mu.^0.5;
+kx = kT./cP./10.*mu.^0.5.*x;
+kf = kT./cP./10.*mu.^0.5.*f;
+km = kT./cP./10.*mu.^0.5.*m;
 
 % update phase segregation speeds
-wm = ((rhom(1:end-1,:)+rhom(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*min(Csgr_m(1:end-1,:),Csgr_m(2:end,:)).*((chi(1:end-1,:)+chi(2:end,:))./2).^2; % melt segregation speed
+wm = (rhom-rho).*g0.*Csgr_m;
+wm = sign((wm(1:end-1,:)+wm(2:end,:))/2).*min(abs(wm(1:end-1,:)),abs(wm(2:end,:)));
+% wm = ((rhom(1:end-1,:)+rhom(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*2./(1./Csgr_m(1:end-1,:)+1./Csgr_m(2:end,:)); % melt segregation speed
 wm(1  ,:)     = min(1,1-top).*wm(1  ,:);
 wm(end,:)     = min(1,1-bot).*wm(end,:);
 wm(:,[1 end]) = -sds*wm(:,[2 end-1]);
 
-wx = (((rhox(1:end-1,:)+rhox(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0).*min(Csgr_x(1:end-1,:),Csgr_x(2:end,:)); % crystal segregation speed
+wx = (rhox-rho).*g0.*Csgr_x;
+wx = sign((wx(1:end-1,:)+wx(2:end,:))/2).*min(abs(wx(1:end-1,:)),abs(wx(2:end,:)));
+% wx = (((rhox(1:end-1,:)+rhox(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0).*2./(1./Csgr_x(1:end-1,:)+1./Csgr_x(2:end,:)); % crystal segregation speed
 wx(1  ,:)     = min(1,1-top).*wx(1  ,:);
 wx(end,:)     = min(1,1-bot).*wx(end,:);
 wx(:,[1 end]) = -sds*wx(:,[2 end-1]);
 
-wf = (((rhof(1:end-1,:)+rhof(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0).*min(Csgr_f(1:end-1,:),Csgr_f(2:end,:)); % fluid segregation speed
+wf = (rhof-rho).*g0.*Csgr_f;
+wf = sign((wf(1:end-1,:)+wf(2:end,:))/2).*min(abs(wf(1:end-1,:)),abs(wf(2:end,:)));
+% wf = (((rhof(1:end-1,:)+rhof(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0).*2./(1./Csgr_f(1:end-1,:)+1./Csgr_f(2:end,:)); % fluid segregation speed
 wf(1  ,:)     = min(1,1-top+fout).*wf(1  ,:);
 wf(end,:)     = min(1,1-bot+fin ).*wf(end,:);
 wf(:,[1 end]) = -sds*wf(:,[2 end-1]);
@@ -146,3 +154,4 @@ if step>0; VolSrc  = -((rho-rhoo)./dt + Div_rhoV - rho.*Div_V)./rho; end
 
 UBG    = - 2*mean(mean(VolSrc(2:end-1,2:end-1)))./2 .* (L/2-XXu);
 WBG    = - 0*mean(mean(VolSrc(2:end-1,2:end-1)))./2 .* (D/2-ZZw);
+end
