@@ -26,9 +26,9 @@ rhof = rhof0 .* (1 - aT.*(T-cal.perT-273.15) + bP.*(Pt-Ptop ));
 % convert weight to volume fraction, update bulk density
 rho  = 1./(m./rhom + x./rhox + f./rhof);  
 
-chi   = max(0,min(1, x.*rho./rhox ));
-phi   = max(0,min(1, f.*rho./rhof ));
-mu    = max(0,min(1, m.*rho./rhom ));                                  
+chi   = max(TINY,min(1-TINY, x.*rho./rhox ));
+phi   = max(TINY,min(1-TINY, f.*rho./rhof ));
+mu    = max(TINY,min(1-TINY, m.*rho./rhom ));                                  
 
 % update effective viscosity
 wtm      = zeros(Nz*Nx,12);

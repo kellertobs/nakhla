@@ -128,13 +128,15 @@ if (diseq && any([v0;v1;vwall;v(:)]>10*TINY))
 
     dFdt   = advn_f + diff_f + Gf;                                         % total rate of change
     
-    F = Fo + (theta.*dFdt + (1-theta).*dFdto).*dt;                         % explicit update of bubble fraction
-    F = min(rho.*(1-TINY),max(rho.*TINY,F));                               % enforce [0,1] limit
-    F([1 end],:) = F([2 end-1],:);                                         % apply boundary conditions
-    F(:,[1 end]) = F(:,[2 end-1]);
+%     F = Fo + (theta.*dFdt + (1-theta).*dFdto).*dt;                         % explicit update of bubble fraction
+%     F = min(rho.*(1-TINY),max(rho.*TINY,F));                               % enforce [0,1] limit
+%     F([1 end],:) = F([2 end-1],:);                                         % apply boundary conditions
+%     F(:,[1 end]) = F(:,[2 end-1]);
     
-    f  = max(TINY,min(1-TINY,F./rho));
-
+    f = (rhoo.*fo + (theta.*dFdt + (1-theta).*dFdto).*dt)./rho;            % explicit update of crystal fraction
+    f = max(0,min(1,f));
+    f([1 end],:) = f([2 end-1],:);                                         % apply boundary conditions
+    f(:,[1 end]) = f(:,[2 end-1]);
 else
     
     f  =  lambda.*f + (1-lambda).*fq;
