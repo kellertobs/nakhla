@@ -1,4 +1,5 @@
 %%*****  UPDATE PARAMETERS & AUXILIARY FIELDS  ****************************
+tic;
 
 % update phase oxide compositions
 wt0 = (cal.perCm-cx)./(cal.perCm-cal.cphs0);
@@ -25,9 +26,9 @@ rhof = rhof0 .* (1 - aT.*(T-cal.perT-273.15) + bP.*(Pt-Ptop ));
 % convert weight to volume fraction, update bulk density
 rho  = 1./(m./rhom + x./rhox + f./rhof);  
 
-chi   = x.*rho./rhox;
-phi   = f.*rho./rhof;
-mu    = m.*rho./rhom;                                  
+chi   = max(0,min(1, x.*rho./rhox ));
+phi   = max(0,min(1, f.*rho./rhof ));
+mu    = max(0,min(1, m.*rho./rhom ));                                  
 
 % update effective viscosity
 wtm      = zeros(Nz*Nx,12);
@@ -81,23 +82,39 @@ kf = kT./cP./10.*mu.^0.5.*f;
 km = kT./cP./10.*mu.^0.5.*m;
 
 % update phase segregation speeds
-wm = (rhom-rho).*g0.*Csgr_m;
-wm = sign((wm(1:end-1,:)+wm(2:end,:))/2).*min(abs(wm(1:end-1,:)),abs(wm(2:end,:)));
-% wm = ((rhom(1:end-1,:)+rhom(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*2./(1./Csgr_m(1:end-1,:)+1./Csgr_m(2:end,:)); % melt segregation speed
+% wmc = (rhom-rho).*g0.*Csgr_m;
+% wm = (mu(1:end-1,:).*wmc(1:end-1,:) + mu(2:end,:).*wmc(2:end,:))./(mu(1:end-1,:)+mu(2:end,:));
+% wm2 = sign((wmc(1:end-1,:)+wmc(2:end,:))/2).*min(abs(wmc(1:end-1,:)),abs(wmc(2:end,:)));
+% wm1 = ((rhom(1:end-1,:)+rhom(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*(Csgr_m(1:end-1,:) +Csgr_m(2:end,:)).*0.5; % melt segregation speed
+% wm2 = ((rhom(1:end-1,:)+rhom(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*(Csgr_m(1:end-1,:).*Csgr_m(2:end,:)).^0.5; % melt segregation speed
+% wm3 = ((rhom(1:end-1,:)+rhom(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*2./(1./Csgr_m(1:end-1,:)+1./Csgr_m(2:end,:)); % melt segregation speed
+wm = ((rhom(1:end-1,:)+rhom(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*min(Csgr_m(1:end-1,:),Csgr_m(2:end,:)); % melt segregation speed
 wm(1  ,:)     = min(1,1-top).*wm(1  ,:);
 wm(end,:)     = min(1,1-bot).*wm(end,:);
 wm(:,[1 end]) = -sds*wm(:,[2 end-1]);
 
-wx = (rhox-rho).*g0.*Csgr_x;
-wx = sign((wx(1:end-1,:)+wx(2:end,:))/2).*min(abs(wx(1:end-1,:)),abs(wx(2:end,:)));
-% wx = (((rhox(1:end-1,:)+rhox(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0).*2./(1./Csgr_x(1:end-1,:)+1./Csgr_x(2:end,:)); % crystal segregation speed
+% figure(100); clf;
+% plot(-wm(:,2:end-1),Zf,'k',-wm1(:,2:end-1),Zf,'r',-wm2(:,2:end-1),Zf,'b',-wm3(:,2:end-1),Zf,'g');
+
+
+% wxc = (rhox-rho).*g0.*Csgr_x;
+% wx1 = (chi(1:end-1,:).*wxc(1:end-1,:) + chi(2:end,:).*wxc(2:end,:))./(chi(1:end-1,:)+chi(2:end,:));
+% wx2 = sign((wxc(1:end-1,:)+wxc(2:end,:))/2).*min(abs(wxc(1:end-1,:)),abs(wxc(2:end,:)));
+% wx1 = ((rhox(1:end-1,:)+rhox(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*(Csgr_x(1:end-1,:) +Csgr_x(2:end,:)).*0.5; % melt segregation speed
+% wx2 = ((rhox(1:end-1,:)+rhox(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*(Csgr_x(1:end-1,:).*Csgr_x(2:end,:)).^0.5; % melt segregation speed
+% wx3 = ((rhox(1:end-1,:)+rhox(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*2./(1./Csgr_x(1:end-1,:)+1./Csgr_x(2:end,:)); % melt segregation speed
+wx = ((rhox(1:end-1,:)+rhox(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*min(Csgr_x(1:end-1,:),Csgr_x(2:end,:)); % melt segregation speed
 wx(1  ,:)     = min(1,1-top).*wx(1  ,:);
 wx(end,:)     = min(1,1-bot).*wx(end,:);
 wx(:,[1 end]) = -sds*wx(:,[2 end-1]);
 
-wf = (rhof-rho).*g0.*Csgr_f;
-wf = sign((wf(1:end-1,:)+wf(2:end,:))/2).*min(abs(wf(1:end-1,:)),abs(wf(2:end,:)));
-% wf = (((rhof(1:end-1,:)+rhof(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0).*2./(1./Csgr_f(1:end-1,:)+1./Csgr_f(2:end,:)); % fluid segregation speed
+% figure(200); clf;
+% plot(-wx(:,2:end-1),Zf,'k',-wx1(:,2:end-1),Zf,'r',-wx2(:,2:end-1),Zf,'b',-wx3(:,2:end-1),Zf,'g');
+% drawnow
+
+% wf = (rhof-rho).*g0.*Csgr_f;
+% wf = sign((wf(1:end-1,:)+wf(2:end,:))/2).*min(abs(wf(1:end-1,:)),abs(wf(2:end,:)));
+wf = (((rhof(1:end-1,:)+rhof(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0).*2./(1./Csgr_f(1:end-1,:)+1./Csgr_f(2:end,:)); % fluid segregation speed
 wf(1  ,:)     = min(1,1-top+fout).*wf(1  ,:);
 wf(end,:)     = min(1,1-bot+fin ).*wf(end,:);
 wf(:,[1 end]) = -sds*wf(:,[2 end-1]);
@@ -149,9 +166,12 @@ diss =  exx(2:end-1,2:end-1).*txx(2:end-1,2:end-1) ...
 Div_rhoV =  + advection(rho.*f,0.*U,wf,h,ADVN,'flx') ...
             + advection(rho.*x,0.*U,wx,h,ADVN,'flx') ...
             + advection(rho.*m,0.*U,wm,h,ADVN,'flx') ...
-            + advection(rho   ,U   ,W ,h,ADVN,'flx');
-if step>0; VolSrc  = -((rho-rhoo)./dt + Div_rhoV - rho.*Div_V)./rho; end
+            + advection(rho   ,U   ,W ,h,ADVN,'adv');
+if step>0; VolSrc  = -((rho-rhoo)./dt + Div_rhoV)./rho; end
+if step>0; VolSrc  = -((rho-rhoo)./dt + theta.*Div_rhoV + (1-theta).*Div_rhoVo)./rho; end
 
 UBG    = - 2*mean(mean(VolSrc(2:end-1,2:end-1)))./2 .* (L/2-XXu);
 WBG    = - 0*mean(mean(VolSrc(2:end-1,2:end-1)))./2 .* (D/2-ZZw);
 end
+
+UDtime = UDtime + toc;

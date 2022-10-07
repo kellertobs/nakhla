@@ -41,7 +41,7 @@ dsumVdt = sum(sum(bndV(2:end-1,2:end-1)*h*h*1)) ...
         + sum(  rho(2,2:end-1).*m(2,2:end-1).*vm(2,2:end-1).*Wm(1,2:end-1)*h*1) - sum(  rho(end-1,2:end-1).*m(end-1,2:end-1).*vm(end-1,2:end-1).*Wm(end,2:end-1)*h*1) ...
         + sum(  rho(2:end-1,2).*m(2:end-1,2).*vm(2:end-1,2).*Um(2:end-1,1)*h*1) - sum(  rho(2:end-1,end-1).*m(2:end-1,end-1).*vm(2:end-1,end-1).*Um(2:end-1,end)*h*1);  % [kg/s]
 
-if step>1; hist.DM(stp) = hist.DM(stp-1) + dsumMdt.*dt; else; hist.DM(stp) = 0; end  % [kg]
+if step>1; hist.DM(stp) = hist.DM(stp-1) + (theta.*dsumMdt + (1-theta).*dsumMdto).*dt; else; hist.DM(stp) = 0; end  % [kg]
 if step>1; hist.DS(stp) = hist.DS(stp-1) + (theta.*dsumSdt + (1-theta).*dsumSdto).*dt; else; hist.DS(stp) = 0; end  % [J ]
 if step>1; hist.DC(stp) = hist.DC(stp-1) + (theta.*dsumCdt + (1-theta).*dsumCdto).*dt; else; hist.DC(stp) = 0; end  % [kg]
 if step>1; hist.DV(stp) =(hist.DV(stp-1) + (theta.*dsumVdt + (1-theta).*dsumVdto).*dt).*any(v(:)>1e-6); else; hist.DV(stp) = 0; end  % [kg]

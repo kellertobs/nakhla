@@ -1,7 +1,13 @@
 %% *****  THERMO-CHEMICAL EVOLUTION  **************************************
+tic;
 
 % store previous iteration
 Ti = T; ci = c; vi = v; xi = x; fi = f;
+if iter<=3
+    iq = true(size(x)); 
+else
+    iq  = abs(xq-xqi)>1e-9;
+end
 
 % update heat content (entropy)
 advn_S = - advection(rho.*m.*sm,Um,Wm,h,ADVN,'flx') ...                    % heat advection
@@ -40,7 +46,7 @@ if ~isnan(cwall); bndC = bndC + rho.*(cwall-c)./tau_a .* bndshape; end     % imp
 dCdt = advn_C + diff_c + bndC;                                             % total rate of change
     
 C = Co + (theta.*dCdt + (1-theta).*dCdto).*dt;                             % explicit update of major component density
-C = max(rho.*(1-f).*cx,min(rho.*(1-f).*cm,C));
+% C = max(rho.*(1-f).*cx,min(rho.*(1-f).*cm,C));
 C([1 end],:) = C([2 end-1],:);                                             % apply boundary conditions
 C(:,[1 end]) = C(:,[2 end-1]);  
     
@@ -60,7 +66,7 @@ if any([v0;v1;vwall;v(:)]>10*TINY)
     dVdt = advn_V + diff_v + bndV;                                         % total rate of change
     
     V = Vo + (theta.*dVdt + (1-theta).*dVdto).*dt;                         % explicit update of volatile component density
-    V = max(TINY,V);
+%     V = max(TINY,V);
     V([1 end],:) = V([2 end-1],:);                                         % apply boundary conditions
     V(:,[1 end]) = V(:,[2 end-1]);
 end
@@ -74,7 +80,9 @@ v = V./rho;
 %% *****  UPDATE PHASE PROPORTIONS  ***************************************
 
 % update local phase equilibrium
-[xq,cxq,cmq,fq,vfq,vmq] = equilibrium(xq,fq,T-273.15,c,v,Pt,cal,TINY);
+xqi = xq; eqtime = tic;
+[xq(iq),cxq(iq),cmq(iq),fq(iq),vfq(iq),vmq(iq)] = equilibrium(xq(iq),fq(iq),T(iq)-273.15,c(iq),v(iq),Pt(iq),cal,TINY);
+EQtime = EQtime + toc(eqtime);
 
 % update crystal fraction
 if diseq
@@ -90,13 +98,15 @@ if diseq
 
     dXdt   = advn_X + diff_x + Gx;                                         % total rate of change
     
-    X = Xo + (theta.*dXdt + (1-theta).*dXdto).*dt;                         % explicit update of crystal fraction
-    X = min(rho.*(1-TINY),max(rho.*TINY,X));                               % enforce [0,1] limit
-    X([1 end],:) = X([2 end-1],:);                                         % apply boundary conditions
-    X(:,[1 end]) = X(:,[2 end-1]);
+%     X = Xo + (theta.*dXdt + (1-theta).*dXdto).*dt;                         % explicit update of crystal fraction
+%     X = min(rho.*(1-TINY),max(rho.*TINY,X));                               % enforce [0,1] limit
+%     X([1 end],:) = X([2 end-1],:);                                         % apply boundary conditions
+%     X(:,[1 end]) = X(:,[2 end-1]);
     
-    x  = X./rho;
-    
+    x = (rhoo.*xo + (theta.*dXdt + (1-theta).*dXdto).*dt)./rho;            % explicit update of crystal fraction
+    x = max(0,min(1,x));
+    x([1 end],:) = x([2 end-1],:);                                         % apply boundary conditions
+    x(:,[1 end]) = x(:,[2 end-1]);
 else
     
     x  =  lambda.*x + (1-lambda).*xq;
@@ -123,7 +133,7 @@ if (diseq && any([v0;v1;vwall;v(:)]>10*TINY))
     F([1 end],:) = F([2 end-1],:);                                         % apply boundary conditions
     F(:,[1 end]) = F(:,[2 end-1]);
     
-    f  = F./rho;
+    f  = max(TINY,min(1-TINY,F./rho));
 
 else
     
@@ -133,7 +143,7 @@ else
 end
 
 % update melt fraction
-m = min(1-x-TINY,max(TINY,1-f-x));
+m = max(0,min(1,1-f-x));
 
 if step>0
 
@@ -161,3 +171,6 @@ resnorm_TC = norm( T - Ti,              2)./(norm(T,2)+TINY) ...
            + norm((v - vi).*(x>10*TINY),2)./(norm(v,2)+TINY) ...
            + norm((x - xi).*(x>10*TINY),2)./(norm(x,2)+TINY) ...
            + norm((f - fi).*(f>10*TINY),2)./(norm(f,2)+TINY);
+
+TCtime = TCtime + toc;
+

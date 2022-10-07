@@ -1,5 +1,5 @@
 % store previous iteration
-SOLi = SOL; %Wi = W; Ui = U; Pi = P;
+SOLi = SOL; tic;
 
 %% assemble coefficients for matrix velocity diagonal and right-hand side
 
@@ -316,3 +316,5 @@ Ubar = (mu (:,1:end-1)+mu (:,2:end))/2 .* Um ...
 dtk = min((h/2)^2./max(kT./rho(:)./cP));                                   % diffusive time step size
 dta = CFL*min(min(h/2/max(abs([Ux(:);Wx(:);Uf(:);Wf(:);Um(:);Wm(:)]+1e-16)))); % advective time step size
 dt  = min([2*dto,dtmax,min(dtk,dta)]);                                     % physical time step size
+
+FMtime = FMtime + toc;

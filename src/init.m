@@ -18,7 +18,7 @@ fprintf('\n   run ID: %s \n\n',runID);
 load ocean;                  % load custom colormap
 run(['../cal/cal_',calID]);  % load melt model calibration
 calibrt =  0;                % not in calibrate mode
-TINY    =  1e-12;            % minimum cutoff phase, component fractions
+TINY    =  1e-16;            % minimum cutoff phase, component fractions
 
 % calculate dimensionless numbers characterising the system dynamics
 [x0,cx0,cm0,f0,vf0,vm0] = equilibrium(0,0,T0,c0,v0,Ptop,cal,TINY);
@@ -197,7 +197,12 @@ if Nx<=10; Pt = mean(mean(Pt(2:end-1,2:end-1))).*ones(size(Pt)); end
 T    =  (Tp+273.15).*exp(aT./rhoref./cP.*Pt); % real temperature [K]
 
 % get volume fractions and bulk density
-step = 0;
+step    = 0;
+theta   = 1/2;
+EQtime  = 0;
+FMtime  = 0;
+TCtime  = 0;
+UDtime  = 0;
 res  = 1;  tol = 1e-12;  x = ones(size(T))./10;  f = v/2;
 while res > tol
     xi = x;  fi = f;
@@ -293,9 +298,6 @@ if restart
         dcy_rid = rho.*rid./HLRID.*log(2);
         Pto = Pt; etao = eta; rhoo = rho; Div_rhoVo = Div_rhoV;
         update; output;
-        time  = time+dt;
-        step  = step+1;
-        theta = 0.5;
     else % continuation file does not exist, start from scratch
         fprintf('\n   !!! restart file does not exist !!! \n   => starting run from scratch %s \n\n',name);
     end
@@ -305,6 +307,7 @@ else
     fluidmech;
     history;
     output;
-    time  = time+dt;
-    step  = step+1;
 end
+
+time  = time+dt;
+step  = step+1;
