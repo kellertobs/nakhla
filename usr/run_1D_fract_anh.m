@@ -2,7 +2,7 @@
 clear all; close all;
 
 % set run parameters
-runID    =  '1D_fract_anh';      % run identifier
+runID    =  '1D_fract_anh_weno5';      % run identifier
 opdir    =  '../out';            % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  500;                 % output frame plotted/saved every 'nop' time steps
@@ -32,8 +32,8 @@ smth     =  (N/30)^2;            % regularisation of initial random perturbation
 zlay     =  0.5;                 % layer thickness (relative to domain depth D)
 wlay_T   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
 wlay_c   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
-T0       =  1180;                % temperature top layer [deg C]
-T1       =  1180;                % temperature base layer [deg C]
+T0       =  1175;                % temperature top layer [deg C]
+T1       =  1175;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
 c0       =  0.51;                % major component top layer [wt SiO2]
 c1       =  0.51;                % major component base layer [wt SiO2]
@@ -107,8 +107,9 @@ dm       =  1e-3;                % melt film size [m]
 g0       =  10.;                 % gravity [m/s2]
 
 % set numerical model parameters
-CFL      =  0.25;                % (physical) time stepping courant number (multiplies stable step) [0,1]
-ADVN     =  'FRM';               % advection scheme ('CFD', 'UPW2', 'UPW3', or 'FRM')
+CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
+SCHM     =  {'weno5',''};        % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
+BCA      =  {'closed','closed'}; % boundary condition on advection (top/bot, sides)
 rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-7;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its

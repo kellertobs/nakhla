@@ -96,6 +96,9 @@ Zf        = (Zc(1:end-1)+Zc(2:end))./2;
 Nx = length(Xc);
 Nz = length(Zc);
 
+inz = 2:Nz-1;
+inx = 2:Nx-1;
+
 % get smoothed initialisation field
 rng(seed);
 rp = randn(Nz,Nx);
@@ -185,7 +188,7 @@ Wx  = W;  Ux  = U;
 Wm  = W;  Um  = U;
 
 eIIref =  1e-6;  
-Div_V  =  0.*P;  Div_rhoV = 0.*P;  Div_rhoVo = Div_rhoV;
+Div_V  =  0.*P;  Div_rhoV = 0.*P(inz,inx);  Div_rhoVo = Div_rhoV;
 exx    =  0.*P;  ezz = 0.*P;  exz = zeros(Nz-1,Nx-1);  eII = 0.*P;  
 txx    =  0.*P;  tzz = 0.*P;  txz = zeros(Nz-1,Nx-1);  tII = 0.*P; 
 VolSrc =  0.*P;  MassErr = 0;  drhodt = 0.*P;  drhodto = 0.*P;
@@ -260,16 +263,16 @@ dcy_rip = rho.*rip./HLRIP.*log(2);
 dcy_rid = rho.*rid./HLRID.*log(2);
 
 % initialise auxiliary variables 
-dSdt   = 0.*T;  dTdt   = 0.*T;  diff_T = 0.*T;  diss_h = 0.*T;
-dCdt   = 0.*c;  diff_c = 0.*c;
-dVdt   = 0.*v;  diff_v = 0.*v;  
-dFdt   = 0.*f;  diff_f = 0.*f;  
-dXdt   = 0.*x;  diff_x = 0.*x;  
-dSIdt  = 0.*si;  diff_si  = 0.*SI;
-dITdt  = 0.*IT;  diff_it  = 0.*IT;
-dCTdt  = 0.*CT;  diff_ct  = 0.*CT;
-dRIPdt = 0.*RIP; diff_rip  = 0.*RIP;
-dRIDdt = 0.*RID; diff_rid  = 0.*RID;
+dSdt   = 0.*T(inz,inx);  dTdt   = 0.*T(inz,inx);  diss_h = 0.*T(inz,inx);
+dCdt   = 0.*c(inz,inx);
+dVdt   = 0.*v(inz,inx);
+dFdt   = 0.*f(inz,inx);
+dXdt   = 0.*x(inz,inx);
+dSIdt  = 0.*si(inz,inx);
+dITdt  = 0.*IT(inz,inx);
+dCTdt  = 0.*CT(inz,inx);
+dRIPdt = 0.*RIP(inz,inx);
+dRIDdt = 0.*RID(inz,inx);
 
 % initialise timing and iterative parameters
 step    = 0;

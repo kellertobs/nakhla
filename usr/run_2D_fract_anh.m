@@ -2,10 +2,10 @@
 clear all; close all;
 
 % set run parameters
-runID    =  '2D_fract_anh';      % run identifier
+runID    =  '2D_fract_anh_weno5'; % run identifier
 opdir    =  '../out/';           % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
-nop      =  100;                 % output frame plotted/saved every 'nop' time steps
+nop      =  200;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot results
 save_op  =  1;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
@@ -15,7 +15,7 @@ bnchm    =  0;                   % switch on to run manufactured solution benchm
 % set model domain parameters
 D        =  10;                  % chamber depth [m]
 L        =  10;                  % chamber width [m]
-N        =  100 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
+N        =  200 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
 h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
@@ -32,8 +32,8 @@ smth     =  (N/30)^2;            % regularisation of initial random perturbation
 zlay     =  0.5;                 % layer thickness (relative to domain depth D)
 wlay_T   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
 wlay_c   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
-T0       =  1180;                % temperature top layer [deg C]
-T1       =  1180;                % temperature base layer [deg C]
+T0       =  1175;                % temperature top layer [deg C]
+T1       =  1175;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
 c0       =  0.51;                % major component top layer [wt SiO2]
 c1       =  0.51;                % major component base layer [wt SiO2]
@@ -108,9 +108,10 @@ g0       =  10.;                 % gravity [m/s2]
 
 % set numerical model parameters
 CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
-ADVN     =  'FRM';               % advection scheme ('CFD', 'UPW2', 'UPW3', or 'FRM')
-rtol     =  1e-5;                % outer its relative tolerance
-atol     =  1e-8;                % outer its absolute tolerance
+SCHM     =  {'weno5',''};        % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
+BCA      =  {'closed','closed'}; % boundary condition on advection (top/bot, sides)
+rtol     =  1e-4;                % outer its relative tolerance
+atol     =  1e-7;                % outer its absolute tolerance
 maxit    =  50;                  % maximum outer its
 lambda   =  0.25;                % iterative lag parameter equilibration
 etareg   =  10;                  % viscosity regularisation parameter

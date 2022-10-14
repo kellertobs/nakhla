@@ -17,9 +17,9 @@ perCm = (perCm-cphs0)./(cphs1-cphs0);
 perCx = (perCx-cphs0)./(cphs1-cphs0);
 
 iter    = 1;
-maxit   = 50;
+maxit   = 100;
 resnorm = 1;
-tol     = 1e-9;
+tol     = 1e-12;
 eps     = 1e-6;
 
 vmq_c0 = (4.7773e-7.*P.^0.6 + 1e-11.*P) .* exp(2565*(1./(T0+273.15)-1./(perTd+273.15))); % Katz et al., 2003; Moore et al., 1998
@@ -28,7 +28,7 @@ vmq0   = (1-c).*vmq_c0 + c.*vmq_c1;
 
 while resnorm > tol && iter < maxit
    
-    beta = 1-exp(-iter/10);
+    beta = 0.5;
 
     [resx,resf,~,cmq,~,~] = res_xf(xq,fq,T0,c,v,P,Tphs0d,Tphs1d,cphs0,cphs1,perTd,perCx,perCm,clap,dTH2O,vmq0,PhDg,TINY);
     
@@ -49,10 +49,13 @@ while resnorm > tol && iter < maxit
         dresf_df = ones(size(fq));
     end
     
-    xq = xq - beta*(resx./dresx_dx);
-    fq = fq - beta*(resf./dresf_df);
+    xq = max(0,min(1,xq - beta*(resx./dresx_dx)));
+    fq = max(0,min(1,fq - beta*(resf./dresf_df)));
     
-    resnorm = (norm(resx(:),2) + norm(resf(:),2))/sqrt(length(xq(:)));
+    indx = xq>10*TINY & xq<1-10*TINY;
+    indf = fq>10*TINY & fq<1-10*TINY;
+
+    resnorm = (norm(resx(indx(:)),2) + norm(resf(indf(:)),2))/sqrt(length(xq(:)));
     
     iter    = iter+1;
 end
@@ -125,11 +128,8 @@ cmq(ind1) =  cm1(ind1);
 cmq(ind2) =  cm2(ind2);
 cmq(ind3) = (cm1(ind3).^a+cm2(ind3).^a).^(1/a);
 
-cxq = min(c./(1-fq),cphs0 + cxq.*(cphs1-cphs0));
-cmq = max(c./(1-fq),cphs0 + cmq.*(cphs1-cphs0));
-
-% cxq = cphs0 + cxq.*(cphs1-cphs0);
-% cmq = cphs0 + cmq.*(cphs1-cphs0);
+cxq = max(cphs0,min(c./(1-fq),cphs0 + cxq.*(cphs1-cphs0)));
+cmq = min(cphs1,max(c./(1-fq),cphs0 + cmq.*(cphs1-cphs0)));
 
 resx = c - (xq.*cxq + (1-xq-fq).*cmq);
 resf = v - (fq.*vfq + (1-xq-fq).*vmq);

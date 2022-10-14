@@ -7,20 +7,20 @@ itm = it./(m + x.*KIT);
 itx = it./(m./KIT + x);
 
 % update incompatible trace element composition
-advn_IT = advection(rho.*m.*itm,Um,Wm,h,ADVN,'flx') ...
-        + advection(rho.*x.*itx,Ux,Wx,h,ADVN,'flx');
+advn_IT = - advect(rho(inz,inx).*m(inz,inx).*itm(inz,inx),Um(inz,:),Wm(:,inx),h,SCHM,[1,2],BCA) ...  % advection
+          - advect(rho(inz,inx).*x(inz,inx).*itx(inz,inx),Ux(inz,:),Wx(:,inx),h,SCHM,[1,2],BCA);
 
 qz   = - (kc(1:end-1,:)+kc(2:end,:))/2 .* ddz(it,h);
 qx   = - (kc(:,1:end-1)+kc(:,2:end))/2 .* ddx(it,h);
-diff_it(2:end-1,2:end-1) = - ddz(qz(:,2:end-1),h) ...                      % diffusion in melt
-                           - ddx(qx(2:end-1,:),h);
+diff_IT = - ddz(qz(:,2:end-1),h) ...                                       % diffusion in melt
+          - ddx(qx(2:end-1,:),h);
 
 assim = zeros(size(it));
 if ~isnan(itwall); assim = assim + (itwall-it).*rho./tau_a .* bndshape; end% impose wall assimilation
     
-dITdt = - advn_IT + diff_it + assim;                                       % total rate of change
+dITdt = advn_IT + diff_IT + assim(inz,inx);                                % total rate of change
 
-IT = ITo + (theta.*dITdt + (1-theta).*dITdto).*dt;                         % explicit update
+IT(inz,inx) = ITo(inz,inx) + (theta.*dITdt + (1-theta).*dITdto).*dt;       % explicit update
 IT = max(0+TINY, IT );
 IT([1 end],:) = IT([2 end-1],:);                                           % boundary conditions
 IT(:,[1 end]) = IT(:,[2 end-1]);
@@ -33,20 +33,20 @@ ctm = ct./(m + x.*KCT);
 ctx = ct./(m./KCT + x);
 
 % update compatible trace element composition
-advn_CT = advection(rho.*m.*ctm,Um,Wm,h,ADVN,'flx') ...
-        + advection(rho.*x.*ctx,Ux,Wx,h,ADVN,'flx');
+advn_CT = - advect(rho(inz,inx).*m(inz,inx).*ctm(inz,inx),Um(inz,:),Wm(:,inx),h,SCHM,[1,2],BCA) ...  % advection
+          - advect(rho(inz,inx).*x(inz,inx).*ctx(inz,inx),Ux(inz,:),Wx(:,inx),h,SCHM,[1,2],BCA);
 
 qz   = - (kc(1:end-1,:)+kc(2:end,:))/2 .* ddz(ct,h);
 qx   = - (kc(:,1:end-1)+kc(:,2:end))/2 .* ddx(ct,h);
-diff_ct(2:end-1,2:end-1) = - ddz(qz(:,2:end-1),h) ...                      % diffusion in melt
-                           - ddx(qx(2:end-1,:),h);
+diff_CT = - ddz(qz(:,2:end-1),h) ...                                       % diffusion in melt
+          - ddx(qx(2:end-1,:),h);
 
-assim = zeros(size(ct));
-if ~isnan(ctwall); assim = assim + (ctwall-ct).*rho./tau_a .* bndshape; end% impose wall assimilation
+assim = zeros(size(it));
+if ~isnan(itwall); assim = assim + (itwall-it).*rho./tau_a .* bndshape; end% impose wall assimilation
+    
+dCTdt = advn_CT + diff_CT + assim(inz,inx);                                % total rate of change
 
-dCTdt = - advn_CT + diff_ct + assim;                                       % total rate of change
-
-CT = CTo + (theta.*dCTdt + (1-theta).*dCTdto).*dt;                         % explicit update
+CT(inz,inx) = CTo(inz,inx) + (theta.*dCTdt + (1-theta).*dCTdto).*dt;       % explicit update
 CT = max(0+TINY, CT );
 CT([1 end],:) = CT([2 end-1],:);                                           % boundary conditions
 CT(:,[1 end]) = CT(:,[2 end-1]);
@@ -55,21 +55,21 @@ CT(:,[1 end]) = CT(:,[2 end-1]);
 % *****  STABLE ISOTOPE RATIO  ********************************************
 
 % update stable isotope in melt
-advn_si = advection(rho.*m.*si,Um,Wm,h,ADVN,'flx') ...
-        + advection(rho.*x.*si,Ux,Wx,h,ADVN,'flx') ...
-        + advection(rho.*f.*si,Uf,Wf,h,ADVN,'flx');
+advn_SI = - advect(rho(inz,inx).*m(inz,inx).*si(inz,inx),Um(inz,:),Wm(:,inx),h,SCHM,[1,2],BCA) ...  % advection
+          - advect(rho(inz,inx).*x(inz,inx).*si(inz,inx),Ux(inz,:),Wx(:,inx),h,SCHM,[1,2],BCA) ...
+          - advect(rho(inz,inx).*f(inz,inx).*si(inz,inx),Uf(inz,:),Wf(:,inx),h,SCHM,[1,2],BCA);
 
 qz   = - (kc(1:end-1,:)+kc(2:end,:))/2 .* ddz(si,h);
 qx   = - (kc(:,1:end-1)+kc(:,2:end))/2 .* ddx(si,h);
-diff_si(2:end-1,2:end-1) = - ddz(qz(:,2:end-1),h) ...                      % diffusion in melt
-                           - ddx(qx(2:end-1,:),h);
+diff_SI = - ddz(qz(:,2:end-1),h) ...                                       % diffusion in melt
+          - ddx(qx(2:end-1,:),h);
                        
 bndSI = zeros(size(si));
 if ~isnan(siwall); bndSI = bndSI + (siwall-si).*rho.*m./tau_a .* bndshape; end % impose wall assimilation
 
-dSIdt = - advn_si + diff_si + bndSI;                                       % total rate of change
+dSIdt = advn_SI + diff_SI + assim(inz,inx);                                % total rate of change
 
-SI = SIo + (theta.*dSIdt + (1-theta).*dSIdto).*dt;                         % explicit update
+SI(inz,inx) = SIo(inz,inx) + (theta.*dSIdt + (1-theta).*dSIdto).*dt;       % explicit update
 SI([1 end],:) = SI([2 end-1],:);                                           % boundary conditions
 SI(:,[1 end]) = SI(:,[2 end-1]);
 
@@ -85,20 +85,20 @@ ripm = rip./(m + x.*KRIP);
 ripx = rip./(m./KRIP + x);
 
 % update radiogenic parent isotope composition
-advn_RIP = advection(rho.*m.*ripm,Um,Wm,h,ADVN,'flx') ...
-         + advection(rho.*x.*ripx,Ux,Wx,h,ADVN,'flx');
+advn_RIP = - advect(rho(inz,inx).*m(inz,inx).*ripm(inz,inx),Um(inz,:),Wm(:,inx),h,SCHM,[1,2],BCA) ...  % advection
+           - advect(rho(inz,inx).*x(inz,inx).*ripx(inz,inx),Ux(inz,:),Wx(:,inx),h,SCHM,[1,2],BCA);
 
 qz   = - (kc(1:end-1,:)+kc(2:end,:))/2 .* ddz(rip,h);
 qx   = - (kc(:,1:end-1)+kc(:,2:end))/2 .* ddx(rip,h);
-diff_rip(2:end-1,2:end-1) = - ddz(qz(:,2:end-1),h) ...                     % diffusion in melt
-                            - ddx(qx(2:end-1,:),h);
+diff_RIP = - ddz(qz(:,2:end-1),h) ...                                      % diffusion in melt
+           - ddx(qx(2:end-1,:),h);
 
 assim = zeros(size(rip));
 if ~isnan(riwall); assim = assim + (riwall-rip).*rho./tau_a .* bndshape; end % impose wall assimilation
-                                       % secular equilibrium!
-dRIPdt = - advn_RIP + diff_rip + assim - dcy_rip + dcy_rip;                % total rate of change
+                                                % secular equilibrium!
+dRIPdt = advn_RIP + diff_RIP + assim(inz,inx) - dcy_rip(inz,inx) + dcy_rip(inz,inx);  % total rate of change
                                        
-RIP = RIPo + (theta.*dRIPdt + (1-theta).*dRIPdto).*dt;                     % explicit update
+RIP(inz,inx) = RIPo(inz,inx) + (theta.*dRIPdt + (1-theta).*dRIPdto).*dt;   % explicit update
 RIP = max(0+TINY, RIP );
 RIP([1 end],:) = RIP([2 end-1],:);                                         % boundary conditions
 RIP(:,[1 end]) = RIP(:,[2 end-1]);
@@ -109,20 +109,20 @@ ridm = rid./(m + x.*KRID);
 ridx = rid./(m./KRID + x);
 
 % update radiogenic daughter isotope composition
-advn_RID = advection(rho.*m.*ridm,Um,Wm,h,ADVN,'flx') ...
-         + advection(rho.*x.*ridx,Ux,Wx,h,ADVN,'flx');
+advn_RID = - advect(rho(inz,inx).*m(inz,inx).*ridm(inz,inx),Um(inz,:),Wm(:,inx),h,SCHM,[1,2],BCA) ...  % advection
+           - advect(rho(inz,inx).*x(inz,inx).*ridx(inz,inx),Ux(inz,:),Wx(:,inx),h,SCHM,[1,2],BCA);
 
 qz   = - (kc(1:end-1,:)+kc(2:end,:))/2 .* ddz(rid,h);
 qx   = - (kc(:,1:end-1)+kc(:,2:end))/2 .* ddx(rid,h);
-diff_rid(2:end-1,2:end-1) = - ddz(qz(:,2:end-1),h) ...                     % diffusion in melt
-                            - ddx(qx(2:end-1,:),h);
+diff_RID = - ddz(qz(:,2:end-1),h) ...                                      % diffusion in melt
+           - ddx(qx(2:end-1,:),h);
 
 assim = zeros(size(rid));
 if ~isnan(riwall); assim = assim + (riwall.*HLRID./HLRIP-rid).*rho./tau_a .* bndshape; end % impose wall assimilation
     
-dRIDdt = - advn_RID + diff_rid + assim - dcy_rid + dcy_rip;                % total rate of change
+dRIDdt = advn_RID + diff_RID + assim(inz,inx) - dcy_rid(inz,inx) + dcy_rip(inz,inx);  % total rate of change
 
-RID = RIDo + (theta.*dRIDdt + (1-theta).*dRIDdto).*dt;                     % explicit update
+RID(inz,inx) = RIDo(inz,inx) + (theta.*dRIDdt + (1-theta).*dRIDdto).*dt;   % explicit update
 RID = max(0+TINY, RID );
 RID([1 end],:) = RID([2 end-1],:);                                         % boundary conditions
 RID(:,[1 end]) = RID(:,[2 end-1]);

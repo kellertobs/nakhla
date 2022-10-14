@@ -77,15 +77,15 @@ elseif Nx <= 10  % create 1D plots
     semilogx(max(1e-6,v(2:end-1,2:end-1)./(1-x(2:end-1,2:end-1))*100).*any(v(:)>10*TINY),Zc(2:end-1).',CL{[1,2]},LW{:});
     title('$\bar{v}/(1-x)$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,5,4)
-    plot(mu (2:end-1,2:end-1)*100.*(mu (2:end-1,2:end-1)>1e-9)    ,Zc(2:end-1).',CL{[1,3]},LW{:}); axis ij tight; box on; hold on;
-    plot(chi(2:end-1,2:end-1)*100.*(chi(2:end-1,2:end-1)>1e-9)    ,Zc(2:end-1).',CL{[1,4]},LW{:});
-    plot(phi(2:end-1,2:end-1)*100.*(phi(2:end-1,2:end-1)>1e-9).*10,Zc(2:end-1).',CL{[1,5]},LW{:});
-    title('$\mu$, $\chi$, $10 \times \phi$ [vol\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+    plot(mu (2:end-1,2:end-1)*100.*(mu (2:end-1,2:end-1)>1e-9),Zc(2:end-1).',CL{[1,3]},LW{:}); axis ij tight; box on; hold on;
+    plot(chi(2:end-1,2:end-1)*100.*(chi(2:end-1,2:end-1)>1e-9),Zc(2:end-1).',CL{[1,4]},LW{:});
+    plot(phi(2:end-1,2:end-1)*100.*(phi(2:end-1,2:end-1)>1e-9),Zc(2:end-1).',CL{[1,5]},LW{:});
+    title('$\mu$, $\chi$, $\phi$ [vol\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,5,5)
     plot(-W(:,2:end-1)*hr,Zf.',CL{[1,2]},LW{:}); axis ij tight; box on; hold on;
-    plot(-(phi(1:end-1,2:end-1)+phi(2:end,2:end-1))/2.*Wf(:,2:end-1)*hr,Zf.',CL{[1,5]},LW{:});
-    plot(-(chi(1:end-1,2:end-1)+chi(2:end,2:end-1))/2.*Wx(:,2:end-1)*hr,Zf.',CL{[1,4]},LW{:});
-    plot(-(mu (1:end-1,2:end-1)+mu (2:end,2:end-1))/2.*Wm(:,2:end-1)*hr,Zf.',CL{[1,3]},LW{:});
+    plot(-(phi(1:end-1,2:end-1)+phi(2:end,2:end-1))/2.*wf(:,2:end-1)*hr,Zf.',CL{[1,5]},LW{:});
+    plot(-(chi(1:end-1,2:end-1)+chi(2:end,2:end-1))/2.*wx(:,2:end-1)*hr,Zf.',CL{[1,4]},LW{:});
+    plot(-(mu (1:end-1,2:end-1)+mu (2:end,2:end-1))/2.*wm(:,2:end-1)*hr,Zf.',CL{[1,3]},LW{:});
     title('$W$, $w_\Delta^f$, $w_\Delta^x$ [m/hr]',TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:}); set(gca,TL{:},TS{:});
 
     if ~exist('fh2','var'); fh2 = figure(VIS{:});
@@ -117,27 +117,27 @@ elseif Nx <= 10  % create 1D plots
     end 
     sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
     subplot(1,5,1)
-    semilogx(max(1e-3,min(1e3,itx(2:end-1,2:end-1)))*100,Zc(2:end-1).',CL{[1,4]},LW{:}); axis ij tight; box on; hold on;
-    semilogx(max(1e-3,min(1e3,itm(2:end-1,2:end-1)))*100,Zc(2:end-1).',CL{[1,3]},LW{:});
-    semilogx(max(1e-3,min(1e3,it (2:end-1,2:end-1)./(1-f(2:end-1,2:end-1))))*100,Zc(2:end-1).',CL{[1,2]},LW{:});
+    semilogx(max(1e-6,min(1e6,itx(2:end-1,2:end-1)))*100,Zc(2:end-1).',CL{[1,4]},LW{:}); axis ij tight; box on; hold on;
+    semilogx(max(1e-6,min(1e6,itm(2:end-1,2:end-1)))*100,Zc(2:end-1).',CL{[1,3]},LW{:});
+    semilogx(max(1e-6,min(1e6,it (2:end-1,2:end-1)./(1-f(2:end-1,2:end-1))))*100,Zc(2:end-1).',CL{[1,2]},LW{:});
     title('incomp. trace',TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,5,2)
-    semilogx(max(1e-3,min(1e3,ctx(2:end-1,2:end-1)))*100,Zc(2:end-1).',CL{[1,4]},LW{:}); axis ij tight; box on; hold on;
-    semilogx(max(1e-3,min(1e3,ctm(2:end-1,2:end-1)))*100,Zc(2:end-1).',CL{[1,3]},LW{:});
-    semilogx(max(1e-3,min(1e3,ct (2:end-1,2:end-1)./(1-f(2:end-1,2:end-1))))*100,Zc(2:end-1).',CL{[1,2]},LW{:});
+    semilogx(max(1e-6,min(1e6,ctx(2:end-1,2:end-1)))*100,Zc(2:end-1).',CL{[1,4]},LW{:}); axis ij tight; box on; hold on;
+    semilogx(max(1e-6,min(1e6,ctm(2:end-1,2:end-1)))*100,Zc(2:end-1).',CL{[1,3]},LW{:});
+    semilogx(max(1e-6,min(1e6,ct (2:end-1,2:end-1)./(1-f(2:end-1,2:end-1))))*100,Zc(2:end-1).',CL{[1,2]},LW{:});
     title('comp. trace',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,5,3)
     plot(si(2:end-1,2:end-1),Zc(2:end-1).',CL{[1,2]},LW{:}); axis ij tight; box on;
     title('stable isotope',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,5,4)
-    semilogx(max(1e-3,min(1e3,ripx(2:end-1,2:end-1)))*100,Zc(2:end-1).',CL{[1,4]},LW{:}); axis ij tight; box on; hold on;
-    semilogx(max(1e-3,min(1e3,ripm(2:end-1,2:end-1)))*100,Zc(2:end-1).',CL{[1,3]},LW{:});
-    semilogx(max(1e-3,min(1e3,rip (2:end-1,2:end-1)./(1-f(2:end-1,2:end-1))))*100,Zc(2:end-1).',CL{[1,2]},LW{:});
+    semilogx(max(1e-6,min(1e6,ripx(2:end-1,2:end-1)))*100,Zc(2:end-1).',CL{[1,4]},LW{:}); axis ij tight; box on; hold on;
+    semilogx(max(1e-6,min(1e6,ripm(2:end-1,2:end-1)))*100,Zc(2:end-1).',CL{[1,3]},LW{:});
+    semilogx(max(1e-6,min(1e6,rip (2:end-1,2:end-1)./(1-f(2:end-1,2:end-1))))*100,Zc(2:end-1).',CL{[1,2]},LW{:});
     title('radiogenic parent',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,5,5)
-    semilogx(max(1e-3,min(1e3,ridx(2:end-1,2:end-1)))*100,Zc(2:end-1).',CL{[1,4]},LW{:}); axis ij tight; box on; hold on;
-    semilogx(max(1e-3,min(1e3,ridm(2:end-1,2:end-1)))*100,Zc(2:end-1).',CL{[1,3]},LW{:});
-    semilogx(max(1e-3,min(1e3,rid (2:end-1,2:end-1)./(1-f(2:end-1,2:end-1))))*100,Zc(2:end-1).',CL{[1,2]},LW{:});
+    semilogx(max(1e-6,min(1e6,ridx(2:end-1,2:end-1)))*100,Zc(2:end-1).',CL{[1,4]},LW{:}); axis ij tight; box on; hold on;
+    semilogx(max(1e-6,min(1e6,ridm(2:end-1,2:end-1)))*100,Zc(2:end-1).',CL{[1,3]},LW{:});
+    semilogx(max(1e-6,min(1e6,rid (2:end-1,2:end-1)./(1-f(2:end-1,2:end-1))))*100,Zc(2:end-1).',CL{[1,2]},LW{:});
     title('radiogenic daughter',TX{:},FS{:}); set(gca,TL{:},TS{:});
 
 else % create 2D plots
@@ -309,10 +309,10 @@ end
 if ~exist('fh7','var'); fh7 = figure(VIS{:});
 else; set(0, 'CurrentFigure', fh7); clf;
 end
-TT = linspace(cal.Tphs0+Ptop*cal.clap,cal.Tphs1+Ptop*cal.clap,500);
-cc = [linspace(cal.cphs1,(cal.perCx+cal.perCm)/2, ceil((cal.perT-cal.Tphs0)./(cal.Tphs1-cal.Tphs0)*500)), ...
-      linspace((cal.perCx+cal.perCm)/2,cal.cphs0,floor((cal.perT-cal.Tphs1)./(cal.Tphs0-cal.Tphs1)*500))];
-[~,CCx,CCm,~,~,~] = equilibrium(0*TT,0*TT,TT,cc,0*TT,Ptop*ones(size(TT)),cal,TINY);
+TT = linspace(cal.Tphs0+Ptop*cal.clap,cal.Tphs1+Ptop*cal.clap,100);
+cc = [linspace(cal.cphs1,(cal.perCx+cal.perCm)/2, ceil((cal.perT-cal.Tphs0)./(cal.Tphs1-cal.Tphs0)*100)), ...
+      linspace((cal.perCx+cal.perCm)/2,cal.cphs0,floor((cal.perT-cal.Tphs1)./(cal.Tphs0-cal.Tphs1)*100))];
+[~,CCx,CCm,~,~,~] = equilibrium(0.5*ones(size(TT)),0*ones(size(TT)),TT,cc,0*TT,Ptop*ones(size(TT)),cal,TINY);
 plot(CCx,TT,'k-',LW{:}); axis tight; hold on; box on;
 plot(CCm,TT,'k-',LW{:});
 perTs  = cal.perT;
@@ -321,18 +321,18 @@ Tphs1s = cal.Tphs1;
 vv = 0.10*ones(size(TT));
 xx = 0.50*ones(size(TT));
 ff = 0.05*ones(size(TT));
-for i = 1:5
-    TT = linspace(Tphs0s+Ptop*cal.clap,Tphs1s+Ptop*cal.clap,500);
-    cc = [linspace(cal.cphs1,(cal.perCx+cal.perCm)/2, ceil((perTs-Tphs0s)./(Tphs1s-Tphs0s)*500)), ...
-          linspace((cal.perCx+cal.perCm)/2,cal.cphs0,floor((perTs-Tphs1s)./(Tphs0s-Tphs1s)*500))];
+for i = 1:10
+    TT = linspace(Tphs0s+Ptop*cal.clap,Tphs1s+Ptop*cal.clap,100);
+    cc = [linspace(cal.cphs1,(cal.perCx+cal.perCm)/2, ceil((perTs-Tphs0s)./(Tphs1s-Tphs0s)*100)), ...
+          linspace((cal.perCx+cal.perCm)/2,cal.cphs0,floor((perTs-Tphs1s)./(Tphs0s-Tphs1s)*100))];
     vmq_c0 = (4.7773e-7.*Ptop.^0.6 + 1e-11.*Ptop) .* exp(2565*(1./(TT+273.15)-1./(cal.perT+273.15))); % Katz et al., 2003; Moore et al., 1998
     vmq_c1 = (3.5494e-3.*Ptop.^0.5 + 9.623e-8.*Ptop - 1.5223e-11.*Ptop.^1.5)./(TT+273.15) + 1.2436e-14.*Ptop.^1.5; % Liu et al., 2015
     vmq0   = (1-cc).*vmq_c0 + cc.*vmq_c1;
-    perTs  = cal.perT -cal.dTH2O(2).*vmq0(round((perTs-Tphs1s)./(Tphs0s-Tphs1s)*500)).^0.75;
+    perTs  = cal.perT -cal.dTH2O(2).*vmq0(round((perTs-Tphs1s)./(Tphs0s-Tphs1s)*100)).^0.75;
     Tphs0s = cal.Tphs0-cal.dTH2O(1).*vmq0(1  ).^0.75;
     Tphs1s = cal.Tphs1-cal.dTH2O(3).*vmq0(end).^0.75;
 end
-[~,CCx,CCm,~,~,~] = equilibrium(0*TT,0*TT,TT,cc,vmq0,Ptop*ones(size(TT)),cal,TINY);
+[~,CCx,CCm,~,~,~] = equilibrium(0.5*ones(size(TT)),zeros(size(TT)),TT,cc,vmq0+0.001,Ptop*ones(size(TT)),cal,TINY);
 plot(CCx,TT,'k-',LW{:}); axis tight; hold on; box on;
 plot(CCm,TT,'k-',LW{:});
 

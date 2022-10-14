@@ -5,11 +5,11 @@ wm = w(1:end-1,2:end-1);
 up = u(2:end-1,2:end  );
 um = u(2:end-1,1:end-1);
 
-vx  = (up+um)./2;
-vz  = (wp+wm)./2;
+uc  = (up+um)./2;
+wc  = (wp+wm)./2;
 
-vxp = max(vx,0); vxm = min(vx,0);
-vzp = max(vz,0); vzm = min(vz,0);
+ucpos = max(uc,0); ucneg = min(uc,0);
+wcpos = max(wc,0); wcneg = min(wc,0);
 
 Div_v = diff(w(:,2:end-1),1,1)./h + diff(u(2:end-1,:),1,2)./h;
 
@@ -49,8 +49,7 @@ switch scheme
         azp   = (-3*acc+4*ajp-ajpp)/2/h;
         azm   = ( 3*acc-4*ajm+ajmm)/2/h;
         
-        advn  = vxp.*axm + vxm.*axp + vzp.*azm + vzm.*azp + acc.*Div_v;
-        
+        advn  = ucpos.*axm + ucneg.*axp + wcpos.*azm + wcneg.*azp + acc.*Div_v;
         
     case 'UPW3'  % 3rd-order upwind
         
@@ -59,8 +58,7 @@ switch scheme
         azp   = (-2*ajm-3*acc+6*ajp-ajpp)/6/h;
         azm   = ( 2*ajp+3*acc-6*ajm+ajmm)/6/h;
         
-        advn  = vxp.*axm + vxm.*axp + vzp.*azm + vzm.*azp + acc.*Div_v;
-
+        advn  = ucpos.*axm + ucneg.*axp + wcpos.*azm + wcneg.*azp + acc.*Div_v;
 end
 
 if strcmp(type,'adv')
