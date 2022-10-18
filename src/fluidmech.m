@@ -250,7 +250,7 @@ AAR  = [];       % forcing entries for R
 
 ii = MapP(2:end-1,2:end-1);
 
-rr = - VolSrc(2:end-1,2:end-1);
+rr = VolSrc(2:end-1,2:end-1);
 if bnchm; rr = rr + src_P_mms(2:end-1,2:end-1); end
 
 IIR = [IIR; ii(:)]; AAR = [AAR; rr(:)];
@@ -272,7 +272,7 @@ if bnchm; RP(MapP(nzp,nxp),:) = P_mms(nzp,nxp); end
 LL = [ KV  -GG  ; ...
       -DD   KP ];
 
-RR = [RV; RP];
+RR = [RV; -RP];
 
 SCL = sqrt(abs(diag(LL)));
 SCL = diag(sparse(1./(SCL+1)));
