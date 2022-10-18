@@ -51,9 +51,8 @@ zdim = dim(1);  zBC = BC{1};
 xdim = dim(2);  xBC = BC{2};
 
 % calculate f x div(v)
-dudx = 0; dwdz = 0;
-if size(f,xdim)>1, dudx = diff(u,1,xdim)./h; end
-if size(f,zdim)>1, dwdz = diff(w,1,zdim)./h; end
+dudx = diff(u,1,xdim)./h;
+dwdz = diff(w,1,zdim)./h;
 fdv = f.*(dudx + dwdz);   
 
 % collect velocities on - (m) and + (p) faces
@@ -129,9 +128,8 @@ end
 
 
 % now calculate div(v x f)
-duf = 0; dwf = 0;
-if size(f,xdim)>1, duf = (uppos.*fxppos + upneg.*fxpneg - umpos.*fxmpos - umneg.*fxmneg)./h; end
-if size(f,zdim)>1, dwf = (wppos.*fzppos + wpneg.*fzpneg - wmpos.*fzmpos - wmneg.*fzmneg)./h; end
+duf = (uppos.*fxppos + upneg.*fxpneg - umpos.*fxmpos - umneg.*fxmneg)./h;
+dwf = (wppos.*fzppos + wpneg.*fzpneg - wmpos.*fzmpos - wmneg.*fzmneg)./h;
 adv = duf + dwf;
 
 if strcmp(scheme{2}, 'vdf')
@@ -212,7 +210,7 @@ if (sten5)
     fppp = circshift(f, -3*shift);
 end
 
-% if the boundary is closed (could use more elegance) but i wanted to be
+% if the boundary is closed (could use more elegance) but I wanted to be
 % able to handle any specified dimension
 if strcmp(BC,'closed') && size(f,dim)>1
     if dim==1 
