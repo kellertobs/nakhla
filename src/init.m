@@ -222,7 +222,7 @@ while res > tol
     
     rhoref  = mean(mean(rho(2:end-1,2:end-1)));
     Pt      = Ptop + rhoref.*g0.*ZZ;
-    if Nz<=10; Pt = mean(mean(Pt(2:end-1,2:end-1))); end
+    if Nz<=10; Pt = mean(mean(Pt(2:end-1,2:end-1))).*ones(size(T)); end
     
     T    =  (Tp+273.15).*exp(aT./rhoref./cP.*Pt);
 
@@ -239,11 +239,12 @@ ripm = rip./(m + x.*KRIP); ripx = rip./(m./KRIP + x);
 ridm = rid./(m + x.*KRID); ridx = rid./(m./KRID + x);
   
 % get bulk enthalpy, silica, volatile content densities
-S = rho.*(cP.*log(T/(T0+273.15)) + x.*Dsx + f.*Dsf - aT./rhoref.*(Pt-Ptop));  
-C = rho.*(m.*cm + x.*cx);
-V = rho.*(m.*vm + f.*vf);
-X = rho.*x;
-F = rho.*f;
+S  = rho.*(cP.*log(T/(T0+273.15)) + x.*Dsx + f.*Dsf - aT./rhoref.*(Pt-Ptop));  
+S0 = rho.*(cP.*log(T0+273.15) + x.*Dsx + f.*Dsf - aT./rhoref.*Ptop);  
+C  = rho.*(m.*cm + x.*cx);
+V  = rho.*(m.*vm + f.*vf);
+X  = rho.*x;
+F  = rho.*f;
 
 % get phase entropies
 sm = S./rho - x.*Dsx - f.*Dsf;

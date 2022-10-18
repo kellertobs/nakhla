@@ -2,7 +2,7 @@
 clear all; close all;
 
 % set run parameters
-runID    =  '1D_fract_anh_weno5';      % run identifier
+runID    =  '1D_fract_anh_weno5';% run identifier
 opdir    =  '../out';            % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  500;                 % output frame plotted/saved every 'nop' time steps
@@ -85,7 +85,6 @@ kT       =  4;                   % thermal conductivity [W/m/K]
 cP       =  1200;                % heat capacity [J/kg/K]
 Dsx      = -300;                 % entropy change of crystallisation [J/kg]
 Dsf      =  400;                 % entropy change of exsolution [J/kg]
-tau_r    =  60;                  % reaction time [s]
 
 % set model rheology parameters
 etaf0    =  0.1;                 % fluid viscosity [Pas]
@@ -109,7 +108,7 @@ g0       =  10.;                 % gravity [m/s2]
 % set numerical model parameters
 CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 SCHM     =  {'weno5',''};        % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
-BCA      =  {'closed','closed'}; % boundary condition on advection (top/bot, sides)
+BCA      =  {'',''};             % boundary condition on advection (top/bot, sides)
 rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-7;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its

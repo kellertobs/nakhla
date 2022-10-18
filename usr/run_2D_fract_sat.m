@@ -85,7 +85,6 @@ kT       =  4;                   % thermal conductivity [W/m/K]
 cP       =  1200;                % heat capacity [J/kg/K]
 Dsx      = -300;                 % entropy change of crystallisation [J/kg]
 Dsf      =  400;                 % entropy change of exsolution [J/kg]
-tau_r    =  60;                  % reaction time [s]
 
 % set model rheology parameters
 etaf0    =  0.1;                 % fluid viscosity [Pas]
@@ -109,12 +108,12 @@ g0       =  10.;                 % gravity [m/s2]
 % set numerical model parameters
 CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 SCHM     =  {'weno5',''};        % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
-BCA      =  {'open','closed'};   % boundary condition on advection (top/bot, sides)
+BCA      =  {'',''};             % boundary condition on advection (top/bot, sides)
 rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-7;                % outer its absolute tolerance
 maxit    =  50;                  % maximum outer its
 lambda   =  0.25;                % iterative lag parameter equilibration
-etareg   =  10;                  % viscosity regularisation parameter
+etareg   =  5;                   % viscosity regularisation parameter
 
 
 %*****  RUN NAKHLA MODEL  *************************************************

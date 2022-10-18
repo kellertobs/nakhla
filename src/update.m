@@ -97,7 +97,7 @@ wx(1  ,:)     = min(1,1-top).*wx(1  ,:);
 wx(end,:)     = min(1,1-bot).*wx(end,:);
 wx(:,[1 end]) = -sds*wx(:,[2 end-1]);
 
-wf = (((rhof(1:end-1,:)+rhof(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0).*2./(1./Csgr_f(1:end-1,:)+1./Csgr_f(2:end,:)); % fluid segregation speed
+wf = ((rhof(1:end-1,:)+rhof(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*2./(1./Csgr_f(1:end-1,:)+1./Csgr_f(2:end,:)); % melt segregation speed
 wf(1  ,:)     = min(1,1-top+fout).*wf(1  ,:);
 wf(end,:)     = min(1,1-bot+fin ).*wf(end,:);
 wf(:,[1 end]) = -sds*wf(:,[2 end-1]);
@@ -110,10 +110,10 @@ Div_V([1 end],:) = Div_V([2 end-1],:);                                     % app
 Div_V(:,[1 end]) = Div_V(:,[2 end-1]);
 
 % update strain rates
-exx(:,2:end-1) = diff(U,1,2)./h - Div_V(:,2:end-1)./3;                     % x-normal strain rate
+exx(:,2:end-1) = diff(U,1,2)./h - Div_V(:,2:end-1)./2;                     % x-normal strain rate
 exx([1 end],:) = exx([2 end-1],:);                                         % apply boundary conditions
 exx(:,[1 end]) = exx(:,[2 end-1]);
-ezz(2:end-1,:) = diff(W,1,1)./h - Div_V(2:end-1,:)./3;                     % z-normal strain rate
+ezz(2:end-1,:) = diff(W,1,1)./h - Div_V(2:end-1,:)./2;                     % z-normal strain rate
 ezz([1 end],:) = ezz([2 end-1],:);                                         % apply boundary conditions
 ezz(:,[1 end]) = ezz(:,[2 end-1]);
 exz            = 1/2.*(diff(U,1,1)./h+diff(W,1,2)./h);                     % shear strain rate
@@ -146,21 +146,22 @@ diss =  exx(2:end-1,2:end-1).*txx(2:end-1,2:end-1) ...
      +  ks(2:end-1,2:end-1).*(grdTz(2:end-1,2:end-1).^2 + grdTx(2:end-1,2:end-1).^2);
 
 % % update volume source
-% Div_rhoV =  + advection(rho.*f,0.*U,wf,h,ADVN,'flx') ...
-%             + advection(rho.*x,0.*U,wx,h,ADVN,'flx') ...
-%             + advection(rho.*m,0.*U,wm,h,ADVN,'flx') ...
-%             + advection(rho   ,U   ,W ,h,ADVN,'adv');
-% if step>0; VolSrc = -((rho-rhoo)./dt + Div_rhoV)./rho; end
+% Div_rhoV =  + advection(rho.*f,0.*U,wf,h,'FRM','flx') ...
+%             + advection(rho.*x,0.*U,wx,h,'FRM','flx') ...
+%             + advection(rho.*m,0.*U,wm,h,'FRM','flx') ...
+%             + advection(rho   ,U   ,W ,h,'FRM','adv');
+% % if step>0; VolSrc = -((rho-rhoo)./dt + Div_rhoV)./rho; end
 % if step>0; VolSrc = -((rho-rhoo)./dt + theta.*Div_rhoV + (1-theta).*Div_rhoVo)./rho; end
 
 Div_rhoV =  + advect(rho(inz,inx).*m(inz,inx),0.*Um(inz,:),wm(:,inx),h,SCHM,[1,2],BCA) ...
             + advect(rho(inz,inx).*x(inz,inx),0.*Ux(inz,:),wx(:,inx),h,SCHM,[1,2],BCA) ...
             + advect(rho(inz,inx).*f(inz,inx),0.*Uf(inz,:),wf(:,inx),h,SCHM,[1,2],BCA) ...
             + advect(rho(inz,inx)            ,   U (inz,:),W (:,inx),h,{SCHM{1},'vdf'},[1,2],BCA);
+% if step>0; VolSrc(inz,inx) = -((rho(inz,inx)-rhoo(inz,inx))./dt + Div_rhoV)./rho(inz,inx)*; end
 if step>0; VolSrc(inz,inx) = -((rho(inz,inx)-rhoo(inz,inx))./dt + theta.*Div_rhoV + (1-theta).*Div_rhoVo)./rho(inz,inx); end
 
-UBG    = - 2*mean(mean(VolSrc(2:end-1,2:end-1)))./2 .* (L/2-XXu);
-WBG    = - 0*mean(mean(VolSrc(2:end-1,2:end-1)))./2 .* (D/2-ZZw);
+UBG    = - 1*mean(mean(VolSrc(inz,inx)))./2 .* (L/2-XXu);
+WBG    = - 1*mean(mean(VolSrc(inz,inx)))./2 .* (D/2-ZZw);
 end
 
 UDtime = UDtime + toc;

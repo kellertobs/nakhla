@@ -1,3 +1,4 @@
+% prep workspace
 clear all; close all;
 
 % set run parameters
@@ -29,10 +30,10 @@ dtmax    =  36;                  % maximum time step [s]
 seed     =  15;                  % random perturbation seed
 smth     =  (N/30)^2;            % regularisation of initial random perturbation
 zlay     =  0.5;                 % layer thickness (relative to domain depth D)
-wlay_T   =  4*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
+wlay_T   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
 wlay_c   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
-T0       =  1250;                % temperature top layer [deg C]
-T1       =  1250;                % temperature base layer [deg C]
+T0       =  1300;                % temperature top layer [deg C]
+T1       =  1300;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
 c0       =  0.51;                % major component top layer [wt SiO2]
 c1       =  0.51;                % major component base layer [wt SiO2]
@@ -66,8 +67,8 @@ Ptop     =  1.25e8;              % top pressure [Pa]
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls)
 bndinit  =  0;                   % switch on (1) to initialise with internal boundary layers
 dw       =  1*h;                 % boundary layer thickness [m]
-fin      =  1;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
-fout     =  1;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
+fin      =  0;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
+fout     =  0;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
 tau_T    =  10*hr;               % wall cooling/assimilation time [s]
 tau_a    =  10*hr;               % wall cooling/assimilation time [s]
 Twall    =  300;                 % wall temperature [degC] (nan = insulating)
@@ -80,11 +81,11 @@ riwall   =  nan;                 % wall radiogenic isotope [wt ppm] (nan = no as
 
 % set thermo-chemical material parameters
 calID    =  'krafla';            % phase diagram calibration
-kc       =  4e-4;                % chemical diffusivity [kg/m/s]
 kT       =  4;                   % thermal conductivity [W/m/K]
 cP       =  1200;                % heat capacity [J/kg/K]
 Dsx      = -300;                 % entropy change of crystallisation [J/kg]
 Dsf      =  400;                 % entropy change of exsolution [J/kg]
+tau_r    =  60;                  % reaction time [s]
 
 % set model rheology parameters
 etaf0    =  0.1;                 % fluid viscosity [Pas]
@@ -100,17 +101,18 @@ rhof0    =  1000;                % bubble phase ref. density [kg/m3] (at T0,cphs
 aT       =  4e-5;                % thermal expansivity [1/K]
 gC       =  0.5;                 % compositional expansivity [1/wt]
 bP       =  1e-8;                % mvp compressibility [1/Pa]
-dx       =  5e-4;                % crystal size [m]
-df       =  5e-4;                % bubble size [m]
-dm       =  5e-4;                % melt film size [m]
+dx       =  1e-3;                % crystal size [m]
+df       =  1e-3;                % bubble size [m]
+dm       =  1e-3;                % melt film size [m]
 g0       =  10.;                 % gravity [m/s2]
 
 % set numerical model parameters
 CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
-ADVN     =  'FRM';               % advection scheme ('UPW2', 'UPW3', or 'FRM')
-rtol     =  1e-5;                % outer its relative tolerance
-atol     =  1e-8;                % outer its absolute tolerance
-maxit    =  50;                  % maximum outer its
+SCHM     =  {'weno5',''};        % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
+BCA      =  {'',''};             % boundary condition on advection (top/bot, sides)
+rtol     =  1e-6;                % outer its relative tolerance
+atol     =  1e-9;                % outer its absolute tolerance
+maxit    =  20;                  % maximum outer its
 lambda   =  0.25;                % iterative lag parameter equilibration
 etareg   =  1e0;                 % viscosity regularisation parameter
 
