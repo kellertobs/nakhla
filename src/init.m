@@ -23,10 +23,20 @@ TINY    =  1e-16;            % minimum cutoff phase, component fractions
 % calculate dimensionless numbers characterising the system dynamics
 [x0,cx0,cm0,f0,vf0,vm0] = equilibrium(0,0,T0,c0,v0,Ptop,cal,TINY);
 
-wt0 = (cal.perCm-cm0)./(cal.perCm-cal.cphs0);
-wt1 = (cal.cphs1-cm0)./(cal.cphs1-cal.perCm);
-cm0_oxds = (wt0(:) .* cal.oxds(1,:) + (1-wt0(:)) .* cal.oxds(2,:)) .* (cm0(:)<=cal.perCm) ...
-         + (wt1(:) .* cal.oxds(2,:) + (1-wt1(:)) .* cal.oxds(3,:)) .* (cm0(:)> cal.perCm);
+fprintf('    initial T: %4.3f \n'  ,T0);
+fprintf('    initial c: %4.3f \n'  ,c0);
+fprintf('    initial v: %4.3f \n'  ,v0);
+fprintf('    initial x: %4.3f \n'  ,x0);
+fprintf('    initial f: %4.3f \n\n',f0);
+
+wt0 = (cal.perCx-cm0)./(cal.perCx-cal.cphs0);
+wt1 = (cal.perCm-cm0)./(cal.perCm-cal.perCx);
+wt2 = (cal.cphs1-cm0)./(cal.cphs1-cal.perCm);
+cm0_cmps = (wt0(:) .* cal.cmps(1,:) + (1-wt0(:)) .* cal.cmps(2,:)) .* (cm0(:)<=cal.perCx) ...
+         + (wt1(:) .* cal.cmps(2,:) + (1-wt1(:)) .* cal.cmps(3,:)) .* (cm0(:)> cal.perCx & cm0(:)<=cal.perCm) ...
+         + (wt2(:) .* cal.cmps(3,:) + (1-wt2(:)) .* cal.cmps(4,:)) .* (cm0(:)> cal.perCm);
+
+cm0_oxds = cm0_cmps*cal.oxds./100;
 
 wtm([1 3 4 6 7 8 9 11 12]) = [cm0_oxds,100.*vm0,0]; % SiO2
 etam0     = grdmodel08(wtm,T0);
@@ -102,7 +112,7 @@ inx = 2:Nx-1;
 % get smoothed initialisation field
 rng(seed);
 rp = randn(Nz,Nx);
-for i = 1:round(smth)
+for k = 1:round(smth)
     rp(2:end-1,2:end-1) = rp(2:end-1,2:end-1) + diff(rp(:,2:end-1),2,1)./8 + diff(rp(2:end-1,:),2,2)./8;
     rp = rp - mean(mean(rp(2:end-1,2:end-1)));
     rp([1 end],:) = 0;
@@ -136,27 +146,29 @@ if bndinit
                     + (1+erf(-(L-XX-dw)/(dw/5)))/2;
     end
 end
+bndinit = max(0,min(1,bndinit));
+
 switch bndmode
     case 0  % none
-        bndshape = zeros(size(ZZ));
+        bndshape = zeros(size(ZZ(inz,inx)));
     case 1  % top only
-        bndshape = exp( ( -ZZ+h/2)/dw);
+        bndshape = exp( ( -ZZ(inz,inx)+h/2)/dw);
     case 2  % bot only
-        bndshape = exp(-(D-ZZ-h/2)/dw);
+        bndshape = exp(-(D-ZZ(inz,inx)-h/2)/dw);
     case 3  % top/bot only
-        bndshape = exp( ( -ZZ+h/2)/dw) ...
-            + exp(-(D-ZZ-h/2)/dw);
+        bndshape = exp( ( -ZZ(inz,inx)+h/2)/dw) ...
+                 + exp(-(D-ZZ(inz,inx)-h/2)/dw);
     case 4 % all walls
-        bndshape = exp( ( -ZZ+h/2)/dw) ...
-            + exp(-(D-ZZ-h/2)/dw) ...
-            + exp( ( -XX+h/2)/dw) ...
-            + exp(-(L-XX-h/2)/dw);
+        bndshape = exp( ( -ZZ(inz,inx)+h/2)/dw) ...
+                 + exp(-(D-ZZ(inz,inx)-h/2)/dw) ...
+                 + exp( ( -XX(inz,inx)+h/2)/dw) ...
+                 + exp(-(L-XX(inz,inx)-h/2)/dw);
 end
 bndshape = max(0,min(1,bndshape));
-bndshape([1 end],:) = bndshape([2 end-1],:);
-bndshape(:,[1 end]) = bndshape(:,[2 end-1]);
 
-bndS = 0.*bndshape;  bndC =  0.*bndshape;  bndV =  0.*bndshape;  bndSI =  0.*bndshape;
+bnd_S = zeros(size(bndshape));
+bnd_C = zeros(size(bndshape));
+bnd_V = zeros(size(bndshape));
 
 % set specified boundaries to no slip, else to free slip
 if bndmode==4;               sds = +1;      % no slip sides for 'all sides(4)'
@@ -171,11 +183,16 @@ Tp  =  T0 + (T1-T0) .* (1+erf((ZZ/D-zlay)/wlay_T))/2 + dT.*rp;  if any(bndinit(:
 c   =  c0 + (c1-c0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dc.*rp;  if any(bndinit(:)) && ~isnan(cwall); c  = c  + (cwall-c ).*bndinit; end % major component
 v   =  v0 + (v1-v0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dv.*rp;  if any(bndinit(:)) && ~isnan(vwall); v  = v  + (vwall-v ).*bndinit; end % volatile component
 
-it  =  it0 + (it1-it0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dit.*rp;  if any(bndinit(:)) && ~isnan(itwall); it  = it  + (itwall-it ).*bndinit; end % incompatible trace element
-ct  =  ct0 + (ct1-ct0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dct.*rp;  if any(bndinit(:)) && ~isnan(ctwall); ct  = ct  + (ctwall-ct ).*bndinit; end % compatible trace element
-si  =  si0 + (si1-si0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dsi.*rp;  if any(bndinit(:)) && ~isnan(siwall); si  = si  + (siwall-si ).*bndinit; end % stable isotope ratio
-rip =  ri0 + (ri1-ri0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dri.*rp;  if any(bndinit(:)) && ~isnan(riwall); rip = rip + (riwall-rip).*bndinit; end % radiogenic isotope parent
-rid =  rip.*HLRID./HLRIP;                                           % radiogenic isotope daughter
+te = zeros(Nz,Nx,length(te0));
+for k = 1:length(te0)
+    te(:,:,k)  =  te0(k) + (te1(k)-te0(k)) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dte(k).*rp;  % trace elements
+    if any(bndinit(:)) && ~isnan(tewall(k)); te(:,:,k)  = te(:,:,k) + (tewall(k)-te(:,:,k)).*bndinit; end 
+end
+ir = zeros(Nz,Nx,length(ir0));
+for k = 1:length(ir0)
+    ir(:,:,k)  =  ir0(k) + (ir1(k)-ir0(k)) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dir(k).*rp;  % isotope ratios  
+    if any(bndinit(:)) && ~isnan(irwall(k)); ir(:,:,k)  = ir(:,:,k) + (irwall(k)-ir(:,:,k)).*bndinit; end
+end
 
 U   =  zeros(size((XX(:,1:end-1)+XX(:,2:end))));  Ui = U;  res_U = 0.*U;
 W   =  zeros(size((XX(1:end-1,:)+XX(2:end,:))));  Wi = W;  res_W = 0.*W; wf = 0.*W; wc = 0.*W;
@@ -231,12 +248,6 @@ end
 rhoBF   = (rho(2:end-2,2:end-1)+rho(3:end-1,2:end-1))/2 - rhoref;
 rhoo    = rho;
 Pto     = Pt;
-
-% get geochemical phase compositions
-itm  = it ./(m + x.*KIT ); itx  = it ./(m./KIT  + x);
-ctm  = ct ./(m + x.*KCT ); ctx  = ct ./(m./KCT  + x);
-ripm = rip./(m + x.*KRIP); ripx = rip./(m./KRIP + x);
-ridm = rid./(m + x.*KRID); ridx = rid./(m./KRID + x);
   
 % get bulk enthalpy, silica, volatile content densities
 S  = rho.*(cP.*log(T/(T0+273.15)) + x.*Dsx + f.*Dsf - aT./rhoref.*(Pt-Ptop));  
@@ -251,29 +262,31 @@ sm = S./rho - x.*Dsx - f.*Dsf;
 sx = sm + Dsx;
 sf = sm + Dsf;
 
-% get geochemical content densities
-IT  = rho.*(m.*itm + x.*itx);
-CT  = rho.*(m.*ctm + x.*ctx);
-SI  = rho.*si;
-RIP = rho.*(m.*ripm + x.*ripx);
-RID = rho.*(m.*ridm + x.*ridx);
+% get trace element phase compositions
+for k = 1:length(te0)
+    tem(:,:,k)  = te(:,:,k) ./(m + x.*Kte(k) );
+    tex(:,:,k)  = te(:,:,k) ./(m./Kte(k)  + x);
+end
 
-% initialise reaction/decay rates
+% get geochemical component densities
+for k = 1:length(te0)
+    TE(:,:,k)  = rho.*(m.*tem(:,:,k) + x.*tex(:,:,k));
+end
+for k = 1:length(ir0)
+    IR(:,:,k)  = rho.*ir(:,:,k);
+end
+
+% initialise phase change rates
 Gx = 0.*x;  Gf = 0.*f;
-dcy_rip = rho.*rip./HLRIP.*log(2);
-dcy_rid = rho.*rid./HLRID.*log(2);
 
 % initialise auxiliary variables 
-dSdt   = 0.*T(inz,inx);  dTdt   = 0.*T(inz,inx);  diss_h = 0.*T(inz,inx);
+dSdt   = 0.*T(inz,inx);  diss_h = 0.*T(inz,inx);
 dCdt   = 0.*c(inz,inx);
 dVdt   = 0.*v(inz,inx);
 dFdt   = 0.*f(inz,inx);
 dXdt   = 0.*x(inz,inx);
-dSIdt  = 0.*si(inz,inx);
-dITdt  = 0.*IT(inz,inx);
-dCTdt  = 0.*CT(inz,inx);
-dRIPdt = 0.*RIP(inz,inx);
-dRIDdt = 0.*RID(inz,inx);
+dTEdt  = 0.*te(inz,inx);
+dIRdt  = 0.*ir(inz,inx);
 
 % initialise timing and iterative parameters
 step    = 0;
@@ -294,13 +307,11 @@ if restart
     end
     if exist(name,'file')
         fprintf('\n   restart from %s \n\n',name);
-        load(name,'U','W','P','Pt','f','x','m','phi','chi','mu','X','F','S','C','V','T','c','v','cm','cx','vm','vf','IT','CT','SI','RIP','RID','it','ct','si','rip','rid','dSdt','dCdt','dVdt','dITdt','dCTdt','dSIdt','dFdt','dXdt','Gf','Gx','rho','eta','eII','tII','dt','time','step','hist','VolSrc','wf','wx');
+        load(name,'U','W','P','Pt','f','x','m','phi','chi','mu','X','F','S','C','V','T','c','v','cm','cx','vm','vf','TE','IR','te','ir','dSdt','dCdt','dVdt','dFdt','dXdt','dTEdt','dIRdt','Gf','Gx','rho','eta','eII','tII','dt','time','step','hist','VolSrc','wf','wx','wm');
         
         xq = x; fq = f;
         SOL = [W(:);U(:);P(:)];
-        dcy_rip = rho.*rip./HLRIP.*log(2);
-        dcy_rid = rho.*rid./HLRID.*log(2);
-        Pto = Pt; etao = eta; rhoo = rho; Div_rhoVo = Div_rhoV;
+        rhoo = rho; Div_rhoVo = Div_rhoV;
         update; output;
     else % continuation file does not exist, start from scratch
         fprintf('\n   !!! restart file does not exist !!! \n   => starting run from scratch %s \n\n',name);

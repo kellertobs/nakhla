@@ -112,34 +112,6 @@ elseif Nx <= 10  % create 1D plots
     plot(P(2:end-1,2:end-1)/1e3,Zc(2:end-1).',CL{[1,2]},LW{:}); axis ij tight; box on;
     title('$P$ [kPa]',TX{:},FS{:}); set(gca,TL{:},TS{:});
 
-    if ~exist('fh3','var'); fh3 = figure(VIS{:});
-    else; set(0, 'CurrentFigure', fh3); clf;
-    end 
-    sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
-    subplot(1,5,1)
-    semilogx(max(1e-6,min(1e6,itx(2:end-1,2:end-1)))*100,Zc(2:end-1).',CL{[1,4]},LW{:}); axis ij tight; box on; hold on;
-    semilogx(max(1e-6,min(1e6,itm(2:end-1,2:end-1)))*100,Zc(2:end-1).',CL{[1,3]},LW{:});
-    semilogx(max(1e-6,min(1e6,it (2:end-1,2:end-1)./(1-f(2:end-1,2:end-1))))*100,Zc(2:end-1).',CL{[1,2]},LW{:});
-    title('incomp. trace',TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:}); set(gca,TL{:},TS{:});
-    subplot(1,5,2)
-    semilogx(max(1e-6,min(1e6,ctx(2:end-1,2:end-1)))*100,Zc(2:end-1).',CL{[1,4]},LW{:}); axis ij tight; box on; hold on;
-    semilogx(max(1e-6,min(1e6,ctm(2:end-1,2:end-1)))*100,Zc(2:end-1).',CL{[1,3]},LW{:});
-    semilogx(max(1e-6,min(1e6,ct (2:end-1,2:end-1)./(1-f(2:end-1,2:end-1))))*100,Zc(2:end-1).',CL{[1,2]},LW{:});
-    title('comp. trace',TX{:},FS{:}); set(gca,TL{:},TS{:});
-    subplot(1,5,3)
-    plot(si(2:end-1,2:end-1),Zc(2:end-1).',CL{[1,2]},LW{:}); axis ij tight; box on;
-    title('stable isotope',TX{:},FS{:}); set(gca,TL{:},TS{:});
-    subplot(1,5,4)
-    semilogx(max(1e-6,min(1e6,ripx(2:end-1,2:end-1)))*100,Zc(2:end-1).',CL{[1,4]},LW{:}); axis ij tight; box on; hold on;
-    semilogx(max(1e-6,min(1e6,ripm(2:end-1,2:end-1)))*100,Zc(2:end-1).',CL{[1,3]},LW{:});
-    semilogx(max(1e-6,min(1e6,rip (2:end-1,2:end-1)./(1-f(2:end-1,2:end-1))))*100,Zc(2:end-1).',CL{[1,2]},LW{:});
-    title('radiogenic parent',TX{:},FS{:}); set(gca,TL{:},TS{:});
-    subplot(1,5,5)
-    semilogx(max(1e-6,min(1e6,ridx(2:end-1,2:end-1)))*100,Zc(2:end-1).',CL{[1,4]},LW{:}); axis ij tight; box on; hold on;
-    semilogx(max(1e-6,min(1e6,ridm(2:end-1,2:end-1)))*100,Zc(2:end-1).',CL{[1,3]},LW{:});
-    semilogx(max(1e-6,min(1e6,rid (2:end-1,2:end-1)./(1-f(2:end-1,2:end-1))))*100,Zc(2:end-1).',CL{[1,2]},LW{:});
-    title('radiogenic daughter',TX{:},FS{:}); set(gca,TL{:},TS{:});
-
 else % create 2D plots
 
     % set axis and border dimensions
@@ -284,23 +256,23 @@ else % create 2D plots
     % plot geochemical variables in Fig. 5
     set(0,'CurrentFigure',fh5)
     set(fh5,'CurrentAxes',ax(51));
-    imagesc(Xc(2:end-1),Zc(2:end-1),it(2:end-1,2:end-1)); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['incomp. trace'],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel('Depth [m]',TX{:},FS{:});
+    imagesc(Xc(2:end-1),Zc(2:end-1),te(2:end-1,2:end-1,1)); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['trace element 1'],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel('Depth [m]',TX{:},FS{:});
     set(fh5,'CurrentAxes',ax(52));
-    imagesc(Xc(2:end-1),Zc(2:end-1),ct(2:end-1,2:end-1)); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['comp. trace'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
+    imagesc(Xc(2:end-1),Zc(2:end-1),te(2:end-1,2:end-1,2)); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['trace element 2'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
     set(fh5,'CurrentAxes',ax(53));
-    imagesc(Xc(2:end-1),Zc(2:end-1),si(2:end-1,2:end-1)); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['stable isotope'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
+    imagesc(Xc(2:end-1),Zc(2:end-1),ir(2:end-1,2:end-1,1)); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['isotope ratio 1'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
     set(fh5,'CurrentAxes',ax(54));
-    imagesc(Xc(2:end-1),Zc(2:end-1),rip(2:end-1,2:end-1)); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['radiogen. parent'],TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:});
+    imagesc(Xc(2:end-1),Zc(2:end-1),te(2:end-1,2:end-1,3)); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['trace element 3'],TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:});
     set(fh5,'CurrentAxes',ax(55));
-    imagesc(Xc(2:end-1),Zc(2:end-1),rid(2:end-1,2:end-1)); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['radiogen. daughter'],TX{:},FS{:}); set(gca,'YTickLabel',[]); xlabel('Width [m]',TX{:},FS{:});
+    imagesc(Xc(2:end-1),Zc(2:end-1),te(2:end-1,2:end-1,4)); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['trace element 4'],TX{:},FS{:}); set(gca,'YTickLabel',[]); xlabel('Width [m]',TX{:},FS{:});
     set(fh5,'CurrentAxes',ax(56));
-    imagesc(Xc(2:end-1),Zc(2:end-1),(dcy_rip(2:end-1,2:end-1)-dcy_rid(2:end-1,2:end-1))./(dcy_rip(2:end-1,2:end-1)+dcy_rid(2:end-1,2:end-1))); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['radiogen. disequilibrium'],TX{:},FS{:}); set(gca,'YTickLabel',[]);
+    imagesc(Xc(2:end-1),Zc(2:end-1),ir(2:end-1,2:end-1,2)); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['isotope ratio 2'],TX{:},FS{:}); set(gca,'YTickLabel',[]);
     sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
 
 end
@@ -400,8 +372,6 @@ if save_op
         print(fh1,name,'-dpng','-r300','-image');
         name = [opdir,'/',runID,'/',runID,'_aux_',num2str(floor(step/nop))];
         print(fh2,name,'-dpng','-r300','-image');
-        name = [opdir,'/',runID,'/',runID,'_gch_',num2str(floor(step/nop))];
-        print(fh3,name,'-dpng','-r300','-image');
         name = [opdir,'/',runID,'/',runID,'_eql',num2str(floor(step/nop))];
         print(fh7,name,'-dpng','-r300','-image');
     else
@@ -420,9 +390,9 @@ if save_op
     end
 
     name = [opdir,'/',runID,'/',runID,'_',num2str(floor(step/nop))];
-    save(name,'U','W','P','Pt','f','x','m','phi','chi','mu','X','F','S','C','V','T','c','v','cm','cx','vm','vf','IT','CT','SI','RIP','RID','it','ct','si','rip','rid','dSdt','dCdt','dVdt','dITdt','dCTdt','dSIdt','dFdt','dXdt','Gf','Gx','rho','eta','eII','tII','dt','time','step','hist','VolSrc','wf','wx');
+    save(name,'U','W','P','Pt','f','x','m','phi','chi','mu','X','F','S','C','V','T','c','v','cm','cx','vm','vf','TE','IR','te','ir','dSdt','dCdt','dVdt','dFdt','dXdt','dTEdt','dIRdt','Gf','Gx','rho','eta','eII','tII','dt','time','step','hist','VolSrc','wf','wx','wm');
     name = [opdir,'/',runID,'/',runID,'_cont'];
-    save(name,'U','W','P','Pt','f','x','m','phi','chi','mu','X','F','S','C','V','T','c','v','cm','cx','vm','vf','IT','CT','SI','RIP','RID','it','ct','si','rip','rid','dSdt','dCdt','dVdt','dITdt','dCTdt','dSIdt','dFdt','dXdt','Gf','Gx','rho','eta','eII','tII','dt','time','step','hist','VolSrc','wf','wx');
+    save(name,'U','W','P','Pt','f','x','m','phi','chi','mu','X','F','S','C','V','T','c','v','cm','cx','vm','vf','TE','IR','te','ir','dSdt','dCdt','dVdt','dFdt','dXdt','dTEdt','dIRdt','Gf','Gx','rho','eta','eII','tII','dt','time','step','hist','VolSrc','wf','wx','wm');
 
     if step == 0
         logfile = [opdir,'/',runID,'/',runID,'.log'];

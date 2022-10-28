@@ -2,21 +2,32 @@
 tic;
 
 % update phase oxide compositions
-wt0 = (cal.perCm-cx)./(cal.perCm-cal.cphs0);
-wt1 = (cal.cphs1-cx)./(cal.cphs1-cal.perCm);
-cx_oxds = reshape((wt0(:) .* cal.oxds(1,:) + (1-wt0(:)) .* cal.oxds(2,:)) .* (cx(:)<=cal.perCm) ...
-                + (wt1(:) .* cal.oxds(2,:) + (1-wt1(:)) .* cal.oxds(3,:)) .* (cx(:)> cal.perCm) ...
-                  ,Nz,Nx,length(cal.oxds));
-wt0 = (cal.perCm-cm)./(cal.perCm-cal.cphs0);
-wt1 = (cal.cphs1-cm)./(cal.cphs1-cal.perCm);
-cm_oxds = reshape((wt0(:) .* cal.oxds(1,:) + (1-wt0(:)) .* cal.oxds(2,:)) .* (cm(:)<=cal.perCm) ...
-                + (wt1(:) .* cal.oxds(2,:) + (1-wt1(:)) .* cal.oxds(3,:)) .* (cm(:)> cal.perCm) ...
-                  ,Nz,Nx,length(cal.oxds));
-wt0 = (cal.perCm-c)./(cal.perCm-cal.cphs0);
-wt1 = (cal.cphs1-c)./(cal.cphs1-cal.perCm);
-c_oxds = reshape((wt0(:) .* cal.oxds(1,:) + (1-wt0(:)) .* cal.oxds(2,:)) .* (c(:)<=cal.perCm) ...
-               + (wt1(:) .* cal.oxds(2,:) + (1-wt1(:)) .* cal.oxds(3,:)) .* (c(:)> cal.perCm) ...
-                 ,Nz,Nx,length(cal.oxds));
+wt0 = (cal.perCx-cx)./(cal.perCx-cal.cphs0);
+wt1 = (cal.perCm-cx)./(cal.perCm-cal.perCx);
+wt2 = (cal.cphs1-cx)./(cal.cphs1-cal.perCm);
+cx_cmps = reshape((wt0(:) .* cal.cmps(1,:) + (1-wt0(:)) .* cal.cmps(2,:)) .* (cx(:)<=cal.perCx) ...
+                + (wt1(:) .* cal.cmps(2,:) + (1-wt1(:)) .* cal.cmps(3,:)) .* (cx(:)> cal.perCx & cx(:)<=cal.perCm) ...
+                + (wt2(:) .* cal.cmps(3,:) + (1-wt2(:)) .* cal.cmps(4,:)) .* (cx(:)> cal.perCm) ...
+                  ,Nz,Nx,length(cal.cmps));
+cx_oxds = reshape(reshape(cx_cmps,Nz*Nx,length(cal.oxds))*cal.oxds/100,Nz,Nx,size(cal.oxds,2));
+
+wt0 = (cal.perCx-cm)./(cal.perCx-cal.cphs0);
+wt1 = (cal.perCm-cm)./(cal.perCm-cal.perCx);
+wt2 = (cal.cphs1-cm)./(cal.cphs1-cal.perCm);
+cm_cmps = reshape((wt0(:) .* cal.cmps(1,:) + (1-wt0(:)) .* cal.cmps(2,:)) .* (cm(:)<=cal.perCx) ...
+                + (wt1(:) .* cal.cmps(2,:) + (1-wt1(:)) .* cal.cmps(3,:)) .* (cm(:)> cal.perCx & cm(:)<=cal.perCm) ...
+                + (wt2(:) .* cal.cmps(3,:) + (1-wt2(:)) .* cal.cmps(4,:)) .* (cm(:)> cal.perCm) ...
+                  ,Nz,Nx,length(cal.cmps));
+cm_oxds = reshape(reshape(cm_cmps,Nz*Nx,length(cal.oxds))*cal.oxds/100,Nz,Nx,size(cal.oxds,2));
+
+wt0 = (cal.perCx-c)./(cal.perCx-cal.cphs0);
+wt1 = (cal.perCm-c)./(cal.perCm-cal.perCx);
+wt2 = (cal.cphs1-c)./(cal.cphs1-cal.perCm);
+c_cmps = reshape((wt0(:) .* cal.cmps(1,:) + (1-wt0(:)) .* cal.cmps(2,:)) .* (c(:)<=cal.perCx) ...
+               + (wt1(:) .* cal.cmps(2,:) + (1-wt1(:)) .* cal.cmps(3,:)) .* (c(:)> cal.perCx & c(:)<=cal.perCm) ...
+               + (wt2(:) .* cal.cmps(3,:) + (1-wt2(:)) .* cal.cmps(4,:)) .* (c(:)> cal.perCm) ...
+                  ,Nz,Nx,length(cal.cmps));
+c_oxds = reshape(reshape(c_cmps,Nz*Nx,length(cal.oxds))*cal.oxds/100,Nz,Nx,size(cal.oxds,2));
 
 % update phase densities
 rhom = rhom0 .* (1 - aT.*(T-cal.perT-273.15) - gC.*(cm-(cal.perCx+cal.perCm)/2));
@@ -76,23 +87,13 @@ if ~calibrt % skip the following if called from calibration script
 
 % diffusion parameters
 ks = kT./T;
-kc = kT./cP./10.*mu.^0.5;
-kx = kT./cP./10.*mu.^0.5.*x;
-kf = kT./cP./10.*mu.^0.5.*f;
-km = kT./cP./10.*mu.^0.5.*m;
 
-% wm1 = ((rhom(1:end-1,:)+rhom(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*(Csgr_m(1:end-1,:) +Csgr_m(2:end,:)).*0.5; % melt segregation speed
-% wm2 = ((rhom(1:end-1,:)+rhom(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*(Csgr_m(1:end-1,:).*Csgr_m(2:end,:)).^0.5; % melt segregation speed
 wm = ((rhom(1:end-1,:)+rhom(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*2./(1./Csgr_m(1:end-1,:)+1./Csgr_m(2:end,:)); % melt segregation speed
-% wm = ((rhom(1:end-1,:)+rhom(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*min(Csgr_m(1:end-1,:),Csgr_m(2:end,:)); % melt segregation speed
 wm(1  ,:)     = min(1,1-top).*wm(1  ,:);
 wm(end,:)     = min(1,1-bot).*wm(end,:);
 wm(:,[1 end]) = -sds*wm(:,[2 end-1]);
 
-% wx1 = ((rhox(1:end-1,:)+rhox(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*(Csgr_x(1:end-1,:) +Csgr_x(2:end,:)).*0.5; % melt segregation speed
-% wx2 = ((rhox(1:end-1,:)+rhox(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*(Csgr_x(1:end-1,:).*Csgr_x(2:end,:)).^0.5; % melt segregation speed
 wx = ((rhox(1:end-1,:)+rhox(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*2./(1./Csgr_x(1:end-1,:)+1./Csgr_x(2:end,:)); % melt segregation speed
-% wx = ((rhox(1:end-1,:)+rhox(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*min(Csgr_x(1:end-1,:),Csgr_x(2:end,:)); % melt segregation speed
 wx(1  ,:)     = min(1,1-top).*wx(1  ,:);
 wx(end,:)     = min(1,1-bot).*wx(end,:);
 wx(:,[1 end]) = -sds*wx(:,[2 end-1]);
@@ -145,18 +146,11 @@ diss =  exx(2:end-1,2:end-1).*txx(2:end-1,2:end-1) ...
      +  phi(2:end-1,2:end-1)./Csgr_f(2:end-1,2:end-1) .* ((wf(1:end-1,2:end-1)+wf(2:end,2:end-1))./2).^2 ...
      +  ks(2:end-1,2:end-1).*(grdTz(2:end-1,2:end-1).^2 + grdTx(2:end-1,2:end-1).^2);
 
-% % update volume source
-% Div_rhoV =  + advection(rho.*f,0.*U,wf,h,'FRM','flx') ...
-%             + advection(rho.*x,0.*U,wx,h,'FRM','flx') ...
-%             + advection(rho.*m,0.*U,wm,h,'FRM','flx') ...
-%             + advection(rho   ,U   ,W ,h,'FRM','adv');
-% % if step>0; VolSrc = -((rho-rhoo)./dt + Div_rhoV)./rho; end
-% if step>0; VolSrc = -((rho-rhoo)./dt + theta.*Div_rhoV + (1-theta).*Div_rhoVo)./rho; end
-
-Div_rhoV =  + advect(rho(inz,inx).*m(inz,inx),0.*Um(inz,:),wm(:,inx),h,SCHM,[1,2],BCA) ...
-            + advect(rho(inz,inx).*x(inz,inx),0.*Ux(inz,:),wx(:,inx),h,SCHM,[1,2],BCA) ...
-            + advect(rho(inz,inx).*f(inz,inx),0.*Uf(inz,:),wf(:,inx),h,SCHM,[1,2],BCA) ...
-            + advect(rho(inz,inx)            ,   U (inz,:),W (:,inx),h,{SCHM{1},'vdf'},[1,2],BCA);
+% update volume source
+Div_rhoV =  + advect(rho(inz,inx).*m(inz,inx),0.*Um(inz,:),wm(:,inx),h,{ADVN,''},[1,2],BCA) ...
+            + advect(rho(inz,inx).*x(inz,inx),0.*Ux(inz,:),wx(:,inx),h,{ADVN,''   },[1,2],BCA) ...
+            + advect(rho(inz,inx).*f(inz,inx),0.*Uf(inz,:),wf(:,inx),h,{ADVN,''   },[1,2],BCA) ...
+            + advect(rho(inz,inx)            ,   U (inz,:),W (:,inx),h,{ADVN,'vdf'},[1,2],BCA);
 % if step>0; VolSrc(inz,inx) = -((rho(inz,inx)-rhoo(inz,inx))./dt + Div_rhoV)./rho(inz,inx)*; end
 if step>0; VolSrc(inz,inx) = -((rho(inz,inx)-rhoo(inz,inx))./dt + theta.*Div_rhoV + (1-theta).*Div_rhoVo)./rho(inz,inx); end
 

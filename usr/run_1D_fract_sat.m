@@ -2,10 +2,10 @@
 clear all; close all;
 
 % set run parameters
-runID    =  '1D_fract_sat_weno5';% run identifier
+runID    =  '1D_fract_sat_cmps';% run identifier
 opdir    =  '../out';            % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
-nop      =  500;                 % output frame plotted/saved every 'nop' time steps
+nop      =  100;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot results
 save_op  =  1;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
@@ -14,8 +14,8 @@ bnchm    =  0;                   % switch on to run manufactured solution benchm
 
 % set model domain parameters
 D        =  10;                  % chamber depth [m]
-L        =  10/400;              % chamber width [m]
-N        =  400 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
+L        =  10/200;              % chamber width [m]
+N        =  200 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
 h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
@@ -43,24 +43,13 @@ v1       =  0.04;                % volatile component base layer [wt H2O]
 dv       =  0e-6;                % amplitude of random noise [wt H2O]
 
 % set model trace and isotope geochemistry parameters
-it0      =  1;                   % incompatible tracer top layer [wt ppm]
-it1      =  1;                   % incompatible tracer base layer [wt ppm]
-dit      =  0.00;                % incompatible tracer random noise [wt ppm]
-KIT      =  1e-2;                % incompatible tracer partition coefficient
-ct0      =  1;                   % compatible tracer top layer [wt ppm]
-ct1      =  1;                   % compatible tracer base layer [wt ppm]
-dct      = -0.00;                % compatible tracer random noise [wt ppm]
-KCT      =  1e+2;                % compatible tracer partition coefficient
-si0      =  0;                   % stable isotope ratio top layer [delta]
-si1      =  0;                   % stable isotope ratio base layer [delta]
-dsi      =  0.00;                % stable isotope ratio random noise [delta]
-ri0      =  1;                   % radiogenic isotope top layer [wt ppm]
-ri1      =  1;                   % radiogenic isotope base layer [wt ppm]
-dri      = -0.00;                % radiogenic isotope random noise [wt ppm]
-KRIP     =  10.;                 % radiogenic parent isotope partition coefficient
-KRID     =  0.1;                 % radiogenic daughter isotope partition coefficient
-HLRIP    =  100*yr;              % radiogenic parent isotope half-life [s]
-HLRID    =    1*yr;              % radiogenic daughter isotope half-life [s]
+te0      =  [0.1,0.3,2,3];       % trace elements top layer [wt ppm]
+te1      =  [0.1,0.3,2,3];       % trace elements base layer [wt ppm]
+dte      =  0e-3.*[1,1,-1,-1];   % trace elements random noise [wt ppm]
+Kte      =  [0.01,0.1,3,10];     % trace elements partition coefficients
+ir0      =  [5,0.76];            % isotope ratios top layer [delta]
+ir1      =  [5,0.76];            % isotope ratios base layer [delta]
+dir      =  [0,0.0];             % isotope ratios random noise [delta]
 
 % set thermo-chemical boundary parameters
 Ptop     =  1.25e8;              % top pressure [Pa]
@@ -74,10 +63,8 @@ tau_a    =  1*hr;                % wall cooling/assimilation time [s]
 Twall    =  300;                 % wall temperature [degC] (nan = insulating)
 cwall    =  nan;                 % wall major component [wt SiO2] (nan = no assimilation)
 vwall    =  nan;                 % wall volatile component [wt H2O] (nan = no assimilation)
-itwall   =  nan;                 % wall incomp. tracer [wt ppm] (nan = no assimilation)
-ctwall   =  nan;                 % wall comp. tracer [wt ppm] (nan = no assimilation)
-siwall   =  nan;                 % wall stable isotope [delta] (nan = no assimilation)
-riwall   =  nan;                 % wall radiogenic isotope [wt ppm] (nan = no assimilation)
+tewall   =  [nan,nan,nan,nan];   % wall trace elements [wt ppm] (nan = no assimilation)
+irwall   =  [nan,nan,nan,nan];   % wall isotope ratios [delta] (nan = no assimilation)
 
 % set thermo-chemical material parameters
 calID    =  'krafla';            % phase diagram calibration
@@ -107,7 +94,7 @@ g0       =  10.;                 % gravity [m/s2]
 
 % set numerical model parameters
 CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
-SCHM     =  {'weno5',''};        % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
+ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
 BCA      =  {'',''};             % boundary condition on advection (top/bot, sides)
 rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-7;                % outer its absolute tolerance

@@ -23,19 +23,19 @@ dsumMdt = sum(  rho(2,2:end-1).*x(2,2:end-1).*Wx(1,2:end-1)*h*1) - sum(rho(end-1
         + sum(  rho(2:end-1,2).*f(2:end-1,2).*Uf(2:end-1,1)*h*1) - sum(rho(2:end-1,end-1).*f(2:end-1,end-1).*Uf(2:end-1,end)*h*1) ...
         + sum(  rho(2,2:end-1).*m(2,2:end-1).*Wm(1,2:end-1)*h*1) - sum(rho(end-1,2:end-1).*m(end-1,2:end-1).*Wm(end,2:end-1)*h*1) ...
         + sum(  rho(2:end-1,2).*m(2:end-1,2).*Um(2:end-1,1)*h*1) - sum(rho(2:end-1,end-1).*m(2:end-1,end-1).*Um(2:end-1,end)*h*1);  % [kg/s]
-dsumSdt = sum(sum(bndS(2:end-1,2:end-1)*h*h*1)) + sum(sum(diss_h(2:end-1,2:end-1)*h*h*1)) ...
+dsumSdt = sum(sum(bnd_S*h*h*1)) + sum(sum(diss_h*h*h*1)) ...
         + sum(  rho(2,2:end-1).*x(2,2:end-1).*sx(2,2:end-1).*Wx(1,2:end-1)*h*1) - sum(rho(end-1,2:end-1).*x(end-1,2:end-1).*sx(end-1,2:end-1).*Wx(end,2:end-1)*h*1) ...
         + sum(  rho(2:end-1,2).*x(2:end-1,2).*sx(2:end-1,2).*Ux(2:end-1,1)*h*1) - sum(rho(2:end-1,end-1).*x(2:end-1,end-1).*sx(2:end-1,end-1).*Ux(2:end-1,end)*h*1) ...
         + sum(  rho(2,2:end-1).*f(2,2:end-1).*sf(2,2:end-1).*Wf(1,2:end-1)*h*1) - sum(rho(end-1,2:end-1).*f(end-1,2:end-1).*sf(end-1,2:end-1).*Wf(end,2:end-1)*h*1) ...
         + sum(  rho(2:end-1,2).*f(2:end-1,2).*sf(2:end-1,2).*Uf(2:end-1,1)*h*1) - sum(rho(2:end-1,end-1).*f(2:end-1,end-1).*sf(2:end-1,end-1).*Uf(2:end-1,end)*h*1) ...
         + sum(  rho(2,2:end-1).*m(2,2:end-1).*sm(2,2:end-1).*Wm(1,2:end-1)*h*1) - sum(rho(end-1,2:end-1).*m(end-1,2:end-1).*sm(end-1,2:end-1).*Wm(end,2:end-1)*h*1) ...
         + sum(  rho(2:end-1,2).*m(2:end-1,2).*sm(2:end-1,2).*Um(2:end-1,1)*h*1) - sum(rho(2:end-1,end-1).*m(2:end-1,end-1).*sm(2:end-1,end-1).*Um(2:end-1,end)*h*1);  % [J /s]
-dsumCdt = sum(sum(bndC(2:end-1,2:end-1)*h*h*1)) ...
+dsumCdt = sum(sum(bnd_C*h*h*1)) ...
         + sum(  rho(2,2:end-1).*x(2,2:end-1).*cx(2,2:end-1).*Wx(1,2:end-1)*h*1) - sum(rho(end-1,2:end-1).*x(end-1,2:end-1).*cx(end-1,2:end-1).*Wx(end,2:end-1)*h*1) ...
         + sum(  rho(2:end-1,2).*x(2:end-1,2).*cx(2:end-1,2).*Ux(2:end-1,1)*h*1) - sum(rho(2:end-1,end-1).*x(2:end-1,end-1).*cx(2:end-1,end-1).*Ux(2:end-1,end)*h*1) ...
         + sum(  rho(2,2:end-1).*m(2,2:end-1).*cm(2,2:end-1).*Wm(1,2:end-1)*h*1) - sum(rho(end-1,2:end-1).*m(end-1,2:end-1).*cm(end-1,2:end-1).*Wm(end,2:end-1)*h*1) ...
         + sum(  rho(2:end-1,2).*m(2:end-1,2).*cm(2:end-1,2).*Um(2:end-1,1)*h*1) - sum(rho(2:end-1,end-1).*m(2:end-1,end-1).*cm(2:end-1,end-1).*Um(2:end-1,end)*h*1);  % [kg/s]
-dsumVdt = sum(sum(bndV(2:end-1,2:end-1)*h*h*1)) ...
+dsumVdt = sum(sum(bnd_V*h*h*1)) ...
         + sum(  rho(2,2:end-1).*f(2,2:end-1).*vf(2,2:end-1).*Wf(1,2:end-1)*h*1) - sum(rho(end-1,2:end-1).*f(end-1,2:end-1).*vf(end-1,2:end-1).*Wf(end,2:end-1)*h*1) ...
         + sum(  rho(2:end-1,2).*f(2:end-1,2).*vf(2:end-1,2).*Uf(2:end-1,1)*h*1) - sum(rho(2:end-1,end-1).*f(2:end-1,end-1).*vf(2:end-1,end-1).*Uf(2:end-1,end)*h*1) ...
         + sum(  rho(2,2:end-1).*m(2,2:end-1).*vm(2,2:end-1).*Wm(1,2:end-1)*h*1) - sum(rho(end-1,2:end-1).*m(end-1,2:end-1).*vm(end-1,2:end-1).*Wm(end,2:end-1)*h*1) ...
@@ -190,25 +190,16 @@ hist.wf(stp,1) = min(min(-(phi(1:end-1,2:end-1)+phi(2:end,2:end-1))/2.*wf(:,2:en
 hist.wf(stp,2) = mean(mean(abs((phi(1:end-1,2:end-1)+phi(2:end,2:end-1))/2.*wf(:,2:end-1))));
 hist.wf(stp,3) = max(max(-(phi(1:end-1,2:end-1)+phi(2:end,2:end-1))/2.*wf(:,2:end-1)));
 
-hist.it(stp,1) = min(min(it(2:end-1,2:end-1)));
-hist.it(stp,2) = mean(mean(it(2:end-1,2:end-1)));
-hist.it(stp,3) = max(max(it(2:end-1,2:end-1)));
-
-hist.ct(stp,1) = min(min(ct(2:end-1,2:end-1)));
-hist.ct(stp,2) = mean(mean(ct(2:end-1,2:end-1)));
-hist.ct(stp,3) = max(max(ct(2:end-1,2:end-1)));
-
-hist.si(stp,1) = min(min(si(2:end-1,2:end-1)));
-hist.si(stp,2) = mean(mean(si(2:end-1,2:end-1)));
-hist.si(stp,3) = max(max(si(2:end-1,2:end-1)));
-
-hist.rip(stp,1) = min(min(rip(2:end-1,2:end-1)));
-hist.rip(stp,2) = mean(mean(rip(2:end-1,2:end-1)));
-hist.rip(stp,3) = max(max(rip(2:end-1,2:end-1)));
-
-hist.rid(stp,1) = min(min(rid(2:end-1,2:end-1)));
-hist.rid(stp,2) = mean(mean(rid(2:end-1,2:end-1)));
-hist.rid(stp,3) = max(max(rid(2:end-1,2:end-1)));
+for k = 1:length(te0)
+    hist.te(stp,k,1) = min(min(te(2:end-1,2:end-1,k)));
+    hist.te(stp,k,2) = mean(mean(te(2:end-1,2:end-1,k)));
+    hist.te(stp,k,3) = max(max(te(2:end-1,2:end-1,k)));
+end
+for k = 1:length(ir0)
+    hist.ir(stp,k,1) = min(min(ir(2:end-1,2:end-1,k)));
+    hist.ir(stp,k,2) = mean(mean(ir(2:end-1,2:end-1,k)));
+    hist.ir(stp,k,3) = max(max(ir(2:end-1,2:end-1,k)));
+end
 
 % fraction, composition, and temperature of eruptible magma suspension (mu>0.55)
 indmagma = max(0,min(1,(1+erf((mu-0.55)./0.05))/2));
@@ -253,17 +244,15 @@ hist.Xultram(stp) = sum(sum(rho(2:end-1,2:end-1).*indultram(2:end-1,2:end-1).*x(
 hist.Tultram(stp) = sum(sum(rho(2:end-1,2:end-1).*indultram(2:end-1,2:end-1).*T(2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*indultram(2:end-1,2:end-1).*h^2));
 
 % differentiation index
-nobnd = bndshape<1e-2;
+nobnd = false(size(c));
+nobnd(inz,inx) = bndshape<1e-2;
 if any(nobnd(:))
-    hist.Rdiff(stp) = (max(max(c(nobnd(2:end-1,2:end-1))))-min(min(c(nobnd(2:end-1,2:end-1)))))./(cal.cphs1-cal.cphs0);
+    hist.Rdiff(stp) = (max(max(c(nobnd)))-min(min(c(nobnd))))./(cal.cphs1-cal.cphs0);
 end
 
 % index of assimilation
 if step>1
-    hist.RaC (stp) = hist.RaC (stp-1) + sum(sum(bndC (2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*h^2)).*dt;
-    hist.RaV (stp) = hist.RaV (stp-1) + sum(sum(bndV (2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*h^2)).*dt;
-    hist.RaSI(stp) = hist.RaSI(stp-1) + sum(sum(bndSI(2:end-1,2:end-1).*h^2))./sum(sum(rho(2:end-1,2:end-1).*h^2)).*dt;
-    hist.Ra  (stp) = hist.Ra  (stp-1) + sum(sum(bndshape(2:end-1,2:end-1).*rho(2:end-1,2:end-1)./tau_a.*h^2))./sum(sum(rho(2:end-1,2:end-1).*h^2)).*dt;
+    hist.Ra (stp) = hist.Ra (stp-1) + sum(sum(bndshape.*rho(2:end-1,2:end-1)./tau_a.*h^2))./sum(sum(rho(2:end-1,2:end-1).*h^2)).*dt;
 else
-    hist.Ra(stp,1) = 0; hist.RaC(stp,1) = 0; hist.RaV(stp,1) = 0; hist.RaSI(stp,1) = 0;
+    hist.Ra(stp,1) = 0;
 end
