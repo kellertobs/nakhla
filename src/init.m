@@ -32,14 +32,14 @@ fprintf('    initial f: %4.3f \n\n',f0);
 wt0 = (cal.perCx-cm0)./(cal.perCx-cal.cphs0);
 wt1 = (cal.perCm-cm0)./(cal.perCm-cal.perCx);
 wt2 = (cal.cphs1-cm0)./(cal.cphs1-cal.perCm);
-cm0_cmps = (wt0(:) .* cal.cmps(1,:) + (1-wt0(:)) .* cal.cmps(2,:)) .* (cm0(:)<=cal.perCx) ...
-         + (wt1(:) .* cal.cmps(2,:) + (1-wt1(:)) .* cal.cmps(3,:)) .* (cm0(:)> cal.perCx & cm0(:)<=cal.perCm) ...
-         + (wt2(:) .* cal.cmps(3,:) + (1-wt2(:)) .* cal.cmps(4,:)) .* (cm0(:)> cal.perCm);
+cm0_cmp = (wt0(:) .* cal.cmp(1,:) + (1-wt0(:)) .* cal.cmp(2,:)) .* (cm0(:)< cal.perCx) ...
+        + (wt1(:) .* cal.cmp(2,:) + (1-wt1(:)) .* cal.cmp(3,:)) .* (cm0(:)>=cal.perCx & cm0(:)<=cal.perCm) ...
+        + (wt2(:) .* cal.cmp(3,:) + (1-wt2(:)) .* cal.cmp(4,:)) .* (cm0(:)> cal.perCm);
 
-cm0_oxds = cm0_cmps*cal.oxds./100;
+cm0_oxd = cm0_cmp*cal.oxd./100;
 
-wtm([1 3 4 6 7 8 9 11 12]) = [cm0_oxds,100.*vm0,0]; % SiO2
-etam0     = grdmodel08(wtm,T0);
+wtm([1 2 3 4 6 7 8 9 11 12]) = [cm0_oxd,100.*vm0,0];
+etam0 = grdmodel08(wtm,T0);
 
 DrhoT = aT*max([abs(T0-Twall),abs(T0-T1),T0/100]);
 Drhoc = gC*max([abs(c0-cwall),abs(c0-c1),c0/100]); 
@@ -53,8 +53,8 @@ ux    = Drhox*g0*(D/10)^2/etam0/etareg;
 uf    = Drhof*g0*(D/10)^2/etam0/etareg .* (max([v0,v1,vwall])>TINY);
 u0    = Drho0*g0*(D/10)^2/etam0/etareg;
 
-wx0   = abs(rhox0-rhom0)*g0*dx^2/etam0;
-wf0   = abs(rhof0-rhom0)*g0*df^2/etam0 .* (max([v0,v1,vwall])>TINY);
+wx0   = abs(rhox0-rhom0)*g0*d0^2/etam0;
+wf0   = abs(rhof0-rhom0)*g0*d0^2/etam0 .* (max([v0,v1,vwall])>TINY);
 
 ud0   = kT/rhom0/cP/(D/10);
 
@@ -74,8 +74,8 @@ RwT   = uwT/u0;
 Rwc   = uwc/u0;
 
 Re    = u0*rhom0*(D/10)/etam0/etareg;
-Rex   = wx0*rhom0*dx/etam0;
-Ref   = wf0*rhom0*df/etam0;
+Rex   = wx0*rhom0*d0/etam0;
+Ref   = wf0*rhom0*d0/etam0;
 
 fprintf('    crystal Re: %1.3e \n'  ,Rex);
 fprintf('     bubble Re: %1.3e \n'  ,Ref);

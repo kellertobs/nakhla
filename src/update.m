@@ -5,29 +5,32 @@ tic;
 wt0 = (cal.perCx-cx)./(cal.perCx-cal.cphs0);
 wt1 = (cal.perCm-cx)./(cal.perCm-cal.perCx);
 wt2 = (cal.cphs1-cx)./(cal.cphs1-cal.perCm);
-cx_cmps = reshape((wt0(:) .* cal.cmps(1,:) + (1-wt0(:)) .* cal.cmps(2,:)) .* (cx(:)<=cal.perCx) ...
-                + (wt1(:) .* cal.cmps(2,:) + (1-wt1(:)) .* cal.cmps(3,:)) .* (cx(:)> cal.perCx & cx(:)<=cal.perCm) ...
-                + (wt2(:) .* cal.cmps(3,:) + (1-wt2(:)) .* cal.cmps(4,:)) .* (cx(:)> cal.perCm) ...
-                  ,Nz,Nx,length(cal.cmps));
-cx_oxds = reshape(reshape(cx_cmps,Nz*Nx,length(cal.oxds))*cal.oxds/100,Nz,Nx,size(cal.oxds,2));
+cx_cmp = reshape((wt0(:) .* cal.cmp(1,:) + (1-wt0(:)) .* cal.cmp(2,:)) .* (cx(:)< cal.perCx) ...
+               + (wt1(:) .* cal.cmp(2,:) + (1-wt1(:)) .* cal.cmp(3,:)) .* (cx(:)>=cal.perCx & cx(:)<=cal.perCm) ...
+               + (wt2(:) .* cal.cmp(3,:) + (1-wt2(:)) .* cal.cmp(4,:)) .* (cx(:)> cal.perCm) ...
+                 ,Nz,Nx,length(cal.cmp));
+cx_oxd = reshape(reshape(cx_cmp,Nz*Nx,length(cal.oxd))*cal.oxd/100,Nz,Nx,size(cal.oxd,2));
 
 wt0 = (cal.perCx-cm)./(cal.perCx-cal.cphs0);
 wt1 = (cal.perCm-cm)./(cal.perCm-cal.perCx);
 wt2 = (cal.cphs1-cm)./(cal.cphs1-cal.perCm);
-cm_cmps = reshape((wt0(:) .* cal.cmps(1,:) + (1-wt0(:)) .* cal.cmps(2,:)) .* (cm(:)<=cal.perCx) ...
-                + (wt1(:) .* cal.cmps(2,:) + (1-wt1(:)) .* cal.cmps(3,:)) .* (cm(:)> cal.perCx & cm(:)<=cal.perCm) ...
-                + (wt2(:) .* cal.cmps(3,:) + (1-wt2(:)) .* cal.cmps(4,:)) .* (cm(:)> cal.perCm) ...
-                  ,Nz,Nx,length(cal.cmps));
-cm_oxds = reshape(reshape(cm_cmps,Nz*Nx,length(cal.oxds))*cal.oxds/100,Nz,Nx,size(cal.oxds,2));
+cm_cmp = reshape((wt0(:) .* cal.cmp(1,:) + (1-wt0(:)) .* cal.cmp(2,:)) .* (cm(:)< cal.perCx) ...
+               + (wt1(:) .* cal.cmp(2,:) + (1-wt1(:)) .* cal.cmp(3,:)) .* (cm(:)>=cal.perCx & cm(:)<=cal.perCm) ...
+               + (wt2(:) .* cal.cmp(3,:) + (1-wt2(:)) .* cal.cmp(4,:)) .* (cm(:)> cal.perCm) ...
+                 ,Nz,Nx,length(cal.cmp));
+cm_oxd = reshape(reshape(cm_cmp,Nz*Nx,length(cal.oxd))*cal.oxd/100,Nz,Nx,size(cal.oxd,2));
 
-wt0 = (cal.perCx-c)./(cal.perCx-cal.cphs0);
-wt1 = (cal.perCm-c)./(cal.perCm-cal.perCx);
-wt2 = (cal.cphs1-c)./(cal.cphs1-cal.perCm);
-c_cmps = reshape((wt0(:) .* cal.cmps(1,:) + (1-wt0(:)) .* cal.cmps(2,:)) .* (c(:)<=cal.perCx) ...
-               + (wt1(:) .* cal.cmps(2,:) + (1-wt1(:)) .* cal.cmps(3,:)) .* (c(:)> cal.perCx & c(:)<=cal.perCm) ...
-               + (wt2(:) .* cal.cmps(3,:) + (1-wt2(:)) .* cal.cmps(4,:)) .* (c(:)> cal.perCm) ...
-                  ,Nz,Nx,length(cal.cmps));
-c_oxds = reshape(reshape(c_cmps,Nz*Nx,length(cal.oxds))*cal.oxds/100,Nz,Nx,size(cal.oxds,2));
+% c_cmp = (x.*cx_cmp + m.*cm_cmp)./(1-f);
+% c_oxd = (x.*cx_oxd + m.*cm_oxd)./(1-f);
+
+wt0 = (cal.perCx-c./(1-f))./(cal.perCx-cal.cphs0);
+wt1 = (cal.perCm-c./(1-f))./(cal.perCm-cal.perCx);
+wt2 = (cal.cphs1-c./(1-f))./(cal.cphs1-cal.perCm);
+c_cmp = reshape((wt0(:) .* cal.cmp(1,:) + (1-wt0(:)) .* cal.cmp(2,:)) .* (c(:)./(1-f(:))< cal.perCx) ...
+              + (wt1(:) .* cal.cmp(2,:) + (1-wt1(:)) .* cal.cmp(3,:)) .* (c(:)./(1-f(:))>=cal.perCx & c(:)./(1-f(:))<=cal.perCm) ...
+              + (wt2(:) .* cal.cmp(3,:) + (1-wt2(:)) .* cal.cmp(4,:)) .* (c(:)./(1-f(:))> cal.perCm) ...
+                ,Nz,Nx,length(cal.cmp));
+c_oxd = reshape(reshape(c_cmp,Nz*Nx,length(cal.oxd))*cal.oxd/100,Nz,Nx,size(cal.oxd,2));
 
 % update phase densities
 rhom = rhom0 .* (1 - aT.*(T-cal.perT-273.15) - gC.*(cm-(cal.perCx+cal.perCm)/2));
@@ -43,18 +46,19 @@ mu    = max(TINY,min(1-TINY, m.*rho./rhom ));
 
 % update effective viscosity
 wtm      = zeros(Nz*Nx,12);
-wtm(:, 1) = reshape(cm_oxds(:,:,1),Nz*Nx,1); % SiO2
-wtm(:, 3) = reshape(cm_oxds(:,:,2),Nz*Nx,1); % Al2O3
-wtm(:, 4) = reshape(cm_oxds(:,:,3),Nz*Nx,1); % FeO
-wtm(:, 6) = reshape(cm_oxds(:,:,4),Nz*Nx,1); % MgO
-wtm(:, 7) = reshape(cm_oxds(:,:,5),Nz*Nx,1); % CaO
-wtm(:, 8) = reshape(cm_oxds(:,:,6),Nz*Nx,1); % Na2O
-wtm(:, 9) = reshape(cm_oxds(:,:,7),Nz*Nx,1); % K2O
-wtm(:,11) = reshape(100.*vm(:,:  ),Nz*Nx,1); % H2O
+wtm(:, 1) = reshape(cm_oxd(:,:,1),Nz*Nx,1); % SiO2
+wtm(:, 2) = reshape(cm_oxd(:,:,2),Nz*Nx,1); % TiO2
+wtm(:, 3) = reshape(cm_oxd(:,:,3),Nz*Nx,1); % Al2O3
+wtm(:, 4) = reshape(cm_oxd(:,:,4),Nz*Nx,1); % FeO
+wtm(:, 6) = reshape(cm_oxd(:,:,5),Nz*Nx,1); % MgO
+wtm(:, 7) = reshape(cm_oxd(:,:,6),Nz*Nx,1); % CaO
+wtm(:, 8) = reshape(cm_oxd(:,:,7),Nz*Nx,1); % Na2O
+wtm(:, 9) = reshape(cm_oxd(:,:,8),Nz*Nx,1); % K2O
+wtm(:,11) = reshape(100.*vm(:,: ),Nz*Nx,1); % H2O
 etam      = reshape(grdmodel08(wtm,T(:)-273.15),Nz,Nx);
 
-etaf  = etaf0.* ones(size(f));                                             % constant fluid viscosity
-etax  = etax0.* ones(size(x));                                             % constant crysta viscosity
+etaf = etaf0.* ones(size(f));                                              % constant fluid viscosity
+etax = etax0.* ones(size(x));                                              % constant crystal viscosity
 
 % get permission weights
 kv = permute(cat(3,etax,etam,etaf),[3,1,2]);
@@ -76,17 +80,14 @@ etaco  = (eta(1:end-1,1:end-1)+eta(2:end,1:end-1) ...
        +  eta(1:end-1,2:end  )+eta(2:end,2:end  ))./4;
 
 % get segregation coefficients
-Csgr = ((1-ff)./[dx;dm;df].^2.*kv.*thtv).^-1 + 1e-18;
+Csgr = ((1-ff)./d0^2.*kv.*thtv).^-1 + 1e-18;
 
 Csgr_x = squeeze(Csgr(1,:,:)); if size(Csgr_x,1)~=size(T,1); Csgr_x = Csgr_x.'; end
 Csgr_f = squeeze(Csgr(3,:,:)); if size(Csgr_f,1)~=size(T,1); Csgr_f = Csgr_f.'; end
 Csgr_m = squeeze(Csgr(2,:,:)); if size(Csgr_m,1)~=size(T,1); Csgr_m = Csgr_m.'; end
-Csgr_m = Csgr_m.*chi.^2; % dampen melt segregation at low crystallinity
+Csgr_m = Csgr_m.*(1-mu).^2; % dampen melt segregation at high melt fraction (dm = d0.*(1-f))
 
 if ~calibrt % skip the following if called from calibration script
-
-% diffusion parameters
-ks = kT./T;
 
 wm = ((rhom(1:end-1,:)+rhom(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*2./(1./Csgr_m(1:end-1,:)+1./Csgr_m(2:end,:)); % melt segregation speed
 wm(1  ,:)     = min(1,1-top).*wm(1  ,:);
@@ -103,6 +104,9 @@ wf(1  ,:)     = min(1,1-top+fout).*wf(1  ,:);
 wf(end,:)     = min(1,1-bot+fin ).*wf(end,:);
 wf(:,[1 end]) = -sds*wf(:,[2 end-1]);
 
+% diffusion parameters
+ks = kT./T;                                                                % entropy diffusion
+kc = min(kT./cP,rho.*abs((rhox-rho).*g0.*Csgr_x.*d0));                     % chemical diffusion by fluctuation in crystal segregation speed
 
 % update velocity divergence
 Div_V(2:end-1,2:end-1) = ddz(W(:,2:end-1),h) ...                           % get velocity divergence

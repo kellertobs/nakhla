@@ -66,7 +66,7 @@ while time <= tend && step <= M
     
     % record model history
     history;
-    
+
     % print diagnostics
     fprintf(1,'\n         total time to solution  = %3.3f sec\n\n',toc(TTtime));
     fprintf(1,'         fluid-mechanics solve   = %1.3e sec\n',FMtime/(iter-1));

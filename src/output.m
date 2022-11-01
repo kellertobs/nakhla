@@ -86,7 +86,7 @@ elseif Nx <= 10  % create 1D plots
     plot(-(phi(1:end-1,2:end-1)+phi(2:end,2:end-1))/2.*wf(:,2:end-1)*hr,Zf.',CL{[1,5]},LW{:});
     plot(-(chi(1:end-1,2:end-1)+chi(2:end,2:end-1))/2.*wx(:,2:end-1)*hr,Zf.',CL{[1,4]},LW{:});
     plot(-(mu (1:end-1,2:end-1)+mu (2:end,2:end-1))/2.*wm(:,2:end-1)*hr,Zf.',CL{[1,3]},LW{:});
-    title('$W$, $w_\Delta^f$, $w_\Delta^x$ [m/hr]',TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+    title('$W$, $w_\Delta^f$, $w_\Delta^x$ [m/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
 
     if ~exist('fh2','var'); fh2 = figure(VIS{:});
     else; set(0, 'CurrentFigure', fh2); clf;
@@ -111,6 +111,34 @@ elseif Nx <= 10  % create 1D plots
     subplot(1,5,5)
     plot(P(2:end-1,2:end-1)/1e3,Zc(2:end-1).',CL{[1,2]},LW{:}); axis ij tight; box on;
     title('$P$ [kPa]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+
+    if ~exist('fh3','var'); fh3 = figure(VIS{:});
+    else; set(0, 'CurrentFigure', fh3); clf;
+    end 
+    sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
+    subplot(1,3,1)
+    plot(squeeze(c_cmp(2:end-1,2:end-1,:)),Zc(2:end-1).',LW{:}); axis ij tight; box on;
+    title('Bulk comps [wt\%]',TX{:},FS{:});ylabel('Depth [km]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+    subplot(1,3,2)
+    plot(squeeze(cx_cmp(2:end-1,2:end-1,:)),Zc(2:end-1).',LW{:}); axis ij tight; box on;
+    title('Xtal comps [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+    subplot(1,3,3)
+    plot(squeeze(cm_cmp(2:end-1,2:end-1,:)),Zc(2:end-1).',LW{:}); axis ij tight; box on;
+    title('Melt comps [wt\%]',TX{:},FS{:}); legend(cal.cmpStr,TX{:},FS{:},'Location','east'); set(gca,TL{:},TS{:});
+ 
+    if ~exist('fh4','var'); fh4 = figure(VIS{:});
+    else; set(0, 'CurrentFigure', fh4); clf;
+    end 
+    sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
+    subplot(1,3,1)
+    plot(squeeze(c_oxd(2:end-1,2:end-1,:)),Zc(2:end-1).',LW{:}); axis ij tight; box on;
+    title('Bulk oxds [wt\%]',TX{:},FS{:});ylabel('Depth [km]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+    subplot(1,3,2)
+    plot(squeeze(cx_oxd(2:end-1,2:end-1,:)),Zc(2:end-1).',LW{:}); axis ij tight; box on;
+    title('Xtal oxds [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+    subplot(1,3,3)
+    plot(squeeze(cm_oxd(2:end-1,2:end-1,:)),Zc(2:end-1).',LW{:}); axis ij tight; box on;
+    title('Melt oxds [wt\%]',TX{:},FS{:}); legend(cal.oxdStr,TX{:},FS{:},'Location','east'); set(gca,TL{:},TS{:});
 
 else % create 2D plots
 
@@ -372,6 +400,10 @@ if save_op
         print(fh1,name,'-dpng','-r300','-image');
         name = [opdir,'/',runID,'/',runID,'_aux_',num2str(floor(step/nop))];
         print(fh2,name,'-dpng','-r300','-image');
+        name = [opdir,'/',runID,'/',runID,'_cmp_',num2str(floor(step/nop))];
+        print(fh3,name,'-dpng','-r300','-image');
+        name = [opdir,'/',runID,'/',runID,'_oxd_',num2str(floor(step/nop))];
+        print(fh4,name,'-dpng','-r300','-image');
         name = [opdir,'/',runID,'/',runID,'_eql',num2str(floor(step/nop))];
         print(fh7,name,'-dpng','-r300','-image');
     else

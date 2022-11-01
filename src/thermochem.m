@@ -6,7 +6,7 @@ Ti = T; ci = c; vi = v; xi = x; fi = f;
 if iter<=3
     iq = true(size(x)); 
 else
-    iq  = abs(xq-xqi)>1e-9;
+    iq = abs(xq-xqi)>1e-9;
 end
 
 % update heat content (entropy)
@@ -34,9 +34,14 @@ S(:,[1 end]) = S(:,[2 end-1]);
 advn_C = - advect(rho(inz,inx).*m(inz,inx).*cm(inz,inx),Um(inz,:),Wm(:,inx),h,{ADVN,''},[1,2],BCA) ...  % major component advection
          - advect(rho(inz,inx).*x(inz,inx).*cx(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);
     
+qCz    = - (kc(1:end-1,:)+kc(2:end,:))./2 .* ddz(c,h);                     % component diffusion z-flux
+qCx    = - (kc(:,1:end-1)+kc(:,2:end))./2 .* ddx(c,h);                     % component diffusion x-flux
+diff_C = (- ddz(qCz(:,inx),h)  ...                                         % component diffusion
+          - ddx(qCx(inz,:),h));
+
 if ~isnan(cwall); bnd_C = rho(inz,inx).*(cwall-c(inz,inx))./tau_a .* bndshape; end % impose boundary layer
 
-dCdt = advn_C + bnd_C;                                                     % total rate of change
+dCdt = advn_C + diff_C + bnd_C;                                            % total rate of change
     
 C(inz,inx) = Co(inz,inx) + (theta.*dCdt + (1-theta).*dCdto).*dt;           % explicit update of major component density
 C([1 end],:) = C([2 end-1],:);                                             % apply boundary conditions
@@ -73,7 +78,7 @@ EQtime = EQtime + toc(eqtime);
 % update crystal fraction
 if diseq
     
-    Gx = lambda.*Gx + (1-lambda) .* (xq-x).*rho./(4*dt);
+    Gx = lambda.*Gx + (1-lambda) .* (xq-x).*rho./(5*dt);
         
     advn_X = - advect(rho(inz,inx).*x(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);
 
@@ -94,7 +99,7 @@ end
 % update bubble fraction
 if (diseq && any([v0;v1;vwall;v(:)]>10*TINY))
     
-    Gf = lambda.*Gf + (1-lambda) .* (fq-f).*rho./(4*dt);
+    Gf = lambda.*Gf + (1-lambda) .* (fq-f).*rho./(5*dt);
     
     advn_F = - advect(rho(inz,inx).*f(inz,inx),Uf(inz,:),Wf(:,inx),h,{ADVN,''},[1,2],BCA);
 

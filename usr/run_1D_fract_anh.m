@@ -2,7 +2,7 @@
 clear all; close all;
 
 % set run parameters
-runID    =  '1D_fract_anh_weno5';% run identifier
+runID    =  '1D_fract_anh';      % run identifier
 opdir    =  '../out';            % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  500;                 % output frame plotted/saved every 'nop' time steps
@@ -32,8 +32,8 @@ smth     =  (N/30)^2;            % regularisation of initial random perturbation
 zlay     =  0.5;                 % layer thickness (relative to domain depth D)
 wlay_T   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
 wlay_c   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
-T0       =  1175;                % temperature top layer [deg C]
-T1       =  1175;                % temperature base layer [deg C]
+T0       =  1200;                % temperature top layer [deg C]
+T1       =  1200;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
 c0       =  0.51;                % major component top layer [wt SiO2]
 c1       =  0.51;                % major component base layer [wt SiO2]
@@ -43,24 +43,13 @@ v1       =  0.00;                % volatile component base layer [wt H2O]
 dv       =  0e-6;                % amplitude of random noise [wt H2O]
 
 % set model trace and isotope geochemistry parameters
-it0      =  1;                   % incompatible tracer top layer [wt ppm]
-it1      =  1;                   % incompatible tracer base layer [wt ppm]
-dit      =  0.00;                % incompatible tracer random noise [wt ppm]
-KIT      =  1e-2;                % incompatible tracer partition coefficient
-ct0      =  1;                   % compatible tracer top layer [wt ppm]
-ct1      =  1;                   % compatible tracer base layer [wt ppm]
-dct      = -0.00;                % compatible tracer random noise [wt ppm]
-KCT      =  1e+2;                % compatible tracer partition coefficient
-si0      =  0;                   % stable isotope ratio top layer [delta]
-si1      =  0;                   % stable isotope ratio base layer [delta]
-dsi      =  0.00;                % stable isotope ratio random noise [delta]
-ri0      =  1;                   % radiogenic isotope top layer [wt ppm]
-ri1      =  1;                   % radiogenic isotope base layer [wt ppm]
-dri      = -0.00;                % radiogenic isotope random noise [wt ppm]
-KRIP     =  10.;                 % radiogenic parent isotope partition coefficient
-KRID     =  0.1;                 % radiogenic daughter isotope partition coefficient
-HLRIP    =  100*yr;              % radiogenic parent isotope half-life [s]
-HLRID    =    1*yr;              % radiogenic daughter isotope half-life [s]
+te0      =  [0.1,0.3,2,3];       % trace elements top layer [wt ppm]
+te1      =  [0.1,0.3,2,3];       % trace elements base layer [wt ppm]
+dte      =  0e-3.*[1,1,-1,-1];   % trace elements random noise [wt ppm]
+Kte      =  [0.01,0.1,3,10];     % trace elements partition coefficients
+ir0      =  [5,0.76];            % isotope ratios top layer [delta]
+ir1      =  [5,0.76];            % isotope ratios base layer [delta]
+dir      =  [0,0.0];             % isotope ratios random noise [delta]
 
 % set thermo-chemical boundary parameters
 Ptop     =  1.25e8;              % top pressure [Pa]
@@ -70,14 +59,12 @@ dw       =  1*h;                 % boundary layer thickness [m]
 fin      =  1;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
 fout     =  1;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
 tau_T    =  10*hr;               % wall cooling/assimilation time [s]
-tau_a    =  10*hr;               % wall cooling/assimilation time [s]
+tau_a    =  1*hr;                % wall cooling/assimilation tie [s]
 Twall    =  300;                 % wall temperature [degC] (nan = insulating)
 cwall    =  nan;                 % wall major component [wt SiO2] (nan = no assimilation)
 vwall    =  nan;                 % wall volatile component [wt H2O] (nan = no assimilation)
-itwall   =  nan;                 % wall incomp. tracer [wt ppm] (nan = no assimilation)
-ctwall   =  nan;                 % wall comp. tracer [wt ppm] (nan = no assimilation)
-siwall   =  nan;                 % wall stable isotope [delta] (nan = no assimilation)
-riwall   =  nan;                 % wall radiogenic isotope [wt ppm] (nan = no assimilation)
+tewall   =  [nan,nan,nan,nan];   % wall trace elements [wt ppm] (nan = no assimilation)
+irwall   =  [nan,nan,nan,nan];   % wall isotope ratios [delta] (nan = no assimilation)
 
 % set thermo-chemical material parameters
 calID    =  'krafla';            % phase diagram calibration
@@ -100,19 +87,17 @@ rhof0    =  1000;                % bubble phase ref. density [kg/m3] (at T0,cphs
 aT       =  4e-5;                % thermal expansivity [1/K]
 gC       =  0.5;                 % compositional expansivity [1/wt]
 bP       =  1e-8;                % mvp compressibility [1/Pa]
-dx       =  1e-3;                % crystal size [m]
-df       =  1e-3;                % bubble size [m]
-dm       =  1e-3;                % melt film size [m]
+d0       =  1e-3;                % crystal/bubble size [m]
 g0       =  10.;                 % gravity [m/s2]
 
 % set numerical model parameters
 CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
-SCHM     =  {'weno5',''};        % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
+ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
 BCA      =  {'',''};             % boundary condition on advection (top/bot, sides)
-rtol     =  1e-4;                % outer its relative tolerance
-atol     =  1e-7;                % outer its absolute tolerance
-maxit    =  20;                  % maximum outer its
-lambda   =  0.25;                % iterative lag parameter equilibration
+rtol     =  1e-3;                % outer its relative tolerance
+atol     =  1e-6;                % outer its absolute tolerance
+maxit    =  10;                  % maximum outer its
+lambda   =  0.5;                 % iterative lag parameter equilibration
 etareg   =  1e0;                 % viscosity regularisation parameter
 
 
