@@ -2,10 +2,10 @@
 clear all; close all;
 
 % set run parameters
-runID    =  '1D_fract_anh';      % run identifier
+runID    =  '1D_fract_anh_3dt';      % run identifier
 opdir    =  '../out';            % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
-nop      =  500;                 % output frame plotted/saved every 'nop' time steps
+nop      =  100;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot results
 save_op  =  1;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
@@ -91,12 +91,12 @@ d0       =  1e-3;                % crystal/bubble size [m]
 g0       =  10.;                 % gravity [m/s2]
 
 % set numerical model parameters
-CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
+CFL      =  0.75;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
 BCA      =  {'',''};             % boundary condition on advection (top/bot, sides)
-rtol     =  1e-3;                % outer its relative tolerance
-atol     =  1e-6;                % outer its absolute tolerance
-maxit    =  10;                  % maximum outer its
+rtol     =  1e-4;                % outer its relative tolerance
+atol     =  1e-7;                % outer its absolute tolerance
+maxit    =  15;                  % maximum outer its
 lambda   =  0.5;                 % iterative lag parameter equilibration
 etareg   =  1e0;                 % viscosity regularisation parameter
 

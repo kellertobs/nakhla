@@ -209,12 +209,8 @@ Div_V  =  0.*P;  Div_rhoV = 0.*P(inz,inx);  Div_rhoVo = Div_rhoV;
 exx    =  0.*P;  ezz = 0.*P;  exz = zeros(Nz-1,Nx-1);  eII = 0.*P;  
 txx    =  0.*P;  tzz = 0.*P;  txz = zeros(Nz-1,Nx-1);  tII = 0.*P; 
 VolSrc =  0.*P;  MassErr = 0;  drhodt = 0.*P;  drhodto = 0.*P;
-
-rhoo =  rhom0.*ones(size(Tp)); rhoref = rhom0;  %#ok<NASGU>
-dto  =  dt;
-Pt   =  rhoref.*g0.*ZZ + Ptop;  
-if Nx<=10; Pt = mean(mean(Pt(2:end-1,2:end-1))).*ones(size(Pt)); end
-T    =  (Tp+273.15).*exp(aT./rhoref./cP.*Pt); % real temperature [K]
+rho    =  rhom0.*ones(size(Tp));
+Pt     =  Ptop + rho.*g0.*ZZ;
 
 % get volume fractions and bulk density
 step    = 0;
@@ -223,10 +219,18 @@ EQtime  = 0;
 FMtime  = 0;
 TCtime  = 0;
 UDtime  = 0;
-res  = 1;  tol = 1e-12;  x = ones(size(T))./10;  f = v/2;
+res  = 1;  tol = 1e-12;  x = ones(size(Tp))./10;  f = v/2;
 while res > tol
     xi = x;  fi = f;
     
+    rho_fz      = (rho(1:end-1,:)+rho(2:end,:))/2;
+    Pt(2:end,:) = Ptop + repmat(cumsum(mean(rho_fz,2)*g0*h),1,Nx);% total pressure
+    Pt(1,:)     = Ptop;
+    Adbt        = aT./mean(rho(2:end-1,2:end-1),'all');
+    if Nz<=10; Pt = mean(mean(Pt(2:end-1,2:end-1))).*ones(size(T)); end
+    
+    T    =  (Tp+273.15).*exp(Adbt./cP.*Pt);
+
     [xq,cxq,cmq,fq,vfq,vmq] = equilibrium(x,f,T-273.15,c,v,Pt,cal,TINY);
     
     x  = xq;  f = fq;  m = 1-x-f;
@@ -236,22 +240,15 @@ while res > tol
     Kf = vfq./vmq;
 
     update;
-    
-    rhoref  = mean(mean(rho(2:end-1,2:end-1)));
-    Pt      = Ptop + rhoref.*g0.*ZZ;
-    if Nz<=10; Pt = mean(mean(Pt(2:end-1,2:end-1))).*ones(size(T)); end
-    
-    T    =  (Tp+273.15).*exp(aT./rhoref./cP.*Pt);
 
     res  = (norm(x(:)-xi(:),2) + norm(f(:)-fi(:),2))./sqrt(2*length(x(:)));
 end
-rhoBF   = (rho(2:end-2,2:end-1)+rho(3:end-1,2:end-1))/2 - rhoref;
-rhoo    = rho;
-Pto     = Pt;
-  
+rhoo = rho;
+dto  = dt; 
+
 % get bulk enthalpy, silica, volatile content densities
-S  = rho.*(cP.*log(T/(T0+273.15)) + x.*Dsx + f.*Dsf - aT./rhoref.*(Pt-Ptop));  
-S0 = rho.*(cP.*log(T0+273.15) + x.*Dsx + f.*Dsf - aT./rhoref.*Ptop);  
+S  = rho.*(cP.*log(T/(T0+273.15)) + x.*Dsx + f.*Dsf - Adbt.*(Pt-Ptop));  
+S0 = rho.*(cP.*log(T0+273.15) + x.*Dsx + f.*Dsf - Adbt.*Ptop);  
 C  = rho.*(m.*cm + x.*cx);
 V  = rho.*(m.*vm + f.*vf);
 X  = rho.*x;

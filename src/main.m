@@ -21,7 +21,7 @@ while time <= tend && step <= M
     So      = S;
     Co      = C;
     Vo      = V;
-    Xo      = X; xo = x;
+    Xo      = X;
     Fo      = F;
     TEo     = TE;
     IRo     = IR;
@@ -35,7 +35,6 @@ while time <= tend && step <= M
     rhoo    = rho;
     Div_rhoVo = Div_rhoV;
     etao    = eta;
-    Pto     = Pt;
     dto     = dt;
     
     % reset residuals and iteration count
