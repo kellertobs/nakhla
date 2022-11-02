@@ -210,7 +210,8 @@ exx    =  0.*P;  ezz = 0.*P;  exz = zeros(Nz-1,Nx-1);  eII = 0.*P;
 txx    =  0.*P;  tzz = 0.*P;  txz = zeros(Nz-1,Nx-1);  tII = 0.*P; 
 VolSrc =  0.*P;  MassErr = 0;  drhodt = 0.*P;  drhodto = 0.*P;
 rho    =  rhom0.*ones(size(Tp));
-Pt     =  Ptop + rho.*g0.*ZZ;
+rhoref =  mean(rho(inz,inx),'all');
+Pt     =  Ptop + rhoref.*g0.*ZZ;
 
 % get volume fractions and bulk density
 step    = 0;
@@ -223,11 +224,10 @@ res  = 1;  tol = 1e-12;  x = ones(size(Tp))./10;  f = v/2;
 while res > tol
     xi = x;  fi = f;
     
-    rho_fz      = (rho(1:end-1,:)+rho(2:end,:))/2;
-    Pt(2:end,:) = Ptop + repmat(cumsum(mean(rho_fz,2)*g0*h),1,Nx);% total pressure
-    Pt(1,:)     = Ptop;
-    Adbt        = aT./mean(rho(2:end-1,2:end-1),'all');
-    if Nz<=10; Pt = mean(mean(Pt(2:end-1,2:end-1))).*ones(size(T)); end
+    rhoref =  mean(rho(inz,inx),'all');
+    Pt     =  Ptop + rhoref.*g0.*ZZ;
+    Adbt   =  aT./rhoref;
+    if Nz<=10; Pt = Ptop.*ones(size(T)); end
     
     T    =  (Tp+273.15).*exp(Adbt./cP.*Pt);
 

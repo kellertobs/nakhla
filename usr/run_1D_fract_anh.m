@@ -2,10 +2,10 @@
 clear all; close all;
 
 % set run parameters
-runID    =  '1D_fract_anh_3dt';      % run identifier
+runID    =  '1D_fract_anh';      % run identifier
 opdir    =  '../out';            % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
-nop      =  100;                 % output frame plotted/saved every 'nop' time steps
+nop      =  500;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot results
 save_op  =  1;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence

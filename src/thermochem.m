@@ -100,7 +100,7 @@ EQtime = EQtime + toc(eqtime);
 % update crystal fraction
 if diseq
     
-    Gx = lambda.*Gx + (1-lambda) .* (xq-x).*rho./(3*dt);
+    Gx = lambda.*Gx + (1-lambda) .* (xq-x).*rho./(4*dt);
         
     advn_X = - advect(rho(inz,inx).*x(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);
 
@@ -121,7 +121,7 @@ end
 % update bubble fraction
 if (diseq && any([v0;v1;vwall;v(:)]>10*TINY))
     
-    Gf = lambda.*Gf + (1-lambda) .* (fq-f).*rho./(3*dt);
+    Gf = lambda.*Gf + (1-lambda) .* (fq-f).*rho./(4*dt);
     
     advn_F = - advect(rho(inz,inx).*f(inz,inx),Uf(inz,:),Wf(:,inx),h,{ADVN,''},[1,2],BCA);
 

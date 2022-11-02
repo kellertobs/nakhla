@@ -72,8 +72,7 @@ IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL; (1/2*EtaC2(:)-1/3*EtaP2(:
 
 
 % z-RHS vector
-rho_fz = (rho(1:end-1,:)+rho(2:end,:))/2;
-rr = - (rho_fz(2:end-1,2:end-1) - mean(rho_fz(2:end-1,2:end-1),2)) .* g0;
+rr = - ((rho(2:end-2,2:end-1)+rho(3:end-1,2:end-1))/2 - rhoref) .* g0;
 if bnchm; rr = rr + src_W_mms(2:end-1,2:end-1); end
 
 IIR = [IIR; ii(:)];  AAR = [AAR; rr(:)];
@@ -289,8 +288,6 @@ SOL = SCL*(LL\RR);  % update solution
 W  = full(reshape(SOL(MapW(:))        ,(Nz-1), Nx   ));                    % matrix z-velocity
 U  = full(reshape(SOL(MapU(:))        , Nz   ,(Nx-1)));                    % matrix x-velocity
 P  = full(reshape(SOL(MapP(:)+(NW+NU)), Nz   , Nx   ));                    % matrix dynamic pressure
-Pt(2:end,:) = Ptop + repmat(cumsum(mean(rho_fz,2)*g0*h),1,Nx) + P(2:end,:);% total pressure
-Pt(1,:)     = Ptop + P(1,:);
 
 % get residual of fluid mechanics equations from iterative update
 resnorm_VP = norm(SOL - SOLi,2)./(norm(SOL,2)+TINY);
