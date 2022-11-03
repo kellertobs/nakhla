@@ -85,10 +85,11 @@ end
 
 T   = max(0,min(1,(T0 - P*clap -Tphs0)./(Tphs1-Tphs0)));
 
-a = 20;
-ind1 = T>=perT+0.025;
-ind2 = T< perT-0.025;
-ind3 = T>=perT-0.025 & T<perT+0.025;
+a = 18;
+b = 0.03;
+ind1 = T>=perT+b;
+ind2 = T< perT-b;
+ind3 = T>=perT-b & T<perT+b;
 
 cx1 = max(0,min(1,          perCx .*erfc(PhDg(1).*(T-perT)./(1-perT))));
 cx2 = max(0,min(1, perCx+(1-perCx).*erfc(PhDg(2).*(T-   0)./   perT) ));
