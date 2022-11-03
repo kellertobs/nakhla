@@ -82,10 +82,9 @@ elseif Nx <= 10  % create 1D plots
     plot(phi(2:end-1,2:end-1)*100.*(phi(2:end-1,2:end-1)>1e-9),Zc(2:end-1).',CL{[1,5]},LW{:});
     title('$\mu$, $\chi$, $\phi$ [vol\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,5,5)
-    plot(-W(:,2:end-1)*hr,Zf.',CL{[1,2]},LW{:}); axis ij tight; box on; hold on;
-    plot(-(phi(1:end-1,2:end-1)+phi(2:end,2:end-1))/2.*wf(:,2:end-1)*hr,Zf.',CL{[1,5]},LW{:});
-    plot(-(chi(1:end-1,2:end-1)+chi(2:end,2:end-1))/2.*wx(:,2:end-1)*hr,Zf.',CL{[1,4]},LW{:});
-    plot(-(mu (1:end-1,2:end-1)+mu (2:end,2:end-1))/2.*wm(:,2:end-1)*hr,Zf.',CL{[1,3]},LW{:});
+    plot(                                                            -W(:,2:end-1) *hr,Zf.',CL{[1,3]},LW{:}); axis ij tight; box on; hold on;
+    plot(-(phi(1:end-1,2:end-1)+phi(2:end,2:end-1))/2.*(Wf(:,2:end-1)-W(:,2:end-1))*hr,Zf.',CL{[1,5]},LW{:});
+    plot(-(chi(1:end-1,2:end-1)+chi(2:end,2:end-1))/2.*(Wx(:,2:end-1)-W(:,2:end-1))*hr,Zf.',CL{[1,4]},LW{:});
     title('$W$, $w_\Delta^f$, $w_\Delta^x$ [m/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
 
     if ~exist('fh2','var'); fh2 = figure(VIS{:});

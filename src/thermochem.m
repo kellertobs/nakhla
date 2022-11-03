@@ -69,17 +69,9 @@ v = V./rho;
 eqtime = tic;
 
 % extract indices for which equilibrium needs updating
-if iter<=3
-    iq = true(size(x)); 
-else
-    iq = abs(xq-xqi)>1e-9;
-end
-iq([1 end],:) = false;
-iq(:,[1 end]) = false;
-xqi = xq; 
+[xq(inz,inx),cxq(inz,inx),cmq(inz,inx),fq(inz,inx),vfq(inz,inx),vmq(inz,inx)] = equilibrium(xq(inz,inx),fq(inz,inx),T(inz,inx)-273.15,c(inz,inx),v(inz,inx),Pt(inz,inx),cal,TINY);
 
-[xq(iq),cxq(iq),cmq(iq),fq(iq),vfq(iq),vmq(iq)] = equilibrium(xq(iq),fq(iq),T(iq)-273.15,c(iq),v(iq),Pt(iq),cal,TINY);
-
+% apply boundary conditions
 xq([1 end],:) = xq([2 end-1],:);
 xq(:,[1 end]) = xq(:,[2 end-1]);
 fq([1 end],:) = fq([2 end-1],:);
@@ -99,12 +91,15 @@ EQtime = EQtime + toc(eqtime);
 
 % update crystal fraction
 if diseq
-    
-    Gx = lambda.*Gx + (1-lambda) .* (xq-x).*rho./(4*dt);
-        
+
+    resGx = Gx - (xq-x).*rho./(4*dt);
+    if iter==1; resGx0 = resGx; end
+    lambda = 0.2+0.6.*max(0,min(1,(abs(resGx)./(abs(resGx0)+1e-6)).^0.2));
+    Gx = Gx - (1-lambda) .* resGx;
+
     advn_X = - advect(rho(inz,inx).*x(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);
 
-    dXdt   = advn_X + Gx(inz,inx);                                         % total rate of change
+    dXdt   = advn_X + Gx(inz,inx);                                % total rate of change
     
     X(inz,inx) = Xo(inz,inx) + (theta.*dXdt + (1-theta).*dXdto).*dt;       % explicit update of crystal fraction
     X = min(rho-F,max(0,X));                                               % enforce limits
@@ -121,8 +116,11 @@ end
 % update bubble fraction
 if (diseq && any([v0;v1;vwall;v(:)]>10*TINY))
     
-    Gf = lambda.*Gf + (1-lambda) .* (fq-f).*rho./(4*dt);
-    
+    resGf = Gf - (fq-f).*rho./(4*dt);
+    if iter==1; resGf0 = resGf; end
+    lambda = 0.2+0.6.*max(0,min(1,(abs(resGf)./(abs(resGf0)+1e-6)).^0.2));
+    Gf = Gf - (1-lambda) .* resGf;
+
     advn_F = - advect(rho(inz,inx).*f(inz,inx),Uf(inz,:),Wf(:,inx),h,{ADVN,''},[1,2],BCA);
 
     dFdt   = advn_F + Gf(inz,inx);                                         % total rate of change
@@ -164,11 +162,11 @@ vm = max(0.9.*vmq,min(1.1.*vmq,(v - f)./m));
 %% *****  UPDATE TC RESIDUALS  ********************************************
 
 % get residual of thermochemical equations from iterative update
-resnorm_TC = norm( T - Ti              ,2)./(norm(T,2)+TINY) ...
-           + norm((c - ci)             ,2)./(norm(c,2)+TINY) ...
-           + norm((v - vi)             ,2)./(norm(v,2)+TINY) ...
-           + norm((x - xi).*(x>10*TINY),2)./(norm(x,2)+TINY) ...
-           + norm((f - fi).*(f>10*TINY),2)./(norm(f,2)+TINY);
+resnorm_TC = norm( T(inz,inx) - Ti(inz,inx)                       ,2)./(norm(T(inz,inx),2)+TINY) ...
+           + norm((c(inz,inx) - ci(inz,inx))                      ,2)./(norm(c(inz,inx),2)+TINY) ...
+           + norm((v(inz,inx) - vi(inz,inx))                      ,2)./(norm(v(inz,inx),2)+TINY) ...
+           + norm((x(inz,inx) - xi(inz,inx)).*(x(inz,inx)>10*TINY),2)./(norm(x(inz,inx),2)+TINY) ...
+           + norm((f(inz,inx) - fi(inz,inx)).*(f(inz,inx)>10*TINY),2)./(norm(f(inz,inx),2)+TINY);
 
 TCtime = TCtime + toc;
 

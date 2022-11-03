@@ -36,6 +36,7 @@ while time <= tend && step <= M
     Div_rhoVo = Div_rhoV;
     etao    = eta;
     dto     = dt;
+    Gxi     = Gx;
     
     % reset residuals and iteration count
     resnorm  = 1;
