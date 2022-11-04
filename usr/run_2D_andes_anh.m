@@ -2,10 +2,10 @@
 clear all; close all;
 
 % set run parameters
-runID    =  '1D_andes_anh';      % run identifier
+runID    =  '2D_andes_anh';      % run identifier
 opdir    =  '../out';            % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
-nop      =  500;                 % output frame plotted/saved every 'nop' time steps
+nop      =  100;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot results
 save_op  =  1;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
@@ -14,8 +14,8 @@ bnchm    =  0;                   % switch on to run manufactured solution benchm
 
 % set model domain parameters
 D        =  10;                  % chamber depth [m]
-L        =  10/400;              % chamber width [m]
-N        =  400 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
+L        =  10;                  % chamber width [m]
+N        =  100 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
 h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
@@ -37,7 +37,7 @@ T1       =  1200;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
 c0       =  0.51;                % major component top layer [wt SiO2]
 c1       =  0.51;                % major component base layer [wt SiO2]
-dc       =  0e-4;                % amplitude of random noise [wt SiO2]
+dc       =  1e-4;                % amplitude of random noise [wt SiO2]
 v0       =  0.00;                % volatile component top layer [wt H2O]
 v1       =  0.00;                % volatile component base layer [wt H2O]
 dv       =  0e-6;                % amplitude of random noise [wt H2O]
@@ -45,11 +45,11 @@ dv       =  0e-6;                % amplitude of random noise [wt H2O]
 % set model trace and isotope geochemistry parameters
 te0      =  [1,1,1,1];           % trace elements top layer [wt ppm]
 te1      =  [1,1,1,1];           % trace elements base layer [wt ppm]
-dte      =  0e-3.*[-1,-1,1,1];   % trace elements random noise [wt ppm]
+dte      =  1e-3.*[-1,-1,1,1];   % trace elements random noise [wt ppm]
 Kte      =  [0.01,0.1,3,10];     % trace elements partition coefficients
 ir0      =  [0,-1];              % isotope ratios top layer [delta]
 ir1      =  [0, 1];              % isotope ratios base layer [delta]
-dir      =  [0, 0];              % isotope ratios random noise [delta]
+dir      =  [1, 0];              % isotope ratios random noise [delta]
 
 % set thermo-chemical boundary parameters
 Ptop     =  1.25e8;              % top pressure [Pa]
@@ -98,7 +98,7 @@ rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-7;                % outer its absolute tolerance
 maxit    =  10;                  % maximum outer its
 lambda   =  0.5;                 % iterative lag parameter equilibration
-etareg   =  1e0;                 % viscosity regularisation parameter
+etareg   =  10;                  % viscosity regularisation parameter
 
 
 %*****  RUN NAKHLA MODEL  *************************************************

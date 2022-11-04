@@ -43,13 +43,13 @@ v1       =  0.04;                % volatile component base layer [wt H2O]
 dv       =  0e-6;                % amplitude of random noise [wt H2O]
 
 % set model trace and isotope geochemistry parameters
-te0      =  [0.1,0.3,2,3];       % trace elements top layer [wt ppm]
-te1      =  [0.1,0.3,2,3];       % trace elements base layer [wt ppm]
-dte      =  0e-3.*[1,1,-1,-1];   % trace elements random noise [wt ppm]
+te0      =  [1,1,1,1];           % trace elements top layer [wt ppm]
+te1      =  [1,1,1,1];           % trace elements base layer [wt ppm]
+dte      =  0e-3.*[-1,-1,1,1];   % trace elements random noise [wt ppm]
 Kte      =  [0.01,0.1,3,10];     % trace elements partition coefficients
-ir0      =  [5,0.76];            % isotope ratios top layer [delta]
-ir1      =  [5,0.76];            % isotope ratios base layer [delta]
-dir      =  [0,0.0];             % isotope ratios random noise [delta]
+ir0      =  [0,-1];              % isotope ratios top layer [delta]
+ir1      =  [0, 1];              % isotope ratios base layer [delta]
+dir      =  [0, 0];              % isotope ratios random noise [delta]
 
 % set thermo-chemical boundary parameters
 Ptop     =  1.25e8;              % top pressure [Pa]
