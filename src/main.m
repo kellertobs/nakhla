@@ -54,12 +54,12 @@ while time <= tend && step <= M
 
         % solve fluid-mechanics equations
         fluidmech;
-        
-        % report convergence
-        report;
 
         % update geochemical evolution
         geochem;
+
+        % report convergence
+        report;
 
         iter = iter+1;
     end
@@ -69,10 +69,10 @@ while time <= tend && step <= M
 
     % print diagnostics
     fprintf(1,'\n         total time to solution  = %3.3f sec\n\n',toc(TTtime));
-    fprintf(1,'         fluid-mechanics solve   = %1.3e sec\n',FMtime/(iter-1));
     fprintf(1,'         thermo-chemical solve   = %1.3e sec\n',TCtime/(iter-1));
     fprintf(1,'         phase equilibr. solve   = %1.3e sec\n',EQtime/(iter-1));
-    fprintf(1,'         coefficients update     = %1.3e sec\n\n',UDtime/(iter-1));
+    fprintf(1,'         coefficients update     = %1.3e sec\n',UDtime/(iter-1));
+    fprintf(1,'         fluid-mechanics solve   = %1.3e sec\n\n',FMtime/(iter-1));
     
     fprintf(1,'         min T   =  %4.1f;    mean T   = %4.1f;    max T   = %4.1f;   [degC]\n' ,min(T(:)-273.15),mean(T(:)-273.15),max(T(:)-273.15));
     fprintf(1,'         min c   =  %1.4f;    mean c   = %1.4f;    max c   = %1.4f;   [wt]\n'   ,min(c(:)  ),mean(c(:)  ),max(c(:)  ));
