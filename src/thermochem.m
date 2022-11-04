@@ -28,15 +28,10 @@ S(:,[1 end]) = S(:,[2 end-1]);
 % update major component
 advn_C = - advect(rho(inz,inx).*m(inz,inx).*cm(inz,inx),Um(inz,:),Wm(:,inx),h,{ADVN,''},[1,2],BCA) ...  % major component advection
          - advect(rho(inz,inx).*x(inz,inx).*cx(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);
-    
-qCz    = - (kc(1:end-1,:)+kc(2:end,:))./2 .* ddz(c,h);                     % component diffusion z-flux
-qCx    = - (kc(:,1:end-1)+kc(:,2:end))./2 .* ddx(c,h);                     % component diffusion x-flux
-diff_C = (- ddz(qCz(:,inx),h)  ...                                         % component diffusion
-          - ddx(qCx(inz,:),h));
 
 if ~isnan(cwall); bnd_C = rho(inz,inx).*(cwall-c(inz,inx))./tau_a .* bndshape; end % impose boundary layer
 
-dCdt = advn_C + diff_C + bnd_C;                                            % total rate of change
+dCdt = advn_C + bnd_C;                                                     % total rate of change
     
 C(inz,inx)   = Co(inz,inx) + (theta.*dCdt + (1-theta).*dCdto).*dt;         % explicit update of major component density
 C([1 end],:) = C([2 end-1],:);                                             % apply boundary conditions
@@ -92,34 +87,28 @@ EQtime = EQtime + toc(eqtime);
 % update crystal fraction
 if diseq
 
-    resGx = Gx - (xq-x).*rho./(4*dt);
-    if iter==1; resGx0 = resGx; end
-    lambda = 0.2+0.6.*max(0,min(1,(abs(resGx)./(abs(resGx0)+1e-6)).^0.2));
-    Gx = Gx - (1-lambda) .* resGx;
+    Gx = lambda * Gx + (1-lambda) * (xq-x).*rho./(4*dt);
 
     advn_X = - advect(rho(inz,inx).*x(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);
 
     dXdt   = advn_X + Gx(inz,inx);                                % total rate of change
     
     X(inz,inx) = Xo(inz,inx) + (theta.*dXdt + (1-theta).*dXdto).*dt;       % explicit update of crystal fraction
-    X = min(rho-F,max(0,X));                                               % enforce limits
+    X = min(rho,max(0,X));                                                 % enforce limits
     X([1 end],:) = X([2 end-1],:);                                         % apply boundary conditions
     X(:,[1 end]) = X(:,[2 end-1]);
 
 else
     
     X  =  lambda.*X + (1-lambda).*xq.*rho;
-    Gx(inz,inx) = (X(inz,inx)-Xo(inz,inx))./dt + advect(rho(inz,inx).*x(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);     % reconstruct crystallisation rate
+    Gx(inz,inx) = (X(inz,inx)-Xo(inz,inx))./dt + advect(rho(inz,inx).*x(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);  % reconstruct crystallisation rate
     
 end
 
 % update bubble fraction
 if (diseq && any([v0;v1;vwall;v(:)]>10*TINY))
     
-    resGf = Gf - (fq-f).*rho./(4*dt);
-    if iter==1; resGf0 = resGf; end
-    lambda = 0.2+0.6.*max(0,min(1,(abs(resGf)./(abs(resGf0)+1e-6)).^0.2));
-    Gf = Gf - (1-lambda) .* resGf;
+    Gf = lambda * Gf + (1-lambda) * (fq-f).*rho./(4*dt);
 
     advn_F = - advect(rho(inz,inx).*f(inz,inx),Uf(inz,:),Wf(:,inx),h,{ADVN,''},[1,2],BCA);
 
@@ -133,7 +122,7 @@ if (diseq && any([v0;v1;vwall;v(:)]>10*TINY))
 else
     
     F  =  lambda.*F + (1-lambda).*fq.*rho;
-    Gf(inz,inx) = (F(inz,inx)-Fo(inz,inx))./dt + advect(rho(inz,inx).*f(inz,inx),Uf(inz,:),Wf(:,inx),h,{ADVN,''},[1,2],BCA);     % reconstruct exsolution rate
+    Gf(inz,inx) = (F(inz,inx)-Fo(inz,inx))./dt + advect(rho(inz,inx).*f(inz,inx),Uf(inz,:),Wf(:,inx),h,{ADVN,''},[1,2],BCA);  % reconstruct exsolution rate
     
 end
 
@@ -168,5 +157,5 @@ resnorm_TC = norm( T(inz,inx) - Ti(inz,inx)                       ,2)./(norm(T(i
            + norm((x(inz,inx) - xi(inz,inx)).*(x(inz,inx)>10*TINY),2)./(norm(x(inz,inx),2)+TINY) ...
            + norm((f(inz,inx) - fi(inz,inx)).*(f(inz,inx)>10*TINY),2)./(norm(f(inz,inx),2)+TINY);
 
-TCtime = TCtime + toc;
+TCtime = TCtime + toc - toc(eqtime);
 

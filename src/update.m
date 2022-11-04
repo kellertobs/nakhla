@@ -112,10 +112,7 @@ wf(:,[1 end]) = -sds*wf(:,[2 end-1]);
 
 % diffusion parameters
 ks = kT./T;                                                                % entropy diffusion
-% kc = kT./cP./10 .* mu;                                                      % chemical diffusion
-% kx = kT./cP./10 .* mu;                                                      % chemical diffusion
-kc = 0.*rho.*abs((rhox-rho).*g0.*Csgr_x.*d0);           % chemical diffusion by fluctuation in crystal segregation speed
-kx = abs((rhox-rho).*g0.*Csgr_x.*d0);
+kx = abs((rhox-rho).*g0.*Csgr_x.*d0);                                      % phase volume diffusion
 
 % update velocity divergence
 Div_V(2:end-1,2:end-1) = ddz(W(:,2:end-1),h) ...                           % get velocity divergence
