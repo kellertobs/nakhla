@@ -162,17 +162,17 @@ else
     hist.rhof(stp,1:3) = NaN;
 end
 
-hist.Gx(stp,1) = min(min(Gx(2:end-1,2:end-1)));
-hist.Gx(stp,2) = mean(mean(Gx(2:end-1,2:end-1)));
-hist.Gx(stp,3) = max(max(Gx(2:end-1,2:end-1)));
+hist.Gx(stp,1) = min(min(Gx));
+hist.Gx(stp,2) = mean(mean(Gx));
+hist.Gx(stp,3) = max(max(Gx));
 
-hist.Gf(stp,1) = min(min(Gf(2:end-1,2:end-1)));
-hist.Gf(stp,2) = mean(mean(Gf(2:end-1,2:end-1)));
-hist.Gf(stp,3) = max(max(Gf(2:end-1,2:end-1)));
+hist.Gf(stp,1) = min(min(Gf));
+hist.Gf(stp,2) = mean(mean(Gf));
+hist.Gf(stp,3) = max(max(Gf));
 
-hist.dV(stp,1) = min(min(VolSrc(2:end-1,2:end-1)));
-hist.dV(stp,2) = mean(mean(VolSrc(2:end-1,2:end-1)));
-hist.dV(stp,3) = max(max(VolSrc(2:end-1,2:end-1)));
+hist.dV(stp,1) = min(min(VolSrc));
+hist.dV(stp,2) = mean(mean(VolSrc));
+hist.dV(stp,3) = max(max(VolSrc));
 
 hist.rho(stp,1) = min(min(rho(2:end-1,2:end-1)));
 hist.rho(stp,2) = mean(mean(rho(2:end-1,2:end-1)));

@@ -249,7 +249,7 @@ AAR  = [];       % forcing entries for R
 
 ii = MapP(2:end-1,2:end-1);
 
-rr = VolSrc(2:end-1,2:end-1);
+rr = VolSrc;
 if bnchm; rr = rr + src_P_mms(2:end-1,2:end-1); end
 
 IIR = [IIR; ii(:)]; AAR = [AAR; rr(:)];

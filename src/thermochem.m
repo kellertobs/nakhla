@@ -87,11 +87,11 @@ EQtime = EQtime + toc(eqtime);
 % update crystal fraction
 if diseq
 
-    Gx = lambda * Gx + (1-lambda) * (xq-x).*rho./(4*dt);
+    Gx = lambda * Gx + (1-lambda) * (xq(inz,inx)-x(inz,inx)).*rho(inz,inx)./(4*dt);
 
     advn_X = - advect(rho(inz,inx).*x(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);
 
-    dXdt   = advn_X + Gx(inz,inx);                                % total rate of change
+    dXdt   = advn_X + Gx;                                                  % total rate of change
     
     X(inz,inx) = Xo(inz,inx) + (theta.*dXdt + (1-theta).*dXdto).*dt;       % explicit update of crystal fraction
     X = min(rho,max(0,X));                                                 % enforce limits
@@ -101,29 +101,31 @@ if diseq
 else
     
     X  =  lambda.*X + (1-lambda).*xq.*rho;
-    Gx(inz,inx) = (X(inz,inx)-Xo(inz,inx))./dt + advect(rho(inz,inx).*x(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);  % reconstruct crystallisation rate
+    Gx = (X(inz,inx)-Xo(inz,inx))./dt + advect(rho(inz,inx).*x(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);  % reconstruct crystallisation rate
     
 end
 
 % update bubble fraction
-if (diseq && any([v0;v1;vwall;v(:)]>10*TINY))
-    
-    Gf = lambda * Gf + (1-lambda) * (fq-f).*rho./(4*dt);
+if any([v0;v1;vwall;v(:)]>10*TINY)
+    if diseq
 
-    advn_F = - advect(rho(inz,inx).*f(inz,inx),Uf(inz,:),Wf(:,inx),h,{ADVN,''},[1,2],BCA);
+        Gf = lambda * Gf + (1-lambda) * (fq(inz,inx)-f(inz,inx)).*rho(inz,inx)./(4*dt);
 
-    dFdt   = advn_F + Gf(inz,inx);                                         % total rate of change
-    
-    F(inz,inx) = Fo(inz,inx) + (theta.*dFdt + (1-theta).*dFdto).*dt;       % explicit update of bubble fraction
-    F = min(rho-X,max(0,F));                                               % enforce limits
-    F([1 end],:) = F([2 end-1],:);                                         % apply boundary conditions
-    F(:,[1 end]) = F(:,[2 end-1]);
+        advn_F = - advect(rho(inz,inx).*f(inz,inx),Uf(inz,:),Wf(:,inx),h,{ADVN,''},[1,2],BCA);
 
-else
-    
-    F  =  lambda.*F + (1-lambda).*fq.*rho;
-    Gf(inz,inx) = (F(inz,inx)-Fo(inz,inx))./dt + advect(rho(inz,inx).*f(inz,inx),Uf(inz,:),Wf(:,inx),h,{ADVN,''},[1,2],BCA);  % reconstruct exsolution rate
-    
+        dFdt   = advn_F + Gf;                                                  % total rate of change
+
+        F(inz,inx) = Fo(inz,inx) + (theta.*dFdt + (1-theta).*dFdto).*dt;       % explicit update of bubble fraction
+        F = min(rho-X,max(0,F));                                               % enforce limits
+        F([1 end],:) = F([2 end-1],:);                                         % apply boundary conditions
+        F(:,[1 end]) = F(:,[2 end-1]);
+
+    else
+
+        F  =  lambda.*F + (1-lambda).*fq.*rho;
+        Gf = (F(inz,inx)-Fo(inz,inx))./dt + advect(rho(inz,inx).*f(inz,inx),Uf(inz,:),Wf(:,inx),h,{ADVN,''},[1,2],BCA);  % reconstruct exsolution rate
+
+    end
 end
 
 % update phase fractions

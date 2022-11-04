@@ -161,11 +161,11 @@ Div_rhoV =  + advect(rho(inz,inx).*m(inz,inx),Um(inz,:)-U(inz,:),Wm(:,inx)-W(:,i
             + advect(rho(inz,inx).*x(inz,inx),Ux(inz,:)-U(inz,:),Wx(:,inx)-W(:,inx),h,{ADVN,''   },[1,2],BCA) ...
             + advect(rho(inz,inx).*f(inz,inx),Uf(inz,:)-U(inz,:),Wf(:,inx)-W(:,inx),h,{ADVN,''   },[1,2],BCA) ...
             + advect(rho(inz,inx)            ,          U(inz,:),          W(:,inx),h,{ADVN,'vdf'},[1,2],BCA);
-if step>0; VolSrc(inz,inx) = -((rho(inz,inx)-rhoo(inz,inx))./dt + Div_rhoV)./rho(inz,inx); end
+if step>0; VolSrc = -((rho(inz,inx)-rhoo(inz,inx))./dt + Div_rhoV)./rho(inz,inx); end
 % if step>0; VolSrc(inz,inx) = -((rho(inz,inx)-rhoo(inz,inx))./dt + theta.*Div_rhoV + (1-theta).*Div_rhoVo)./rho(inz,inx); end
 
-UBG    = - 1*mean(mean(VolSrc(inz,inx)))./2 .* (L/2-XXu);
-WBG    = - 1*mean(mean(VolSrc(inz,inx)))./2 .* (D/2-ZZw);
+UBG    = - 1*mean(mean(VolSrc))./2 .* (L/2-XXu);
+WBG    = - 1*mean(mean(VolSrc))./2 .* (D/2-ZZw);
 end
 
 UDtime = UDtime + toc;

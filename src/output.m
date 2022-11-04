@@ -101,11 +101,11 @@ elseif Nx <= 10  % create 1D plots
     semilogx(eta(2:end-1,2:end-1),Zc(2:end-1).',CL{[1,2]},LW{:});
     title('$\bar{\eta}$ [Pas]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,5,3)
-    plot(    Gx(2:end-1,2:end-1)./rho(2:end-1,2:end-1)*hr.*(chi(2:end-1,2:end-1)>1e-9),Zc(2:end-1).',CL{[1,4]},LW{:}); axis ij tight; box on; hold on;
-    plot(10.*Gf(2:end-1,2:end-1)./rho(2:end-1,2:end-1)*hr.*(phi(2:end-1,2:end-1)>1e-9),Zc(2:end-1).',CL{[1,5]},LW{:});
+    plot(    Gx./rho(2:end-1,2:end-1)*hr.*(chi(2:end-1,2:end-1)>1e-9),Zc(2:end-1).',CL{[1,4]},LW{:}); axis ij tight; box on; hold on;
+    plot(10.*Gf./rho(2:end-1,2:end-1)*hr.*(phi(2:end-1,2:end-1)>1e-9),Zc(2:end-1).',CL{[1,5]},LW{:});
     title('$10 \times \Gamma_f/\bar{\rho}$, $\Gamma_x/\bar{\rho}$ [wt/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,5,4)
-    plot(VolSrc(2:end-1,2:end-1),Zc(2:end-1).',CL{[1,2]},LW{:}); axis ij tight; box on;
+    plot(VolSrc,Zc(2:end-1).',CL{[1,2]},LW{:}); axis ij tight; box on;
     title('$\dot{V}$ [1/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,5,5)
     plot(P(2:end-1,2:end-1)/1e3,Zc(2:end-1).',CL{[1,2]},LW{:}); axis ij tight; box on;
@@ -257,10 +257,10 @@ else % create 2D plots
     imagesc(Xc(2:end-1),Zc(2:end-1),phi(2:end-1,2:end-1).*100.*(phi(2:end-1,2:end-1)>1e-9)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\phi$ [vol\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
     set(fh3,'CurrentAxes',ax(33));
-    imagesc(Xc(2:end-1),Zc(2:end-1),Gx(2:end-1,2:end-1)./rho(2:end-1,2:end-1)*hr*100.*(chi(2:end-1,2:end-1)>1e-9)); axis ij equal tight; box on; cb = colorbar;
+    imagesc(Xc(2:end-1),Zc(2:end-1),Gx./rho(2:end-1,2:end-1)*hr*100.*(chi(2:end-1,2:end-1)>1e-9)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\Gamma_x/\bar{\rho}$ [wt\%/hr]'],TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:}); xlabel('Width [m]',TX{:},FS{:});
     set(fh3,'CurrentAxes',ax(34));
-    imagesc(Xc(2:end-1),Zc(2:end-1),Gf(2:end-1,2:end-1)./rho(2:end-1,2:end-1)*hr*100.*(phi(2:end-1,2:end-1)>1e-9)); axis ij equal tight; box on; cb = colorbar;
+    imagesc(Xc(2:end-1),Zc(2:end-1),Gf./rho(2:end-1,2:end-1)*hr*100.*(phi(2:end-1,2:end-1)>1e-9)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\Gamma_f/\bar{\rho}$ [wt\%/hr]'],TX{:},FS{:}); xlabel('Width [m]',TX{:},FS{:}); set(gca,'YTickLabel',[]);
     sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
 

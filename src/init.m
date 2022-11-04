@@ -208,7 +208,7 @@ eIIref =  1e-6;
 Div_V  =  0.*P;  Div_rhoV = 0.*P(inz,inx);  Div_rhoVo = Div_rhoV;
 exx    =  0.*P;  ezz = 0.*P;  exz = zeros(Nz-1,Nx-1);  eII = 0.*P;  
 txx    =  0.*P;  tzz = 0.*P;  txz = zeros(Nz-1,Nx-1);  tII = 0.*P; 
-VolSrc =  0.*P;  MassErr = 0;  drhodt = 0.*P;  drhodto = 0.*P;
+VolSrc =  0.*P(inz,inx);  MassErr = 0;  drhodt = 0.*P;  drhodto = 0.*P;
 rho    =  rhom0.*ones(size(Tp));
 rhoref =  mean(rho(inz,inx),'all');
 Pt     =  Ptop + rhoref.*g0.*ZZ;
@@ -274,7 +274,7 @@ for k = 1:length(ir0)
 end
 
 % initialise phase change rates
-Gx = 0.*x;  Gf = 0.*f;
+Gx = 0.*x(inz,inx);  Gf = 0.*f(inz,inx);
 
 % initialise auxiliary variables 
 dSdt   = 0.*T(inz,inx);  diss_h = 0.*T(inz,inx);
