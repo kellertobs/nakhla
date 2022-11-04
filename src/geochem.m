@@ -2,8 +2,8 @@
 
 % *****  Trace Elements  **************************************************
 
-advn_TE = zeros(size(TE(inz,inx,:)));
-diff_TE = zeros(size(TE(inz,inx,:)));
+bnd_TE = zeros(size(TE(inz,inx,:)));
+adv_TE = zeros(size(TE(inz,inx,:)));
 for i = 1:length(te0)
     
     % update trace element phase compositions
@@ -11,18 +11,15 @@ for i = 1:length(te0)
     tex(:,:,i)  = te(:,:,i)./(m./Kte(i)  + x);
 
     % get trace element advection
-    advn_TE(:,:,i) = - advect(rho(inz,inx).*m(inz,inx).*tem(inz,inx,i),Um(inz,:),Wm(:,inx),h,{ADVN,''},[1,2],BCA) ...
-                     - advect(rho(inz,inx).*x(inz,inx).*tex(inz,inx,i),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);
+    adv_TE(:,:,i) = - advect(rho(inz,inx).*m(inz,inx).*tem(inz,inx,i),Um(inz,:),Wm(:,inx),h,{ADVN,''},[1,2],BCA) ...
+                    - advect(rho(inz,inx).*x(inz,inx).*tex(inz,inx,i),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);
 
-    % get isotope ratio diffusion
-    qz = - (kc(1:end-1,:)+kc(2:end,:))./2 .* ddz(te(:,:,i),h);
-    qx = - (kc(:,1:end-1)+kc(:,2:end))./2 .* ddx(te(:,:,i),h);
-    diff_TE(:,:,i) = (- ddz(qz(:,inx),h)  ...
-                      - ddx(qx(inz,:),h));
+    % get trace element assimilation
+    if ~isnan(tewall(i)); bnd_TE(:,:,i) = bnd_TE(:,:,i) + (tewall(i)-te(inz,inx,i)).*rho(inz,inx)./tau_a .* bndshape; end
 end
 
 % get total rate of change
-dTEdt = advn_TE + diff_TE;
+dTEdt = adv_TE + bnd_TE;
 
 % update trace element concentrations
 TE(inz,inx,:) = TEo(inz,inx,:) + (theta.*dTEdt + (1-theta).*dTEdto).*dt;   % explicit update
@@ -33,27 +30,25 @@ TE(:,[1 end],:) = TE(:,[2 end-1],:);
 
 % *****  Isotope Ratios  **************************************************
 
-advn_IR = zeros(size(IR(inz,inx,:)));
-diff_IR = zeros(size(IR(inz,inx,:)));
+bnd_IR = zeros(size(IR(inz,inx,:)));
+adv_IR = zeros(size(IR(inz,inx,:)));
 for i = 1:length(ir0)
     % get isotope ratio advection
-    advn_IR(:,:,i) = - advect(rho(inz,inx).*m(inz,inx).*ir(inz,inx,i),Um(inz,:),Wm(:,inx),h,{ADVN,''},[1,2],BCA) ...
-                     - advect(rho(inz,inx).*x(inz,inx).*ir(inz,inx,i),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);
+    adv_IR(:,:,i) = - advect(rho(inz,inx).*m(inz,inx).*ir(inz,inx,i),Um(inz,:),Wm(:,inx),h,{ADVN,''},[1,2],BCA) ...
+                    - advect(rho(inz,inx).*x(inz,inx).*ir(inz,inx,i),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);
 
-    % get isotope ratio diffusion
-    qz = - (kc(1:end-1,:)+kc(2:end,:))./2 .* ddz(ir(:,:,i),h);
-    qx = - (kc(:,1:end-1)+kc(:,2:end))./2 .* ddx(ir(:,:,i),h);
-    diff_IR(:,:,i) = (- ddz(qz(:,inx),h)  ...
-                      - ddx(qx(inz,:),h));
+    % get isotope ratio assimilation
+    if ~isnan(irwall(i)); bnd_IR(:,:,i) = bnd_IR(:,:,i) + (irwall(i)-ir(inz,inx,i)).*rho(inz,inx)./tau_a .* bndshape; end
 end
 
 % get total rate of change
-dIRdt = advn_IR + diff_IR;
+dIRdt = adv_IR + bnd_IR;
 
 % update isotope ratio concentrations
 IR(inz,inx,:) = IRo(inz,inx,:) + (theta.*dIRdt + (1-theta).*dIRdto).*dt;   % explicit update
 IR([1 end],:,:) = IR([2 end-1],:,:);                                       % boundary conditions
 IR(:,[1 end],:) = IR(:,[2 end-1],:);
 
+% convert from mixture density to concentration
 for i = 1:length(te0); te(:,:,i) = TE(:,:,i)./rho; end
 for i = 1:length(ir0); ir(:,:,i) = IR(:,:,i)./rho; end
