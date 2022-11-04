@@ -2,7 +2,7 @@
 clear all; close all;
 
 % set run parameters
-runID    =  '1D_fract_sat';      % run identifier
+runID    =  '1D_andes_sat';      % run identifier
 opdir    =  '../out';            % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  500;                 % output frame plotted/saved every 'nop' time steps
@@ -67,7 +67,7 @@ tewall   =  [nan,nan,nan,nan];   % wall trace elements [wt ppm] (nan = no assimi
 irwall   =  [nan,nan,nan,nan];   % wall isotope ratios [delta] (nan = no assimilation)
 
 % set thermo-chemical material parameters
-calID    =  'krafla';            % phase diagram calibration
+calID    =  'andes';             % phase diagram calibration
 kT       =  4;                   % thermal conductivity [W/m/K]
 cP       =  1200;                % heat capacity [J/kg/K]
 Dsx      = -300;                 % entropy change of crystallisation [J/kg]
