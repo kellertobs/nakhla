@@ -11,7 +11,7 @@ cal.oxd    = [  42.7    0.0    0.0    0.0   57.3    0.0    0.0    0.0     % for
 
 cal.cmpStr = {'for','fay','opx','cpx','ant','alb','kfs','qtz'};
 cal.cmp    = [  95.0    5.0    0.0    0.0    0.0    0.0    0.0    0.0     % cphs0 => dunite
-                12.0    8.0   38.0   18.0   24.0    0.0    0.0    0.0     % perCx => pyroxenite
+                12.0    8.0   34.0   20.0   24.0    2.0    0.0    0.0     % perCx => pyroxenite
                  1.0    1.5   15.0   34.0   28.0   20.0    0.5    0.0     % perCm => basalt
                  0.0    0.0    0.0    8.0    9.0   15.0   31.0   37.0];   % cphs1 => rhyolite
 

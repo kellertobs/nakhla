@@ -97,7 +97,7 @@ BCA      =  {'',''};             % boundary condition on advection (top/bot, sid
 rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-7;                % outer its absolute tolerance
 maxit    =  10;                  % maximum outer its
-lambda   =  0.333;               % iterative lag parameter equilibration
+lambda   =  0.5;                 % iterative lag parameter equilibration
 etareg   =  1e0;                 % viscosity regularisation parameter
 
 
