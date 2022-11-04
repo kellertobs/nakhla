@@ -21,7 +21,7 @@ calibrt =  0;                % not in calibrate mode
 TINY    =  1e-16;            % minimum cutoff phase, component fractions
 
 % calculate dimensionless numbers characterising the system dynamics
-[x0,cx0,cm0,f0,vf0,vm0] = equilibrium(0,0,T0,c0,v0,Ptop,cal,TINY);
+[x0,cx0,cm0,f0,vf0,vm0] = equilibrium(0.5,v0/2,T0,c0,v0,Ptop,cal,TINY);
 
 fprintf('    initial T: %4.3f \n'  ,T0);
 fprintf('    initial c: %4.3f \n'  ,c0);
