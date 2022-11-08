@@ -34,6 +34,7 @@ while time <= tend && step <= M
     dIRdto  = dIRdt;
     rhoo    = rho;
     Div_rhoVo = Div_rhoV;
+    Div_Vo  = Div_V;
     etao    = eta;
     dto     = dt;
     Gxi     = Gx;

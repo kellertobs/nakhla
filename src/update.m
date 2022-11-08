@@ -112,7 +112,8 @@ wf(:,[1 end]) = -sds*wf(:,[2 end-1]);
 
 % diffusion parameters
 ks = kT./T;                                                                % entropy diffusion
-kx = abs((rhox-rho).*g0.*Csgr_x.*d0);                                      % phase volume diffusion
+% kx = abs((rhox-rho).*g0.*Csgr_x.*d0);                                      % phase volume diffusion
+kc = rho.*abs((rhox-rho).*g0.*Csgr_x*d0);                                  % component diffusion
 
 % update velocity divergence
 Div_V(2:end-1,2:end-1) = ddz(W(:,2:end-1),h) ...                           % get velocity divergence
@@ -157,12 +158,13 @@ diss =  exx(2:end-1,2:end-1).*txx(2:end-1,2:end-1) ...
      +  ks(2:end-1,2:end-1).*(grdTz(2:end-1,2:end-1).^2 + grdTx(2:end-1,2:end-1).^2);
 
 % update volume source
-Div_rhoV =  + advect(rho(inz,inx).*m(inz,inx),Um(inz,:)-U(inz,:),Wm(:,inx)-W(:,inx),h,{ADVN,''   },[1,2],BCA) ...
-            + advect(rho(inz,inx).*x(inz,inx),Ux(inz,:)-U(inz,:),Wx(:,inx)-W(:,inx),h,{ADVN,''   },[1,2],BCA) ...
-            + advect(rho(inz,inx).*f(inz,inx),Uf(inz,:)-U(inz,:),Wf(:,inx)-W(:,inx),h,{ADVN,''   },[1,2],BCA) ...
-            + advect(rho(inz,inx)            ,          U(inz,:),          W(:,inx),h,{ADVN,'vdf'},[1,2],BCA);
+Div_rhoVi =  + advect(rho(inz,inx).*m(inz,inx),0.*U(inz,:),wm(:,inx),h,{ADVN,''   },[1,2],BCA) ...
+             + advect(rho(inz,inx).*x(inz,inx),0.*U(inz,:),wx(:,inx),h,{ADVN,''   },[1,2],BCA) ...
+             + advect(rho(inz,inx).*f(inz,inx),0.*U(inz,:),wf(:,inx),h,{ADVN,''   },[1,2],BCA) ...
+             + advect(rho(inz,inx)            ,   U(inz,:), W(:,inx),h,{ADVN,'vdf'},[1,2],BCA);
+Div_rhoV = lambda.*Div_rhoV + (1-lambda).*Div_rhoVi;
 if step>0; VolSrc = -((rho(inz,inx)-rhoo(inz,inx))./dt + Div_rhoV)./rho(inz,inx); end
-% if step>0; VolSrc(inz,inx) = -((rho(inz,inx)-rhoo(inz,inx))./dt + theta.*Div_rhoV + (1-theta).*Div_rhoVo)./rho(inz,inx); end
+% if step>0; VolSrc = -((rho(inz,inx)-rhoo(inz,inx))./dt + theta.*Div_rhoV + (1-theta).*(Div_rhoVo+rhoo(inz,inx).*Div_Vo(inz,inx)))./rho(inz,inx)/theta; end
 
 UBG    = - 1*mean(mean(VolSrc))./2 .* (L/2-XXu);
 WBG    = - 1*mean(mean(VolSrc))./2 .* (D/2-ZZw);

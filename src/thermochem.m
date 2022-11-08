@@ -9,17 +9,17 @@ advn_S = - advect(rho(inz,inx).*m(inz,inx).*sm(inz,inx),Um(inz,:),Wm(:,inx),h,{A
          - advect(rho(inz,inx).*x(inz,inx).*sx(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA) ...
          - advect(rho(inz,inx).*f(inz,inx).*sf(inz,inx),Uf(inz,:),Wf(:,inx),h,{ADVN,''},[1,2],BCA);
 
-qTz    = - (ks(1:end-1,:)+ks(2:end,:))./2 .* ddz(T,h);                     % heat diffusion z-flux
-qTx    = - (ks(:,1:end-1)+ks(:,2:end))./2 .* ddx(T,h);                     % heat diffusion x-flux
-diff_T = (- ddz(qTz(:,inx),h)  ...                                         % heat diffusion
-          - ddx(qTx(inz,:),h));
+qSz    = - (ks(1:end-1,:)+ks(2:end,:))./2 .* ddz(T,h);
+qSx    = - (ks(:,1:end-1)+ks(:,2:end))./2 .* ddx(T,h);
+diff_S = (- ddz(qSz(:,inx),h)  ...
+          - ddx(qSx(inz,:),h));
 
 diss_h = diss ./ T(inz,inx);
 
 if ~isnan(Twall); bnd_T = ((Twall+273.15)-T(inz,inx))./tau_T .* bndshape; end % impose top boundary layer
 bnd_S = rho(inz,inx).*cP.*bnd_T./T(inz,inx);
 
-dSdt = advn_S + diff_T + diss_h + bnd_S;                                   % total rate of change
+dSdt = advn_S + diff_S + diss_h + bnd_S;                                   % total rate of change
 
 S(inz,inx)   = So(inz,inx) + (theta.*dSdt + (1-theta).*dSdto).*dt;         % explicit update of major component density
 S([1 end],:) = S([2 end-1],:);                                             % apply zero flux boundary conditions
@@ -29,9 +29,14 @@ S(:,[1 end]) = S(:,[2 end-1]);
 advn_C = - advect(rho(inz,inx).*m(inz,inx).*cm(inz,inx),Um(inz,:),Wm(:,inx),h,{ADVN,''},[1,2],BCA) ...  % major component advection
          - advect(rho(inz,inx).*x(inz,inx).*cx(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);
 
+qCz    = - (kc(1:end-1,:)+kc(2:end,:))./2 .* ddz(c,h);
+qCx    = - (kc(:,1:end-1)+kc(:,2:end))./2 .* ddx(c,h);
+diff_C = (- ddz(qCz(:,inx),h)  ...
+          - ddx(qCx(inz,:),h));
+
 if ~isnan(cwall); bnd_C = rho(inz,inx).*(cwall-c(inz,inx))./tau_a .* bndshape; end % impose boundary layer
 
-dCdt = advn_C + bnd_C;                                                     % total rate of change
+dCdt = advn_C + diff_C + bnd_C;                                            % total rate of change
     
 C(inz,inx)   = Co(inz,inx) + (theta.*dCdt + (1-theta).*dCdto).*dt;         % explicit update of major component density
 C([1 end],:) = C([2 end-1],:);                                             % apply boundary conditions
@@ -42,9 +47,14 @@ if any([v0;v1;vwall;v(:)]>10*TINY)
     advn_V = - advect(rho(inz,inx).*m(inz,inx).*vm(inz,inx),Um(inz,:),Wm(:,inx),h,{ADVN,''},[1,2],BCA) ...  % volatile component advection
              - advect(rho(inz,inx).*f(inz,inx).*vf(inz,inx),Uf(inz,:),Wf(:,inx),h,{ADVN,''},[1,2],BCA);
     
+    qVz    = - (kc(1:end-1,:)+kc(2:end,:))./2 .* ddz(v,h);
+    qVx    = - (kc(:,1:end-1)+kc(:,2:end))./2 .* ddx(v,h);
+    diff_V = (- ddz(qVz(:,inx),h)  ...
+              - ddx(qVx(inz,:),h));
+
     if ~isnan(vwall); bnd_V = rho(inz,inx).*(vwall-v(inz,inx))./tau_a .* bndshape; end % impose boundary layer
     
-    dVdt = advn_V + bnd_V;                                                 % total rate of change
+    dVdt = advn_V + diff_V + bnd_V;                                                 % total rate of change
     
     V(inz,inx)   = Vo(inz,inx) + (theta.*dVdt + (1-theta).*dVdto).*dt;     % explicit update of volatile component density
     V([1 end],:) = V([2 end-1],:);                                         % apply boundary conditions
