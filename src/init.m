@@ -227,7 +227,7 @@ while res > tol
     rhoref =  mean(rho(inz,inx),'all');
     Pt     =  Ptop + rhoref.*g0.*ZZ;
     Adbt   =  aT./rhoref;
-    if Nz<=10; Pt = Ptop.*ones(size(T)); end
+    if Nz<=10; Pt = Ptop.*ones(size(Tp)); end
     
     T    =  (Tp+273.15).*exp(Adbt./cP.*Pt);
 

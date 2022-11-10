@@ -52,11 +52,11 @@ while resnorm > tol && iter < maxit
     xq = max(0,min(1   ,xq - beta*(resx./dresx_dx)));
     fq = max(0,min(1-xq,fq - beta*(resf./dresf_df)));
     
-    indx = xq>10*TINY & xq<1-10*TINY;
-    indf = fq>10*TINY & fq<1-10*TINY;
+    indx = xq>0 & xq<1 & xq+fq<1;
+    indf = fq>0 & fq<1 & xq+fq<1;
 
     resnorm = (norm(resx(indx(:)),2) + norm(resf(indf(:)),2))/sqrt(length(xq(:)));
-    
+
     iter    = iter+1;
 end
 
@@ -86,7 +86,7 @@ end
 T   = max(0,min(1,(T0 - P*clap -Tphs0)./(Tphs1-Tphs0)));
 
 a = 15;
-b = 0.025;
+b = 0.035;
 ind1 = T>=perT+b;
 ind2 = T< perT-b;
 ind3 = T>=perT-b & T<perT+b;
@@ -113,7 +113,7 @@ cmq(ind3) = (cm1(ind3).^a+cm2(ind3).^a).^(1/a);
 cxq = max(cphs0,min(c./(1-fq),cphs0 + cxq.*(cphs1-cphs0)));
 cmq = min(cphs1,max(c./(1-fq),cphs0 + cmq.*(cphs1-cphs0)));
 
-resx = c - (xq.*cxq + max(0,min(1,1-xq-fq)).*cmq);
-resf = v - (fq.*vfq + max(0,min(1,1-xq-fq)).*vmq);
+resx = c - (xq.*cxq + (1-xq-fq).*cmq);
+resf = v - (fq.*vfq + (1-xq-fq).*vmq);
 
 end

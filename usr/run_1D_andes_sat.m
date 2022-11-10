@@ -37,10 +37,10 @@ T1       =  1100;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
 c0       =  0.507;               % major component top layer [wt SiO2]
 c1       =  0.507;               % major component base layer [wt SiO2]
-dc       =  0e-4;                % amplitude of random noise [wt SiO2]
+dc       =  1e-4;                % amplitude of random noise [wt SiO2]
 v0       =  0.04;                % volatile component top layer [wt H2O]
 v1       =  0.04;                % volatile component base layer [wt H2O]
-dv       =  0e-6;                % amplitude of random noise [wt H2O]
+dv       =  1e-5;                % amplitude of random noise [wt H2O]
 
 % set model trace and isotope geochemistry parameters
 te0      =  [1,1,1,1];           % trace elements top layer [wt ppm]
@@ -97,7 +97,7 @@ BCA      =  {'',''};             % boundary condition on advection (top/bot, sid
 rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-7;                % outer its absolute tolerance
 maxit    =  10;                  % maximum outer its
-lambda   =  0.5;                 % iterative lag parameter equilibration
+lambda   =  0.25;                % iterative lag parameter equilibration
 etareg   =  1e0;                 % viscosity regularisation parameter
 
 
