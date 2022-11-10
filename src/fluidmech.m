@@ -297,7 +297,7 @@ Wf   = W + wf;                                                             % mvp
 Uf   = U + 0.;                                                             % mvp x-velocity
 Wx   = W + wx;                                                             % xtl z-velocity
 Ux   = U + 0.;                                                             % xtl x-velocity
-Wm   = W + wm;                                                             % mlt z-velocity
+Wm   = W + 0.;                                                             % mlt z-velocity
 Um   = U + 0.;                                                             % mlt x-velocity
 
 % update mixture volume flux
