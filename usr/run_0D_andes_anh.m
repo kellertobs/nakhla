@@ -81,11 +81,8 @@ BB       = [ 0.30, 0.15, 0.55; 0.48, 0.02, 0.50; 0.80, 0.08, 0.12; ];  % permiss
 CC       = [ 0.20, 0.20, 0.20; 0.60, 0.60, 0.12; 0.20, 0.25, 0.50; ];  % permission step widths
 
 % set model buoyancy parameters
-rhom0    =  2750;                % melt phase ref. density [kg/m3] (at T0,cphs0,Ptop)
-rhox0    =  3050;                % crystal phase ref. density [kg/m3] (at T0,cphs0,Ptop)
 rhof0    =  1000;                % bubble phase ref. density [kg/m3] (at T0,cphs0,Ptop)
 aT       =  4e-5;                % thermal expansivity [1/K]
-gC       =  0.5;                 % compositional expansivity [1/wt]
 bP       =  1e-8;                % mvp compressibility [1/Pa]
 d0       =  1e-3;                % crystal/bubble size [m]
 g0       =  10.;                 % gravity [m/s2]

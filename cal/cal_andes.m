@@ -18,17 +18,21 @@ cal.cmp    = [  95.0    5.0    0.0    0.0    0.0    0.0    0.0    0.0     % cphs
 cal.oxd = cal.oxd./sum(cal.oxd,2)*100;
 cal.cmp = cal.cmp./sum(cal.cmp,2)*100;
 
-p = cal.cmp*cal.oxd./100;
+cal.cmp_oxd = cal.cmp*cal.oxd./100;
+
+cal.rhox0 = [3270,4390,3000,3250,2730,2620,2580,2650];
+cal.rhom0 = [2710,3580,2580,2850,2530,2310,2290,2360];
+cal.rhof0 = 500;
 
 % specify phase diagram parameters
-cal.cphs0    =  p(1,1)/100;          % phase diagram lower bound composition [wt SiO2]
-cal.cphs1    =  p(4,1)/100;          % phase diagram upper bound composition [wt SiO2]
-cal.Tphs0    =  845;                 % phase diagram lower bound temperature [degC]
-cal.Tphs1    =  1780;                % phase diagram upper bound temperature [degC]
-cal.PhDg     =  [8.0,4.0,1.2,1.2];   % Phase diagram curvature factor (> 1)
-cal.perCm    =  p(3,1)/100;          % peritectic liquidus composition [wt SiO2]
-cal.perCx    =  p(2,1)/100;          % peritectic solidus  composition [wt SiO2]
-cal.perT     =  1145;                % peritectic temperature [degC]
-cal.clap     =  1e-7;                % Clapeyron slope for P-dependence of melting T [degC/Pa]
-cal.dTH2O    =  [1300,1100,900];     % solidus shift from water content [degC/wt^0.75]
+cal.cphs0    =  cal.cmp_oxd(1,1)/100; % phase diagram lower bound composition [wt SiO2]
+cal.cphs1    =  cal.cmp_oxd(4,1)/100; % phase diagram upper bound composition [wt SiO2]
+cal.Tphs0    =  845;                  % phase diagram lower bound temperature [degC]
+cal.Tphs1    =  1780;                 % phase diagram upper bound temperature [degC]
+cal.PhDg     =  [8.0,4.0,1.2,1.2];    % phase diagram curvature factor (> 1)
+cal.perCm    =  cal.cmp_oxd(3,1)/100; % peritectic liquidus composition [wt SiO2]
+cal.perCx    =  cal.cmp_oxd(2,1)/100; % peritectic solidus  composition [wt SiO2]
+cal.perT     =  1145;                 % peritectic temperature [degC]
+cal.clap     =  1e-7;                 % Clapeyron slope for P-dependence of melting T [degC/Pa]
+cal.dTH2O    =  [1300,1100,900];      % solidus shift from water content [degC/wt^0.75]
 

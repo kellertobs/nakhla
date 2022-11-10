@@ -30,9 +30,11 @@ c_cmp = reshape((wt0(:) .* cal.cmp(1,:) + (1-wt0(:)) .* cal.cmp(2,:)) .* (c(:)./
 c_oxd = reshape(reshape(c_cmp,Nz*Nx,length(cal.oxd))*cal.oxd/100,Nz,Nx,size(cal.oxd,2));
 
 % update phase densities
-rhom = rhom0 .* (1 - aT.*(T-cal.perT-273.15) - gC.*(cm-(cal.perCx+cal.perCm)/2));
-rhox = rhox0 .* (1 - aT.*(T-cal.perT-273.15) - gC.*(cx-(cal.perCx+cal.perCm)/2));
-rhof = rhof0 .* (1 - aT.*(T-cal.perT-273.15) + bP.*(Pt-Ptop ));
+rhom = squeeze(sum(permute(cm_cmp/100,[3,1,2])./cal.rhom0.')).^-1 .* (1 - aT.*(T-cal.perT-273.15));
+rhox = squeeze(sum(permute(cx_cmp/100,[3,1,2])./cal.rhox0.')).^-1 .* (1 - aT.*(T-cal.perT-273.15));
+rhof = cal.rhof0 .* (1 - aT.*(T-cal.perT-273.15) + bP.*(Pt-Ptop ));
+% rhom = rhom0 .* (1 - aT.*(T-cal.perT-273.15) - gC.*(cm-(cal.perCx+cal.perCm)/2));
+% rhox = rhox0 .* (1 - aT.*(T-cal.perT-273.15) - gC.*(cx-(cal.perCx+cal.perCm)/2));
 
 % convert weight to volume fraction, update bulk density
 rho  = 1./(m./rhom + x./rhox + f./rhof);  

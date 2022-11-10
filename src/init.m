@@ -38,23 +38,48 @@ cm0_cmp = (wt0(:) .* cal.cmp(1,:) + (1-wt0(:)) .* cal.cmp(2,:)) .* (cm0(:)< cal.
 
 cm0_oxd = cm0_cmp*cal.oxd./100;
 
+wt0 = (cal.perCx-cx0)./(cal.perCx-cal.cphs0);
+wt1 = (cal.perCm-cx0)./(cal.perCm-cal.perCx);
+wt2 = (cal.cphs1-cx0)./(cal.cphs1-cal.perCm);
+cx0_cmp = (wt0(:) .* cal.cmp(1,:) + (1-wt0(:)) .* cal.cmp(2,:)) .* (cx0(:)< cal.perCx) ...
+        + (wt1(:) .* cal.cmp(2,:) + (1-wt1(:)) .* cal.cmp(3,:)) .* (cx0(:)>=cal.perCx & cx0(:)<=cal.perCm) ...
+        + (wt2(:) .* cal.cmp(3,:) + (1-wt2(:)) .* cal.cmp(4,:)) .* (cx0(:)> cal.perCm);
+
+cx0_oxd = cx0_cmp*cal.oxd./100;
+
+wt0 = (cal.perCx-c0)./(cal.perCx-cal.cphs0);
+wt1 = (cal.perCm-c0)./(cal.perCm-cal.perCx);
+wt2 = (cal.cphs1-c0)./(cal.cphs1-cal.perCm);
+c0_cmp = (wt0(:) .* cal.cmp(1,:) + (1-wt0(:)) .* cal.cmp(2,:)) .* (c0(:)< cal.perCx) ...
+        + (wt1(:) .* cal.cmp(2,:) + (1-wt1(:)) .* cal.cmp(3,:)) .* (c0(:)>=cal.perCx & c0(:)<=cal.perCm) ...
+        + (wt2(:) .* cal.cmp(3,:) + (1-wt2(:)) .* cal.cmp(4,:)) .* (c0(:)> cal.perCm);
+
+c0_oxd = c0_cmp*cal.oxd./100;
+
+rhof0 = cal.rhof0;
+rhom0 = sum(cm0_oxd/100./cal.rhom0).^-1;
+rhox0 = sum(cx0_oxd/100./cal.rhox0).^-1;
+
+cm1_oxd = (0.999.*cm0_cmp + 0.001.*cal.cmp(1))*cal.oxd./100;
+cm2_oxd = (0.999.*cm0_cmp + 0.001.*cal.cmp(4))*cal.oxd./100;
+
 wtm([1 2 3 4 6 7 8 9 11 12]) = [cm0_oxd,100.*vm0,0];
 etam0 = grdmodel08(wtm,T0);
 
 DrhoT = aT*max([abs(T0-Twall),abs(T0-T1),T0/100]);
-Drhoc = gC*max([abs(c0-cwall),abs(c0-c1),c0/100]); 
-Drhox = x0/100*abs(rhox0-rhom0);
-Drhof = f0/100*abs(rhof0-rhom0);
+Drhoc = abs(sum(cm1_oxd/100./cal.rhom0).^-1-sum(cm2_oxd/100./cal.rhom0).^-1);
+Drhox = 0.01*abs(rhox0-rhom0);
+Drhof = 0.01*abs(cal.rhof0-rhom0) * (max([v0,v1,vwall])>TINY);
 Drho0 = DrhoT + Drhoc + Drhox + Drhof;
 
 uT    = DrhoT*g0*(D/10)^2/etam0/etareg;
 uc    = Drhoc*g0*(D/10)^2/etam0/etareg;
 ux    = Drhox*g0*(D/10)^2/etam0/etareg;
-uf    = Drhof*g0*(D/10)^2/etam0/etareg .* (max([v0,v1,vwall])>TINY);
+uf    = Drhof*g0*(D/10)^2/etam0/etareg * (max([v0,v1,vwall])>TINY);
 u0    = Drho0*g0*(D/10)^2/etam0/etareg;
 
 wx0   = abs(rhox0-rhom0)*g0*d0^2/etam0;
-wf0   = abs(rhof0-rhom0)*g0*d0^2/etam0 .* (max([v0,v1,vwall])>TINY);
+wf0   = abs(rhof0-rhom0)*g0*d0^2/etam0 * (max([v0,v1,vwall])>TINY);
 
 ud0   = kT/rhom0/cP/(D/10);
 
