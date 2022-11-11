@@ -82,9 +82,9 @@ elseif Nx <= 10  % create 1D plots
     plot(phi(2:end-1,2:end-1)*100.*(phi(2:end-1,2:end-1)>1e-9),Zc(2:end-1).',CL{[1,5]},LW{:});
     title('$\mu$, $\chi$, $\phi$ [vol\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,5,5)
-    plot(                                                            -W(:,2:end-1) *hr,Zf.',CL{[1,3]},LW{:}); axis ij tight; box on; hold on;
-    plot(-(phi(1:end-1,2:end-1)+phi(2:end,2:end-1))/2.*(Wf(:,2:end-1)-W(:,2:end-1))*hr,Zf.',CL{[1,5]},LW{:});
+    plot(-(phi(1:end-1,2:end-1)+phi(2:end,2:end-1))/2.*(Wf(:,2:end-1)-W(:,2:end-1))*hr,Zf.',CL{[1,5]},LW{:}); axis ij tight; box on; hold on;
     plot(-(chi(1:end-1,2:end-1)+chi(2:end,2:end-1))/2.*(Wx(:,2:end-1)-W(:,2:end-1))*hr,Zf.',CL{[1,4]},LW{:});
+    plot(                                                            -W(:,2:end-1) *hr,Zf.',CL{[1,3]},LW{:});
     title('$W$, $w_\Delta^f$, $w_\Delta^x$ [m/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
 
     if ~exist('fh2','var'); fh2 = figure(VIS{:});
@@ -108,8 +108,8 @@ elseif Nx <= 10  % create 1D plots
     plot(VolSrc,Zc(2:end-1).',CL{[1,2]},LW{:}); axis ij tight; box on;
     title('$\dot{V}$ [1/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,5,5)
-    plot(P(2:end-1,2:end-1)/1e3,Zc(2:end-1).',CL{[1,2]},LW{:}); axis ij tight; box on;
-    title('$P$ [kPa]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+    plot(P(2:end-1,2:end-1),Zc(2:end-1).',CL{[1,2]},LW{:}); axis ij tight; box on;
+    title('$P$ [Pa]',TX{:},FS{:}); set(gca,TL{:},TS{:});
 
     if ~exist('fh3','var'); fh3 = figure(VIS{:});
     else; set(0, 'CurrentFigure', fh3); clf;
@@ -276,7 +276,7 @@ else % create 2D plots
     imagesc(Xc(2:end-1),Zc(2:end-1),-(chi(1:end-1,2:end-1)+chi(2:end,2:end-1))/2.*wx(:,2:end-1).*hr); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$w_\Delta^x$ [m/hr]'],TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:}); xlabel('Width [m]',TX{:},FS{:});
     set(fh4,'CurrentAxes',ax(44));
-    imagesc(Xc(2:end-1),Zc(2:end-1),-(phi(1:end-1,2:end-1)+phi(2:end,2:end-1))/2.*wf(:,2:end-1).*hr); axis ij equal tight; box on; cb = colorbar;
+    imagesc(Xc(2:end-1),Zc(2:end-1),-(phi(1:end-1,2:end-1)+phi(2:end,2:end-1))/2.*wf(:,2:end-1).*hr.*(any(phi(2:end-1,2:end-1)>1e-9))); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$w_\Delta^f$ [m/hr]'],TX{:},FS{:}); xlabel('Width [m]',TX{:},FS{:}); set(gca,'YTickLabel',[]);
     sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
 
@@ -421,9 +421,9 @@ if save_op
     end
 
     name = [opdir,'/',runID,'/',runID,'_',num2str(floor(step/nop))];
-    save(name,'U','W','P','Pt','f','x','m','phi','chi','mu','X','F','S','C','V','T','c','v','cm','cx','vm','vf','TE','IR','te','ir','dSdt','dCdt','dVdt','dFdt','dXdt','dTEdt','dIRdt','Gf','Gx','rho','eta','eII','tII','dt','time','step','hist','VolSrc','wf','wx','wm');
+    save(name,'U','W','P','Pt','f','x','m','phi','chi','mu','X','F','S','C','V','T','c','v','cm','cx','vm','vf','TE','IR','te','ir','dSdt','dCdt','dVdt','dFdt','dXdt','dTEdt','dIRdt','Gf','Gx','rho','eta','eII','tII','dt','time','step','hist','VolSrc','wf','wx');
     name = [opdir,'/',runID,'/',runID,'_cont'];
-    save(name,'U','W','P','Pt','f','x','m','phi','chi','mu','X','F','S','C','V','T','c','v','cm','cx','vm','vf','TE','IR','te','ir','dSdt','dCdt','dVdt','dFdt','dXdt','dTEdt','dIRdt','Gf','Gx','rho','eta','eII','tII','dt','time','step','hist','VolSrc','wf','wx','wm');
+    save(name,'U','W','P','Pt','f','x','m','phi','chi','mu','X','F','S','C','V','T','c','v','cm','cx','vm','vf','TE','IR','te','ir','dSdt','dCdt','dVdt','dFdt','dXdt','dTEdt','dIRdt','Gf','Gx','rho','eta','eII','tII','dt','time','step','hist','VolSrc','wf','wx');
 
     if step == 0
         logfile = [opdir,'/',runID,'/',runID,'.log'];

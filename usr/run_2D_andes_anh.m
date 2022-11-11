@@ -32,11 +32,11 @@ smth     =  (N/30)^2;            % regularisation of initial random perturbation
 zlay     =  0.5;                 % layer thickness (relative to domain depth D)
 wlay_T   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
 wlay_c   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
-T0       =  1250;                % temperature top layer [deg C]
-T1       =  1250;                % temperature base layer [deg C]
+T0       =  1200;                % temperature top layer [deg C]
+T1       =  1200;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
-c0       =  0.515;               % major component top layer [wt SiO2]
-c1       =  0.515;               % major component base layer [wt SiO2]
+c0       =  0.5175;              % major component top layer [wt SiO2]
+c1       =  0.5175;              % major component base layer [wt SiO2]
 dc       =  1e-4;                % amplitude of random noise [wt SiO2]
 v0       =  0.00;                % volatile component top layer [wt H2O]
 v1       =  0.00;                % volatile component base layer [wt H2O]
@@ -68,7 +68,7 @@ irwall   =  [nan,nan,nan,nan];   % wall isotope ratios [delta] (nan = no assimil
 
 % set thermo-chemical material parameters
 calID    =  'andes';             % phase diagram calibration
-kT       =  4;                   % thermal conductivity [W/m/K]
+kT0      =  4;                   % thermal conductivity [W/m/K]
 cP       =  1200;                % heat capacity [J/kg/K]
 Dsx      = -300;                 % entropy change of crystallisation [J/kg]
 Dsf      =  400;                 % entropy change of exsolution [J/kg]
@@ -81,9 +81,6 @@ BB       = [ 0.30, 0.15, 0.55; 0.48, 0.02, 0.50; 0.80, 0.08, 0.12; ];  % permiss
 CC       = [ 0.20, 0.20, 0.20; 0.60, 0.60, 0.12; 0.20, 0.25, 0.50; ];  % permission step widths
 
 % set model buoyancy parameters
-rhom0    =  2750;                % melt phase ref. density [kg/m3] (at T0,cphs0,Ptop)
-rhox0    =  3050;                % crystal phase ref. density [kg/m3] (at T0,cphs0,Ptop)
-rhof0    =  1000;                % bubble phase ref. density [kg/m3] (at T0,cphs0,Ptop)
 aT       =  4e-5;                % thermal expansivity [1/K]
 gC       =  0.5;                 % compositional expansivity [1/wt]
 bP       =  1e-8;                % mvp compressibility [1/Pa]

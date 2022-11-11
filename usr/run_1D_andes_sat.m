@@ -32,15 +32,15 @@ smth     =  (N/30)^2;            % regularisation of initial random perturbation
 zlay     =  0.5;                 % layer thickness (relative to domain depth D)
 wlay_T   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
 wlay_c   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
-T0       =  1150;                % temperature top layer [deg C]
-T1       =  1150;                % temperature base layer [deg C]
+T0       =  1100;                % temperature top layer [deg C]
+T1       =  1100;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
-c0       =  0.515;               % major component top layer [wt SiO2]
-c1       =  0.515;               % major component base layer [wt SiO2]
-dc       =  1e-4;                % amplitude of random noise [wt SiO2]
+c0       =  0.5167;               % major component top layer [wt SiO2]
+c1       =  0.5167;               % major component base layer [wt SiO2]
+dc       =  0e-4;                % amplitude of random noise [wt SiO2]
 v0       =  0.04;                % volatile component top layer [wt H2O]
 v1       =  0.04;                % volatile component base layer [wt H2O]
-dv       =  1e-5;                % amplitude of random noise [wt H2O]
+dv       =  0e-5;                % amplitude of random noise [wt H2O]
 
 % set model trace and isotope geochemistry parameters
 te0      =  [1,1,1,1];           % trace elements top layer [wt ppm]
@@ -56,7 +56,7 @@ Ptop     =  1.25e8;              % top pressure [Pa]
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls)
 bndinit  =  0;                   % switch on (1) to initialise with internal boundary layers
 dw       =  1*h;                 % boundary layer thickness [m]
-fin      =  1;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
+fin      =  0;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
 fout     =  1;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
 tau_T    =  10*hr;               % wall cooling/assimilation time [s]
 tau_a    =  1*hr;                % wall cooling/assimilation tie [s]
@@ -68,7 +68,7 @@ irwall   =  [nan,nan,nan,nan];   % wall isotope ratios [delta] (nan = no assimil
 
 % set thermo-chemical material parameters
 calID    =  'andes';             % phase diagram calibration
-kT       =  4;                   % thermal conductivity [W/m/K]
+kT0      =  4;                   % thermal conductivity [W/m/K]
 cP       =  1200;                % heat capacity [J/kg/K]
 Dsx      = -300;                 % entropy change of crystallisation [J/kg]
 Dsf      =  400;                 % entropy change of exsolution [J/kg]

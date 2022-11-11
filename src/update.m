@@ -113,8 +113,10 @@ wf(end,:)     = min(1,1-bot+fin ).*wf(end,:);
 wf(:,[1 end]) = -sds*wf(:,[2 end-1]);
 
 % diffusion parameters
+% kc = rho.*abs((rhox-rho).*g0.*Csgr_x*d0);                                % component diffusion
+kc = rho.*abs(rhox-rhom)/10.*g0./eta*d0^3;                                 % component diffusion
+kT = kT0 + kc.*cP;                                                         % heat diffusion
 ks = kT./T;                                                                % entropy diffusion
-kc = rho.*abs((rhox-rho).*g0.*Csgr_x*d0);                                  % component diffusion
 
 % update velocity divergence
 Div_V(2:end-1,2:end-1) = ddz(W(:,2:end-1),h) ...                           % get velocity divergence
@@ -162,8 +164,8 @@ diss =  exx(2:end-1,2:end-1).*txx(2:end-1,2:end-1) ...
 Div_rhoV =  + advect(rho(inz,inx).*x(inz,inx),0.*U(inz,:),wx(:,inx),h,{ADVN,''   },[1,2],BCA) ...
             + advect(rho(inz,inx).*f(inz,inx),0.*U(inz,:),wf(:,inx),h,{ADVN,''   },[1,2],BCA) ...
             + advect(rho(inz,inx)            ,   U(inz,:), W(:,inx),h,{ADVN,'vdf'},[1,2],BCA);
-% if step>0; VolSrc = -((rho(inz,inx)-rhoo(inz,inx))./dt + Div_rhoV)./rho(inz,inx); end
-if step>0; VolSrc = - ((rho(inz,inx)-rhoo(inz,inx))./dt + theta.*Div_rhoV + (1-theta).*Div_rhoVo)./rho(inz,inx); end
+if step>0; VolSrc = -((rho(inz,inx)-rhoo(inz,inx))./dt + Div_rhoV)./rho(inz,inx); end
+% if step>0; VolSrc = - ((rho(inz,inx)-rhoo(inz,inx))./dt + theta.*Div_rhoV + (1-theta).*Div_rhoVo)./rho(inz,inx); end
 
 UBG    = - 1*mean(mean(VolSrc))./2 .* (L/2-XXu);
 WBG    = - 1*mean(mean(VolSrc))./2 .* (D/2-ZZw);

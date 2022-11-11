@@ -81,7 +81,7 @@ u0    = Drho0*g0*(D/10)^2/etam0/etareg;
 wx0   = abs(rhox0-rhom0)*g0*d0^2/etam0;
 wf0   = abs(rhof0-rhom0)*g0*d0^2/etam0 * (max([v0,v1,vwall])>TINY);
 
-ud0   = kT/rhom0/cP/(D/10);
+ud0   = kT0/rhom0/cP/(D/10);
 
 uwT   = dw/tau_T; 
 uwc   = dw/tau_a; 
@@ -236,7 +236,7 @@ txx    =  0.*P;  tzz = 0.*P;  txz = zeros(Nz-1,Nx-1);  tII = 0.*P;
 VolSrc =  0.*P(inz,inx);  MassErr = 0;  drhodt = 0.*P;  drhodto = 0.*P;
 rho    =  rhom0.*ones(size(Tp));
 rhoref =  mean(rho(inz,inx),'all');
-Pt     =  Ptop + rhoref.*g0.*ZZ;
+Pt     =  Ptop + rhoref.*g0.*ZZ .* 1.01;
 
 % get volume fractions and bulk density
 step    = 0;
@@ -247,10 +247,11 @@ TCtime  = 0;
 UDtime  = 0;
 res  = 1;  tol = 1e-12;  x = ones(size(Tp))./10;  f = v/2;
 while res > tol
-    xi = x;  fi = f;
+    Pti = Pt;
     
     rhoref =  mean(rho(inz,inx),'all');
-    Pt     =  Ptop + rhoref.*g0.*ZZ;
+    rhofz  = (rho(1:end-1,:)+rho(2:end,:))/2;
+    Pt(2:end,:) = Ptop + repmat(cumsum(mean(rhofz,2).*g0.*h),1,Nx);
     Adbt   =  aT./rhoref;
     if Nz<=10; Pt = Ptop.*ones(size(Tp)); end
     
@@ -266,7 +267,7 @@ while res > tol
 
     update;
 
-    res  = (norm(x(:)-xi(:),2) + norm(f(:)-fi(:),2))./sqrt(2*length(x(:)));
+    res  = norm(Pt(:)-Pti(:),2)./norm(Pt(:),2);
 end
 rhoo = rho;
 dto  = dt; 
@@ -329,7 +330,7 @@ if restart
     end
     if exist(name,'file')
         fprintf('\n   restart from %s \n\n',name);
-        load(name,'U','W','P','Pt','f','x','m','phi','chi','mu','X','F','S','C','V','T','c','v','cm','cx','vm','vf','TE','IR','te','ir','dSdt','dCdt','dVdt','dFdt','dXdt','dTEdt','dIRdt','Gf','Gx','rho','eta','eII','tII','dt','time','step','hist','VolSrc','wf','wx','wm');
+        load(name,'U','W','P','Pt','f','x','m','phi','chi','mu','X','F','S','C','V','T','c','v','cm','cx','vm','vf','TE','IR','te','ir','dSdt','dCdt','dVdt','dFdt','dXdt','dTEdt','dIRdt','Gf','Gx','rho','eta','eII','tII','dt','time','step','hist','VolSrc','wf','wx');
         
         xq = x; fq = f;
         SOL = [W(:);U(:);P(:)];
