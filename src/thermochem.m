@@ -40,6 +40,7 @@ if ~isnan(cwall); bnd_C = rho(inz,inx).*(cwall-c(inz,inx))./tau_a .* bndshape; e
 dCdt = advn_C + diff_C + bnd_C;                                            % total rate of change
     
 C(inz,inx)   = Co(inz,inx) + (theta.*dCdt + (1-theta).*dCdto).*dt;         % explicit update of major component density
+C            = max(cal.cphs0.*rho,min(cal.cphs1.*rho,C));
 C([1 end],:) = C([2 end-1],:);                                             % apply boundary conditions
 C(:,[1 end]) = C(:,[2 end-1]);  
     
@@ -58,9 +59,9 @@ if any([v0;v1;vwall;v(:)]>10*TINY)
     dVdt = advn_V + diff_V + bnd_V;                                                 % total rate of change
     
     V(inz,inx)   = Vo(inz,inx) + (theta.*dVdt + (1-theta).*dVdto).*dt;     % explicit update of volatile component density
+    V            = max(TINY,min(rho,V));
     V([1 end],:) = V([2 end-1],:);                                         % apply boundary conditions
     V(:,[1 end]) = V(:,[2 end-1]);
-    V            = max(TINY,V);
 end
 
 % convert enthalpy and component densities to temperature and concentrations
@@ -105,7 +106,7 @@ if diseq
     dXdt   = advn_X + Gx;                                                  % total rate of change
     
     X(inz,inx) = Xo(inz,inx) + (theta.*dXdt + (1-theta).*dXdto).*dt;       % explicit update of crystal fraction
-    X = min(rho,max(0,X));                                                 % enforce limits
+    X = min(rho-F,max(0,X));                                               % enforce limits
     X([1 end],:) = X([2 end-1],:);                                         % apply boundary conditions
     X(:,[1 end]) = X(:,[2 end-1]);
 
@@ -127,7 +128,7 @@ if any([v0;v1;vwall;v(:)]>10*TINY)
         dFdt   = advn_F + Gf;                                                  % total rate of change
 
         F(inz,inx) = Fo(inz,inx) + (theta.*dFdt + (1-theta).*dFdto).*dt;       % explicit update of bubble fraction
-        F = min(rho-X,max(0,F));                                               % enforce limits
+        F = min(rho,max(0,F));                                               % enforce limits
         F([1 end],:) = F([2 end-1],:);                                         % apply boundary conditions
         F(:,[1 end]) = F(:,[2 end-1]);
 
@@ -167,8 +168,8 @@ vm = max(0.9.*vmq,min(1.1.*vmq,(v - f)./m));
 resnorm_TC = norm( T(inz,inx) - Ti(inz,inx)                       ,2)./(norm(T(inz,inx),2)+TINY) ...
            + norm((c(inz,inx) - ci(inz,inx))                      ,2)./(norm(c(inz,inx),2)+TINY) ...
            + norm((v(inz,inx) - vi(inz,inx))                      ,2)./(norm(v(inz,inx),2)+TINY) ...
-           + norm((x(inz,inx) - xi(inz,inx)).*(x(inz,inx)>0).*(m(inz,inx)>0),2)./(norm(x(inz,inx),2)+TINY) ...
-           + norm((f(inz,inx) - fi(inz,inx)).*(f(inz,inx)>0).*(m(inz,inx)>0),2)./(norm(f(inz,inx),2)+TINY);
+           + norm((x(inz,inx) - xi(inz,inx)).*(x(inz,inx)>10*TINY).*(m(inz,inx)>10*TINY),2)./(norm(x(inz,inx),2)+TINY) ...
+           + norm((f(inz,inx) - fi(inz,inx)).*(f(inz,inx)>10*TINY).*(m(inz,inx)>10*TINY),2)./(norm(f(inz,inx),2)+TINY);
 
 TCtime = TCtime + toc - toc(eqtime);
 
