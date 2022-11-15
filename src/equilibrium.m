@@ -49,8 +49,8 @@ while resnorm > tol && iter < maxit
         dresf_df = ones(size(fq));
     end
     
-    xq = max(0,min(1   ,xq - beta*(resx./dresx_dx)));
-    fq = max(0,min(1-xq,fq - beta*(resf./dresf_df)));
+    xq = max(0,min(1-fq,xq - beta*(resx./dresx_dx)));
+    fq = max(0,min(1   ,fq - beta*(resf./dresf_df)));
     
     indx = xq>0 & xq<1 & xq+fq<1;
     indf = fq>0 & fq<1 & xq+fq<1;
@@ -86,7 +86,7 @@ end
 T   = max(0,min(1,(T0 - P*clap -Tphs0)./(Tphs1-Tphs0)));
 
 a = 15;
-b = 0.035;
+b = 0.05;
 ind1 = T>=perT+b;
 ind2 = T< perT-b;
 ind3 = T>=perT-b & T<perT+b;
