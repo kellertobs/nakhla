@@ -72,7 +72,6 @@ IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL; (1/2*EtaC2(:)-1/3*EtaP2(:
 
 
 % z-RHS vector
-rhofz = (rho(1:end-1,:)+rho(2:end,:))/2;
 rr = - (rhofz(2:end-1,2:end-1) - mean(rhofz(2:end-1,2:end-1),2)) .* g0;
 if bnchm; rr = rr + src_W_mms(2:end-1,2:end-1); end
 
@@ -250,7 +249,7 @@ AAR  = [];       % forcing entries for R
 
 ii = MapP(2:end-1,2:end-1);
 
-rr = VolSrc;
+rr = -VolSrc;
 if bnchm; rr = rr + src_P_mms(2:end-1,2:end-1); end
 
 IIR = [IIR; ii(:)]; AAR = [AAR; rr(:)];
@@ -272,7 +271,7 @@ if bnchm; RP(MapP(nzp,nxp),:) = P_mms(nzp,nxp); end
 LL = [ KV  -GG  ; ...
       -DD   KP ];
 
-RR = [RV; -RP];
+RR = [RV; RP];
 
 SCL = sqrt(abs(diag(LL)));
 SCL = diag(sparse(1./(SCL+1)));
@@ -289,32 +288,35 @@ SOL = SCL*(LL\RR);  % update solution
 W  = full(reshape(SOL(MapW(:))        ,(Nz-1), Nx   ));                    % matrix z-velocity
 U  = full(reshape(SOL(MapU(:))        , Nz   ,(Nx-1)));                    % matrix x-velocity
 P  = full(reshape(SOL(MapP(:)+(NW+NU)), Nz   , Nx   ));                    % matrix dynamic pressure
-Pt(2:end,:) = Ptop + repmat(cumsum(mean(rhofz,2).*g0.*h),1,Nx);
 
-% get residual of fluid mechanics equations from iterative update
-resnorm_VP = norm(SOL - SOLi,2)./(norm(SOL,2)+TINY);
+if ~bnchm
+    Pt(2:end,:) = Ptop + repmat(cumsum(mean(rhofz,2).*g0.*h),1,Nx);
+    if Nz<=10; Pt = Ptop.*ones(size(Tp)); end
 
-% update phase velocities
-Wf   = W + wf;                                                             % mvp z-velocity
-Uf   = U + 0.;                                                             % mvp x-velocity
-Wx   = W + wx;                                                             % xtl z-velocity
-Ux   = U + 0.;                                                             % xtl x-velocity
-Wm   = W + 0.;                                                             % mlt z-velocity
-Um   = U + 0.;                                                             % mlt x-velocity
+    % get residual of fluid mechanics equations from iterative update
+    resnorm_VP = norm(SOL - SOLi,2)./(norm(SOL,2)+TINY);
 
-% update mixture volume flux
-Wbar = (mu (1:end-1,:)+mu (2:end,:))/2 .* Wm ...
-     + (chi(1:end-1,:)+chi(2:end,:))/2 .* Wx ...
-     + (phi(1:end-1,:)+phi(2:end,:))/2 .* Wf;
-Ubar = (mu (:,1:end-1)+mu (:,2:end))/2 .* Um ...
-     + (chi(:,1:end-1)+chi(:,2:end))/2 .* Ux ...
-     + (phi(:,1:end-1)+phi(:,2:end))/2 .* Uf; 
+    % update phase velocities
+    Wf   = W + wf;                                                             % mvp z-velocity
+    Uf   = U + 0.;                                                             % mvp x-velocity
+    Wx   = W + wx;                                                             % xtl z-velocity
+    Ux   = U + 0.;                                                             % xtl x-velocity
+    Wm   = W + 0.;                                                             % mlt z-velocity
+    Um   = U + 0.;                                                             % mlt x-velocity
 
- 
-%% update time step
+    % update mixture volume flux
+    Wbar = (mu (1:end-1,:)+mu (2:end,:))/2 .* Wm ...
+         + (chi(1:end-1,:)+chi(2:end,:))/2 .* Wx ...
+         + (phi(1:end-1,:)+phi(2:end,:))/2 .* Wf;
+    Ubar = (mu (:,1:end-1)+mu (:,2:end))/2 .* Um ...
+         + (chi(:,1:end-1)+chi(:,2:end))/2 .* Ux ...
+         + (phi(:,1:end-1)+phi(:,2:end))/2 .* Uf;
 
-dtk = min((h/2)^2./max(kT(:)./rho(:)./cP));                                % diffusive time step size
-dta = CFL*min(h/2/max(abs([Ux(:);Wx(:);Uf(:);Wf(:);Um(:);Wm(:)]+1e-16)));  % advective time step size
-dt  = min([2*dto,dtmax,min(dtk,dta)]);                                     % physical time step size
+
+    %% update time step
+    dtk = min((h/2)^2./max(kT(:)./rho(:)./cP));                                % diffusive time step size
+    dta = CFL*min(h/2/max(abs([Ux(:);Wx(:);Uf(:);Wf(:);Um(:);Wm(:)]+1e-16)));  % advective time step size
+    dt  = min([2*dto,dtmax,min(dtk,dta)]);                                     % physical time step size
+end
 
 FMtime = FMtime + toc;

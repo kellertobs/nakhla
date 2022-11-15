@@ -1,5 +1,7 @@
 % create manufactured solution
-clear x z;
+load ocean.mat
+clear x z
+TINY = 1e-16;
 syms U_mms(x,z) W_mms(x,z) P_mms(x,z) eta_mms(x,z) rho_mms(x,z) src_mms(x,z)
 
 fprintf(1,'\n\n  ***  compose manufactured solution\n\n');
@@ -47,7 +49,7 @@ subplot(2,3,1); fcontour( -W_mms*hr  ,[0,L],'LineWidth',1.5); axis ij equal tigh
 subplot(2,3,2); fcontour(  U_mms*hr  ,[0,L],'LineWidth',1.5); axis ij equal tight; colorbar('TicklabelInterpreter','latex'); box on; title('manufact. $U$ [m/hr]','Interpreter','latex'); set(gca,'TicklabelInterpreter','latex')
 subplot(2,3,3); fcontour(  P_mms/1e3 ,[0,L],'LineWidth',1.5); axis ij equal tight; colorbar('TicklabelInterpreter','latex'); box on; title('manufact. $P$ [kPa]','Interpreter','latex'); set(gca,'TicklabelInterpreter','latex')
 fprintf(1,' . ');
-subplot(2,3,4); fcontour(      rho_mms ,[0,L],'LineWidth',1.5); axis ij equal tight; colorbar('TicklabelInterpreter','latex'); box on; title('manufact. $\Delta \rho$ [kg/m$^3$]','Interpreter','latex'); set(gca,'TicklabelInterpreter','latex')
+subplot(2,3,4); fcontour(      rho_mms ,[0,L],'LineWidth',1.5); axis ij equal tight; colorbar('TicklabelInterpreter','latex'); box on; title('manufact. $\rho$ [kg/m$^3$]','Interpreter','latex'); set(gca,'TicklabelInterpreter','latex')
 subplot(2,3,5); fcontour(log10(eta_mms),[0,L],'LineWidth',1.5); axis ij equal tight; colorbar('TicklabelInterpreter','latex'); box on; title('manufact. $\eta$ [log$_{10}$ Pas]','Interpreter','latex'); set(gca,'TicklabelInterpreter','latex')
 subplot(2,3,6); fcontour(      src_mms ,[0,L],'LineWidth',1.5); axis ij equal tight; colorbar('TicklabelInterpreter','latex'); box on; title('manufact. $\dot{V} [1/s]$','Interpreter','latex'); set(gca,'TicklabelInterpreter','latex')
 drawnow;
@@ -84,6 +86,7 @@ drawnow;
 % evaluate analytical solution on appropriate coordinate grids
 [x,z]  = meshgrid(x_mms,zw_mms);
 W_mms  = double(subs(W_mms)); fprintf(1,' . ');
+rhofz  = double(subs(rho_mms)); fprintf(1,' . ');
 [x,z]  = meshgrid(xu_mms,z_mms);
 U_mms  = double(subs(U_mms)); fprintf(1,' . ');
 [x,z]  = meshgrid(x_mms,z_mms);
@@ -91,15 +94,33 @@ P_mms  = double(subs(P_mms)); fprintf(1,' . ');
 rho    = double(subs(rho_mms)); fprintf(1,' . ');
 eta    = double(subs(eta_mms)); fprintf(1,' . ');
 VolSrc = double(subs(src_mms)); fprintf(1,' . ');
+VolSrc = VolSrc(2:end-1,2:end-1);
 [x,z]  = meshgrid(xu_mms,zw_mms);
 etaco  = double(subs(eta_mms)); fprintf(1,' . ');
-theta  = 1;
+
 WBG    = 0.*W_mms;
 UBG    = 0.*U_mms;
+SOL    = [W_mms(:);U_mms(:);P_mms(:)];
+dt     = 0;
+
+% get mapping arrays
+Nx = length(x_mms);
+Nz = length(z_mms);
+
+NP =  Nz   * Nx   ;
+NW = (Nz-1)* Nx   ;
+NU =  Nz   *(Nx-1);
+MapP = reshape(1:NP,Nz  ,Nx  );
+MapW = reshape(1:NW,Nz-1,Nx  );
+MapU = reshape(1:NU,Nz  ,Nx-1) + NW;
+
+% set boundary conditions to free slip
+sds = -1;
+top = -1;
+bot = -1;
 
 fprintf(1,' . \n');
    
 % call fluid mechanics solver
-tic;
+FMtime = 0;
 fluidmech;
-solvetime = toc;
