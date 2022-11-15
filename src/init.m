@@ -66,7 +66,7 @@ cm2_oxd = (0.999.*cm0_cmp + 0.001.*cal.cmp(4))*cal.oxd./100;
 wtm([1 2 3 4 6 7 8 9 11 12]) = [cm0_oxd,100.*vm0,0];
 etam0 = grdmodel08(wtm,T0);
 
-DrhoT = aT*max([abs(T0-Twall),abs(T0-T1),T0/100]);
+DrhoT = cal.aT*max([abs(T0-Twall),abs(T0-T1),T0/100]);
 Drhoc = abs(sum(cm1_oxd/100./cal.rhom0).^-1-sum(cm2_oxd/100./cal.rhom0).^-1);
 Drhox = 0.01*abs(rhox0-rhom0);
 Drhof = 0.01*abs(cal.rhof0-rhom0) * (max([v0,v1,vwall])>TINY);
@@ -158,18 +158,19 @@ if bndinit
         case 0  % none
             bndinit = zeros(size(ZZ));
         case 1  % top only
-            bndinit = (1+erf( ( -ZZ+dw)/(dw/5)))/2;
+            bndinit = (1+erf( ( -ZZ+dw)/h))/2;
         case 2  % bot only
-            bndinit = (1+erf(-(D-ZZ-dw)/(dw/5)))/2;
+            bndinit = (1+erf(-(D-ZZ-dw)/h))/2;
         case 3  % top/bot only
-            bndinit = (1+erf( ( -ZZ+dw)/(dw/5)))/2 ...
-                    + (1+erf(-(D-ZZ-dw)/(dw/5)))/2;
+            bndinit = (1+erf( ( -ZZ+dw)/h))/2 ...
+                    + (1+erf(-(D-ZZ-dw)/h))/2;
         case 4 % all walls
-            bndinit = (1+erf( ( -ZZ+dw)/(dw/5)))/2 ...
-                    + (1+erf(-(D-ZZ-dw)/(dw/5)))/2 ...
-                    + (1+erf( ( -XX+dw)/(dw/5)))/2 ...
-                    + (1+erf(-(L-XX-dw)/(dw/5)))/2;
+            bndinit = (1+erf( ( -ZZ+dw)/h))/2 ...
+                    + (1+erf(-(D-ZZ-dw)/h))/2 ...
+                    + (1+erf( ( -XX+dw)/h))/2 ...
+                    + (1+erf(-(L-XX-dw)/h))/2;
     end
+    dw = h;
 end
 bndinit = max(0,min(1,bndinit));
 
@@ -205,7 +206,7 @@ else;                        bot = -1; end  % free slip for other types
 
 % initialise solution fields
 Tp  =  T0 + (T1-T0) .* (1+erf((ZZ/D-zlay)/wlay_T))/2 + dT.*rp;  if any(bndinit(:)) && ~isnan(Twall); Tp = Tp + (Twall-Tp).*bndinit; end % potential temperature [C]
-c   =  c0 + (c1-c0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dc.*rp;  if any(bndinit(:)) && ~isnan(cwall); c  = c  + (cwall-c ).*bndinit; end % major component
+c   =  c0 + (c1-c0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dc.*rp;  if any(bndinit(:)) && ~isnan(cwall); c  = c  + (cwall-c ).*bndinit; end; cin = c;% major component
 v   =  v0 + (v1-v0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dv.*rp;  if any(bndinit(:)) && ~isnan(vwall); v  = v  + (vwall-v ).*bndinit; end % volatile component
 
 te = zeros(Nz,Nx,length(te0));
@@ -252,13 +253,15 @@ while res > tol
     rhoref =  mean(rho(inz,inx),'all');
     rhofz  = (rho(1:end-1,:)+rho(2:end,:))/2;
     Pt(2:end,:) = Ptop + repmat(cumsum(mean(rhofz,2).*g0.*h),1,Nx);
-    Adbt   =  aT./rhoref;
+    Adbt   =  cal.aT./rhoref;
     if Nz<=10; Pt = Ptop.*ones(size(Tp)); end
     
     T    =  (Tp+273.15).*exp(Adbt./cP.*Pt);
 
     [xq,cxq,cmq,fq,vfq,vmq] = equilibrium(x,f,T-273.15,c,v,Pt,cal,TINY);
     
+    c = cin.*(1-f);
+
     x  = xq;  f = fq;  m = 1-x-f;
     cm = cmq; cx = cxq;
     vm = vmq; vf = vfq;

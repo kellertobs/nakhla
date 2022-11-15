@@ -30,14 +30,13 @@ c_cmp = reshape((wt0(:) .* cal.cmp(1,:) + (1-wt0(:)) .* cal.cmp(2,:)) .* (c(:)./
 c_oxd = reshape(reshape(c_cmp,Nz*Nx,length(cal.oxd))*cal.oxd/100,Nz,Nx,size(cal.oxd,2));
 
 % update phase densities
-rhom = squeeze(sum(permute(cm_cmp/100,[3,1,2])./cal.rhom0.')).^-1 .* (1 - aT.*(T-cal.perT-273.15));
-rhox = squeeze(sum(permute(cx_cmp/100,[3,1,2])./cal.rhox0.')).^-1 .* (1 - aT.*(T-cal.perT-273.15));
-rhof = cal.rhof0 .* (1 - aT.*(T-cal.perT-273.15) + bP.*(Pt-Ptop ));
-% rhom = rhom0 .* (1 - aT.*(T-cal.perT-273.15) - gC.*(cm-(cal.perCx+cal.perCm)/2));
-% rhox = rhox0 .* (1 - aT.*(T-cal.perT-273.15) - gC.*(cx-(cal.perCx+cal.perCm)/2));
+rhom = squeeze(sum(permute(cm_cmp/100,[3,1,2])./cal.rhom0.')).^-1 .* (1 - cal.aT.*(T-cal.perT-273.15)); if size(rhom,2)~=size(T,2); rhom = rhom(1,:).'; end
+rhox = squeeze(sum(permute(cx_cmp/100,[3,1,2])./cal.rhox0.')).^-1 .* (1 - cal.aT.*(T-cal.perT-273.15)); if size(rhox,2)~=size(T,2); rhox = rhox(1,:).'; end
+rhof = cal.rhof0 .* (1 - cal.aT.*(T-cal.perT-273.15) + cal.bP.*(Pt-Ptop ));
 
 % convert weight to volume fraction, update bulk density
-rho  = 1./(m./rhom + x./rhox + f./rhof);  
+rho   = 1./(m./rhom + x./rhox + f./rhof);  
+rhofz = (rho(1:end-1,:)+rho(2:end,:))/2;
 
 chi   = max(TINY,min(1-TINY, x.*rho./rhox ));
 phi   = max(TINY,min(1-TINY, f.*rho./rhof ));
@@ -56,8 +55,8 @@ wtm(:, 9) = reshape(cm_oxd(:,:,8),Nz*Nx,1); % K2O
 wtm(:,11) = reshape(100.*vm(:,: ),Nz*Nx,1); % H2O
 etam      = reshape(grdmodel08(wtm,T(:)-273.15),Nz,Nx);
 
-etaf = etaf0.* ones(size(f));                                              % constant fluid viscosity
-etax = etax0.* ones(size(x));                                              % constant crystal viscosity
+etaf = cal.etaf0.* ones(size(f));  % constant fluid viscosity
+etax = cal.etax0.* ones(size(x));  % constant solid viscosity
 
 % get permission weights
 kv = permute(cat(3,etax,etam,etaf),[3,1,2]);
@@ -65,15 +64,15 @@ Mv = permute(repmat(kv,1,1,1,3),[4,1,2,3])./permute(repmat(kv,1,1,1,3),[1,4,2,3]
  
 ff = max(1e-9,min(1-1e-9,permute(cat(3,chi,mu,phi),[3,1,2])));
 FF = permute(repmat(ff,1,1,1,3),[4,1,2,3]);
-Sf = (FF./BB).^(1./CC);  Sf = Sf./sum(Sf,2);
-Xf = sum(AA.*Sf,2).*FF + (1-sum(AA.*Sf,2)).*Sf;
+Sf = (FF./cal.BB).^(1./cal.CC);  Sf = Sf./sum(Sf,2);
+Xf = sum(cal.AA.*Sf,2).*FF + (1-sum(cal.AA.*Sf,2)).*Sf;
 
 % get momentum and volume permissions
 thtv = squeeze(prod(Mv.^Xf,2));
 
 % get effective viscosity
 eta    = squeeze(sum(ff.*kv.*thtv,1));  if size(eta,1)~=size(T,1); eta = eta.'; end
-if ~calibrt; etamax = 1e+6.*min(eta(:)); else; etamax = 1e3.*etax0; end
+if ~calibrt; etamax = 1e+6.*min(eta(:)); else; etamax = 1e3.*cal.etax0; end
 eta    = (1./etamax + 1./(eta.*etareg)).^-1;
 etaco  = (eta(1:end-1,1:end-1)+eta(2:end,1:end-1) ...
        +  eta(1:end-1,2:end  )+eta(2:end,2:end  ))./4;
@@ -125,10 +124,10 @@ Div_V([1 end],:) = Div_V([2 end-1],:);                                     % app
 Div_V(:,[1 end]) = Div_V(:,[2 end-1]);
 
 % update strain rates
-exx(:,2:end-1) = diff(U,1,2)./h - Div_V(:,2:end-1)./2;                     % x-normal strain rate
+exx(:,2:end-1) = diff(U,1,2)./h - Div_V(:,2:end-1)./3;                     % x-normal strain rate
 exx([1 end],:) = exx([2 end-1],:);                                         % apply boundary conditions
 exx(:,[1 end]) = exx(:,[2 end-1]);
-ezz(2:end-1,:) = diff(W,1,1)./h - Div_V(2:end-1,:)./2;                     % z-normal strain rate
+ezz(2:end-1,:) = diff(W,1,1)./h - Div_V(2:end-1,:)./3;                     % z-normal strain rate
 ezz([1 end],:) = ezz([2 end-1],:);                                         % apply boundary conditions
 ezz(:,[1 end]) = ezz(:,[2 end-1]);
 exz            = 1/2.*(diff(U,1,1)./h+diff(W,1,2)./h);                     % shear strain rate
@@ -170,6 +169,5 @@ if step>0; VolSrc = -((rho(inz,inx)-rhoo(inz,inx))./dt + Div_rhoV)./rho(inz,inx)
 UBG    = - 1*mean(mean(VolSrc))./2 .* (L/2-XXu);
 WBG    = - 1*mean(mean(VolSrc))./2 .* (D/2-ZZw);
 
-end
-
 UDtime = UDtime + toc;
+end
