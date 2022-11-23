@@ -12,7 +12,7 @@ cal.oxd    = [  42.7    0.0    0.0    0.0   57.3    0.0    0.0    0.0      % for
 
 cal.cmpStr = {'for','fay','opx','cpx','ant','alb','kfs','qtz'};
 cal.cmp    = [  95.0    5.0    0.0    0.0    0.0    0.0    0.0    0.0      % cphs0 => dunite
-                 9.0    5.0   28.0   23.0   27.0    8.0    0.0    0.0      % perCx => pyroxenite
+                 9.0    6.0   28.0   23.0   26.0    8.0    0.0    0.0      % perCx => pyroxenite
                  1.4    1.0   17.2   36.2   23.8   20.0    0.4    0.0      % perCm => basalt
                  0.0    0.0    0.0   16.0    3.0    6.0   30.0   45.0];    % cphs1 => rhyolite
 
@@ -43,6 +43,6 @@ cal.bP    =  1e-8;                                                         % flu
 % specify rheology parameters
 cal.etaf0 =  0.1;                                                          % fluid viscosity [Pas]
 cal.etax0 =  1e16;                                                         % solid viscosity [Pas]
-cal.AA    = [ 0.60, 0.25, 0.30; 0.20, 0.20, 0.20; 0.20, 0.20, 0.20; ];     % permission slopes
-cal.BB    = [ 0.44, 0.15, 0.41; 0.60, 0.01, 0.39; 0.84, 0.09, 0.07; ];     % permission step locations
-cal.CC    = [ 0.30, 0.30, 0.30; 0.60, 0.60, 0.10; 0.30, 0.30, 0.40; ];     % permission step widths
+cal.AA  =  [ 0.60, 0.25, 0.30; 0.20, 0.20, 0.20; 0.20, 0.20, 0.20; ];  % permission slopes   
+cal.BB  =  [ 0.43, 0.16, 0.41; 0.60, 0.01, 0.39; 0.81, 0.10, 0.09; ];  % permission step locations
+cal.CC  =  [ 0.20, 0.20, 0.20; 0.60, 0.60, 0.10; 0.20, 0.15, 0.30; ];  % permission step widths

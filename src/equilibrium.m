@@ -86,7 +86,7 @@ end
 T   = max(0,min(1,(T0 - P*clap -Tphs0)./(Tphs1-Tphs0)));
 
 a = 15;
-b = 0.05;
+b = 0.04;
 ind1 = T>=perT+b;
 ind2 = T< perT-b;
 ind3 = T>=perT-b & T<perT+b;
