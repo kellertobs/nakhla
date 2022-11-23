@@ -212,17 +212,17 @@ v   =  v0 + (v1-v0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dv.*rp;  if any(bndinit(:
 te = zeros(Nz,Nx,length(te0));
 for k = 1:length(te0)
     te(:,:,k)  =  te0(k) + (te1(k)-te0(k)) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dte(k).*rp;  % trace elements
-    if any(bndinit(:)) && ~isnan(tewall(k)); te(:,:,k)  = te(:,:,k) + (tewall(k)-te(:,:,k)).*bndinit; end 
+    if any(bndinit(:)) && ~isnan(tewall(k)); te(:,:,k)  = te(:,:,k) + (tewall(k)-te(:,:,k)).*bndinit; end; tein = te; 
 end
 ir = zeros(Nz,Nx,length(ir0));
 for k = 1:length(ir0)
     ir(:,:,k)  =  ir0(k) + (ir1(k)-ir0(k)) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dir(k).*rp;  % isotope ratios  
-    if any(bndinit(:)) && ~isnan(irwall(k)); ir(:,:,k)  = ir(:,:,k) + (irwall(k)-ir(:,:,k)).*bndinit; end
+    if any(bndinit(:)) && ~isnan(irwall(k)); ir(:,:,k)  = ir(:,:,k) + (irwall(k)-ir(:,:,k)).*bndinit; end; irin = ir;
 end
 
 U   =  zeros(size((XX(:,1:end-1)+XX(:,2:end))));  Ui = U;  res_U = 0.*U;
 W   =  zeros(size((XX(1:end-1,:)+XX(2:end,:))));  Wi = W;  res_W = 0.*W; wf = 0.*W; wc = 0.*W;
-P   =  0.*Tp;  Pi = P;  res_P = 0.*P;  meanQ = 0;  
+P   =  0.*Tp;  Pi = P;  res_P = 0.*P;  meanQ = 0;  Vel = 0.*P;
 SOL = [W(:);U(:);P(:)];
 
 % initialise auxiliary fields
@@ -248,19 +248,24 @@ TCtime  = 0;
 UDtime  = 0;
 res  = 1;  tol = 1e-12;  x = ones(size(Tp))./10;  f = v/2;
 while res > tol
-    Pti = Pt;
+    Pti = Pt; xi = x; fi = f;
     
     rhoref =  mean(rho(inz,inx),'all');
     rhofz  = (rho(1:end-1,:)+rho(2:end,:))/2;
-    Pt(2:end,:) = Ptop + repmat(cumsum(mean(rhofz,2).*g0.*h),1,Nx);
     Adbt   =  cal.aT./rhoref;
+    Pt( 2:end, :) = repmat(cumsum(mean(rhofz,2).*g0.*h),1,Nx);
+    Pt            = Pt - Pt(2,:)/2 + Ptop;
+    Pt([1 end],:) = Pt([2 end-1],:);
+    Pt(:,[1 end]) = Pt(:,[2 end-1]);
     if Nz<=10; Pt = Ptop.*ones(size(Tp)); end
-    
+
     T    =  (Tp+273.15).*exp(Adbt./cP.*Pt);
 
     [xq,cxq,cmq,fq,vfq,vmq] = equilibrium(x,f,T-273.15,c,v,Pt,cal,TINY);
     
-    c = cin.*(1-f);
+    c  = cin .*(1-f);
+    te = tein.*(1-f);
+    ir = irin.*(1-f);
 
     x  = xq;  f = fq;  m = 1-x-f;
     cm = cmq; cx = cxq;
@@ -270,7 +275,9 @@ while res > tol
 
     update;
 
-    res  = norm(Pt(:)-Pti(:),2)./norm(Pt(:),2);
+    res  = norm(Pt(:)-Pti(:),2)./norm(Pt(:),2) ...
+         + norm(x(:)-xi(:),2)./(norm(x(:),2)+TINY) ...
+         + norm(f(:)-fi(:),2)./(norm(f(:),2)+TINY);
 end
 rhoo = rho;
 dto  = dt; 
@@ -333,14 +340,20 @@ if restart
     end
     if exist(name,'file')
         fprintf('\n   restart from %s \n\n',name);
-        load(name,'U','W','P','Pt','f','x','m','phi','chi','mu','X','F','S','C','V','T','c','v','cm','cx','vm','vf','TE','IR','te','ir','dSdt','dCdt','dVdt','dFdt','dXdt','dTEdt','dIRdt','Gf','Gx','rho','eta','eII','tII','dt','time','step','hist','VolSrc','wf','wx');
-        
+        load(name,'U','W','P','Pt','f','x','m','phi','chi','mu','X','F','S','C','V','T','c','v','cm','cx','vm','vf','TE','IR','te','ir','dSdt','dCdt','dVdt','dFdt','dXdt','dTEdt','dIRdt','Gf','Gx','rho','eta','eII','tII','dt','time','step','VolSrc','wf','wx','wm');
+        name = [opdir,'/',runID,'/',runID,'_hist'];
+        load(name,'hist');
+
         xq = x; fq = f;
         SOL = [W(:);U(:);P(:)];
         rhoo = rho; Div_rhoVo = Div_rhoV;
         update; output;
     else % continuation file does not exist, start from scratch
-        fprintf('\n   !!! restart file does not exist !!! \n   => starting run from scratch %s \n\n',name);
+        fprintf('\n   !!! restart file does not exist !!! \n   => starting run from scratch %s \n\n',runID);
+        update;
+        fluidmech;
+        history;
+        output;
     end
 else
     % complete, plot, and save initial condition

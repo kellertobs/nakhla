@@ -289,8 +289,15 @@ W  = full(reshape(SOL(MapW(:))        ,(Nz-1), Nx   ));                    % mat
 U  = full(reshape(SOL(MapU(:))        , Nz   ,(Nx-1)));                    % matrix x-velocity
 P  = full(reshape(SOL(MapP(:)+(NW+NU)), Nz   , Nx   ));                    % matrix dynamic pressure
 
+% magma velocity magnitude
+Vel  = sqrt(((W([1,1:end],:)+W([1:end,end],:))/2).^2 ...
+          + ((U(:,[1,1:end])+U(:,[1:end,end]))/2).^2);
+
 if ~bnchm
-    Pt(2:end,:) = Ptop + repmat(cumsum(mean(rhofz,2).*g0.*h),1,Nx);
+    Pt( 2:end, :) = repmat(cumsum(mean(rhofz,2).*g0.*h),1,Nx);
+    Pt            = Pt - Pt(2,:)/2 + Ptop;
+    Pt([1 end],:) = Pt([2 end-1],:);
+    Pt(:,[1 end]) = Pt(:,[2 end-1]);
     if Nz<=10; Pt = Ptop.*ones(size(Tp)); end
 
     % get residual of fluid mechanics equations from iterative update
@@ -301,7 +308,7 @@ if ~bnchm
     Uf   = U + 0.;                                                             % mvp x-velocity
     Wx   = W + wx;                                                             % xtl z-velocity
     Ux   = U + 0.;                                                             % xtl x-velocity
-    Wm   = W + 0.;                                                             % mlt z-velocity
+    Wm   = W + wm;                                                             % mlt z-velocity
     Um   = U + 0.;                                                             % mlt x-velocity
 
     % update mixture volume flux
@@ -312,7 +319,11 @@ if ~bnchm
          + (chi(:,1:end-1)+chi(:,2:end))/2 .* Ux ...
          + (phi(:,1:end-1)+phi(:,2:end))/2 .* Uf;
 
+    % mixture volume flux magnitude
+    Vbar = sqrt(((Wbar([1,1:end],:)+Wbar([1:end,end],:))/2).^2 ...
+              + ((Ubar(:,[1,1:end])+Ubar(:,[1:end,end]))/2).^2);
 
+    
     %% update time step
     dtk = min((h/2)^2./max(kT(:)./rho(:)./cP));                                % diffusive time step size
     dta = CFL*min(h/2/max(abs([Ux(:);Wx(:);Uf(:);Wf(:);Um(:);Wm(:)]+1e-16)));  % advective time step size

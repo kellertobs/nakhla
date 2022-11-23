@@ -101,7 +101,8 @@ elseif Nx <= 10  % create 1D plots
     subplot(1,5,5)
     plot(-(phi(1:end-1,2:end-1)+phi(2:end,2:end-1))/2.*(Wf(:,2:end-1)-W(:,2:end-1))*hr,Zf.',CL{[1,5]},LW{:}); axis ij tight; box on; hold on;
     plot(-(chi(1:end-1,2:end-1)+chi(2:end,2:end-1))/2.*(Wx(:,2:end-1)-W(:,2:end-1))*hr,Zf.',CL{[1,4]},LW{:});
-    plot(                                                            -W(:,2:end-1) *hr,Zf.',CL{[1,3]},LW{:});
+    plot(-( mu(1:end-1,2:end-1)+ mu(2:end,2:end-1))/2.*(Wm(:,2:end-1)-W(:,2:end-1))*hr,Zf.',CL{[1,3]},LW{:});
+    plot(                                                            -W(:,2:end-1) *hr,Zf.',CL{[1,2]},LW{:});
     title('$W$, $w_\Delta^f$, $w_\Delta^x$ [m/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
 
     if ~exist('fh2','var'); fh2 = figure(VIS{:});
@@ -440,9 +441,11 @@ if save_op
     end
 
     name = [opdir,'/',runID,'/',runID,'_',num2str(floor(step/nop))];
-    save(name,'U','W','P','Pt','f','x','m','phi','chi','mu','X','F','S','C','V','T','c','v','cm','cx','vm','vf','TE','IR','te','ir','dSdt','dCdt','dVdt','dFdt','dXdt','dTEdt','dIRdt','Gf','Gx','rho','eta','eII','tII','dt','time','step','hist','VolSrc','wf','wx');
+    save(name,'U','W','P','Pt','f','x','m','phi','chi','mu','X','F','S','C','V','T','c','v','cm','cx','vm','vf','TE','IR','te','ir','dSdt','dCdt','dVdt','dFdt','dXdt','dTEdt','dIRdt','Gf','Gx','rho','eta','eII','tII','dt','time','step','VolSrc','wf','wx','wm');
     name = [opdir,'/',runID,'/',runID,'_cont'];
-    save(name,'U','W','P','Pt','f','x','m','phi','chi','mu','X','F','S','C','V','T','c','v','cm','cx','vm','vf','TE','IR','te','ir','dSdt','dCdt','dVdt','dFdt','dXdt','dTEdt','dIRdt','Gf','Gx','rho','eta','eII','tII','dt','time','step','hist','VolSrc','wf','wx');
+    save(name,'U','W','P','Pt','f','x','m','phi','chi','mu','X','F','S','C','V','T','c','v','cm','cx','vm','vf','TE','IR','te','ir','dSdt','dCdt','dVdt','dFdt','dXdt','dTEdt','dIRdt','Gf','Gx','rho','eta','eII','tII','dt','time','step','VolSrc','wf','wx','wm');
+    name = [opdir,'/',runID,'/',runID,'_hist'];
+    save(name,'hist');
 
     if step == 0
         logfile = [opdir,'/',runID,'/',runID,'.log'];

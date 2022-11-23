@@ -5,8 +5,8 @@ TINY = 1e-16;
 
 % calibration run options
 runID     = 'test';              % run ID for output files; [system name_wt.% SiO2_wt.% H2O] 
-holdfig   = 1;                   % set to 1 to hold figures, to 0 for new figures
-linestyle = '--';                 % set line style for plots
+holdfig   = 0;                   % set to 1 to hold figures, to 0 for new figures
+linestyle = '-';                 % set line style for plots
 save_plot = 0;                   % turn on (1) to save output file in /out directory
 
 % set phase diagram parameters
@@ -31,6 +31,7 @@ Nz = length(T); Nx = 1; Ptop = min(P); Pt = P; etareg = 1; calibrt = 1; T = T+27
 update;
 T = T-273.15;
 
+wm =  mu.*Csgr_m .* (rhom-rho)*g0; % melt segregation speed
 wx = chi.*Csgr_x .* (rhox-rho)*g0; % crystal segregation speed
 wf = phi.*Csgr_f .* (rhof-rho)*g0; % fluid segregation speed
 
@@ -59,6 +60,7 @@ etam(ind) = [];
 etax(ind) = [];
 etaf(ind) = [];
 eta (ind) = [];
+wm  (ind) = [];
 wx  (ind) = [];
 wf  (ind) = [];
 f  (ind) = [];
@@ -156,7 +158,7 @@ ylabel('Viscosity [log$_{10}$ Pas]','Interpreter','latex','FontSize',15)
 
 % plot phase segregation speeds
 figure(7); if ~holdfig; clf; end
-semilogy(T,max(1e-15,abs(wx)).*3600,'k',T,max(1e-15,abs(wf)).*3600,'b','LineStyle',linestyle,'LineWidth',2); hold on; box on; axis tight;
+semilogy(T,max(1e-16,abs(x.*wx)).*3600,'k',T,max(1e-16,abs(m.*wm)).*3600,'r',T,max(1e-16,abs(f.*wf)).*3600,'b','LineStyle',linestyle,'LineWidth',2); hold on; box on; axis tight;
 legend('crystals','fluid','Interpreter','latex','FontSize',15,'box','off','location','best')
 set(gca,'TickLabelInterpreter','latex','FontSize',13)
 title('Phase segregation model','Interpreter','latex','FontSize',18)

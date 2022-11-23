@@ -9,7 +9,6 @@ nop      =  100;                 % output frame plotted/saved every 'nop' time s
 plot_op  =  1;                   % switch on to live plot results
 save_op  =  1;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
-diseq    =  1;                   % switch on disequilibrium approac
 bnchm    =  0;                   % switch on to run manufactured solution benchmark on flui mechanics solver
 
 % set model domain parameters
@@ -58,8 +57,8 @@ bndinit  =  0;                   % switch on (1) to initialise with internal bou
 dw       =  1*h;                 % boundary layer thickness [m]
 fin      =  1;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
 fout     =  1;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
-tau_T    =  10*hr;               % wall cooling/assimilation time [s]
-tau_a    =  1*hr;                % wall cooling/assimilation tie [s]
+tau_T    =  8*hr;                % wall cooling/assimilation time [s]
+tau_a    =  4*hr;                % wall cooling/assimilation tie [s]
 Twall    =  300;                 % wall temperature [degC] (nan = insulating)
 cwall    =  nan;                 % wall major component [wt SiO2] (nan = no assimilation)
 vwall    =  nan;                 % wall volatile component [wt H2O] (nan = no assimilation)
@@ -78,7 +77,7 @@ d0       =  1e-3;                % crystal/bubble size [m]
 g0       =  10.;                 % gravity [m/s2]
 
 % set numerical model parameters
-CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
+CFL      =  0.80;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
 BCA      =  {'',''};             % boundary condition on advection (top/bot, sides)
 rtol     =  1e-4;                % outer its relative tolerance
