@@ -49,17 +49,17 @@ dte      =  1e-3.*[-1,-1,1,1];   % trace elements random noise [wt ppm]
 Kte      =  [0.01,0.1,3,10];     % trace elements partition coefficients
 ir0      =  [5,0.7];             % isotope ratios top layer [delta]
 ir1      =  [5,0.7];             % isotope ratios base layer [delta]
-dir      =  [0.05,0.001];        % isotope ratios random noise [delta]
+dir      =  1e-3.*[-1,1].*ir0;   % isotope ratios random noise [delta]
 
 % set thermo-chemical boundary parameters
 Ptop     =  1.25e8;              % top pressure [Pa]
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls)
-bndinit  =  1;                   % switch on (1) to initialise with internal boundary layers
-dw       =  5*h;                 % boundary layer thickness [m]
-fin      =  1;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
+bndinit  =  0;                   % switch on (1) to initialise with internal boundary layers
+dw       =  1*h;                 % boundary layer thickness [m]
+fin      =  0;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
 fout     =  1;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
 tau_T    =  10*hr;               % wall cooling/assimilation time [s]
-tau_a    =  1*hr;                % wall cooling/assimilation tie [s]
+tau_a    =  10*hr;               % wall cooling/assimilation tie [s]
 Twall    =  300;                 % wall temperature [degC] (nan = insulating)
 cwall    =  0.70;                % wall major component [wt SiO2] (nan = no assimilation)
 vwall    =  0.04;                % wall volatile component [wt H2O] (nan = no assimilation)
@@ -81,8 +81,8 @@ g0       =  10.;                 % gravity [m/s2]
 CFL      =  0.75;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
 BCA      =  {'',''};             % boundary condition on advection (top/bot, sides)
-rtol     =  1e-4;                % outer its relative tolerance
-atol     =  1e-7;                % outer its absolute tolerance
+rtol     =  1e-3;                % outer its relative tolerance
+atol     =  1e-6;                % outer its absolute tolerance
 maxit    =  10;                  % maximum outer its
 lambda   =  0.25;                % iterative lag parameter equilibration
 etareg   =  1e0;                 % viscosity regularisation parameter
