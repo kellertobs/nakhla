@@ -12,7 +12,6 @@ nop      =  1;                   % output frame plotted/saved every 'nop' time s
 plot_op  =  0;                   % switch on to live plot of results
 save_op  =  0;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
-diseq    =  1;                   % switch on disequilibrium approac
 bnchm    =  1;                   % switch on to run manufactured solution benchmark on flui mechanics solver
 
 % set model domain parameters

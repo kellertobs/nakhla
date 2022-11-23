@@ -1,6 +1,6 @@
 clear; close all;
 
-DT = [2,1,1/2];
+DT = [1,1/2,1/4];
 
 for dt = DT
     
@@ -12,7 +12,6 @@ nop      =  4;                   % output frame plotted/saved every 'nop' time s
 plot_op  =  1;                   % switch on to live plot of results
 save_op  =  0;                   % switch on to save output to file
 plot_cv  =  1;                   % switch on to live plot iterative convergence
-diseq    =  1;                   % switch on disequilibrium approac
 bnchm    =  0;                   % switch on to run manufactured solution benchmark on flui mechanics solver
 
 % set model domain parameters
@@ -39,10 +38,10 @@ T1       =  1050;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
 c0       =  0.52;                % major component top layer [wt SiO2]
 c1       =  0.52;                % major component base layer [wt SiO2]
-dc       =  1e-5;                % amplitude of random noise [wt SiO2]
+dc       =  1e-3;                % amplitude of random noise [wt SiO2]
 v0       =  0.04;                % volatile component top layer [wt H2O]
 v1       =  0.04;                % volatile component base layer [wt H2O]
-dv       =  0e-6;                % amplitude of random noise [wt H2O]
+dv       =  1e-5;                % amplitude of random noise [wt H2O]
 
 % set model trace and isotope geochemistry parameters
 te0      =  [1,1,1,1];           % trace elements top layer [wt ppm]
@@ -60,8 +59,8 @@ bndinit  =  0;                   % switch on (1) to initialise with internal bou
 dw       =  1*h;                 % boundary layer thickness [m]
 fin      =  0;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
 fout     =  0;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
-tau_T    =  10*hr;               % wall cooling/assimilation time [s]
-tau_a    =  1*hr;                % wall cooling/assimilation tie [s]
+tau_T    =  8*hr;                % wall cooling/assimilation time [s]
+tau_a    =  4*hr;                % wall cooling/assimilation tie [s]
 Twall    =  300;                 % wall temperature [degC] (nan = insulating)
 cwall    =  nan;                 % wall major component [wt SiO2] (nan = no assimilation)
 vwall    =  nan;                 % wall volatile component [wt H2O] (nan = no assimilation)
@@ -80,7 +79,7 @@ d0       =  1e-3;                % crystal/bubble size [m]
 g0       =  10.;                 % gravity [m/s2]
 
 % set numerical model parameters
-CFL      =  2.00;                % (physical) time stepping courant number (multiplies stable step) [0,1]
+CFL      =  1.00;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
 BCA      =  {'',''};             % boundary condition on advection (top/bot, sides)
 rtol     =  1e-6;                % outer its relative tolerance
@@ -106,9 +105,6 @@ run('../src/main')
 run('../src/output')
 
 % plot convergence
-% EH = abs(hist.EH(end));
-% EC = abs(hist.EC(end));
-% EV = abs(hist.EV(end));
 EM = norm(diff(hist.EM(2:end)),2)./length(diff(hist.EM(2:end)));
 ES = norm(diff(hist.ES(2:end)),2)./length(diff(hist.ES(2:end)));
 EC = norm(diff(hist.EC(2:end)),2)./length(diff(hist.EC(2:end)));

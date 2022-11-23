@@ -63,6 +63,7 @@ rhox0 = sum(cx0_oxd/100./cal.rhox0).^-1;
 cm1_oxd = (0.999.*cm0_cmp + 0.001.*cal.cmp(1))*cal.oxd./100;
 cm2_oxd = (0.999.*cm0_cmp + 0.001.*cal.cmp(4))*cal.oxd./100;
 
+wtm = [];
 wtm([1 2 3 4 6 7 8 9 11 12]) = [cm0_oxd,100.*vm0,0];
 etam0 = grdmodel08(wtm,T0);
 
