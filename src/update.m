@@ -79,16 +79,17 @@ etaco  = (eta(1:end-1,1:end-1)+eta(2:end,1:end-1) ...
        +  eta(1:end-1,2:end  )+eta(2:end,2:end  ))./4;
 
 % get segregation coefficients
-Csgr = ((1-ff)./d0^2.*kv.*thtv).^-1 + TINY^2;
+dd = permute(cat(3,d0*ones(size(mu)),d0*(1-mu),d0*ones(size(mu))),[3,1,2]);
+Csgr = ((1-ff)./dd.^2.*kv.*thtv).^-1 + TINY^2;
 
 Csgr_x = squeeze(Csgr(1,:,:)); if size(Csgr_x,1)~=size(T,1); Csgr_x = Csgr_x.'; end
 Csgr_f = squeeze(Csgr(3,:,:)); if size(Csgr_f,1)~=size(T,1); Csgr_f = Csgr_f.'; end
 Csgr_m = squeeze(Csgr(2,:,:)); if size(Csgr_m,1)~=size(T,1); Csgr_m = Csgr_m.'; end
-Csgr_m = Csgr_m.*(1-mu).^2 + TINY^2; % dampen melt segregation at high melt fraction (dm = d0.*(1-f))
+% Csgr_m = Csgr_m.*(1-mu).^2 + TINY^2; % dampen melt segregation at high melt fraction (dm = d0.*(1-f))
 
 if ~calibrt % skip the following if called from calibration script
 
-wm = ((rhom(1:end-1,:)+rhom(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*2./(1./Csgr_m(1:end-1,:)+1./Csgr_m(2:end,:)); % melt segregation speed
+wm = 0.*((rhom(1:end-1,:)+rhom(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*2./(1./Csgr_m(1:end-1,:)+1./Csgr_m(2:end,:)); % melt segregation speed
 wm(1  ,:)     = min(1,1-top).*wm(1  ,:);
 wm(end,:)     = min(1,1-bot).*wm(end,:);
 wm(:,[1 end]) = -sds*wm(:,[2 end-1]);

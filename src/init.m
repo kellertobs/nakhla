@@ -348,7 +348,7 @@ if restart
         xq = x; fq = f;
         SOL = [W(:);U(:);P(:)];
         rhoo = rho; Div_rhoVo = Div_rhoV;
-        update; output;
+        update;
     else % continuation file does not exist, start from scratch
         fprintf('\n   !!! restart file does not exist !!! \n   => starting run from scratch %s \n\n',runID);
         update;
