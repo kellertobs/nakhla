@@ -129,7 +129,7 @@ if any([v0;v1;vwall;v(:)]>10*TINY)
     dFdt   = advn_F + diff_F + Gf;                                     % total rate of change
 
     F(inz,inx) = Fo(inz,inx) + (theta.*dFdt + (1-theta).*dFdto).*dt;   % explicit update of bubble fraction
-    F = min(rho,max(0,F));                                             % enforce limits
+    F = min(V,max(0,F));                                               % enforce limits
     F([1 end],:) = F([2 end-1],:);                                     % apply boundary conditions
     F(:,[1 end]) = F(:,[2 end-1]);
     
@@ -154,7 +154,7 @@ cx = c./(m./Kc + x);
 % volatile component
 Kf = vfq./vmq;
 vf = vfq;
-vm = max(0.9.*vmq,min(1.1.*vmq,(v - f)./m));
+vm = max(0,min(1,(v - f)./max(TINY,m)));
 
 
 %% *****  UPDATE TC RESIDUALS  ********************************************

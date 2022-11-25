@@ -69,14 +69,14 @@ function [resx,resf,cxq,cmq,vfq,vmq] = res_xf(xq,fq,T0,c,v,P,Tphs0d,Tphs1d,cphs0
 
 if any(v(:)>10*TINY)
     vfq = ones(size(v));
-    vmq = max(TINY,min(v./(1-xq),vmq0));
+    vmq = max(0,min(v./(1-xq),vmq0));
     
     Tphs0 = Tphs0d - dTH2O(1).*vmq.^0.75;
     Tphs1 = Tphs1d - dTH2O(3).*vmq.^0.75;
     perT  = (perTd - dTH2O(2).*vmq.^0.75 -Tphs0)./(Tphs1-Tphs0);
 else
     vfq =  ones(size(v));
-    vmq = zeros(size(v))+TINY;
+    vmq = zeros(size(v));
     
     Tphs0 = Tphs0d;
     Tphs1 = Tphs1d;
