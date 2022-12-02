@@ -19,9 +19,17 @@ load ocean;                  % load custom colormap
 run(['../cal/cal_',calID]);  % load melt model calibration
 calibrt =  0;                % not in calibrate mode
 TINY    =  1e-16;            % minimum cutoff phase, component fractions
+BCA     =  {'',''};          % boundary condition on advection (top/bot, sides)
+bnchm   =  0;                % not a benchmark run
 
 % calculate dimensionless numbers characterising the system dynamics
-[x0,cx0,cm0,f0,vf0,vm0] = equilibrium(0.5,v0/2,T0,c0,v0,Ptop,cal,TINY);
+res = 1; x0 = 0; f0 = 0;
+while res>1e-16
+    ci = c0*(1-f0);
+    [x0,cx0,cm0,f0,vf0,vm0] = equilibrium(x0,f0,T0,c0*(1-f0),v0,Ptop,cal,TINY);
+    m0 = 1-x0-f0;
+    res = abs(c0*(1-f0)-ci)/ci;
+end
 
 fprintf('    initial T: %4.3f \n'  ,T0);
 fprintf('    initial c: %4.3f \n'  ,c0);
@@ -29,36 +37,26 @@ fprintf('    initial v: %4.3f \n'  ,v0);
 fprintf('    initial x: %4.3f \n'  ,x0);
 fprintf('    initial f: %4.3f \n\n',f0);
 
-wt0 = (cal.perCx-cm0)./(cal.perCx-cal.cphs0);
-wt1 = (cal.perCm-cm0)./(cal.perCm-cal.perCx);
-wt2 = (cal.cphs1-cm0)./(cal.cphs1-cal.perCm);
-cm0_cmp = (wt0(:) .* cal.cmp(1,:) + (1-wt0(:)) .* cal.cmp(2,:)) .* (cm0(:)< cal.perCx) ...
-        + (wt1(:) .* cal.cmp(2,:) + (1-wt1(:)) .* cal.cmp(3,:)) .* (cm0(:)>=cal.perCx & cm0(:)<=cal.perCm) ...
-        + (wt2(:) .* cal.cmp(3,:) + (1-wt2(:)) .* cal.cmp(4,:)) .* (cm0(:)> cal.perCm);
-
-cm0_oxd = cm0_cmp*cal.oxd./100;
+% update oxide compositions
+wt0 = (cal.perCm-cm0)./(cal.perCm-cal.cphs0);
+wt1 = (cal.cphs1-cm0)./(cal.cphs1-cal.perCm);
+cm0_oxd = (wt0(:) .* cal.cmp_oxd(1,:) + (1-wt0(:)) .* cal.cmp_oxd(3,:)) .* (cm0< cal.perCm) ...
+        + (wt1(:) .* cal.cmp_oxd(3,:) + (1-wt1(:)) .* cal.cmp_oxd(4,:)) .* (cm0>=cal.perCm);
 
 wt0 = (cal.perCx-cx0)./(cal.perCx-cal.cphs0);
-wt1 = (cal.perCm-cx0)./(cal.perCm-cal.perCx);
-wt2 = (cal.cphs1-cx0)./(cal.cphs1-cal.perCm);
-cx0_cmp = (wt0(:) .* cal.cmp(1,:) + (1-wt0(:)) .* cal.cmp(2,:)) .* (cx0(:)< cal.perCx) ...
-        + (wt1(:) .* cal.cmp(2,:) + (1-wt1(:)) .* cal.cmp(3,:)) .* (cx0(:)>=cal.perCx & cx0(:)<=cal.perCm) ...
-        + (wt2(:) .* cal.cmp(3,:) + (1-wt2(:)) .* cal.cmp(4,:)) .* (cx0(:)> cal.perCm);
+wt1 = (cal.cphs1-cx0)./(cal.cphs1-cal.perCx);
+cx0_oxd = (wt0(:) .* cal.cmp_oxd(1,:) + (1-wt0(:)) .* cal.cmp_oxd(2,:)) .* (cx0< cal.perCx) ...
+        + (wt1(:) .* cal.cmp_oxd(2,:) + (1-wt1(:)) .* cal.cmp_oxd(4,:)) .* (cx0>=cal.perCx);
 
-cx0_oxd = cx0_cmp*cal.oxd./100;
+c0_oxd = (m0.*cm0_oxd + x0.*cx0_oxd)./(1-f0);
 
-wt0 = (cal.perCx-c0)./(cal.perCx-cal.cphs0);
-wt1 = (cal.perCm-c0)./(cal.perCm-cal.perCx);
-wt2 = (cal.cphs1-c0)./(cal.cphs1-cal.perCm);
-c0_cmp = (wt0(:) .* cal.cmp(1,:) + (1-wt0(:)) .* cal.cmp(2,:)) .* (c0(:)< cal.perCx) ...
-        + (wt1(:) .* cal.cmp(2,:) + (1-wt1(:)) .* cal.cmp(3,:)) .* (c0(:)>=cal.perCx & c0(:)<=cal.perCm) ...
-        + (wt2(:) .* cal.cmp(3,:) + (1-wt2(:)) .* cal.cmp(4,:)) .* (c0(:)> cal.perCm);
-
-c0_oxd = c0_cmp*cal.oxd./100;
+cm0_cmp = cm0_oxd/cal.oxd*100;
+cx0_cmp = cx0_oxd/cal.oxd*100;
+ c0_cmp =  c0_oxd/cal.oxd*100;
 
 rhof0 = cal.rhof0;
-rhom0 = sum(cm0_oxd/100./cal.rhom0).^-1;
-rhox0 = sum(cx0_oxd/100./cal.rhox0).^-1;
+rhom0 = sum(cm0_cmp/100./cal.rhom0).^-1;
+rhox0 = sum(cx0_cmp/100./cal.rhox0).^-1;
 
 cm1_oxd = (0.999.*cm0_cmp + 0.001.*cal.cmp(1))*cal.oxd./100;
 cm2_oxd = (0.999.*cm0_cmp + 0.001.*cal.cmp(4))*cal.oxd./100;
@@ -137,6 +135,7 @@ inx = 2:Nx-1;
 
 % get smoothed initialisation field
 rng(seed);
+smth = smth*Nx*Nz*1e-4;
 rp = randn(Nz,Nx);
 for k = 1:round(smth)
     rp(2:end-1,2:end-1) = rp(2:end-1,2:end-1) + diff(rp(:,2:end-1),2,1)./8 + diff(rp(2:end-1,:),2,2)./8;
@@ -247,7 +246,7 @@ EQtime  = 0;
 FMtime  = 0;
 TCtime  = 0;
 UDtime  = 0;
-res  = 1;  tol = 1e-12;  x = ones(size(Tp))./10;  f = v/2;
+res  = 1;  tol = 1e-13;  x = zeros(size(Tp));  f = v/2;
 while res > tol
     Pti = Pt; xi = x; fi = f;
     
@@ -331,6 +330,7 @@ dsumMdt = 0;
 dsumSdt = 0;
 dsumCdt = 0;
 dsumVdt = 0;
+dsumCdt_oxd = 0;
 
 % overwrite fields from file if restarting run
 if restart

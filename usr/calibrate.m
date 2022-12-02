@@ -1,11 +1,12 @@
 % calibrate phase diagram
 addpath('../src');
+load ocean
 TINY = 1e-16;
 
 
 % calibration run options
 runID     = 'test';              % run ID for output files; [system name_wt.% SiO2_wt.% H2O] 
-holdfig   = 0;                   % set to 1 to hold figures, to 0 for new figures
+holdfig   = 1;                   % set to 1 to hold figures, to 0 for new figures
 linestyle = '-';                 % set line style for plots
 save_plot = 0;                   % turn on (1) to save output file in /out directory
 
@@ -17,15 +18,21 @@ d0       =  1e-3;                % crystal size [m]
 g0       =  10.;                 % gravity [m/s2]
 
 % set ranges for control variables T, c, v, P
-T = linspace(700,1400,5e2).';    % temperature range [degC]
-c = linspace(0.52,0.52,5e2).';   % major component range [wt SiO2]
-v = linspace(0.00,0.00,5e2).';   % volatile component range [wt H2O]
-P = linspace(125,125,5e2).'*1e6; % pressure range [Pa]
+T = linspace(1350,700,400).';    % temperature range [degC]
+c = linspace(0.51,0.51,400).';   % major component range [wt SiO2]
+v = linspace(0.00,0.00,400).';   % volatile component range [wt H2O]
+P = linspace(125,125,400).'*1e6; % pressure range [Pa]
 
 % equilibrium phase fractions and compositions
 run(['../cal/cal_',calID]);  % load melt model calibration
-[x,cx,cm,f,vf,vm]  =  equilibrium(ones(size(T)).*0.5,v./10,T,c,v,P,cal,TINY);
-m = 1-f-x;  
+c0 = c; res = 1; x = zeros(size(T)); f = zeros(size(T));
+while res>1e-13
+    ci = c;
+    [x,cx,cm,f,vf,vm]  =  equilibrium(x,f,T,c,v,P,cal,TINY);
+    c = c0.*(1-f);
+    m = 1-f-x;
+    res = norm(c-ci,'fro')./norm(c,'fro');
+end
 
 Nz = length(T); Nx = 1; Ptop = min(P); Pt = P; etareg = 1; calibrt = 1; T = T+273.15;
 update;
@@ -72,9 +79,8 @@ if ~holdfig; close all; end
 
 % plot phase diagram
 figure(1); if ~holdfig; clf; end
-TT = linspace(cal.Tphs0+Ptop*cal.clap,cal.Tphs1+Ptop*cal.clap,500);
-cc = [linspace(cal.cphs1,(cal.perCx+cal.perCm)/2, ceil((cal.perT-cal.Tphs0)./(cal.Tphs1-cal.Tphs0)*500)), ...
-      linspace((cal.perCx+cal.perCm)/2,cal.cphs0,floor((cal.perT-cal.Tphs1)./(cal.Tphs0-cal.Tphs1)*500))];
+TT = [linspace(cal.Tphs0+Ptop*cal.clap,cal.perT+Ptop*cal.clap,200),linspace(cal.perT+Ptop*cal.clap,cal.Tphs1+Ptop*cal.clap,200)];
+cc = [linspace(cal.cphs1,(cal.perCx+cal.perCm)/2,200),linspace((cal.perCx+cal.perCm)/2,cal.cphs0,200)];
 [~,CCx,CCm,~,~,~] = equilibrium(0*TT,0*TT,TT,cc,0*TT,Ptop*ones(size(TT)),cal,TINY);
 plot(CCx,TT,'k-','LineWidth',2); axis tight; hold on; box on;
 plot(CCm,TT,'k-','LineWidth',2);
@@ -85,9 +91,8 @@ vv = 0.10*ones(size(TT));
 xx = 0.50*ones(size(TT));
 ff = 0.05*ones(size(TT));
 for i = 1:5
-    TT = linspace(Tphs0s+Ptop*cal.clap,Tphs1s+Ptop*cal.clap,500);
-    cc = [linspace(cal.cphs1,(cal.perCx+cal.perCm)/2, ceil((perTs-Tphs0s)./(Tphs1s-Tphs0s)*500)), ...
-          linspace((cal.perCx+cal.perCm)/2,cal.cphs0,floor((perTs-Tphs1s)./(Tphs0s-Tphs1s)*500))];
+    TT = [linspace(Tphs0s+Ptop*cal.clap,perTs+Ptop*cal.clap,200),linspace(perTs+Ptop*cal.clap,Tphs1s+Ptop*cal.clap,200)];
+    cc = [linspace(cal.cphs1,(cal.perCx+cal.perCm)/2,200),linspace((cal.perCx+cal.perCm)/2,cal.cphs0,200)];
     vmq_c0 = (4.7773e-7.*Ptop.^0.6 + 1e-11.*Ptop) .* exp(2565*(1./(TT+273.15)-1./(cal.perT+273.15))); % Katz et al., 2003; Moore et al., 1998
     vmq_c1 = (3.5494e-3.*Ptop.^0.5 + 9.623e-8.*Ptop - 1.5223e-11.*Ptop.^1.5)./(TT+273.15) + 1.2436e-14.*Ptop.^1.5; % Liu et al., 2015
     vmq0   = (1-cc).*vmq_c0 + cc.*vmq_c1;
@@ -169,12 +174,16 @@ ylabel('Segregation flux [m/hr]','Interpreter','latex','FontSize',15)
 figure(8); if ~holdfig; clf; end
 subplot(2,1,1)
 sgtitle('Phase Oxide Fractions','Interpreter','latex','FontSize',18)
-plot(T,cm_oxd,'LineStyle',linestyle,'LineWidth',2); hold on; box on; axis tight;
+for i=1:cal.nc
+    plot(T,cm_oxd(:,i),'LineStyle',linestyle,'LineWidth',2,'color',ocean(round((i-1)*213/cal.nc)+1,:)); hold on; box on; axis tight;
+end
 legend(cal.oxdStr,'Interpreter','latex','FontSize',13,'box','off','location','best')
 set(gca,'TickLabelInterpreter','latex','FontSize',13)
 ylabel('Melt composition [wt\%]','Interpreter','latex','FontSize',15)
 subplot(2,1,2)
-plot(T,cx_oxd,'LineStyle',linestyle,'LineWidth',2); hold on; box on; axis tight;
+for i=1:cal.nc
+    plot(T,cx_oxd(:,i),'LineStyle',linestyle,'LineWidth',2,'color',ocean(round((i-1)*213/cal.nc)+1,:)); hold on; box on; axis tight;
+end
 set(gca,'TickLabelInterpreter','latex','FontSize',13)
 xlabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',15)
 ylabel('Solid composition [wt\%]','Interpreter','latex','FontSize',15)
@@ -183,12 +192,16 @@ ylabel('Solid composition [wt\%]','Interpreter','latex','FontSize',15)
 figure(9); if ~holdfig; clf; end
 subplot(2,1,1)
 sgtitle('Phase Component Fractions','Interpreter','latex','FontSize',18)
-plot(T,cm_cmp,'LineStyle',linestyle,'LineWidth',2); hold on; box on; axis tight;
+for i=1:cal.nc
+    plot(T,cm_cmp(:,i),'LineStyle',linestyle,'LineWidth',2,'color',ocean(round((i-1)*213/cal.nc)+1,:)); hold on; box on; axis tight;
+end
 legend(cal.cmpStr,'Interpreter','latex','FontSize',13,'box','off','location','best')
 set(gca,'TickLabelInterpreter','latex','FontSize',13)
 ylabel('Melt composition [wt\%]','Interpreter','latex','FontSize',15)
 subplot(2,1,2)
-plot(T,cx_cmp,'LineStyle',linestyle,'LineWidth',2); hold on; box on; axis tight;
+for i=1:cal.nc
+    plot(T,cx_cmp(:,i),'LineStyle',linestyle,'LineWidth',2,'color',ocean(round((i-1)*213/cal.nc)+1,:)); hold on; box on; axis tight;
+end
 set(gca,'TickLabelInterpreter','latex','FontSize',13)
 xlabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',15)
 ylabel('Solid composition [wt\%]','Interpreter','latex','FontSize',15)

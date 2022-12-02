@@ -2,19 +2,19 @@
 cal.nc     =  8;
 cal.oxdStr =  {'SiO$_2$','TiO$_2$','Al$_2$O$_3$','FeO','MgO','CaO','Na$_2$O','K$_2$O'};
 cal.oxd    = [  42.7    0.0    0.0    0.0   57.3    0.0    0.0    0.0      % for
-                30.0    0.5    0.0   69.5    0.0    0.0    0.0    0.0      % fay
-                55.0    0.1    7.5    3.0   33.9    0.4    0.1    0.0      % opx
-                49.3    0.2    1.0   30.2    1.9   15.3    1.5    0.6      % cpx
+                30.0    0.6    0.0   69.4    0.0    0.0    0.0    0.0      % fay
+                54.9    0.2    7.5    3.0   33.9    0.4    0.1    0.0      % opx
+                49.2    0.8    1.0   30.0    1.9   15.0    1.5    0.6      % cpx
                 44.4    0.0   35.8    0.0    0.0   19.2    0.6    0.0      % ant
-                67.3    0.0   20.2    0.0    0.0    0.8   11.3    0.4      % alb
-                64.8    0.0   18.3    0.0    0.0    0.0    0.0   16.9      % kfs
+                67.3    0.0   20.2    0.0    0.0    0.8   11.0    0.7      % alb
+                64.8    0.0   18.3    0.0    0.0    0.0    0.9   16.0      % kfs
                 99.99   0.01   0.0    0.0    0.0    0.0    0.0    0.0];    % qtz
 
 cal.cmpStr = {'for','fay','opx','cpx','ant','alb','kfs','qtz'};
 cal.cmp    = [  95.0    5.0    0.0    0.0    0.0    0.0    0.0    0.0      % cphs0 => dunite
-                 9.0    6.0   28.0   23.0   26.0    8.0    0.0    0.0      % perCx => pyroxenite
-                 1.4    1.0   17.2   36.2   23.8   20.0    0.4    0.0      % perCm => basalt
-                 0.0    0.0    0.0   16.0    3.0    6.0   30.0   45.0];    % cphs1 => rhyolite
+                 5.0    4.0   17.0   28.0   36.0   10.0    0.0    0.0      % perCx => pyroxenite
+                 2.0    1.8   11.0   37.0   27.0   19.5    1.0    0.8      % perCm => basalt
+                 0.0    0.0    2.0   11.0    6.0   12.0   31.0   38.0];    % cphs1 => rhyolite
 
 cal.oxd = cal.oxd./sum(cal.oxd,2)*100;
 cal.cmp = cal.cmp./sum(cal.cmp,2)*100;
@@ -38,11 +38,12 @@ cal.rhox0 = [3270,4390,3000,3250,2730,2620,2580,2650];                     % sol
 cal.rhom0 = [2710,3580,2580,2850,2530,2310,2290,2360];                     % liquid component reference densities [kg/m3]
 cal.rhof0 = 500;                                                           % fluid reference density [kg/m3]
 cal.aT    =  4e-5;                                                         % thermal expansivity [1/K]
+cal.gH    =  0.75;                                                         % hydrous melt expansivity [1/(wt H2O)]
 cal.bP    =  1e-8;                                                         % fluid compressibility [1/Pa]
 
 % specify rheology parameters
 cal.etaf0 =  0.1;                                                          % fluid viscosity [Pas]
 cal.etax0 =  1e16;                                                         % solid viscosity [Pas]
-cal.AA  =  [ 0.60, 0.25, 0.30; 0.20, 0.20, 0.20; 0.20, 0.20, 0.20; ];  % permission slopes   
-cal.BB  =  [ 0.43, 0.16, 0.41; 0.60, 0.01, 0.39; 0.81, 0.10, 0.09; ];  % permission step locations
-cal.CC  =  [ 0.20, 0.20, 0.20; 0.60, 0.60, 0.10; 0.20, 0.15, 0.30; ];  % permission step widths
+cal.AA    =  [ 0.60, 0.25, 0.30; 0.20, 0.20, 0.20; 0.20, 0.20, 0.20; ];    % permission slopes   
+cal.BB    =  [ 0.43, 0.16, 0.41; 0.60, 0.01, 0.39; 0.81, 0.10, 0.09; ];    % permission step locations
+cal.CC    =  [ 0.20, 0.20, 0.20; 0.60, 0.60, 0.10; 0.20, 0.15, 0.30; ];    % permission step widths

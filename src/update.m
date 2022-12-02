@@ -1,37 +1,28 @@
 %%*****  UPDATE PARAMETERS & AUXILIARY FIELDS  ****************************
 tic;
 
-% update phase oxide compositions
+% update oxide compositions
+wt0 = (cal.perCm-cm)./(cal.perCm-cal.cphs0);
+wt1 = (cal.cphs1-cm)./(cal.cphs1-cal.perCm);
+cm_oxd = reshape((wt0(:) .* cal.cmp_oxd(1,:) + (1-wt0(:)) .* cal.cmp_oxd(3,:)) .* (cm(:)<=cal.perCm) ...
+               + (wt1(:) .* cal.cmp_oxd(3,:) + (1-wt1(:)) .* cal.cmp_oxd(4,:)) .* (cm(:)> cal.perCm) ...
+                 ,Nz,Nx,cal.nc);
+
 wt0 = (cal.perCx-cx)./(cal.perCx-cal.cphs0);
-wt1 = (cal.perCm-cx)./(cal.perCm-cal.perCx);
-wt2 = (cal.cphs1-cx)./(cal.cphs1-cal.perCm);
-cx_cmp = reshape((wt0(:) .* cal.cmp(1,:) + (1-wt0(:)) .* cal.cmp(2,:)) .* (cx(:)< cal.perCx) ...
-               + (wt1(:) .* cal.cmp(2,:) + (1-wt1(:)) .* cal.cmp(3,:)) .* (cx(:)>=cal.perCx & cx(:)<=cal.perCm) ...
-               + (wt2(:) .* cal.cmp(3,:) + (1-wt2(:)) .* cal.cmp(4,:)) .* (cx(:)> cal.perCm) ...
-                 ,Nz,Nx,length(cal.cmp));
-cx_oxd = reshape(reshape(cx_cmp,Nz*Nx,length(cal.oxd))*cal.oxd/100,Nz,Nx,size(cal.oxd,2));
+wt1 = (cal.cphs1-cx)./(cal.cphs1-cal.perCx);
+cx_oxd = reshape((wt0(:) .* cal.cmp_oxd(1,:) + (1-wt0(:)) .* cal.cmp_oxd(2,:)) .* (cx(:)<=cal.perCx) ...
+               + (wt1(:) .* cal.cmp_oxd(2,:) + (1-wt1(:)) .* cal.cmp_oxd(4,:)) .* (cx(:)> cal.perCx) ...
+                 ,Nz,Nx,cal.nc);
 
-wt0 = (cal.perCx-cm)./(cal.perCx-cal.cphs0);
-wt1 = (cal.perCm-cm)./(cal.perCm-cal.perCx);
-wt2 = (cal.cphs1-cm)./(cal.cphs1-cal.perCm);
-cm_cmp = reshape((wt0(:) .* cal.cmp(1,:) + (1-wt0(:)) .* cal.cmp(2,:)) .* (cm(:)< cal.perCx) ...
-               + (wt1(:) .* cal.cmp(2,:) + (1-wt1(:)) .* cal.cmp(3,:)) .* (cm(:)>=cal.perCx & cm(:)<=cal.perCm) ...
-               + (wt2(:) .* cal.cmp(3,:) + (1-wt2(:)) .* cal.cmp(4,:)) .* (cm(:)> cal.perCm) ...
-                 ,Nz,Nx,length(cal.cmp));
-cm_oxd = reshape(reshape(cm_cmp,Nz*Nx,length(cal.oxd))*cal.oxd/100,Nz,Nx,size(cal.oxd,2));
+c_oxd = (m.*cm_oxd + x.*cx_oxd)./(1-f);
 
-wt0 = (cal.perCx-c./(1-f))./(cal.perCx-cal.cphs0);
-wt1 = (cal.perCm-c./(1-f))./(cal.perCm-cal.perCx);
-wt2 = (cal.cphs1-c./(1-f))./(cal.cphs1-cal.perCm);
-c_cmp = reshape((wt0(:) .* cal.cmp(1,:) + (1-wt0(:)) .* cal.cmp(2,:)) .* (c(:)./(1-f(:))< cal.perCx) ...
-              + (wt1(:) .* cal.cmp(2,:) + (1-wt1(:)) .* cal.cmp(3,:)) .* (c(:)./(1-f(:))>=cal.perCx & c(:)./(1-f(:))<=cal.perCm) ...
-              + (wt2(:) .* cal.cmp(3,:) + (1-wt2(:)) .* cal.cmp(4,:)) .* (c(:)./(1-f(:))> cal.perCm) ...
-                ,Nz,Nx,length(cal.cmp));
-c_oxd = reshape(reshape(c_cmp,Nz*Nx,length(cal.oxd))*cal.oxd/100,Nz,Nx,size(cal.oxd,2));
+cm_cmp = reshape(reshape(cm_oxd,Nz*Nx,cal.nc)/cal.oxd*100,Nz,Nx,cal.nc);
+cx_cmp = reshape(reshape(cx_oxd,Nz*Nx,cal.nc)/cal.oxd*100,Nz,Nx,cal.nc);
+ c_cmp = reshape(reshape( c_oxd,Nz*Nx,cal.nc)/cal.oxd*100,Nz,Nx,cal.nc);
 
 % update phase densities
-rhom = squeeze(sum(permute(cm_cmp/100,[3,1,2])./cal.rhom0.')).^-1 .* (1 - cal.aT.*(T-cal.perT-273.15)); if size(rhom,2)~=size(T,2); rhom = rhom(1,:).'; end
-rhox = squeeze(sum(permute(cx_cmp/100,[3,1,2])./cal.rhox0.')).^-1 .* (1 - cal.aT.*(T-cal.perT-273.15)); if size(rhox,2)~=size(T,2); rhox = rhox(1,:).'; end
+rhom = squeeze(sum(permute(cm_cmp/100,[3,1,2])./cal.rhom0.')).^-1 .* (1 - cal.aT.*(T-cal.perT-273.15) - cal.gH.*vm); if size(rhom,2)~=size(T,2); rhom = rhom(1,:).'; end
+rhox = squeeze(sum(permute(cx_cmp/100,[3,1,2])./cal.rhox0.')).^-1 .* (1 - cal.aT.*(T-cal.perT-273.15)             ); if size(rhox,2)~=size(T,2); rhox = rhox(1,:).'; end
 rhof = cal.rhof0 .* (1 - cal.aT.*(T-cal.perT-273.15) + cal.bP.*(Pt-Ptop ));
 
 % convert weight to volume fraction, update bulk density
@@ -89,7 +80,7 @@ Csgr_m = squeeze(Csgr(2,:,:)); if size(Csgr_m,1)~=size(T,1); Csgr_m = Csgr_m.'; 
 
 if ~calibrt % skip the following if called from calibration script
 
-wm = 0.*((rhom(1:end-1,:)+rhom(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*2./(1./Csgr_m(1:end-1,:)+1./Csgr_m(2:end,:)); % melt segregation speed
+wm = ((rhom(1:end-1,:)+rhom(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*2./(1./Csgr_m(1:end-1,:)+1./Csgr_m(2:end,:)); % melt segregation speed
 wm(1  ,:)     = min(1,1-top).*wm(1  ,:);
 wm(end,:)     = min(1,1-bot).*wm(end,:);
 wm(:,[1 end]) = -sds*wm(:,[2 end-1]);
@@ -106,9 +97,9 @@ wf(:,[1 end]) = -sds*wf(:,[2 end-1]);
 
 % diffusion parameters
 kW  = Vel*h/100;                                                           % convection fluctuation diffusivity
-kwm = abs((rhom-rho).*g0.*Csgr_m*d0);                                      % segregation fluctuation diffusivity
-kwx = abs((rhox-rho).*g0.*Csgr_x*d0);                                      % segregation fluctuation diffusivity
-kwf = abs((rhof-rho).*g0.*Csgr_f*d0);                                      % segregation fluctuation diffusivity
+kwm = abs((rhom-rho).*g0.*Csgr_m*d0*10);                                   % segregation fluctuation diffusivity
+kwx = abs((rhox-rho).*g0.*Csgr_x*d0*10);                                   % segregation fluctuation diffusivity
+kwf = abs((rhof-rho).*g0.*Csgr_f*d0*10);                                   % segregation fluctuation diffusivity
 km  = m.*(kwm + kW).*rho;                                                  % melt  fraction diffusion 
 kx  = x.*(kwx + kW).*rho;                                                  % solid fraction diffusion 
 kf  = f.*(kwf + kW).*rho;                                                  % fluid fraction diffusion 

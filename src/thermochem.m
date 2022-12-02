@@ -64,7 +64,7 @@ if any([v0;v1;vwall;v(:)]>10*TINY)
     V(:,[1 end]) = V(:,[2 end-1]);
 end
 
-% convert enthalpy and component densities to temperature and concentrations
+% convert entropy and component densities to temperature and concentrations
 T = (T0+273.15)*exp(S./rho./cP - x.*Dsx./cP - f.*Dsf./cP + Adbt./cP.*(Pt-Ptop));  % convert entropy to temperature
 c = C./rho;
 v = V./rho;
@@ -148,14 +148,15 @@ sf = sm + Dsf;
 % update phase compositions
 % major component
 Kc = cxq./cmq;
-cm = c./(m + x.*Kc);
-cx = c./(m./Kc + x);
+cm = c./(m + x.*Kc); cm(m==0) = cmq(m==0);
+cx = c./(m./Kc + x); cx(m==1) = cxq(m==1);
 
 % volatile component
-Kf = vfq./vmq;
-vf = vfq;
-vm = max(0,min(1,(v - f)./max(TINY,m)));
-
+Kf = vfq./max(TINY,vmq);
+% vf = vfq;
+% vm = max(0,min(1,(v - f)./max(TINY,m))); vm(m==0) = vmq(m==0);
+vm = v./max(TINY,m + f.*Kf); vm(m==0) = vmq(m==0);
+vf = v./max(TINY,m./Kf + f); vf(m==1) = vfq(m==1);
 
 %% *****  UPDATE TC RESIDUALS  ********************************************
 

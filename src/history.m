@@ -4,8 +4,9 @@ dsumMdto = dsumMdt;
 dsumSdto = dsumSdt;
 dsumCdto = dsumCdt;
 dsumVdto = dsumVdt;
+dsumCdto_oxd = dsumCdt_oxd;
 
-stp = max(1,step);
+stp = max(1,step+1);
 
 % record model time
 hist.time(stp) = time;
@@ -40,18 +41,26 @@ dsumVdt = sum(sum(bnd_V*h*h*1)) ...
         + sum(  rho(2:end-1,2).*f(2:end-1,2).*vf(2:end-1,2).*Uf(2:end-1,1)*h*1) - sum(rho(2:end-1,end-1).*f(2:end-1,end-1).*vf(2:end-1,end-1).*Uf(2:end-1,end)*h*1) ...
         + sum(  rho(2,2:end-1).*m(2,2:end-1).*vm(2,2:end-1).*Wm(1,2:end-1)*h*1) - sum(rho(end-1,2:end-1).*m(end-1,2:end-1).*vm(end-1,2:end-1).*Wm(end,2:end-1)*h*1) ...
         + sum(  rho(2:end-1,2).*m(2:end-1,2).*vm(2:end-1,2).*Um(2:end-1,1)*h*1) - sum(rho(2:end-1,end-1).*m(2:end-1,end-1).*vm(2:end-1,end-1).*Um(2:end-1,end)*h*1);  % [kg/s]
+for i=1:cal.nc
+    dsumCdt_oxd(i) =  ...
+               + sum(  rho(2,2:end-1).*x(2,2:end-1).*cx_oxd(2,2:end-1,i)/100.*Wx(1,2:end-1)*h*1) - sum(rho(end-1,2:end-1).*x(end-1,2:end-1).*cx_oxd(end-1,2:end-1,i)/100.*Wx(end,2:end-1)*h*1) ...
+               + sum(  rho(2:end-1,2).*x(2:end-1,2).*cx_oxd(2:end-1,2,i)/100.*Ux(2:end-1,1)*h*1) - sum(rho(2:end-1,end-1).*x(2:end-1,end-1).*cx_oxd(2:end-1,end-1,i)/100.*Ux(2:end-1,end)*h*1) ...
+               + sum(  rho(2,2:end-1).*m(2,2:end-1).*cm_oxd(2,2:end-1,i)/100.*Wm(1,2:end-1)*h*1) - sum(rho(end-1,2:end-1).*m(end-1,2:end-1).*cm_oxd(end-1,2:end-1,i)/100.*Wm(end,2:end-1)*h*1) ...
+               + sum(  rho(2:end-1,2).*m(2:end-1,2).*cm_oxd(2:end-1,2,i)/100.*Um(2:end-1,1)*h*1) - sum(rho(2:end-1,end-1).*m(2:end-1,end-1).*cm_oxd(2:end-1,end-1,i)/100.*Um(2:end-1,end)*h*1);  % [kg/s]
+end
 
-if step>1; hist.DM(stp) = hist.DM(stp-1) +         dsumMdt                       .*dt; else; hist.DM(stp) = 0; end  % [kg]
-if step>1; hist.DS(stp) = hist.DS(stp-1) + (theta.*dsumSdt + (1-theta).*dsumSdto).*dt; else; hist.DS(stp) = 0; end  % [J ]
-if step>1; hist.DC(stp) = hist.DC(stp-1) + (theta.*dsumCdt + (1-theta).*dsumCdto).*dt; else; hist.DC(stp) = 0; end  % [kg]
-if step>1; hist.DV(stp) =(hist.DV(stp-1) + (theta.*dsumVdt + (1-theta).*dsumVdto).*dt).*any(v(:)>1e-6); else; hist.DV(stp) = 0; end  % [kg]
+if step>=1; hist.DM(stp) = hist.DM(stp-1) +         dsumMdt                       .*dt; else; hist.DM(stp) = 0; end  % [kg]
+if step>=1; hist.DS(stp) = hist.DS(stp-1) + (theta.*dsumSdt + (1-theta).*dsumSdto).*dt; else; hist.DS(stp) = 0; end  % [J ]
+if step>=1; hist.DC(stp) = hist.DC(stp-1) + (theta.*dsumCdt + (1-theta).*dsumCdto).*dt; else; hist.DC(stp) = 0; end  % [kg]
+if step>=1; hist.DV(stp) =(hist.DV(stp-1) + (theta.*dsumVdt + (1-theta).*dsumVdto).*dt).*any(v(:)>1e-6); else; hist.DV(stp) = 0; end  % [kg]
+if step>=1; hist.DC_oxd(stp,:) = hist.DC_oxd(stp-1,:) + (theta.*dsumCdt_oxd + (1-theta).*dsumCdto_oxd).*dt; else; hist.DC_oxd(stp,1:cal.nc) = 0; end  % [kg]
 
 % record conservation error of mass M, heat H, major component C, volatile component V
 hist.EM(stp) = (hist.sumM(stp) - hist.DM(stp))./hist.sumM(1) - 1;  % [kg/kg]
 hist.ES(stp) = (hist.sumS(stp) - hist.DS(stp))./hist.sumS(1) - 1;  % [J /J ]
 hist.EC(stp) = (hist.sumC(stp) - hist.DC(stp))./hist.sumC(1) - 1;  % [kg/kg]
 hist.EV(stp) =((hist.sumV(stp) - hist.DV(stp))./hist.sumV(1) - 1).*any(v(:)>1e-6);  % [kg/kg]
-
+hist.EC_oxd(stp,:) = (hist.sumC_oxd(stp,:) - hist.DC_oxd(stp,:))./hist.sumC_oxd(1,:) - 1;  % [kg/kg]
 
 % record variable and coefficient diagnostics
 hist.W(stp,1) = min(min(-W(:,2:end-1)));

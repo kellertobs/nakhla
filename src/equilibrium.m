@@ -19,7 +19,7 @@ perCx = (perCx-cphs0)./(cphs1-cphs0);
 iter    = 1;
 maxit   = 100;
 resnorm = 1;
-tol     = 1e-12;
+tol     = 1e-15;
 eps     = 1e-6;
 
 vmq_c0 = (4.7773e-7.*P.^0.6 + 1e-11.*P) .* exp(2565*(1./(T0+273.15)-1./(perTd+273.15))); % Katz et al., 2003; Moore et al., 1998
