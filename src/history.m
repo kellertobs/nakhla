@@ -16,6 +16,9 @@ hist.sumM(stp) = sum(sum(rho(2:end-1,2:end-1)*h*h*1));  % [kg]
 hist.sumS(stp) = sum(sum(  S(2:end-1,2:end-1)*h*h*1));  % [J]
 hist.sumC(stp) = sum(sum(  C(2:end-1,2:end-1)*h*h*1));  % [kg]
 hist.sumV(stp) = sum(sum(  V(2:end-1,2:end-1)*h*h*1));  % [kg]
+for i=1:cal.nc
+    hist.sumC_oxd(stp,i) = sum(sum(c_oxd(2:end-1,2:end-1,i)/100.*rho(2:end-1,2:end-1)*h*h*1));  % [kg]
+end
 
 % record expected rates of change by volume change and imposed boundaries layers
 dsumMdt = sum(  rho(2,2:end-1).*x(2,2:end-1).*Wx(1,2:end-1)*h*1) - sum(rho(end-1,2:end-1).*x(end-1,2:end-1).*Wx(end,2:end-1)*h*1) ...
