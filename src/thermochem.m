@@ -39,7 +39,7 @@ diff_C = (- ddz(qCz(:,inx),h)  ...
 
 if ~isnan(cwall); bnd_C = rho(inz,inx).*(cwall-c(inz,inx))./tau_a .* bndshape; end % impose boundary layer
 
-dCdt = advn_C + 0.*diff_C + bnd_C;                                            % total rate of change
+dCdt = advn_C + diff_C + bnd_C;                                            % total rate of change
     
 C(inz,inx)   = Co(inz,inx) + (theta.*dCdt + (1-theta).*dCdto).*dt;         % explicit update of major component density
 C            = max(cal.cphs0.*rho,min(cal.cphs1.*rho,C));
@@ -108,7 +108,7 @@ qXx    = - (kx(:,1:end-1)+kx(:,2:end))./2 .* ddx(x,h);
 diff_X = (- ddz(qXz(:,inx),h)  ...
           - ddx(qXx(inz,:),h));
 
-dXdt   = advn_X + 0.*diff_X + Gx;                                             % total rate of change
+dXdt   = advn_X + diff_X + Gx;                                             % total rate of change
 
 X(inz,inx) = Xo(inz,inx) + (theta.*dXdt + (1-theta).*dXdto).*dt;           % explicit update of crystal fraction
 X = max(0,min(rho-F, X ));                                                 % enforce limits
