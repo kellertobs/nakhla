@@ -11,8 +11,8 @@ for i = 1:length(te0)
     tex(:,:,i)  = te(:,:,i)./(m./Kte(i)  + x);
 
     % get trace element advection
-    adv_TE(:,:,i) = - advect(rho(inz,inx).*m(inz,inx).*tem(inz,inx,i),Um(inz,:),Wm(:,inx),h,{ADVN,''},[1,2],BCA) ...
-                    - advect(rho(inz,inx).*x(inz,inx).*tex(inz,inx,i),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);
+    adv_TE(:,:,i) = - advect(M(inz,inx).*tem(inz,inx,i),Um(inz,:),Wm(:,inx),h,{ADVN,''},[1,2],BCA) ...
+                    - advect(X(inz,inx).*tex(inz,inx,i),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);
 
     % get trace element assimilation
     if ~isnan(tewall(i)); bnd_TE(:,:,i) = bnd_TE(:,:,i) + (tewall(i)-te(inz,inx,i)).*rho(inz,inx)./tau_a .* bndshape; end
@@ -34,8 +34,8 @@ bnd_IR = zeros(size(IR(inz,inx,:)));
 adv_IR = zeros(size(IR(inz,inx,:)));
 for i = 1:length(ir0)
     % get isotope ratio advection
-    adv_IR(:,:,i) = - advect(rho(inz,inx).*m(inz,inx).*ir(inz,inx,i),Um(inz,:),Wm(:,inx),h,{ADVN,''},[1,2],BCA) ...
-                    - advect(rho(inz,inx).*x(inz,inx).*ir(inz,inx,i),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);
+    adv_IR(:,:,i) = - advect(M(inz,inx).*ir(inz,inx,i),Um(inz,:),Wm(:,inx),h,{ADVN,''},[1,2],BCA) ...
+                    - advect(X(inz,inx).*ir(inz,inx,i),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);
 
     % get isotope ratio assimilation
     if ~isnan(irwall(i)); bnd_IR(:,:,i) = bnd_IR(:,:,i) + (irwall(i)-ir(inz,inx,i)).*rho(inz,inx)./tau_a .* bndshape; end

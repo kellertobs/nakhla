@@ -2,7 +2,7 @@
 init;
     
 % physical time stepping loop
-while time <= tend && step <= M
+while time <= tend && step <= Nt
     
     if step==1; theta=1; else; theta=1/2; end
 
