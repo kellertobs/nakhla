@@ -13,11 +13,11 @@ plot_cv  =  0;                   % switch on to live plot iterative convergence
 % set model domain parameters
 D        =  10;                  % chamber depth [m]
 L        =  10;                  % chamber width [m]
-N        =  150 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
+N        =  100 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
 h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
-M        =  2e5;                 % number of time steps to take
+Nt       =  2e5;                 % number of time steps to take
 hr       =  3600;                % conversion seconds to hours
 yr       =  24*365.25*hr;        % conversion seconds to years
 tend     =  1*yr;                % end time for simulation [s]
@@ -56,8 +56,8 @@ bndinit  =  0;                   % switch on (1) to initialise with internal bou
 dw       =  1*h;                 % boundary layer thickness [m]
 fin      =  1;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
 fout     =  1;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
-tau_T    =  12*hr;               % wall cooling/assimilation time [s]
-tau_a    =  24*hr;               % wall cooling/assimilation tie [s]
+tau_T    =  8*hr;                % wall cooling/assimilation time [s]
+tau_a    =  8*hr;                % wall cooling/assimilation tie [s]
 Twall    =  300;                 % wall temperature [degC] (nan = insulating)
 cwall    =  nan;                 % wall major component [wt SiO2] (nan = no assimilation)
 vwall    =  nan;                 % wall volatile component [wt H2O] (nan = no assimilation)

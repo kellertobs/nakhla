@@ -2,7 +2,7 @@
 clear all; close all;
 
 % set run parameters
-runID    =  '1D_fract_anh_d1';      % run identifier
+runID    =  '1D_fract_anh';      % run identifier
 opdir    =  '../out';            % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  500;                 % output frame plotted/saved every 'nop' time steps
@@ -17,7 +17,7 @@ N        =  500 + 2;             % number of grid points in z-direction (incl. 2
 h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
-M        =  3e5;                 % number of time steps to take
+Nt       =  3e5;                 % number of time steps to take
 hr       =  3600;                % conversion seconds to hours
 yr       =  24*365.25*hr;        % conversion seconds to years
 tend     =  1*yr;                % end time for simulation [s]
@@ -72,15 +72,15 @@ Dsx      = -300;                 % entropy change of crystallisation [J/kg]
 Dsf      =  400;                 % entropy change of exsolution [J/kg]
 
 % set model buoyancy parameters
-d0       =  1e-3;              % crystal/bubble size [m]
+d0       =  0.5e-3;              % crystal/bubble size [m]
 g0       =  10.;                 % gravity [m/s2]
 
 % set numerical model parameters
 CFL      =  0.80;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
-rtol     =  1e-4;                % outer its relative tolerance
-atol     =  1e-7;                % outer its absolute tolerance
-maxit    =  10;                  % maximum outer its
+rtol     =  1e-5;                % outer its relative tolerance
+atol     =  1e-8;                % outer its absolute tolerance
+maxit    =  15;                  % maximum outer its
 lambda   =  0.50;                % iterative lag parameter equilibration
 etareg   =  1e0;                 % viscosity regularisation parameter
 

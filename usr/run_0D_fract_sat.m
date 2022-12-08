@@ -17,7 +17,7 @@ N        =  1 + 2;               % number of grid points in z-direction (incl. 2
 h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
-M        =  1200;                % number of time steps to take
+Nt       =  1200;                % number of time steps to take
 hr       =  3600;                % conversion seconds to hours
 yr       =  24*365.25*hr;        % conversion seconds to years
 tend     =  14*hr;               % end time for simulation [s]

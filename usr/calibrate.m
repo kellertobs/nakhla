@@ -18,9 +18,9 @@ d0       =  1e-3;                % crystal size [m]
 g0       =  10.;                 % gravity [m/s2]
 
 % set ranges for control variables T, c, v, P
-T = linspace(1350,700,400).';    % temperature range [degC]
+T = linspace(1400,700,400).';    % temperature range [degC]
 c = linspace(0.51,0.51,400).';   % major component range [wt SiO2]
-v = linspace(0.00,0.00,400).';   % volatile component range [wt H2O]
+v = linspace(0.04,0.04,400).';   % volatile component range [wt H2O]
 P = linspace(125,125,400).'*1e6; % pressure range [Pa]
 
 % equilibrium phase fractions and compositions
@@ -207,17 +207,20 @@ xlabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',15)
 ylabel('Solid composition [wt\%]','Interpreter','latex','FontSize',15)
 
 % plot simplified mineral assemblage
-% figure(9); clf;
-% patch([T;flipud(T)],[zeros(size(T));flipud(olv)],[0.6,0.8,0.5],'LineWidth',2); hold on; box on; axis tight;
-% patch([T;flipud(T)],[olv;flipud(olv+pxn)],[0.6,0.6,0.6],'LineWidth',2);
-% patch([T;flipud(T)],[olv+pxn;flipud(olv+pxn+plg)],[0.9,0.9,0.9],'LineWidth',2);
-% patch([T;flipud(T)],[olv+pxn+plg;flipud(olv+pxn+plg+qtz)],[0.9,0.7,1.0],'LineWidth',2);
-% patch([T;flipud(T)],[olv+pxn+plg+qtz;flipud(olv+pxn+plg+qtz+kfs)],[1.0,0.8,0.7],'LineWidth',2);
-% legend('~olivine','~pyroxene','~plagioclase','~quartz','~k-feldspar','Interpreter','latex','FontSize',15,'box','off','location','best')
-% set(gca,'TickLabelInterpreter','latex','FontSize',13)
-% title('Mineral assemblage','Interpreter','latex','FontSize',18)
-% xlabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',15)
-% ylabel('Mineral fraction [wt]','Interpreter','latex','FontSize',15)
+figure(10); clf;
+patch([T;flipud(T)],[zeros(size(T));flipud(c_cmp(:,1))],0.9.*[0.6,0.8,0.5],'LineWidth',2); hold on; box on; axis tight;
+patch([T;flipud(T)],[c_cmp(:,1);flipud(c_cmp(:,1)+c_cmp(:,2))],1.1.*[0.6,0.8,0.5],'LineWidth',2);
+patch([T;flipud(T)],[c_cmp(:,1)+c_cmp(:,2);flipud(c_cmp(:,1)+c_cmp(:,2)+c_cmp(:,3))],0.9.*[0.6,0.6,0.6],'LineWidth',2);
+patch([T;flipud(T)],[c_cmp(:,1)+c_cmp(:,2)+c_cmp(:,3);flipud(c_cmp(:,1)+c_cmp(:,2)+c_cmp(:,3)+c_cmp(:,4))],1.1.*[0.6,0.6,0.6],'LineWidth',2);
+patch([T;flipud(T)],[c_cmp(:,1)+c_cmp(:,2)+c_cmp(:,3)+c_cmp(:,4);flipud(c_cmp(:,1)+c_cmp(:,2)+c_cmp(:,3)+c_cmp(:,4)+c_cmp(:,5))],0.9.*[0.9,0.9,0.9],'LineWidth',2);
+patch([T;flipud(T)],[c_cmp(:,1)+c_cmp(:,2)+c_cmp(:,3)+c_cmp(:,4)+c_cmp(:,5);flipud(c_cmp(:,1)+c_cmp(:,2)+c_cmp(:,3)+c_cmp(:,4)+c_cmp(:,5)+c_cmp(:,6))],1.1.*[0.9,0.9,0.9],'LineWidth',2);
+patch([T;flipud(T)],[c_cmp(:,1)+c_cmp(:,2)+c_cmp(:,3)+c_cmp(:,4)+c_cmp(:,5)+c_cmp(:,6);flipud(c_cmp(:,1)+c_cmp(:,2)+c_cmp(:,3)+c_cmp(:,4)+c_cmp(:,5)+c_cmp(:,6)+c_cmp(:,7))],[1.0,0.8,0.7],'LineWidth',2);
+patch([T;flipud(T)],[c_cmp(:,1)+c_cmp(:,2)+c_cmp(:,3)+c_cmp(:,4)+c_cmp(:,5)+c_cmp(:,6)+c_cmp(:,7);flipud(c_cmp(:,1)+c_cmp(:,2)+c_cmp(:,3)+c_cmp(:,4)+c_cmp(:,5)+c_cmp(:,6)+c_cmp(:,7)+c_cmp(:,8))],[0.9,0.7,1.0],'LineWidth',2);
+legend('~forsterite','~fayalite','~orthopyroxene','~clinopyroxene','~anorthite','~albite','~k-feldspar','~quartz','Interpreter','latex','FontSize',15,'box','off','location','best')
+set(gca,'TickLabelInterpreter','latex','FontSize',13)
+title('Mineral assemblage','Interpreter','latex','FontSize',18)
+xlabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',15)
+ylabel('Mineral fraction [wt]','Interpreter','latex','FontSize',15)
 
 
 % create output directory
@@ -235,12 +238,16 @@ if save_plot
     print(figure(3),name,'-dpng','-r300','-opengl');
     name = ['../out/',runID,'/',runID,'_vol_compnt'];
     print(figure(4),name,'-dpng','-r300','-opengl');
-    name = ['../out/',runID,'/',runID,'_densities'];
+    name = ['../out/',runID,'/',runID,'_density'];
     print(figure(5),name,'-dpng','-r300','-opengl');
     name = ['../out/',runID,'/',runID,'_viscosity'];
     print(figure(6),name,'-dpng','-r300','-opengl');
     name = ['../out/',runID,'/',runID,'_segr_speed'];
     print(figure(7),name,'-dpng','-r300','-opengl');
-    name = ['../out/',runID,'/',runID,'_minerals'];
-    print(figure(7),name,'-dpng','-r300','-opengl');
+    name = ['../out/',runID,'/',runID,'_oxides'];
+    print(figure(8),name,'-dpng','-r300','-opengl');
+    name = ['../out/',runID,'/',runID,'_components'];
+    print(figure(9),name,'-dpng','-r300','-opengl');
+    name = ['../out/',runID,'/',runID,'_modalcmp'];
+    print(figure(10),name,'-dpng','-r300','-opengl');
 end

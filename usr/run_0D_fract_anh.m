@@ -17,7 +17,7 @@ N        =  1 + 2;               % number of grid points in z-direction (incl. 2
 h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
-M        =  1000;                % number of time steps to take
+Nt       =  1000;                % number of time steps to take
 hr       =  3600;                % conversion seconds to hours
 yr       =  24*365.25*hr;        % conversion seconds to years
 tend     =  12*hr;               % end time for simulation [s]
@@ -30,8 +30,8 @@ smth     =  (N/30)^2;            % regularisation of initial random perturbation
 zlay     =  0.5;                 % layer thickness (relative to domain depth D)
 wlay_T   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
 wlay_c   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
-T0       =  1310;                % temperature top layer [deg C]
-T1       =  1310;                % temperature base layer [deg C]
+T0       =  1315;                % temperature top layer [deg C]
+T1       =  1315;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
 c0       =  0.51;                % major component top layer [wt SiO2]
 c1       =  0.51;                % major component base layer [wt SiO2]

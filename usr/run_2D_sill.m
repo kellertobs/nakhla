@@ -9,7 +9,6 @@ nop      =  200;                 % output frame plotted/saved every 'nop' time s
 plot_op  =  1;                   % switch on to live plot results
 save_op  =  1;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
-bnchm    =  0;                   % switch on to run manufactured solution benchmark on flui mechanics solver
 
 % set model domain parameters
 D        =  5;                   % chamber depth [m]
@@ -18,7 +17,7 @@ N        =  100 + 2;             % number of grid points in z-direction (incl. 2
 h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
-M        =  1e5;                 % number of time steps to take
+Nt       =  1e5;                 % number of time steps to take
 hr       =  3600;                % conversion seconds to hours
 yr       =  24*365.25*hr;        % conversion seconds to years
 tend     =  1*yr;                % end time for simulation [s]
