@@ -289,6 +289,7 @@ C  = rho.*(m.*cm + x.*cx);
 V  = rho.*(m.*vm + f.*vf);
 X  = rho.*x;
 F  = rho.*f;
+M  = rho.*m;
 
 % get phase entropies
 sm = S./rho - x.*Dsx - f.*Dsf;

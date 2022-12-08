@@ -65,7 +65,7 @@ thtv = squeeze(prod(Mv.^Xf,2));
 % get effective viscosity
 eta    = squeeze(sum(ff.*kv.*thtv,1));  if size(eta,1)~=size(T,1); eta = eta.'; end
 if ~calibrt; etamax = 1e+6.*min(eta(:)); else; etamax = 1e3.*cal.etax0; end
-eta    = (1./etamax + 1./(eta.*etareg)).^-1;
+eta    = (1./etamax + 1./(eta*etareg)).^-1;
 etaco  = (eta(1:end-1,1:end-1)+eta(2:end,1:end-1) ...
        +  eta(1:end-1,2:end  )+eta(2:end,2:end  ))./4;
 
@@ -151,12 +151,14 @@ diss =  exx(2:end-1,2:end-1).*txx(2:end-1,2:end-1) ...
 
 
 % update volume source
-Div_rhoV =  + advect(rho(inz,inx).*m(inz,inx),0.*U(inz,:),wm(:,inx),h,{ADVN,''   },[1,2],BCA) ...
-            + advect(rho(inz,inx).*x(inz,inx),0.*U(inz,:),wx(:,inx),h,{ADVN,''   },[1,2],BCA) ...
-            + advect(rho(inz,inx).*f(inz,inx),0.*U(inz,:),wf(:,inx),h,{ADVN,''   },[1,2],BCA) ...
-            + advect(rho(inz,inx)            ,   U(inz,:), W(:,inx),h,{ADVN,'vdf'},[1,2],BCA);
-if step>0; VolSrc = -((rho(inz,inx)-rhoo(inz,inx))./dt + Div_rhoV)./rho(inz,inx); end
-% if step>0; VolSrc = - ((rho(inz,inx)-rhoo(inz,inx))./dt + theta.*Div_rhoV + (1-theta).*Div_rhoVo)./rho(inz,inx); end
+if step>0
+    Div_rhoV =  + advect(M(inz,inx),0.*U(inz,:),wm(:,inx),h,{ADVN,''   },[1,2],BCA) ...
+                + advect(X(inz,inx),0.*U(inz,:),wx(:,inx),h,{ADVN,''   },[1,2],BCA) ...
+                + advect(F(inz,inx),0.*U(inz,:),wf(:,inx),h,{ADVN,''   },[1,2],BCA) ...
+                + advect(rho(inz,inx), U(inz,:), W(:,inx),h,{ADVN,'vdf'},[1,2],BCA);
+    VolSrc = -((rho(inz,inx)-rhoo(inz,inx))./dt + Div_rhoV)./rho(inz,inx); 
+%     VolSrc = - ((rho(inz,inx)-rhoo(inz,inx))./dt + theta.*Div_rhoV + (1-theta).*Div_rhoVo)./rho(inz,inx);
+end
 
 UBG    = - 1*mean(mean(VolSrc))./2 .* (L/2-XXu);
 WBG    = - 1*mean(mean(VolSrc))./2 .* (D/2-ZZw);
