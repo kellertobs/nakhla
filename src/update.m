@@ -66,8 +66,8 @@ thtv = squeeze(prod(Mv.^Xf,2));
 eta    = squeeze(sum(ff.*kv.*thtv,1));  if size(eta,1)~=size(T,1); eta = eta.'; end
 if ~calibrt; etamax = 1e+6.*min(eta(:)); else; etamax = 1e3.*cal.etax0; end
 eta    = (1./etamax + 1./(eta*etareg)).^-1;
-etaco  = (eta(1:end-1,1:end-1)+eta(2:end,1:end-1) ...
-       +  eta(1:end-1,2:end  )+eta(2:end,2:end  ))./4;
+etaco  = (eta(1:end-1,1:end-1).*eta(2:end,1:end-1) ...
+       .* eta(1:end-1,2:end  ).*eta(2:end,2:end  )).^0.25;
 
 % get segregation coefficients
 dd = permute(cat(3,d0*ones(size(mu)),d0*(1-mu),d0*ones(size(mu))),[3,1,2]);
@@ -80,17 +80,20 @@ Csgr_m = squeeze(Csgr(2,:,:)); if size(Csgr_m,1)~=size(T,1); Csgr_m = Csgr_m.'; 
 
 if ~calibrt % skip the following if called from calibration script
 
-wm = ((rhom(1:end-1,:)+rhom(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*2./(1./Csgr_m(1:end-1,:)+1./Csgr_m(2:end,:)); % melt segregation speed
+wm = ((rhom(1:end-1,:)+rhom(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*(Csgr_m(1:end-1,:).*Csgr_m(2:end,:)).^0.5; % melt segregation speed
+% wm = ((rhom(1:end-1,:)+rhom(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*2./(1./Csgr_m(1:end-1,:)+1./Csgr_m(2:end,:)); % melt segregation speed
 wm(1  ,:)     = min(1,1-top).*wm(1  ,:);
 wm(end,:)     = min(1,1-bot).*wm(end,:);
 wm(:,[1 end]) = -sds*wm(:,[2 end-1]);
 
-wx = ((rhox(1:end-1,:)+rhox(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*2./(1./Csgr_x(1:end-1,:)+1./Csgr_x(2:end,:)); % solid segregation speed
+wx = ((rhox(1:end-1,:)+rhox(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*(Csgr_x(1:end-1,:).*Csgr_x(2:end,:)).^0.5; % solid segregation speed
+% wx = ((rhox(1:end-1,:)+rhox(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*2./(1./Csgr_x(1:end-1,:)+1./Csgr_x(2:end,:)); % solid segregation speed
 wx(1  ,:)     = min(1,1-top).*wx(1  ,:);
 wx(end,:)     = min(1,1-bot).*wx(end,:);
 wx(:,[1 end]) = -sds*wx(:,[2 end-1]);
 
-wf = ((rhof(1:end-1,:)+rhof(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*2./(1./Csgr_f(1:end-1,:)+1./Csgr_f(2:end,:)); % fluid segregation speed
+wf = ((rhof(1:end-1,:)+rhof(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*(Csgr_f(1:end-1,:).*Csgr_f(2:end,:)).^0.5; % fluid segregation speed
+% wf = ((rhof(1:end-1,:)+rhof(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*2./(1./Csgr_f(1:end-1,:)+1./Csgr_f(2:end,:)); % fluid segregation speed
 wf(1  ,:)     = min(1,1-top+fout).*wf(1  ,:);
 wf(end,:)     = min(1,1-bot+fin ).*wf(end,:);
 wf(:,[1 end]) = -sds*wf(:,[2 end-1]);
@@ -157,7 +160,7 @@ if step>0
                 + advect(F(inz,inx),0.*U(inz,:),wf(:,inx),h,{ADVN,''   },[1,2],BCA) ...
                 + advect(rho(inz,inx), U(inz,:), W(:,inx),h,{ADVN,'vdf'},[1,2],BCA);
     VolSrc = -((rho(inz,inx)-rhoo(inz,inx))./dt + Div_rhoV)./rho(inz,inx); 
-%     VolSrc = - ((rho(inz,inx)-rhoo(inz,inx))./dt + theta.*Div_rhoV + (1-theta).*Div_rhoVo)./rho(inz,inx);
+%     VolSrc = -((rho(inz,inx)-rhoo(inz,inx))./dt + theta.*Div_rhoV + (1-theta).*Div_rhoVo)./rho(inz,inx);
 end
 
 UBG    = - 1*mean(mean(VolSrc))./2 .* (L/2-XXu);
