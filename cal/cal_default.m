@@ -41,9 +41,20 @@ cal.aT    =  4e-5;                                                         % the
 cal.gH    =  0.75;                                                         % hydrous melt expansivity [1/(wt H2O)]
 cal.bP    =  1e-8;                                                         % fluid compressibility [1/Pa]
 
-% specify rheology parameters
-cal.etaf0 =  0.1;                                                          % fluid viscosity [Pas]
-cal.etax0 =  1e16;                                                         % solid viscosity [Pas]
-cal.AA    =  [ 0.60, 0.25, 0.30; 0.20, 0.20, 0.20; 0.20, 0.20, 0.20; ];    % permission slopes   
-cal.BB    =  [ 0.43, 0.16, 0.41; 0.60, 0.01, 0.39; 0.81, 0.10, 0.09; ];    % permission step locations
-cal.CC    =  [ 0.20, 0.20, 0.20; 0.60, 0.60, 0.10; 0.20, 0.15, 0.30; ];    % permission step widths
+% specify mixture viscosity parameters (Costa et al., 2009)
+cal.B       = 3.5;              % Einstein-Roscoe powerlaw coefficient
+cal.chi_pck = 0.60;             % rheologically critical crystal fraction
+cal.gamma   = 3.00;             % step-function steepness coefficient
+cal.delta   = 30;               % solid viscosity melt-weakening slope
+cal.xi      = 3.2e-4;           % solid viscosity level
+cal.etaf0   = 0.1;              % fluid viscosity constant
+
+% specify segregation coefficient parameters
+cal.dx      = 1e-3;             % crystal size [m]
+cal.df      = 1e-3;             % bubble size [m]
+cal.bm      = 50;               % melt permeability geometric factor (k0 = dx^2/bm)
+cal.nm      = 3;                % melt permeability powerlaw (k0*mu^nm*(1-mu)^mm)
+cal.mm      = 2;                % melt permeability powerlaw (k0*mu^nm*(1-mu)^mm)
+cal.bf      = 50;               % fluid permeability geometric factor (k0 = dx^2/bm)
+cal.nf      = 4;                % fluid permeability powerlaw (k0*phi^nf*(1-phi)^mf)
+cal.mf      = 2;                % fluid permeability powerlaw (k0*phi^nf*(1-phi)^mf)
