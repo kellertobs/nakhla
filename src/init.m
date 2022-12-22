@@ -77,13 +77,13 @@ ux    = Drhox*g0*(D/10)^2/etam0/etareg;
 uf    = Drhof*g0*(D/10)^2/etam0/etareg * (max([v0,v1,vwall])>TINY);
 u0    = Drho0*g0*(D/10)^2/etam0/etareg;
 
-wx0   = abs(rhox0-rhom0)*g0*d0^2/etam0;
-wf0   = abs(rhof0-rhom0)*g0*d0^2/etam0 * (max([v0,v1,vwall])>TINY);
+wx0   = abs(rhox0-rhom0)*g0*dx^2/etam0;
+wf0   = abs(rhof0-rhom0)*g0*df^2/etam0 * (max([v0,v1,vwall])>TINY);
 
 ud0   = kT0/rhom0/cP/(D/10);
 
-uwT   = dw/tau_T; 
-uwc   = dw/tau_a; 
+uwT   = bnd_w/tau_T; 
+uwc   = bnd_w/tau_a; 
 
 RaT   = uT/ud0;
 Rac   = uc/ud0;
@@ -98,8 +98,8 @@ RwT   = uwT/u0;
 Rwc   = uwc/u0;
 
 Re    = u0*rhom0*(D/10)/etam0/etareg;
-Rex   = wx0*rhom0*d0/etam0;
-Ref   = wf0*rhom0*d0/etam0;
+Rex   = wx0*rhom0*dx/etam0;
+Ref   = wf0*rhom0*df/etam0;
 
 fprintf('    crystal Re: %1.3e \n'  ,Rex);
 fprintf('     bubble Re: %1.3e \n'  ,Ref);
@@ -153,42 +153,50 @@ MapP = reshape(1:NP,Nz  ,Nx  );
 MapW = reshape(1:NW,Nz-1,Nx  );
 MapU = reshape(1:NU,Nz  ,Nx-1) + NW;
 
-if bndinit
+if bnd_h>0
     switch bndmode
         case 0  % none
             bndinit = zeros(size(ZZ));
         case 1  % top only
-            bndinit = (1+erf( ( -ZZ+dw)/h))/2;
+            bndinit = (1+erf( ( -ZZ+bnd_h)/bnd_w))/2;
         case 2  % bot only
-            bndinit = (1+erf(-(D-ZZ-dw)/h))/2;
+            bndinit = (1+erf(-(D-ZZ-bnd_h)/bnd_w))/2;
         case 3  % top/bot only
-            bndinit = (1+erf( ( -ZZ+dw)/h))/2 ...
-                    + (1+erf(-(D-ZZ-dw)/h))/2;
+            bndinit = (1+erf( ( -ZZ+bnd_h)/bnd_w))/2 ...
+                + (1+erf(-(D-ZZ-bnd_h)/bnd_w))/2;
         case 4 % all walls
-            bndinit = (1+erf( ( -ZZ+dw)/h))/2 ...
-                    + (1+erf(-(D-ZZ-dw)/h))/2 ...
-                    + (1+erf( ( -XX+dw)/h))/2 ...
-                    + (1+erf(-(L-XX-dw)/h))/2;
+            bndinit = (1+erf( ( -ZZ+bnd_h)/bnd_w))/2 ...
+                + (1+erf(-(D-ZZ-bnd_h)/bnd_w))/2 ...
+                + (1+erf( ( -XX+bnd_h)/bnd_w))/2 ...
+                + (1+erf(-(L-XX-bnd_h)/bnd_w))/2;
+                + (1+erf(-(D-ZZ-bnd_h)/bnd_w))/2;
+        case 5 % only walls
+            bndinit = (1+erf( ( -XX+bnd_h)/bnd_w))/2 ...
+                    + (1+erf(-(L-XX-bnd_h)/bnd_w))/2;
     end
-    dw = h;
+    bndinit = max(0,min(1,bndinit));
+else
+    bndinit = zeros(size(ZZ));
 end
-bndinit = max(0,min(1,bndinit));
 
 switch bndmode
     case 0  % none
         bndshape = zeros(size(ZZ(inz,inx)));
     case 1  % top only
-        bndshape = exp( ( -ZZ(inz,inx)+h/2)/dw);
+        bndshape = exp( ( -ZZ(inz,inx))/bnd_w);
     case 2  % bot only
-        bndshape = exp(-(D-ZZ(inz,inx)-h/2)/dw);
+        bndshape = exp(-(D-ZZ(inz,inx))/bnd_w);
     case 3  % top/bot only
-        bndshape = exp( ( -ZZ(inz,inx)+h/2)/dw) ...
-                 + exp(-(D-ZZ(inz,inx)-h/2)/dw);
+        bndshape = exp( ( -ZZ(inz,inx))/bnd_w) ...
+                 + exp(-(D-ZZ(inz,inx))/bnd_w);
     case 4 % all walls
-        bndshape = exp( ( -ZZ(inz,inx)+h/2)/dw) ...
-                 + exp(-(D-ZZ(inz,inx)-h/2)/dw) ...
-                 + exp( ( -XX(inz,inx)+h/2)/dw) ...
-                 + exp(-(L-XX(inz,inx)-h/2)/dw);
+        bndshape = exp( ( -ZZ(inz,inx))/bnd_w) ...
+                 + exp(-(D-ZZ(inz,inx))/bnd_w) ...
+                 + exp( ( -XX(inz,inx))/bnd_w) ...
+                 + exp(-(L-XX(inz,inx))/bnd_w);
+    case 5 % only walls
+        bndshape = exp( ( -XX(inz,inx))/bnd_w) ...
+                 + exp(-(L-XX(inz,inx))/bnd_w);
 end
 bndshape = max(0,min(1,bndshape));
 
@@ -197,12 +205,13 @@ bnd_C = zeros(size(bndshape));
 bnd_V = zeros(size(bndshape));
 
 % set specified boundaries to no slip, else to free slip
-if bndmode==4;               sds = +1;      % no slip sides for 'all sides(4)'
+if bndmode>=4;               sds = +1;      % no slip sides for 'all sides(4)'
 else;                        sds = -1; end  % free slip sides for other types
 if bndmode==1 || bndmode>=3; top = +1;      % no slip top for 'top only(1)', 'top/bot(3)', 'all sides(4)'
 else;                        top = -1; end  % free slip for other types
 if bndmode>=2;               bot = +1;      % no slip bot for 'bot only(2)', 'top/bot(3)', 'all sides(4)'
 else;                        bot = -1; end  % free slip for other types
+if bndmode==5;               top = -1; bot = -1; end % free slip top/bot for 'only walls(5)'
 
 % initialise solution fields
 Tp  =  T0 + (T1-T0) .* (1+erf((ZZ/D-zlay)/wlay_T))/2 + dT.*rp;  if any(bndinit(:)) && ~isnan(Twall); Tp = Tp + (Twall-Tp).*bndinit; end % potential temperature [C]

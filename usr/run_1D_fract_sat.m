@@ -52,8 +52,8 @@ dir      =  [0, 0];              % isotope ratios random noise [delta]
 % set thermo-chemical boundary parameters
 Ptop     =  125e6;               % top pressure [Pa]
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls)
-bndinit  =  0;                   % switch on (1) to initialise with internal boundary layers
-dw       =  1*h;                 % boundary layer thickness [m]
+bnd_w    =  0.025;               % boundary layer width [m]
+bnd_h    =  0*h;                 % internal wall rock layer thickness [m]
 fin      =  1;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
 fout     =  1;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
 tau_T    =  12*hr;               % wall cooling/assimilation time [s]
@@ -65,24 +65,26 @@ tewall   =  [nan,nan,nan,nan];   % wall trace elements [wt ppm] (nan = no assimi
 irwall   =  [nan,nan,nan,nan];   % wall isotope ratios [delta] (nan = no assimilation)
 
 % set thermo-chemical material parameters
-calID    =  'morb';              % phase diagram calibration
+calID    =  'default';           % phase diagram calibration
 kT0      =  5;                   % thermal conductivity [W/m/K]
 cP       =  1200;                % heat capacity [J/kg/K]
-Dsx      = -300;                 % entropy change of crystallisation [J/kg]
-Dsf      =  400;                 % entropy change of exsolution [J/kg]
+Dsx      = -250;                 % entropy change of crystallisation [J/kg]
+Dsf      =  350;                 % entropy change of exsolution [J/kg]
 
 % set model buoyancy parameters
-d0       =  0.5e-3;              % crystal/bubble size [m]
+dx       =  1e-3;                % crystal size [m]
+df       =  1e-3;                % bubble size [m]
 g0       =  10.;                 % gravity [m/s2]
 
 % set numerical model parameters
-CFL      =  0.80;                % (physical) time stepping courant number (multiplies stable step) [0,1]
+CFL      =  0.75;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
-rtol     =  1e-5;                % outer its relative tolerance
-atol     =  1e-8;                % outer its absolute tolerance
+rtol     =  1e-4;                % outer its relative tolerance
+atol     =  1e-7;                % outer its absolute tolerance
 maxit    =  15;                  % maximum outer its
 lambda   =  0.50;                % iterative lag parameter equilibration
 etareg   =  1e0;                 % viscosity regularisation parameter
+mink     =  1e-8;                % minimum diffusivity for phase, component fractions
 
 
 %*****  RUN NAKHLA MODEL  *************************************************

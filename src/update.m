@@ -47,66 +47,46 @@ wtm(:, 9) = reshape(cm_oxd(:,:,8),Nz*Nx,1); % K2O
 wtm(:,11) = reshape(100.*vm(:,: ),Nz*Nx,1); % H2O
 etam      = reshape(grdmodel08(wtm,T(:)-273.15),Nz,Nx);
 
-etaf = cal.etaf0.* ones(size(f));  % constant fluid viscosity
-etax = cal.etax0.* ones(size(x));  % constant solid viscosity
+% effective mixture shear viscosity (Costa et al., 2009)
+hh     = (1-cal.xi).*erf(sqrt(pi)./(2.*(1-cal.xi)).*(chi./cal.chi_pck).*(1+(chi./cal.chi_pck).^cal.gamma));
+eta    = etam .* (1+(chi./cal.chi_pck).^cal.delta) ./ (1-hh).^(cal.B*cal.chi_pck);
 
-% get permission weights
-kv = permute(cat(3,etax,etam,etaf),[3,1,2]);
-Mv = permute(repmat(kv,1,1,1,3),[4,1,2,3])./permute(repmat(kv,1,1,1,3),[1,4,2,3]);
- 
-ff = max(TINY,min(1-TINY,permute(cat(3,chi,mu,phi),[3,1,2])));
-FF = permute(repmat(ff,1,1,1,3),[4,1,2,3]);
-Sf = (FF./cal.BB).^(1./cal.CC);  Sf = Sf./sum(Sf,2);
-Xf = sum(cal.AA.*Sf,2).*FF + (1-sum(cal.AA.*Sf,2)).*Sf;
-
-% get momentum and volume permissions
-thtv = squeeze(prod(Mv.^Xf,2));
-
-% get effective viscosity
-eta    = squeeze(sum(ff.*kv.*thtv,1));  if size(eta,1)~=size(T,1); eta = eta.'; end
-if ~calibrt; etamax = 1e+6.*min(eta(:)); else; etamax = 1e3.*cal.etax0; end
+if ~calibrt; etamax = 1e+6.*min(eta(:)); else; etamax = 1e+32.*min(eta(:)); end
 eta    = (1./etamax + 1./(eta*etareg)).^-1;
 etaco  = (eta(1:end-1,1:end-1).*eta(2:end,1:end-1) ...
        .* eta(1:end-1,2:end  ).*eta(2:end,2:end  )).^0.25;
 
-% get segregation coefficients
-dd = permute(cat(3,d0*ones(size(mu)),d0*(1-mu),d0*ones(size(mu))),[3,1,2]);
-Csgr = ((1-ff)./dd.^2.*kv.*thtv).^-1 + TINY^2;
-
-Csgr_x = squeeze(Csgr(1,:,:)); if size(Csgr_x,1)~=size(T,1); Csgr_x = Csgr_x.'; end
-Csgr_f = squeeze(Csgr(3,:,:)); if size(Csgr_f,1)~=size(T,1); Csgr_f = Csgr_f.'; end
-Csgr_m = squeeze(Csgr(2,:,:)); if size(Csgr_m,1)~=size(T,1); Csgr_m = Csgr_m.'; end
-% Csgr_m = Csgr_m.*(1-mu).^2 + TINY^2; % dampen melt segregation at high melt fraction (dm = d0.*(1-f))
+% phase segregation coefficients
+Ksgr_x = 2/9*cal.dx^2./eta + TINY.^2;
+Ksgr_f = 2/9*cal.df^2./eta + cal.dx^2/cal.bf./cal.etaf0.*phi.^(cal.nf-1).*(1-phi).^cal.mf + TINY.^2;
+Ksgr_m =                     cal.dx^2/cal.bm./    etam .*mu .^(cal.nm-1).*(1-mu ).^cal.mm + TINY.^2;
 
 if ~calibrt % skip the following if called from calibration script
 
-wm = ((rhom(1:end-1,:)+rhom(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*(Csgr_m(1:end-1,:).*Csgr_m(2:end,:)).^0.5; % melt segregation speed
-% wm = ((rhom(1:end-1,:)+rhom(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*2./(1./Csgr_m(1:end-1,:)+1./Csgr_m(2:end,:)); % melt segregation speed
+wm = ((rhom(1:end-1,:)+rhom(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*(Ksgr_m(1:end-1,:).*Ksgr_m(2:end,:)).^0.5; % melt segregation speed
 wm(1  ,:)     = min(1,1-top).*wm(1  ,:);
 wm(end,:)     = min(1,1-bot).*wm(end,:);
 wm(:,[1 end]) = -sds*wm(:,[2 end-1]);
 
-wx = ((rhox(1:end-1,:)+rhox(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*(Csgr_x(1:end-1,:).*Csgr_x(2:end,:)).^0.5; % solid segregation speed
-% wx = ((rhox(1:end-1,:)+rhox(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*2./(1./Csgr_x(1:end-1,:)+1./Csgr_x(2:end,:)); % solid segregation speed
+wx = ((rhox(1:end-1,:)+rhox(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*(Ksgr_x(1:end-1,:).*Ksgr_x(2:end,:)).^0.5; % solid segregation speed
 wx(1  ,:)     = min(1,1-top).*wx(1  ,:);
 wx(end,:)     = min(1,1-bot).*wx(end,:);
 wx(:,[1 end]) = -sds*wx(:,[2 end-1]);
 
-wf = ((rhof(1:end-1,:)+rhof(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*(Csgr_f(1:end-1,:).*Csgr_f(2:end,:)).^0.5; % fluid segregation speed
-% wf = ((rhof(1:end-1,:)+rhof(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*2./(1./Csgr_f(1:end-1,:)+1./Csgr_f(2:end,:)); % fluid segregation speed
+wf = ((rhof(1:end-1,:)+rhof(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*(Ksgr_f(1:end-1,:).*Ksgr_f(2:end,:)).^0.5; % fluid segregation speed
 wf(1  ,:)     = min(1,1-top+fout).*wf(1  ,:);
 wf(end,:)     = min(1,1-bot+fin ).*wf(end,:);
 wf(:,[1 end]) = -sds*wf(:,[2 end-1]);
 
 % diffusion parameters
 kW  = Vel*h/100;                                                           % convection fluctuation diffusivity
-kwm = abs((rhom-rho).*g0.*Csgr_m*d0*10);                                   % segregation fluctuation diffusivity
-kwx = abs((rhox-rho).*g0.*Csgr_x*d0*10);                                   % segregation fluctuation diffusivity
-kwf = abs((rhof-rho).*g0.*Csgr_f*d0*10);                                   % segregation fluctuation diffusivity
-km  = m.*(kwm + kW).*rho;                                                  % melt  fraction diffusion 
-kx  = x.*(kwx + kW).*rho;                                                  % solid fraction diffusion 
-kf  = f.*(kwf + kW).*rho;                                                  % fluid fraction diffusion 
-kc  = (x.*kwx + f.*kwf + m.*kwm + kW).*rho;                                % component diffusion
+kwm = abs((rhom-rho).*g0.*Ksgr_m*dx*10);                                   % segregation fluctuation diffusivity
+kwx = abs((rhox-rho).*g0.*Ksgr_x*dx*10);                                   % segregation fluctuation diffusivity
+kwf = abs((rhof-rho).*g0.*Ksgr_f*df*10);                                   % segregation fluctuation diffusivity
+km  = m.*(kwm + kW + mink).*rho;                                           % melt  fraction diffusion 
+kx  = x.*(kwx + kW + mink).*rho;                                           % solid fraction diffusion 
+kf  = f.*(kwf + kW + mink).*rho;                                           % fluid fraction diffusion 
+kc  = (x.*kwx + f.*kwf + m.*kwm + kW + mink).*rho;                         % component diffusion
 kT  = kT0 + kc.*cP;                                                        % heat diffusion
 ks  = kT./T;                                                               % entropy diffusion
 
@@ -143,14 +123,14 @@ tII([1 end],:) = tII([2 end-1],:);
 
 % heat dissipation (entropy production) rate
 [grdTx,grdTz] = gradient(T,h);
-diss =  exx(2:end-1,2:end-1).*txx(2:end-1,2:end-1) ...
-     +  ezz(2:end-1,2:end-1).*tzz(2:end-1,2:end-1) ...
-     +  2.*(exz(1:end-1,1:end-1)+exz(2:end,1:end-1)+exz(1:end-1,2:end)+exz(2:end,2:end))./4 ...
-         .*(txz(1:end-1,1:end-1)+txz(2:end,1:end-1)+txz(1:end-1,2:end)+txz(2:end,2:end))./4 ...
-     +   mu(2:end-1,2:end-1)./Csgr_m(2:end-1,2:end-1) .* ((wm(1:end-1,2:end-1)+wm(2:end,2:end-1))./2).^2 ...
-     +  chi(2:end-1,2:end-1)./Csgr_x(2:end-1,2:end-1) .* ((wx(1:end-1,2:end-1)+wx(2:end,2:end-1))./2).^2 ...
-     +  phi(2:end-1,2:end-1)./Csgr_f(2:end-1,2:end-1) .* ((wf(1:end-1,2:end-1)+wf(2:end,2:end-1))./2).^2 ...
-     +  ks(2:end-1,2:end-1).*(grdTz(2:end-1,2:end-1).^2 + grdTx(2:end-1,2:end-1).^2);
+diss = ks(2:end-1,2:end-1).*(grdTz(2:end-1,2:end-1).^2 + grdTx(2:end-1,2:end-1).^2);% ...
+     + exx(2:end-1,2:end-1).*txx(2:end-1,2:end-1) ...
+     + ezz(2:end-1,2:end-1).*tzz(2:end-1,2:end-1) ...
+     + 2.*(exz(1:end-1,1:end-1).*exz(2:end,1:end-1).*exz(1:end-1,2:end).*exz(2:end,2:end)).^0.25 ...
+        .*(txz(1:end-1,1:end-1).*txz(2:end,1:end-1).*txz(1:end-1,2:end).*txz(2:end,2:end)).^0.25 ...
+     +  mu(2:end-1,2:end-1)./Ksgr_m(2:end-1,2:end-1) .* ((wm(1:end-1,2:end-1)+wm(2:end,2:end-1))./2).^2 ...
+     + chi(2:end-1,2:end-1)./Ksgr_x(2:end-1,2:end-1) .* ((wx(1:end-1,2:end-1)+wx(2:end,2:end-1))./2).^2 ...
+     + phi(2:end-1,2:end-1)./Ksgr_f(2:end-1,2:end-1) .* ((wf(1:end-1,2:end-1)+wf(2:end,2:end-1))./2).^2;
 
 
 % update volume source
@@ -159,12 +139,12 @@ if step>0
                 + advect(X(inz,inx),0.*U(inz,:),wx(:,inx),h,{ADVN,''   },[1,2],BCA) ...
                 + advect(F(inz,inx),0.*U(inz,:),wf(:,inx),h,{ADVN,''   },[1,2],BCA) ...
                 + advect(rho(inz,inx), U(inz,:), W(:,inx),h,{ADVN,'vdf'},[1,2],BCA);
-    VolSrc = -((rho(inz,inx)-rhoo(inz,inx))./dt + Div_rhoV)./rho(inz,inx); 
-%     VolSrc = -((rho(inz,inx)-rhoo(inz,inx))./dt + theta.*Div_rhoV + (1-theta).*Div_rhoVo)./rho(inz,inx);
+%     VolSrc = -((rho(inz,inx)-rhoo(inz,inx))./dt + Div_rhoV)./rho(inz,inx); 
+    VolSrc = -((rho(inz,inx)-rhoo(inz,inx))./dt + theta.*Div_rhoV + (1-theta).*Div_rhoVo)./rho(inz,inx);
 end
 
-UBG    = - 1*mean(mean(VolSrc))./2 .* (L/2-XXu);
-WBG    = - 1*mean(mean(VolSrc))./2 .* (D/2-ZZw);
+UBG    = - 2*mean(mean(VolSrc))./2 .* (L/2-XXu);
+WBG    = - 0*mean(mean(VolSrc))./2 .* (D/2-ZZw);
 
 UDtime = UDtime + toc;
 end

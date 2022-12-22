@@ -5,82 +5,108 @@ tic;
 Ti = T; ci = c; vi = v; xi = x; fi = f;
 
 
-% update heat content (entropy)
-advn_S = - advect(M(inz,inx).*sm(inz,inx),Um(inz,:),Wm(:,inx),h,{ADVN,''},[1,2],BCA) ...  % heat advection
-         - advect(X(inz,inx).*sx(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA) ...
-         - advect(F(inz,inx).*sf(inz,inx),Uf(inz,:),Wf(:,inx),h,{ADVN,''},[1,2],BCA);
+%***  update heat content (entropy)
 
-qSz    = - (ks(1:end-1,:)+ks(2:end,:))./2 .* ddz(T,h);
-qSx    = - (ks(:,1:end-1)+ks(:,2:end))./2 .* ddx(T,h);
-diff_S = (- ddz(qSz(:,inx),h)  ...
-          - ddx(qSx(inz,:),h));
+% heat advection
+advn_S = - advect(M(inz,inx).*sm(inz,inx),Um(inz,:),Wm(:,inx),h,{ADVN,''},[1,2],BCA) ...  % melt  advection
+         - advect(X(inz,inx).*sx(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA) ...  % solid advection
+         - advect(F(inz,inx).*sf(inz,inx),Uf(inz,:),Wf(:,inx),h,{ADVN,''},[1,2],BCA);     % fluid advection
 
+qSz    = - (ks(1:end-1,:)+ks(2:end,:))./2 .* ddz(T,h);  % z-flux
+qSx    = - (ks(:,1:end-1)+ks(:,2:end))./2 .* ddx(T,h);  % x-flux
+diff_S =(- ddz(qSz(:,inx),h)  ...
+         - ddx(qSx(inz,:),h));
+
+% heat dissipation
 diss_h = diss ./ T(inz,inx);
 
+% boundary layers
 if ~isnan(Twall)
-    bnd_T = ((Twall+273.15)-T(inz,inx))./tau_T .* bndshape;  % impose top boundary layer
+    bnd_T = ((Twall+273.15)-T(inz,inx))./tau_T .* bndshape;
     bnd_S = rho(inz,inx).*cP.*bnd_T./T(inz,inx);
 end
 
-dSdt = advn_S + diff_S + diss_h + bnd_S;                                   % total rate of change
+% total rate of change
+dSdt = advn_S + diff_S + diss_h + bnd_S;
 
-S(inz,inx)   = So(inz,inx) + (theta.*dSdt + (1-theta).*dSdto).*dt;         % explicit update of major component density
-S([1 end],:) = S([2 end-1],:);                                             % apply zero flux boundary conditions
+% semi-implicit update of bulk entropy density
+S(inz,inx)   = So(inz,inx) + (theta.*dSdt + (1-theta).*dSdto).*dt;    
+
+% boundary conditions
+S([1 end],:) = S([2 end-1],:);                                             
 S(:,[1 end]) = S(:,[2 end-1]);
 
-% update major component
-advn_C = - advect(M(inz,inx).*cm(inz,inx),Um(inz,:),Wm(:,inx),h,{ADVN,''},[1,2],BCA) ...  % major component advection
-         - advect(X(inz,inx).*cx(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);
 
-qCz    = - (kc(1:end-1,:)+kc(2:end,:))./2 .* ddz(c,h);
-qCx    = - (kc(:,1:end-1)+kc(:,2:end))./2 .* ddx(c,h);
+%***  update major component (SiO2)
+
+% major component advection
+advn_C = - advect(M(inz,inx).*cm(inz,inx),Um(inz,:),Wm(:,inx),h,{ADVN,''},[1,2],BCA) ...  % melt  advection
+         - advect(X(inz,inx).*cx(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);     % solid advection
+
+% major component diffusion
+qCz    = - (kc(1:end-1,:)+kc(2:end,:))./2 .* ddz(c,h);  % z-flux
+qCx    = - (kc(:,1:end-1)+kc(:,2:end))./2 .* ddx(c,h);  % x-flux
 diff_C = (- ddz(qCz(:,inx),h)  ...
           - ddx(qCx(inz,:),h));
 
-if ~isnan(cwall); bnd_C = rho(inz,inx).*(cwall-c(inz,inx))./tau_a .* bndshape; end % impose boundary layer
+% boundary layers
+if ~isnan(cwall); bnd_C = rho(inz,inx).*(cwall-c(inz,inx))./tau_a .* bndshape; end
 
-dCdt = advn_C + diff_C + bnd_C;                                            % total rate of change
+% total rate of change
+dCdt = advn_C + diff_C + bnd_C;                                            
     
-C(inz,inx)   = Co(inz,inx) + (theta.*dCdt + (1-theta).*dCdto).*dt;         % explicit update of major component density
+% semi-implicit update of major component density
+C(inz,inx)   = Co(inz,inx) + (theta.*dCdt + (1-theta).*dCdto).*dt;         
 C            = max(cal.cphs0.*rho,min(cal.cphs1.*rho,C));
-C([1 end],:) = C([2 end-1],:);                                             % apply boundary conditions
+
+% boundary conditions
+C([1 end],:) = C([2 end-1],:);
 C(:,[1 end]) = C(:,[2 end-1]);  
     
-% update volatile component
+
+%***  update volatile component (H2O)
 if any([v0;v1;vwall;v(:)]>10*TINY)
-    advn_V = - advect(M(inz,inx).*vm(inz,inx),Um(inz,:),Wm(:,inx),h,{ADVN,''},[1,2],BCA) ...  % volatile component advection
-             - advect(F(inz,inx).*vf(inz,inx),Uf(inz,:),Wf(:,inx),h,{ADVN,''},[1,2],BCA);
+
+    % volatile component advection
+    advn_V = - advect(M(inz,inx).*vm(inz,inx),Um(inz,:),Wm(:,inx),h,{ADVN,''},[1,2],BCA) ...  % melt  advection
+             - advect(F(inz,inx).*vf(inz,inx),Uf(inz,:),Wf(:,inx),h,{ADVN,''},[1,2],BCA);     % fluid advection
     
-    qVz    = - (kc(1:end-1,:)+kc(2:end,:))./2 .* ddz(v,h);
-    qVx    = - (kc(:,1:end-1)+kc(:,2:end))./2 .* ddx(v,h);
+    % volatile component diffusion
+    qVz    = - (kc(1:end-1,:)+kc(2:end,:))./2 .* ddz(v,h);  % z-flux
+    qVx    = - (kc(:,1:end-1)+kc(:,2:end))./2 .* ddx(v,h);  % x-flux
     diff_V = (- ddz(qVz(:,inx),h)  ...
               - ddx(qVx(inz,:),h));
 
-    if ~isnan(vwall); bnd_V = rho(inz,inx).*(vwall-v(inz,inx))./tau_a .* bndshape; end % impose boundary layer
+    % boundary layers
+    if ~isnan(vwall); bnd_V = rho(inz,inx).*(vwall-v(inz,inx))./tau_a .* bndshape; end 
     
-    dVdt = advn_V + diff_V + bnd_V;                                                 % total rate of change
+    % total rate of change
+    dVdt = advn_V + diff_V + bnd_V;                                                 
     
-    V(inz,inx)   = Vo(inz,inx) + (theta.*dVdt + (1-theta).*dVdto).*dt;     % explicit update of volatile component density
+    % semi-implicit update of volatile component density
+    V(inz,inx)   = Vo(inz,inx) + (theta.*dVdt + (1-theta).*dVdto).*dt;
     V            = max(0,min(rho,V));
-    V([1 end],:) = V([2 end-1],:);                                         % apply boundary conditions
+
+    % boundary conditions
+    V([1 end],:) = V([2 end-1],:);                                         
     V(:,[1 end]) = V(:,[2 end-1]);
 end
 
+
 % convert entropy and component densities to temperature and concentrations
-T = (T0+273.15)*exp((S - X.*Dsx - F.*Dsf)./rho./cP + Adbt./cP.*(Pt-Ptop));  % convert entropy to temperature
+T = (T0+273.15)*exp((S - X.*Dsx - F.*Dsf)./rho./cP + Adbt./cP.*(Pt-Ptop));
 c = C./rho;
 v = V./rho;
 
 
 %% *****  UPDATE PHASE PROPORTIONS  ***************************************
 
-% update local phase equilibrium
 eqtime = tic;
 
-% extract indices for which equilibrium needs updating
+%*** update phase equilibrium
 [xq(inz,inx),cxq(inz,inx),cmq(inz,inx),fq(inz,inx),vfq(inz,inx),vmq(inz,inx)] = equilibrium(xq(inz,inx),fq(inz,inx),T(inz,inx)-273.15,c(inz,inx),v(inz,inx),Pt(inz,inx),cal,TINY);
 
-% apply boundary conditions
+% boundary conditions
 xq([1 end],:) = xq([2 end-1],:);
 xq(:,[1 end]) = xq(:,[2 end-1]);
 fq([1 end],:) = fq([2 end-1],:);
@@ -98,52 +124,67 @@ vmq(:,[1 end]) = vmq(:,[2 end-1]);
 
 EQtime = EQtime + toc(eqtime);
 
-% update crystal fraction
+
+%***  update crystal fraction
+
+% crystallisation rate
 Gx = lambda * Gx + (1-lambda) * (xq(inz,inx)-x(inz,inx)).*rho(inz,inx)./(5*dt);
 
+% crystallinity advection
 advn_X = - advect(X(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);
 
-qXz    = - (kx(1:end-1,:)+kx(2:end,:))./2 .* ddz(x,h);
-qXx    = - (kx(:,1:end-1)+kx(:,2:end))./2 .* ddx(x,h);
+% crystallinity diffusion
+qXz    = - (kx(1:end-1,:)+kx(2:end,:))./2 .* ddz(x,h);  % z-flux
+qXx    = - (kx(:,1:end-1)+kx(:,2:end))./2 .* ddx(x,h);  % x-flux
 diff_X = (- ddz(qXz(:,inx),h)  ...
           - ddx(qXx(inz,:),h));
 
-dXdt   = advn_X + diff_X + Gx;                                             % total rate of change
+% total rate of change
+dXdt   = advn_X + diff_X + Gx;
 
-X(inz,inx) = Xo(inz,inx) + (theta.*dXdt + (1-theta).*dXdto).*dt;           % explicit update of crystal fraction
-X = max(0,min(rho-F, X ));                                                 % enforce limits
-X([1 end],:) = X([2 end-1],:);                                             % apply boundary conditions
+% semi-implicit update of crystal fraction
+X(inz,inx) = Xo(inz,inx) + (theta.*dXdt + (1-theta).*dXdto).*dt;
+X = max(0, X );
+
+% boundary conditions
+X([1 end],:) = X([2 end-1],:);
 X(:,[1 end]) = X(:,[2 end-1]);
 
-% update bubble fraction
+
+%***  update bubble fraction
 if any([v0;v1;vwall;v(:)]>10*TINY)
 
+    % fluid exsolution rate
     Gf = lambda * Gf + (1-lambda) * (fq(inz,inx)-f(inz,inx)).*rho(inz,inx)./(5*dt);
 
+    % fluid bubble advection
     advn_F = - advect(F(inz,inx),Uf(inz,:),Wf(:,inx),h,{ADVN,''},[1,2],BCA);
 
-    qFz    = - (kf(1:end-1,:)+kf(2:end,:))./2 .* ddz(f,h);
-    qFx    = - (kf(:,1:end-1)+kf(:,2:end))./2 .* ddx(f,h);
+    % fluid bubble diffusion
+    qFz    = - (kf(1:end-1,:)+kf(2:end,:))./2 .* ddz(f,h);  % z-flux
+    qFx    = - (kf(:,1:end-1)+kf(:,2:end))./2 .* ddx(f,h);  % x-flux
     diff_F = (- ddz(qFz(:,inx),h)  ...
               - ddx(qFx(inz,:),h));
 
-    dFdt   = advn_F + diff_F + Gf;                                         % total rate of change
+    % total rate of change
+    dFdt   = advn_F + diff_F + Gf;
 
-    F(inz,inx) = Fo(inz,inx) + (theta.*dFdt + (1-theta).*dFdto).*dt;       % explicit update of bubble fraction
-    F = max(0,min(V, F ));                                                 % enforce limits
-    F([1 end],:) = F([2 end-1],:);                                         % apply boundary conditions
+    % semi-implicit update of bubble fraction
+    F(inz,inx) = Fo(inz,inx) + (theta.*dFdt + (1-theta).*dFdto).*dt;
+    F = max(0,min(V, F ));
+
+    % boundary conditions
+    F([1 end],:) = F([2 end-1],:);                                         
     F(:,[1 end]) = F(:,[2 end-1]);
     
-else 
-    diff_F = 0;
 end
 
 M = rho-X-F;
 
 % update phase fractions
-x = max(0,min(1,X./rho));
-f = max(0,min(1,F./rho));
-m = max(0,min(1,M./rho));
+x = max(0,min(1,X./(X+M+F)));
+f = max(0,min(1,F./(X+M+F)));
+m = max(0,min(1,M./(X+M+F)));
 
 % update phase entropies
 sm = (S - X.*Dsx - F.*Dsf)./rho;
@@ -161,12 +202,13 @@ Kf = vfq./max(TINY,vmq);
 vm = v./max(TINY,m + f.*Kf); vm(m==0) = vmq(m==0);
 vf = v./max(TINY,m./Kf + f); vf(m==1) = vfq(m==1);
 
+
 %% *****  UPDATE TC RESIDUALS  ********************************************
 
 % get residual of thermochemical equations from iterative update
-resnorm_TC = norm( T(inz,inx) - Ti(inz,inx)                       ,2)./(norm(T(inz,inx),2)+TINY) ...
-           + norm((c(inz,inx) - ci(inz,inx))                      ,2)./(norm(c(inz,inx),2)+TINY) ...
-           + norm((v(inz,inx) - vi(inz,inx))                      ,2)./(norm(v(inz,inx),2)+TINY) ...
+resnorm_TC = norm( T(inz,inx) - Ti(inz,inx),2)./(norm(T(inz,inx),2)+TINY) ...
+           + norm( c(inz,inx) - ci(inz,inx),2)./(norm(c(inz,inx),2)+TINY) ...
+           + norm( v(inz,inx) - vi(inz,inx),2)./(norm(v(inz,inx),2)+TINY) ...
            + norm((x(inz,inx) - xi(inz,inx)).*(x(inz,inx)>10*TINY).*(m(inz,inx)>10*TINY),2)./(norm(x(inz,inx),2)+TINY) ...
            + norm((f(inz,inx) - fi(inz,inx)).*(f(inz,inx)>10*TINY).*(m(inz,inx)>10*TINY),2)./(norm(f(inz,inx),2)+TINY);
 

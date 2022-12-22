@@ -14,13 +14,14 @@ save_plot = 0;                   % turn on (1) to save output file in /out direc
 calID    =  'morb';             % phase diagram calibration
 
 % set model buoyancy parameters
-d0       =  1e-3;                % crystal size [m]
+dx       =  1e-3;                % crystal size [m]
+df       =  1e-3;                % bubble size [m]
 g0       =  10.;                 % gravity [m/s2]
 
 % set ranges for control variables T, c, v, P
 T = linspace(1400,700,400).';    % temperature range [degC]
 c = linspace(0.51,0.51,400).';   % major component range [wt SiO2]
-v = linspace(0.04,0.04,400).';   % volatile component range [wt H2O]
+v = linspace(0.02,0.02,400).';   % volatile component range [wt H2O]
 P = linspace(125,125,400).'*1e6; % pressure range [Pa]
 
 % equilibrium phase fractions and compositions
@@ -38,9 +39,9 @@ Nz = length(T); Nx = 1; Ptop = min(P); Pt = P; etareg = 1; calibrt = 1; T = T+27
 update;
 T = T-273.15;
 
-wm =  mu.*Csgr_m .* (rhom-rho)*g0; % melt segregation speed
-wx = chi.*Csgr_x .* (rhox-rho)*g0; % crystal segregation speed
-wf = phi.*Csgr_f .* (rhof-rho)*g0; % fluid segregation speed
+wm =  mu.*Ksgr_m .* (rhom-rho)*g0; % melt segregation speed
+wx = chi.*Ksgr_x .* (rhox-rho)*g0; % crystal segregation speed
+wf = phi.*Ksgr_f .* (rhof-rho)*g0; % fluid segregation speed
 
 
 % block out values below solidus and above liquidus
@@ -64,8 +65,6 @@ rhom(ind) = [];
 rhof(ind) = [];
 rho (ind) = [];
 etam(ind) = [];
-etax(ind) = [];
-etaf(ind) = [];
 eta (ind) = [];
 wm  (ind) = [];
 wx  (ind) = [];
@@ -73,6 +72,9 @@ wf  (ind) = [];
 f  (ind) = [];
 x  (ind) = [];
 m  (ind) = [];
+phi(ind) = [];
+chi(ind) = [];
+mu (ind) = [];
 Ptop = min(P); Pt = P;
 
 if ~holdfig; close all; end
@@ -153,8 +155,7 @@ ylabel('Density [kg/m$^3$]','Interpreter','latex','FontSize',15)
 
 % plot mixture rheology
 figure(6); if ~holdfig; clf; end
-semilogy(T,etax,'k',T,min(etam,eta),'r',T,etaf,'b','LineStyle',linestyle,'LineWidth',2); hold on; box on; axis tight;
-semilogy(T,eta,'Color',[0.5 0.5 0.5],'LineStyle',linestyle,'LineWidth',2); hold on; box on; axis tight;
+semilogy(T,eta,'k',T,etam,'r','LineStyle',linestyle,'LineWidth',2); hold on; box on; axis tight;
 legend('crystals','melt','fluid','mixture','Interpreter','latex','FontSize',15,'box','off','location','best')
 set(gca,'TickLabelInterpreter','latex','FontSize',13)
 title('Viscosity model','Interpreter','latex','FontSize',18)
@@ -163,8 +164,8 @@ ylabel('Viscosity [log$_{10}$ Pas]','Interpreter','latex','FontSize',15)
 
 % plot phase segregation speeds
 figure(7); if ~holdfig; clf; end
-semilogy(T,max(1e-16,abs(x.*wx)).*3600,'k',T,max(1e-16,abs(m.*wm)).*3600,'r',T,max(1e-16,abs(f.*wf)).*3600,'b','LineStyle',linestyle,'LineWidth',2); hold on; box on; axis tight;
-legend('crystals','fluid','Interpreter','latex','FontSize',15,'box','off','location','best')
+semilogy(T,max(1e-18,abs(chi.*wx)).*3600,'k',T,max(1e-18,abs(mu.*wm)).*3600,'r',T,max(1e-18,abs(phi.*wf)).*3600,'b','LineStyle',linestyle,'LineWidth',2); hold on; box on; axis tight;
+legend('crystals','melt','fluid','Interpreter','latex','FontSize',15,'box','off','location','best')
 set(gca,'TickLabelInterpreter','latex','FontSize',13)
 title('Phase segregation model','Interpreter','latex','FontSize',18)
 xlabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',15)
