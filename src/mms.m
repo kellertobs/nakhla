@@ -9,12 +9,12 @@ fprintf(1,'\n\n  ***  compose manufactured solution\n\n');
 % compose manufactured solution variables
 W_mms(x,z) = 5.00e-5.*(cos(4*(x)*pi/L).*sin(4*(z)*pi/L));
 U_mms(x,z) = 1.00e-5.*(sin(4*(x)*pi/L).*cos(4*(z)*pi/L));
-P_mms(x,z) = 2.00e+4.*(sin(4*(x)*pi/L).*sin(4*(z)*pi/L));
+P_mms(x,z) = 2.00e+3.*(sin(4*(x)*pi/L).*sin(4*(z)*pi/L));
 
 % compose manufactured material coefficients and volume source
-eta_mms(x,z) = 1e+3-8e+2.*(cos(4*(x)*pi/L).*sin(4*(z)*pi/L));
-rho_mms(x,z) = 3e+3-1e+1.*(cos(4*(x)*pi/L).*sin(4*(z)*pi/L)); rhoref = 3e+3;
-src_mms(x,z) =     -1e-4.*(sin(4*(x)*pi/L).*sin(4*(z)*pi/L));
+eta_mms(x,z)  = 1e+3-8e+2.*(cos(4*(x)*pi/L).*sin(4*(z)*pi/L));
+rho_mms(x,z)  = 3e+3-1e+1.*(cos(4*(x)*pi/L).*sin(4*(z)*pi/L)); rhoref = 3e+3;
+src_mms(x,z)  =     -1e-5.*(sin(4*(x)*pi/L).*sin(4*(z)*pi/L));
 
 fprintf(1,'       W   = %s \n',char(W_mms));
 fprintf(1,'       U   = %s \n',char(U_mms));
@@ -25,14 +25,15 @@ fprintf(1,'       src = %s \n',char(src_mms));
 fprintf(1,'       . ');
 
 % update strain rates
-exx_mms(x,z) = diff(U_mms,x) - (diff(W_mms,z) + diff(U_mms,x))./3;         % x-normal strain rate
-ezz_mms(x,z) = diff(W_mms,z) - (diff(W_mms,z) + diff(U_mms,x))./3;         % z-normal strain rate
-exz_mms(x,z) = 1/2.*(diff(U_mms,z)+diff(W_mms,x))                ;         % shear strain rate
+DivV_mms(x,z)= (diff(W_mms,z) + diff(U_mms,x));
+exx_mms(x,z) = diff(U_mms,x) - DivV_mms./3;         % x-normal strain rate
+ezz_mms(x,z) = diff(W_mms,z) - DivV_mms./3;         % z-normal strain rate
+exz_mms(x,z) = 1/2.*(diff(U_mms,z)+diff(W_mms,x));  % shear strain rate
 fprintf(1,' . ');
 
 % update stresses
-txx_mms(x,z) = eta_mms .* exx_mms;                                         % x-normal stress
-tzz_mms(x,z) = eta_mms .* ezz_mms;                                         % z-normal stress
+txx_mms(x,z) = eta_mms .* exx_mms + eta_mms.*DivV_mms;                     % x-normal stress
+tzz_mms(x,z) = eta_mms .* ezz_mms + eta_mms.*DivV_mms;                     % z-normal stress
 txz_mms(x,z) = eta_mms .* exz_mms;                                         % xz-shear stress
 fprintf(1,' . ');
 
@@ -97,6 +98,7 @@ VolSrc = double(subs(src_mms)); fprintf(1,' . ');
 VolSrc = VolSrc(2:end-1,2:end-1);
 [x,z]  = meshgrid(xu_mms,zw_mms);
 etaco  = double(subs(eta_mms)); fprintf(1,' . ');
+zeta   = eta;
 
 WBG    = 0.*W_mms;
 UBG    = 0.*U_mms;
