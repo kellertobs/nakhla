@@ -2,7 +2,7 @@
 tic;
 
 % store previous iteration
-Ti = T; ci = c; vi = v; xi = x; fi = f;
+Si = S; Ci = C; Vi = V; Xi = X; Fi = F;
 
 
 %***  update heat content (entropy)
@@ -50,7 +50,7 @@ diff_C = (- ddz(qCz(:,inx),h)  ...
           - ddx(qCx(inz,:),h));
 
 % boundary layers
-if ~isnan(cwall); bnd_C = rho(inz,inx).*(cwall-c(inz,inx))./tau_a .* bndshape; end
+if ~isnan(cwall); bnd_C = (rho(inz,inx).*cwall-C(inz,inx))./tau_a .* bndshape; end
 
 % total rate of change
 dCdt = advn_C + diff_C + bnd_C;                                            
@@ -78,7 +78,7 @@ if any([v0;v1;vwall;v(:)]>10*TINY)
               - ddx(qVx(inz,:),h));
 
     % boundary layers
-    if ~isnan(vwall); bnd_V = rho(inz,inx).*(vwall-v(inz,inx))./tau_a .* bndshape; end 
+    if ~isnan(vwall); bnd_V = (rho(inz,inx).*vwall-V(inz,inx))./tau_a .* bndshape; end 
     
     % total rate of change
     dVdt = advn_V + diff_V + bnd_V;                                                 
@@ -94,7 +94,7 @@ end
 
 
 % convert entropy and component densities to temperature and concentrations
-T = (T0+273.15)*exp((S - X.*Dsx - F.*Dsf)./rho./cP + Adbt./cP.*(Pt-Ptop));
+T = (cal.Tphs1+273.15)*exp((S - X.*Dsx - F.*Dsf)./rho./cP + Adbt./cP.*(Pt-Ptop));
 c = C./rho;
 v = V./rho;
 
@@ -122,13 +122,15 @@ vfq(:,[1 end]) = vfq(:,[2 end-1]);
 vmq([1 end],:) = vmq([2 end-1],:);
 vmq(:,[1 end]) = vmq(:,[2 end-1]);
 
+mq = 1-xq-fq;
+
 EQtime = EQtime + toc(eqtime);
 
 
 %***  update crystal fraction
 
 % crystallisation rate
-Gx = lambda * Gx + (1-lambda) * (xq(inz,inx)-x(inz,inx)).*rho(inz,inx)./(5*dt);
+Gx = lambda * Gx + (1-lambda) * (rho(inz,inx).*xq(inz,inx)-X(inz,inx))./max(tau_r,5*dt);
 
 % crystallinity advection
 advn_X = - advect(X(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);
@@ -155,7 +157,7 @@ X(:,[1 end]) = X(:,[2 end-1]);
 if any([v0;v1;vwall;v(:)]>10*TINY)
 
     % fluid exsolution rate
-    Gf = lambda * Gf + (1-lambda) * (fq(inz,inx)-f(inz,inx)).*rho(inz,inx)./(5*dt);
+    Gf = lambda * Gf + (1-lambda) * (rho(inz,inx).*fq(inz,inx)-F(inz,inx))./max(tau_r,5*dt);
 
     % fluid bubble advection
     advn_F = - advect(F(inz,inx),Uf(inz,:),Wf(:,inx),h,{ADVN,''},[1,2],BCA);
@@ -182,9 +184,9 @@ end
 M = rho-X-F;
 
 % update phase fractions
-x = max(0,min(1,X./(X+M+F)));
-f = max(0,min(1,F./(X+M+F)));
-m = max(0,min(1,M./(X+M+F)));
+x = max(0,min(1,X./rho));
+f = max(0,min(1,F./rho));
+m = max(0,min(1,M./rho));
 
 % update phase entropies
 sm = (S - X.*Dsx - F.*Dsf)./rho;
@@ -206,11 +208,11 @@ vf = v./max(TINY,m./Kf + f); vf(m==1) = vfq(m==1);
 %% *****  UPDATE TC RESIDUALS  ********************************************
 
 % get residual of thermochemical equations from iterative update
-resnorm_TC = norm( T(inz,inx) - Ti(inz,inx),2)./(norm(T(inz,inx),2)+TINY) ...
-           + norm( c(inz,inx) - ci(inz,inx),2)./(norm(c(inz,inx),2)+TINY) ...
-           + norm( v(inz,inx) - vi(inz,inx),2)./(norm(v(inz,inx),2)+TINY) ...
-           + norm((x(inz,inx) - xi(inz,inx)).*(x(inz,inx)>10*TINY).*(m(inz,inx)>10*TINY),2)./(norm(x(inz,inx),2)+TINY) ...
-           + norm((f(inz,inx) - fi(inz,inx)).*(f(inz,inx)>10*TINY).*(m(inz,inx)>10*TINY),2)./(norm(f(inz,inx),2)+TINY);
+resnorm_TC = norm( S(inz,inx) - Si(inz,inx),2)./(norm(S(inz,inx),2)+TINY) ...
+           + norm( C(inz,inx) - Ci(inz,inx),2)./(norm(C(inz,inx),2)+TINY) ...
+           + norm( V(inz,inx) - Vi(inz,inx),2)./(norm(V(inz,inx),2)+TINY) ...
+           + norm((X(inz,inx) - Xi(inz,inx)).*(x(inz,inx)>10*TINY).*(m(inz,inx)>10*TINY),2)./(norm(X(inz,inx),2)+TINY) ...
+           + norm((F(inz,inx) - Fi(inz,inx)).*(f(inz,inx)>10*TINY).*(m(inz,inx)>10*TINY),2)./(norm(F(inz,inx),2)+TINY);
 
 TCtime = TCtime + toc - toc(eqtime);
 
