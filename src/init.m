@@ -4,7 +4,7 @@ if ~isfolder([opdir,'/',runID])
 end
 
 % save input parameters and runtime options (unless restarting)
-if restart == 0 
+if restart == 0 && save_op == 1
     parfile = [opdir,'/',runID,'/',runID,'_par'];
     save(parfile);
 end
@@ -136,14 +136,16 @@ inx = 2:Nx-1;
 % get smoothed initialisation field
 rng(seed);
 smth = smth*Nx*Nz*1e-4;
-rp = randn(Nz,Nx);
-for k = 1:round(smth)
+rp   = randn(Nz,Nx);
+for i = 1:round(smth)
     rp(2:end-1,2:end-1) = rp(2:end-1,2:end-1) + diff(rp(:,2:end-1),2,1)./8 + diff(rp(2:end-1,:),2,2)./8;
     rp = rp - mean(mean(rp(2:end-1,2:end-1)));
     rp([1 end],:) = 0;
     rp(:,[1 end]) = 0;
 end
 rp = rp./max(abs(rp(:)));
+
+gp = exp(-(XX-L/2).^2/(L/8)^2 - (ZZ-D/2).^2/(D/8)^2);
 
 % get mapping arrays
 NP =  Nz   * Nx   ;
@@ -214,19 +216,19 @@ else;                        bot = -1; end  % free slip for other types
 if bndmode==5;               top = -1; bot = -1; end % free slip top/bot for 'only walls(5)'
 
 % initialise solution fields
-Tp  =  T0 + (T1-T0) .* (1+erf((ZZ/D-zlay)/wlay_T))/2 + dT.*rp;  if any(bndinit(:)) && ~isnan(Twall); Tp = Tp + (Twall-Tp).*bndinit; end % potential temperature [C]
-c   =  c0 + (c1-c0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dc.*rp;  if any(bndinit(:)) && ~isnan(cwall); c  = c  + (cwall-c ).*bndinit; end; cin = c;% major component
-v   =  v0 + (v1-v0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dv.*rp;  if any(bndinit(:)) && ~isnan(vwall); v  = v  + (vwall-v ).*bndinit; end % volatile component
+Tp  =  T0 + (T1-T0) .* (1+erf((ZZ/D-zlay)/wlay_T))/2 + dTr.*rp + dTg.*gp;  if any(bndinit(:)) && ~isnan(Twall); Tp = Tp + (Twall-Tp).*bndinit; end % potential temperature [C]
+c   =  c0 + (c1-c0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dcr.*rp + dcg.*gp;  if any(bndinit(:)) && ~isnan(cwall); c  = c  + (cwall-c ).*bndinit; end; cin = c;% major component
+v   =  v0 + (v1-v0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dvr.*rp + dvg.*gp;  if any(bndinit(:)) && ~isnan(vwall); v  = v  + (vwall-v ).*bndinit; end % volatile component
 
-te = zeros(Nz,Nx,length(te0));
-for k = 1:length(te0)
-    te(:,:,k)  =  te0(k) + (te1(k)-te0(k)) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dte(k).*rp;  % trace elements
-    if any(bndinit(:)) && ~isnan(tewall(k)); te(:,:,k)  = te(:,:,k) + (tewall(k)-te(:,:,k)).*bndinit; end; tein = te; 
+te = zeros(Nz,Nx,cal.nte);
+for i = 1:cal.nte
+    te(:,:,i)  =  te0(i) + (te1(i)-te0(i)) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dter(i).*rp + dteg(i).*gp;  % trace elements
+    if any(bndinit(:)) && ~isnan(tewall(i)); te(:,:,i)  = te(:,:,i) + (tewall(i)-te(:,:,i)).*bndinit; end; tein = te; 
 end
-ir = zeros(Nz,Nx,length(ir0));
-for k = 1:length(ir0)
-    ir(:,:,k)  =  ir0(k) + (ir1(k)-ir0(k)) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dir(k).*rp;  % isotope ratios  
-    if any(bndinit(:)) && ~isnan(irwall(k)); ir(:,:,k)  = ir(:,:,k) + (irwall(k)-ir(:,:,k)).*bndinit; end; irin = ir;
+ir = zeros(Nz,Nx,cal.nir);
+for i = 1:cal.nir
+    ir(:,:,i)  =  ir0(i) + (ir1(i)-ir0(i)) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dirr(i).*rp + dirg(i).*gp;  % isotope ratios  
+    if any(bndinit(:)) && ~isnan(irwall(i)); ir(:,:,i)  = ir(:,:,i) + (irwall(i)-ir(:,:,i)).*bndinit; end; irin = ir;
 end
 
 U   =  zeros(size((XX(:,1:end-1)+XX(:,2:end))));  Ui = U;  res_U = 0.*U;
@@ -240,7 +242,7 @@ Wx  = W;  Ux  = U;
 Wm  = W;  Um  = U;
 
 eIIref =  1e-6;  
-Div_V  =  0.*P;  Div_rhoV = 0.*P(inz,inx);  Div_rhoVo = Div_rhoV;
+Div_V  =  0.*P;  Div_Vo = 0;  Div_rhoV = 0.*P(inz,inx);  Div_rhoVo = Div_rhoV;
 exx    =  0.*P;  ezz = 0.*P;  exz = zeros(Nz-1,Nx-1);  eII = 0.*P;  
 txx    =  0.*P;  tzz = 0.*P;  txz = zeros(Nz-1,Nx-1);  tII = 0.*P; 
 VolSrc =  0.*P(inz,inx);  MassErr = 0;  drhodt = 0.*P;  drhodto = 0.*P;
@@ -292,8 +294,8 @@ rhoo = rho;
 dto  = dt; 
 
 % get bulk enthalpy, silica, volatile content densities
-S  = rho.*(cP.*log(T/(T0+273.15)) + x.*Dsx + f.*Dsf - Adbt.*(Pt-Ptop));  
-S0 = rho.*(cP.*log(T0+273.15) + x.*Dsx + f.*Dsf - Adbt.*Ptop);  
+S  = rho.*(cP.*log(T/(cal.Tphs1+273.15)) + x.*Dsx + f.*Dsf - Adbt.*(Pt-Ptop));  
+S0 = rho.*(cP.*log(cal.Tphs1+273.15) + x.*Dsx + f.*Dsf - Adbt.*Ptop);  
 C  = rho.*(m.*cm + x.*cx);
 V  = rho.*(m.*vm + f.*vf);
 X  = rho.*x;
@@ -306,27 +308,43 @@ sx = sm + Dsx;
 sf = sm + Dsf;
 
 % get trace element phase compositions
-for k = 1:length(te0)
-    tem(:,:,k)  = te(:,:,k) ./(m + x.*Kte(k) );
-    tex(:,:,k)  = te(:,:,k) ./(m./Kte(k)  + x);
+Kte = zeros(Nz,Nx,cal.nte);
+tem = zeros(Nz,Nx,cal.nte);
+tex = zeros(Nz,Nx,cal.nte);
+for i = 1:cal.nte
+    for j=1:cal.nc; Kte(:,:,i) = Kte(:,:,i) + cal.Kte_cmp(i,j) .* c_cmp(:,:,j)./100; end
+
+    tem(:,:,i)  = te(:,:,i)./(m + x.*Kte(:,:,i));
+    tex(:,:,i)  = te(:,:,i)./(m./Kte(:,:,i) + x);
+end
+
+irm = zeros(Nz,Nx,cal.nir);
+irx = zeros(Nz,Nx,cal.nir);
+for i = 1:cal.nir
+    irm(:,:,i)  = ir(:,:,i)./(1-f);
+    irx(:,:,i)  = ir(:,:,i)./(1-f);
 end
 
 % get geochemical component densities
-for k = 1:length(te0)
-    TE(:,:,k)  = rho.*(m.*tem(:,:,k) + x.*tex(:,:,k));
+TE = zeros(Nz,Nx,cal.nte);
+for i = 1:cal.nte
+    TE(:,:,i)  = rho.*(m.*tem(:,:,i) + x.*tex(:,:,i));
 end
-for k = 1:length(ir0)
-    IR(:,:,k)  = rho.*ir(:,:,k);
+
+IR = zeros(Nz,Nx,cal.nir);
+for i = 1:cal.nir
+    IR(:,:,i)  = rho.*(m.*irm(:,:,i) + x.*irx(:,:,i));
 end
 
 % initialise phase change rates
-Gx = 0.*x(inz,inx);  Gf = 0.*f(inz,inx);
+Gx = 0.*x(inz,inx);  Gf = 0.*f(inz,inx);  Gm = 0.*m(inz,inx);
 
 % initialise auxiliary variables 
 dSdt   = 0.*T(inz,inx);  diss_h = 0.*T(inz,inx);
 dCdt   = 0.*c(inz,inx);
 dVdt   = 0.*v(inz,inx);
 dFdt   = 0.*f(inz,inx);
+dMdt   = 0.*m(inz,inx);
 dXdt   = 0.*x(inz,inx);
 dTEdt  = 0.*te(inz,inx);
 dIRdt  = 0.*ir(inz,inx);

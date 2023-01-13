@@ -134,7 +134,7 @@ elseif Nx <= 10  % create 1D plots
     plot(VolSrc,Zc(2:end-1).',CL{[1,2]},LW{:}); axis ij tight; box on;
     title('$\dot{V}$ [1/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,5,5)
-    plot(P(2:end-1,2:end-1),Zc(2:end-1).',CL{[1,2]},LW{:}); axis ij tight; box on;
+    plot(P(2:end-1,2:end-1)-zeta(2:end-1,2:end-1).*Div_V(2:end-1,2:end-1),Zc(2:end-1).',CL{[1,2]},LW{:}); axis ij tight; box on;
     title('$P$ [Pa]',TX{:},FS{:}); set(gca,TL{:},TS{:});
 
     if ~exist('fh3','var'); fh3 = figure(VIS{:});
@@ -322,19 +322,19 @@ else % create 2D plots
     set(0,'CurrentFigure',fh5)
     set(fh5,'CurrentAxes',ax(51));
     imagesc(Xc(2:end-1),Zc(2:end-1),te(2:end-1,2:end-1,1)./(1-f(inz,inx))); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['trace element K=',num2str(Kte(1))],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel('Depth [m]',TX{:},FS{:}); 
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['trace element 1'],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel('Depth [m]',TX{:},FS{:}); 
     set(fh5,'CurrentAxes',ax(52));
     imagesc(Xc(2:end-1),Zc(2:end-1),te(2:end-1,2:end-1,2)./(1-f(inz,inx))); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['trace element K=',num2str(Kte(2))],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['trace element 2'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
     set(fh5,'CurrentAxes',ax(53));
     imagesc(Xc(2:end-1),Zc(2:end-1),ir(2:end-1,2:end-1,1)./(1-f(inz,inx))); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['isotope ratio 1'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
     set(fh5,'CurrentAxes',ax(54));
     imagesc(Xc(2:end-1),Zc(2:end-1),te(2:end-1,2:end-1,3)./(1-f(inz,inx))); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['trace element K=',num2str(Kte(3))],TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:});
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['trace element 3'],TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:});
     set(fh5,'CurrentAxes',ax(55));
     imagesc(Xc(2:end-1),Zc(2:end-1),te(2:end-1,2:end-1,4)./(1-f(inz,inx))); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['trace element K=',num2str(Kte(4))],TX{:},FS{:}); set(gca,'YTickLabel',[]); xlabel('Width [m]',TX{:},FS{:});
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['trace element 4'],TX{:},FS{:}); set(gca,'YTickLabel',[]); xlabel('Width [m]',TX{:},FS{:});
     set(fh5,'CurrentAxes',ax(56));
     imagesc(Xc(2:end-1),Zc(2:end-1),ir(2:end-1,2:end-1,2)./(1-f(inz,inx))); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['isotope ratio 2'],TX{:},FS{:}); set(gca,'YTickLabel',[]);
