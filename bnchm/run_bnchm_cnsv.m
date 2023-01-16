@@ -2,7 +2,7 @@
 clear; close all;
 
 % load default parameters
-run('./par_default')
+run('../usr/par_default')
 
 % test decreasing time step
 RTOL = [1e-3,1e-6,1e-9];

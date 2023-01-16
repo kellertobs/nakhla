@@ -4,7 +4,7 @@ init;
 % physical time stepping loop
 while time <= tend && step <= Nt
     
-    if step==1; theta=1; else; theta=1/2; end
+%     if step==1; theta=1; else; theta=1/2; end
 
     fprintf(1,'*****  step %d;  dt = %4.4e;  time = %4.4e [hr]\n\n',step,dt./3600,time./3600);
     TTtime  = tic;

@@ -145,7 +145,7 @@ for i = 1:round(smth)
 end
 rp = rp./max(abs(rp(:)));
 
-gp = exp(-(XX-L/2).^2/(L/8)^2 - (ZZ-D/2).^2/(D/8)^2);
+gp = exp(-(XX-D/2).^2/(D/8)^2 - (ZZ-D/2).^2/(D/8)^2);
 
 % get mapping arrays
 NP =  Nz   * Nx   ;
@@ -217,8 +217,8 @@ if bndmode==5;               top = -1; bot = -1; end % free slip top/bot for 'on
 
 % initialise solution fields
 Tp  =  T0 + (T1-T0) .* (1+erf((ZZ/D-zlay)/wlay_T))/2 + dTr.*rp + dTg.*gp;  if any(bndinit(:)) && ~isnan(Twall); Tp = Tp + (Twall-Tp).*bndinit; end % potential temperature [C]
-c   =  c0 + (c1-c0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dcr.*rp + dcg.*gp;  if any(bndinit(:)) && ~isnan(cwall); c  = c  + (cwall-c ).*bndinit; end; cin = c;% major component
-v   =  v0 + (v1-v0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dvr.*rp + dvg.*gp;  if any(bndinit(:)) && ~isnan(vwall); v  = v  + (vwall-v ).*bndinit; end % volatile component
+c   =  c0 + (c1-c0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dcr.*rp + dcg.*gp;  if any(bndinit(:)) && ~isnan(cwall); c  = c  + (cwall-c ).*bndinit; end; cin = c; % major component
+v   =  v0 + (v1-v0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dvr.*rp + dvg.*gp;  if any(bndinit(:)) && ~isnan(vwall); v  = v  + (vwall-v ).*bndinit; end; vin = v; % volatile component
 
 te = zeros(Nz,Nx,cal.nte);
 for i = 1:cal.nte
@@ -274,6 +274,7 @@ while res > tol
 
     [xq,cxq,cmq,fq,vfq,vmq] = equilibrium(x,f,T-273.15,c,v,Pt,cal,TINY);
     
+    v  = vin .*(1-x);
     c  = cin .*(1-f);
     te = tein.*(1-f);
     ir = irin.*(1-f);

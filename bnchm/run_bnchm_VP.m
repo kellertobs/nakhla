@@ -1,7 +1,7 @@
 clear; close all;
 
 % load default parameters
-run('./par_default')
+run('../usr/par_default')
 
  % test decreasing grid step
 NN = [50,100,200]; 

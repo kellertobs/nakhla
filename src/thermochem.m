@@ -44,16 +44,16 @@ advn_C = - advect(M(inz,inx).*cm(inz,inx),Um(inz,:),Wm(:,inx),h,{ADVN,''},[1,2],
          - advect(X(inz,inx).*cx(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);     % solid advection
 
 % major component diffusion
-qCz    = - (kc(1:end-1,:)+kc(2:end,:))./2 .* ddz(c,h);  % z-flux
-qCx    = - (kc(:,1:end-1)+kc(:,2:end))./2 .* ddx(c,h);  % x-flux
-diff_C = (- ddz(qCz(:,inx),h)  ...
-          - ddx(qCx(inz,:),h));
+% qCz    = - (kc(1:end-1,:)+kc(2:end,:))./2 .* ddz(c,h);  % z-flux
+% qCx    = - (kc(:,1:end-1)+kc(:,2:end))./2 .* ddx(c,h);  % x-flux
+% diff_C = (- ddz(qCz(:,inx),h)  ...
+%           - ddx(qCx(inz,:),h));
 
 % boundary layers
 if ~isnan(cwall); bnd_C = (rho(inz,inx).*cwall-C(inz,inx))./tau_a .* bndshape; end
 
 % total rate of change
-dCdt = advn_C + diff_C + bnd_C;                                            
+dCdt = advn_C + bnd_C;                                            
     
 % semi-implicit update of major component density
 C(inz,inx)   = Co(inz,inx) + (theta.*dCdt + (1-theta).*dCdto).*dt;         
@@ -72,16 +72,16 @@ if any([v0;v1;vwall;v(:)]>10*TINY)
              - advect(F(inz,inx).*vf(inz,inx),Uf(inz,:),Wf(:,inx),h,{ADVN,''},[1,2],BCA);     % fluid advection
     
     % volatile component diffusion
-    qVz    = - (kc(1:end-1,:)+kc(2:end,:))./2 .* ddz(v,h);  % z-flux
-    qVx    = - (kc(:,1:end-1)+kc(:,2:end))./2 .* ddx(v,h);  % x-flux
-    diff_V = (- ddz(qVz(:,inx),h)  ...
-              - ddx(qVx(inz,:),h));
+%     qVz    = - (kv(1:end-1,:)+kv(2:end,:))./2 .* ddz(v,h);  % z-flux
+%     qVx    = - (kv(:,1:end-1)+kv(:,2:end))./2 .* ddx(v,h);  % x-flux
+%     diff_V = (- ddz(qVz(:,inx),h)  ...
+%               - ddx(qVx(inz,:),h));
 
     % boundary layers
     if ~isnan(vwall); bnd_V = (rho(inz,inx).*vwall-V(inz,inx))./tau_a .* bndshape; end 
     
     % total rate of change
-    dVdt = advn_V + diff_V + bnd_V;                                                 
+    dVdt = advn_V + bnd_V;                                                 
     
     % semi-implicit update of volatile component density
     V(inz,inx)   = Vo(inz,inx) + (theta.*dVdt + (1-theta).*dVdto).*dt;
@@ -136,13 +136,13 @@ Gx = lambda * Gx + (1-lambda) * (rho(inz,inx).*xq(inz,inx)-X(inz,inx))./max(tau_
 advn_X = - advect(X(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);
 
 % crystallinity diffusion
-qXz    = - (kx(1:end-1,:)+kx(2:end,:))./2 .* ddz(x,h);  % z-flux
-qXx    = - (kx(:,1:end-1)+kx(:,2:end))./2 .* ddx(x,h);  % x-flux
-diff_X = (- ddz(qXz(:,inx),h)  ...
-          - ddx(qXx(inz,:),h));
+% qXz    = - (kx(1:end-1,:)+kx(2:end,:))./2 .* ddz(x,h);  % z-flux
+% qXx    = - (kx(:,1:end-1)+kx(:,2:end))./2 .* ddx(x,h);  % x-flux
+% diff_X = (- ddz(qXz(:,inx),h)  ...
+%           - ddx(qXx(inz,:),h));
 
 % total rate of change
-dXdt   = advn_X + diff_X + Gx;
+dXdt   = advn_X + Gx;
 
 % semi-implicit update of crystal fraction
 X(inz,inx) = Xo(inz,inx) + (theta.*dXdt + (1-theta).*dXdto).*dt;
@@ -163,13 +163,13 @@ if any([v0;v1;vwall;v(:)]>10*TINY)
     advn_F = - advect(F(inz,inx),Uf(inz,:),Wf(:,inx),h,{ADVN,''},[1,2],BCA);
 
     % fluid bubble diffusion
-    qFz    = - (kf(1:end-1,:)+kf(2:end,:))./2 .* ddz(f,h);  % z-flux
-    qFx    = - (kf(:,1:end-1)+kf(:,2:end))./2 .* ddx(f,h);  % x-flux
-    diff_F = (- ddz(qFz(:,inx),h)  ...
-              - ddx(qFx(inz,:),h));
+%     qFz    = - (kf(1:end-1,:)+kf(2:end,:))./2 .* ddz(f,h);  % z-flux
+%     qFx    = - (kf(:,1:end-1)+kf(:,2:end))./2 .* ddx(f,h);  % x-flux
+%     diff_F = (- ddz(qFz(:,inx),h)  ...
+%               - ddx(qFx(inz,:),h));
 
     % total rate of change
-    dFdt   = advn_F + diff_F + Gf;
+    dFdt   = advn_F + Gf;
 
     % semi-implicit update of bubble fraction
     F(inz,inx) = Fo(inz,inx) + (theta.*dFdt + (1-theta).*dFdto).*dt;

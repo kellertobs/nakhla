@@ -2,7 +2,7 @@
 clear; close all;
 
 % load default parameters
-run('./par_default')
+run('../usr/par_default')
 
 % set run parameters
 runID    =  'bnchm_TC_h';       % run identifier

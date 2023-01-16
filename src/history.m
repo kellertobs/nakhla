@@ -52,8 +52,8 @@ for i=1:cal.nc
                + sum(  M(2:end-1,2).*cm_oxd(2:end-1,2,i)/100.*Um(2:end-1,1)*h*1) - sum(M(2:end-1,end-1).*cm_oxd(2:end-1,end-1,i)/100.*Um(2:end-1,end)*h*1);  % [kg/s]
 end
 
-if step>=1; hist.DM(stp) = hist.DM(stp-1) + (theta.*dsumMdt + (1-theta).*dsumMdto).*dt; else; hist.DM(stp) = 0; end  % [kg]
-% if step>=1; hist.DM(stp) = hist.DM(stp-1) +         dsumMdt                       .*dt; else; hist.DM(stp) = 0; end  % [kg]
+% if step>=1; hist.DM(stp) = hist.DM(stp-1) + (theta.*dsumMdt + (1-theta).*dsumMdto).*dt; else; hist.DM(stp) = 0; end  % [kg]
+if step>=1; hist.DM(stp) = hist.DM(stp-1) +         dsumMdt                       .*dt; else; hist.DM(stp) = 0; end  % [kg]
 if step>=1; hist.DS(stp) = hist.DS(stp-1) + (theta.*dsumSdt + (1-theta).*dsumSdto).*dt; else; hist.DS(stp) = 0; end  % [J ]
 if step>=1; hist.DC(stp) = hist.DC(stp-1) + (theta.*dsumCdt + (1-theta).*dsumCdto).*dt; else; hist.DC(stp) = 0; end  % [kg]
 if step>=1; hist.DV(stp) = hist.DV(stp-1) + (theta.*dsumVdt + (1-theta).*dsumVdto).*dt.*any(v(:)>1e-6); else; hist.DV(stp) = 0; end  % [kg]
@@ -217,9 +217,9 @@ hist.Gf(stp,1) = min(min(Gf));
 hist.Gf(stp,2) = mean(mean(Gf));
 hist.Gf(stp,3) = max(max(Gf));
 
-hist.dV(stp,1) = min(min(theta.*Div_V+(1-theta).*Div_Vo));
-hist.dV(stp,2) = mean(mean(theta.*Div_V+(1-theta).*Div_Vo));
-hist.dV(stp,3) = max(max(theta.*Div_V+(1-theta).*Div_Vo));
+hist.dV(stp,1) = min(min(Div_V));
+hist.dV(stp,2) = mean(mean(Div_V));
+hist.dV(stp,3) = max(max(Div_V));
 
 hist.rho(stp,1) = min(min(rho(2:end-1,2:end-1)));
 hist.rho(stp,2) = mean(mean(rho(2:end-1,2:end-1)));

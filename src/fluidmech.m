@@ -55,16 +55,15 @@ IIR = [IIR; ii(:)]; AAR = [AAR; aa(:)];
 ii    = MapW(2:end-1,2:end-1);
  EtaC1 =  etaco(2:end-1,1:end-1);   EtaC2 =  etaco(2:end-1,2:end  );
  EtaP1 =  eta  (2:end-2,2:end-1);   EtaP2 =  eta  (3:end-1,2:end-1);
-ZetaP1 = zeta  (2:end-2,2:end-1);  ZetaP2 = zeta  (3:end-1,2:end-1);
 
 % coefficients multiplying z-velocities W
 %             top          ||         bottom          ||           left            ||          right
 jj1 = MapW(1:end-2,2:end-1); jj2 = MapW(3:end,2:end-1); jj3 = MapW(2:end-1,1:end-2); jj4 = MapW(2:end-1,3:end);
 
-aa = - 2/3*(EtaP1+EtaP2)/h^2 - (ZetaP1+ZetaP2)/h^2 - 1/2*(EtaC1+EtaC2)/h^2;
+aa = - 1/2*(EtaP1+EtaP2)/h^2 - 1/2*(EtaC1+EtaC2)/h^2;
 IIL = [IIL; ii(:)]; JJL = [JJL;  ii(:)];   AAL = [AAL; aa(:)           ];      % W on stencil centre
-IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; (2/3*EtaP1(:)+ZetaP1(:))/h^2];      % W one above
-IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL; (2/3*EtaP2(:)+ZetaP2(:))/h^2];      % W one below
+IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; 1/2*EtaP1(:)/h^2];      % W one above
+IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL; 1/2*EtaP2(:)/h^2];      % W one below
 IIL = [IIL; ii(:)]; JJL = [JJL; jj3(:)];   AAL = [AAL; 1/2*EtaC1(:)/h^2];      % W one to the left
 IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL; 1/2*EtaC2(:)/h^2];      % W one to the right
 
@@ -76,10 +75,10 @@ IIL = [IIL; ii(:)]; JJL = [JJL;  ii(:)];   AAL = [AAL; aa(:)];
 %         top left         ||        bottom left          ||       top right       ||       bottom right
 jj1 = MapU(2:end-2,1:end-1); jj2 = MapU(3:end-1,1:end-1); jj3 = MapU(2:end-2,2:end); jj4 = MapU(3:end-1,2:end);
 
-IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; (1/2*EtaC1(:)-1/3*EtaP1(:)+ZetaP1(:))/h^2];  % U one to the top and left
-IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL;-(1/2*EtaC1(:)-1/3*EtaP2(:)+ZetaP2(:))/h^2];  % U one to the bottom and left
-IIL = [IIL; ii(:)]; JJL = [JJL; jj3(:)];   AAL = [AAL;-(1/2*EtaC2(:)-1/3*EtaP1(:)+ZetaP1(:))/h^2];  % U one to the top and right
-IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL; (1/2*EtaC2(:)-1/3*EtaP2(:)+ZetaP2(:))/h^2];  % U one to the bottom and right
+IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; (1/2*EtaC1(:)-1/2*EtaP1(:))/h^2];  % U one to the top and left
+IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL;-(1/2*EtaC1(:)-1/2*EtaP2(:))/h^2];  % U one to the bottom and left
+IIL = [IIL; ii(:)]; JJL = [JJL; jj3(:)];   AAL = [AAL;-(1/2*EtaC2(:)-1/2*EtaP1(:))/h^2];  % U one to the top and right
+IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL; (1/2*EtaC2(:)-1/2*EtaP2(:))/h^2];  % U one to the bottom and right
 
 
 % z-RHS vector
@@ -124,16 +123,15 @@ IIR = [IIR; ii(:)]; AAR = [AAR; aa(:)];
 ii    = MapU(2:end-1,2:end-1);
  EtaC1 =  etaco(1:end-1,2:end-1);   EtaC2 =  etaco(2:end  ,2:end-1);
  EtaP1 =  eta  (2:end-1,2:end-2);   EtaP2 =  eta  (2:end-1,3:end-1);
-ZetaP1 = zeta  (2:end-1,2:end-2);  ZetaP2 = zeta  (2:end-1,3:end-1);
 
 % coefficients multiplying x-velocities U
 %            left          ||          right          ||           top             ||          bottom
 jj1 = MapU(2:end-1,1:end-2); jj2 = MapU(2:end-1,3:end); jj3 = MapU(1:end-2,2:end-1); jj4 = MapU(3:end,2:end-1);
 
-aa = - 2/3*(EtaP1+EtaP2)/h^2 - (ZetaP1+ZetaP2)/h^2 - 1/2*(EtaC1+EtaC2)/h^2;
+aa = - 1/2*(EtaP1+EtaP2)/h^2 - 1/2*(EtaC1+EtaC2)/h^2;
 IIL = [IIL; ii(:)]; JJL = [JJL;  ii(:)];   AAL = [AAL; aa(:)           ];      % U on stencil centre
-IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; (2/3*EtaP1(:)+ZetaP1(:))/h^2];      % U one to the left
-IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL; (2/3*EtaP2(:)+ZetaP2(:))/h^2];      % U one to the right
+IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; 1/2*EtaP1(:)/h^2];      % U one to the left
+IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL; 1/2*EtaP2(:)/h^2];      % U one to the right
 IIL = [IIL; ii(:)]; JJL = [JJL; jj3(:)];   AAL = [AAL; 1/2*EtaC1(:)/h^2];      % U one above
 IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL; 1/2*EtaC2(:)/h^2];      % U one below
 
@@ -141,10 +139,10 @@ IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL; 1/2*EtaC2(:)/h^2];      %
 %         top left         ||        top right          ||       bottom left       ||       bottom right
 jj1 = MapW(1:end-1,2:end-2); jj2 = MapW(1:end-1,3:end-1); jj3 = MapW(2:end,2:end-2); jj4 = MapW(2:end,3:end-1);
 
-IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; (1/2*EtaC1(:)-1/3*EtaP1(:)+ZetaP1(:))/h^2];  % W one to the top and left
-IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL;-(1/2*EtaC1(:)-1/3*EtaP2(:)+ZetaP2(:))/h^2];  % W one to the top and right
-IIL = [IIL; ii(:)]; JJL = [JJL; jj3(:)];   AAL = [AAL;-(1/2*EtaC2(:)-1/3*EtaP1(:)+ZetaP1(:))/h^2];  % W one to the bottom and left
-IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL; (1/2*EtaC2(:)-1/3*EtaP2(:)+ZetaP2(:))/h^2];  % W one to the bottom and right
+IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; (1/2*EtaC1(:)-1/2*EtaP1(:))/h^2];  % W one to the top and left
+IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL;-(1/2*EtaC1(:)-1/2*EtaP2(:))/h^2];  % W one to the top and right
+IIL = [IIL; ii(:)]; JJL = [JJL; jj3(:)];   AAL = [AAL;-(1/2*EtaC2(:)-1/2*EtaP1(:))/h^2];  % W one to the bottom and left
+IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL; (1/2*EtaC2(:)-1/2*EtaP2(:))/h^2];  % W one to the bottom and right
 
 
 % x-RHS vector
@@ -314,13 +312,22 @@ if ~bnchm
     % get residual of fluid mechanics equations from iterative update
     resnorm_VP = norm(SOL - SOLi,2)./(norm(SOL,2)+TINY);
 
+    qxz    = - (kx(1:end-1,:)+kx(2:end,:))./2 .* ddz(chi,h);  % z-flux
+    qxx    = - (kx(:,1:end-1)+kx(:,2:end))./2 .* ddx(chi,h);  % x-flux
+
+    qfz    = - (kf(1:end-1,:)+kf(2:end,:))./2 .* ddz(phi,h);  % z-flux
+    qfx    = - (kf(:,1:end-1)+kf(:,2:end))./2 .* ddx(phi,h);  % x-flux
+
+    qmz    = -qxz-qfz;
+    qmx    = -qxx-qfx;
+
     % update phase velocities
-    Wf   = W + wf;                                                             % mvp z-velocity
-    Uf   = U + 0.;                                                             % mvp x-velocity
-    Wx   = W + wx;                                                             % xtl z-velocity
-    Ux   = U + 0.;                                                             % xtl x-velocity
-    Wm   = W + wm;                                                             % mlt z-velocity
-    Um   = U + 0.;                                                             % mlt x-velocity
+    Wf   = W + wf + qfz./((phi(1:end-1,:)+phi(2:end,:))./2);               % mvp z-velocity
+    Uf   = U + 0. + qfx./((phi(:,1:end-1)+phi(:,2:end))./2);               % mvp x-velocity
+    Wx   = W + wx + qxz./((chi(1:end-1,:)+chi(2:end,:))./2);               % xtl z-velocity
+    Ux   = U + 0. + qxx./((chi(:,1:end-1)+chi(:,2:end))./2);               % xtl x-velocity
+    Wm   = W + wm + qmz./((mu (1:end-1,:)+mu (2:end,:))./2);               % mlt z-velocity
+    Um   = U + 0. + qmx./((mu (:,1:end-1)+mu (:,2:end))./2);               % mlt x-velocity
 
     % update mixture volume flux
     Wbar = (mu (1:end-1,:)+mu (2:end,:))/2 .* Wm ...
@@ -336,9 +343,9 @@ if ~bnchm
 
     
     %% update time step
-    dtk = min((h/2)^2./max(kT(:)./rho(:)./cP));                                % diffusive time step size
-    dta = CFL*min(h/2/max(abs([Ux(:);Wx(:);Uf(:);Wf(:);Um(:);Wm(:)]+1e-16)));  % advective time step size
-    dt  = min([2*dto,dtmax,min(dtk,dta)]);                                     % physical time step size
+    dtk = (h/2)^2./max(kT(:)./rho(:)./cP)/2;                               % diffusive time step size
+    dta = CFL*h/2/max(abs([Ux(:);Wx(:);Uf(:);Wf(:);Um(:);Wm(:)]+1e-16));   % advective time step size
+    dt  = min([2*dto,dtmax,min(dtk,dta)]);                                 % physical time step size
 end
 
 end
