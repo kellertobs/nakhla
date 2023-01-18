@@ -231,8 +231,8 @@ for i = 1:cal.nir
     if any(bndinit(:)) && ~isnan(irwall(i)); ir(:,:,i)  = ir(:,:,i) + (irwall(i)-ir(:,:,i)).*bndinit; end; irin = ir;
 end
 
-U   =  zeros(size((XX(:,1:end-1)+XX(:,2:end))));  Ui = U;  res_U = 0.*U;
-W   =  zeros(size((XX(1:end-1,:)+XX(2:end,:))));  Wi = W;  res_W = 0.*W; wf = 0.*W; wc = 0.*W;
+U   =  zeros(size((XX(:,1:end-1)+XX(:,2:end))));  UBG = U; Ui = U;  res_U = 0.*U;
+W   =  zeros(size((XX(1:end-1,:)+XX(2:end,:))));  WBG = W; Wi = W;  res_W = 0.*W; wf = 0.*W; wc = 0.*W;
 P   =  0.*Tp;  Pi = P;  res_P = 0.*P;  meanQ = 0;  Vel = 0.*P;
 SOL = [W(:);U(:);P(:)];
 

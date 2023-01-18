@@ -1,6 +1,3 @@
-% prep workspace
-clear all; close all;
-
 % set run parameters
 runID    =  'default';           % run identifier
 opdir    =  '../out';            % output directory

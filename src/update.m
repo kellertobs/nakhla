@@ -80,7 +80,7 @@ wf(end,:)     = min(1,1-bot+fin ).*wf(end,:);
 wf(:,[1 end]) = -sds*wf(:,[2 end-1]);
 
 % diffusion parameters
-kW  = Vel*h/100;                                                           % convection fluctuation diffusivity
+kW  = Vel/10*h/10;                                                         % convection fluctuation diffusivity
 kwx = abs((rhox-rho).*g0.*Ksgr_x*dx*10);                                   % segregation fluctuation diffusivity
 kwf = abs((rhof-rho).*g0.*Ksgr_f*df*10);                                   % segregation fluctuation diffusivity
 kx  = chi.*(kwx + kW + mink);                                              % solid fraction diffusion 
@@ -135,17 +135,15 @@ end
 
 % update volume source
 if step>0
-    Div_rhoV =  + advect(M(inz,inx),Um(inz,:)-U(inz,:),Wm(:,inx)-W(:,inx),h,{ADVN,''},[1,2],BCA) ...
-                + advect(X(inz,inx),Ux(inz,:)-U(inz,:),Wx(:,inx)-W(:,inx),h,{ADVN,''},[1,2],BCA) ...
-                + advect(F(inz,inx),Uf(inz,:)-U(inz,:),Wf(:,inx)-W(:,inx),h,{ADVN,''},[1,2],BCA) ...
-                + advect(rho(inz,inx),        U(inz,:),          W(:,inx),h,{ADVN,'vdf'},[1,2],BCA);
-    VolSrc = -((rho(inz,inx)-rhoo(inz,inx))./dt + Div_rhoV)./rho(inz,inx); 
-%     VolSrc = -((rho(inz,inx)-rhoo(inz,inx))./dt + theta.*Div_rhoV + (1-theta).*(Div_rhoVo + rhoo(inz,inx).*Div_Vo(inz,inx)))./rho(inz,inx)./theta;
-%     VolSrc = -((rho(inz,inx)-rhoo(inz,inx))./dt + theta.*(Div_rhoV - rho(inz,inx).*Div_V(inz,inx)) + (1-theta).*Div_rhoVo)./rho(inz,inx)./theta;
+    Div_rhoV = + advect(M(inz,inx),Um(inz,:),Wm(:,inx),h,{ADVN,''},[1,2],BCA) ...  % melt  advection
+               + advect(X(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA) ...  % solid advection
+               + advect(F(inz,inx),Uf(inz,:),Wf(:,inx),h,{ADVN,''},[1,2],BCA);     % fluid advection
+    F_DivV   = (rho(inz,inx)-rhoo(inz,inx))./dt + theta.*Div_rhoV + (1-theta).*Div_rhoVo; % get residual of mixture mass conservation
+    VolSrc   = Div_V(inz,inx) - 0.95*F_DivV./rho(inz,inx);  % correct volume source term by scaled residual
 end
 
-UBG    = - (1-sds)*mean(mean(VolSrc))./2 .* (L/2-XXu);
-WBG    = - (1+sds)*mean(mean(VolSrc))./2 .* (D/2-ZZw);
+UBG    = - (1-sds)*mean(VolSrc,'all')./2 .* (L/2-XXu);
+WBG    = - (1+sds)*mean(VolSrc,'all')./2 .* (D/2-ZZw);
 
 UDtime = UDtime + toc;
 end

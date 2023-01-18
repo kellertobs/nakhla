@@ -46,10 +46,10 @@ dx       =  1e-3;                % crystal size [m]
 df       =  1e-3;                % bubble size [m]
 
 % set numerical model parameters
-CFL      =  0.25;                % (physical) time stepping courant number (multiplies stable step) [0,1]
+CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
-rtol     =  1e-6;                % outer its relative tolerance
-atol     =  1e-9;                % outer its absolute tolerance
+rtol     =  1e-4;                % outer its relative tolerance
+atol     =  1e-7;                % outer its absolute tolerance
 maxit    =  50;                  % maximum outer its
 lambda   =  0.50;                % iterative lag parameter equilibration
 mink     =  1e-8;                % minimum diffusivity for phase, component fractions
