@@ -18,12 +18,6 @@ for i = 1:cal.nte
     adv_TE(:,:,i) = - advect(M(inz,inx).*tem(inz,inx,i),Um(inz,:),Wm(:,inx),h,{ADVN,''},[1,2],BCA) ...
                     - advect(X(inz,inx).*tex(inz,inx,i),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);
 
-    % trace element diffusion
-%     qz    = - (kc(1:end-1,:)+kc(2:end,:))./2 .* ddz(te(:,:,i),h);  % z-flux
-%     qx    = - (kc(:,1:end-1)+kc(:,2:end))./2 .* ddx(te(:,:,i),h);  % x-flux
-%     diff_TE = (- ddz(qz(:,inx),h)  ...
-%                - ddx(qx(inz,:),h));
-
     % get trace element assimilation
     if ~isnan(tewall(i)); bnd_TE(:,:,i) = bnd_TE(:,:,i) + (rho(inz,inx).*tewall(i)-TE(inz,inx,i))./tau_a .* bndshape; end
 end
@@ -51,12 +45,6 @@ for i = 1:cal.nir
     % get isotope ratio advection
     adv_IR(:,:,i) = - advect(M(inz,inx).*irm(inz,inx,i),Um(inz,:),Wm(:,inx),h,{ADVN,''},[1,2],BCA) ...
                     - advect(X(inz,inx).*irx(inz,inx,i),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);
-
-    % isotope ratio diffusion
-%     qz    = - (kc(1:end-1,:)+kc(2:end,:))./2 .* ddz(ir(:,:,i),h);  % z-flux
-%     qx    = - (kc(:,1:end-1)+kc(:,2:end))./2 .* ddx(ir(:,:,i),h);  % x-flux
-%     diff_IR = (- ddz(qz(:,inx),h)  ...
-%                - ddx(qx(inz,:),h));
 
     % get isotope ratio assimilation
     if ~isnan(irwall(i)); bnd_IR(:,:,i) = bnd_IR(:,:,i) + (rho(inz,inx).*irwall(i)-IR(inz,inx,i))./tau_a .* bndshape; end
