@@ -21,8 +21,8 @@ h        =  D/(N-2);             % grid spacing (equal in both dimensions, do no
 % set model timing parameters
 Nt       =  2000;                % number of time steps to take
 tend     =  12*hr;               % end time for simulation [s]
-dt       =  48;                  % initial time step [s]
-dtmax    =  48;                  % maximum time step [s]
+dt       =  36;                  % initial time step [s]
+dtmax    =  36;                  % maximum time step [s]
 
 % set initial thermo-chemical state
 T0       =  1325;                % temperature top layer [deg C]
@@ -43,6 +43,7 @@ Dsx      = -300;                 % entropy change of crystallisation [J/kg]
 Dsf      =  400;                 % entropy change of exsolution [J/kg]
 
 % set numerical model parameters
+theta    =  1/2;                 % time stepping mode (0 explicit Euler, 1/2 Crank-Nicolson, 1 implicit Euler)
 CFL      =  0.75;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
 rtol     =  1e-6;                % outer its relative tolerance

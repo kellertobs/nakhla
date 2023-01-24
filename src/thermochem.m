@@ -118,7 +118,7 @@ EQtime = EQtime + toc(eqtime);
 %***  update crystal fraction
 
 % crystallisation rate
-Gx = lambda * Gx + (1-lambda) * (rho(inz,inx).*xq(inz,inx)-X(inz,inx))./max(tau_r,2*dt);
+Gx = lambda * Gx + (1-lambda) * (xq(inz,inx).*rho(inz,inx)-X(inz,inx))./max(tau_r,3*dt);
 
 % crystallinity advection
 advn_X = - advect(X(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);
@@ -139,7 +139,7 @@ X(:,[1 end]) = X(:,[2 end-1]);
 if any([v0;v1;vwall;v(:)]>10*TINY)
 
     % fluid exsolution rate
-    Gf = lambda * Gf + (1-lambda) * (rho(inz,inx).*fq(inz,inx)-F(inz,inx))./max(tau_r,2*dt);
+    Gf = lambda * Gf + (1-lambda) * (fq(inz,inx).*rho(inz,inx)-F(inz,inx))./max(tau_r,3*dt);
 
     % fluid bubble advection
     advn_F = - advect(F(inz,inx),Uf(inz,:),Wf(:,inx),h,{ADVN,''},[1,2],BCA);
@@ -184,11 +184,11 @@ vf = v./max(TINY,m./Kf + f); vf(m==1) = vfq(m==1);
 %% *****  UPDATE TC RESIDUALS  ********************************************
 
 % get residual of thermochemical equations from iterative update
-resnorm_TC = norm( S(inz,inx) - Si(inz,inx),2)./(norm(S(inz,inx),2)+TINY) ...
-           + norm( C(inz,inx) - Ci(inz,inx),2)./(norm(C(inz,inx),2)+TINY) ...
-           + norm( V(inz,inx) - Vi(inz,inx),2)./(norm(V(inz,inx),2)+TINY) ...
-           + norm((X(inz,inx) - Xi(inz,inx)).*(x(inz,inx)>10*TINY).*(m(inz,inx)>10*TINY),2)./(norm(X(inz,inx),2)+TINY) ...
-           + norm((F(inz,inx) - Fi(inz,inx)).*(f(inz,inx)>10*TINY).*(m(inz,inx)>10*TINY),2)./(norm(F(inz,inx),2)+TINY);
+resnorm_TC = norm( S(inz,inx) - Si(inz,inx),'fro')./(norm(S(inz,inx),'fro')+TINY) ...
+           + norm( C(inz,inx) - Ci(inz,inx),'fro')./(norm(C(inz,inx),'fro')+TINY) ...
+           + norm( V(inz,inx) - Vi(inz,inx),'fro')./(norm(V(inz,inx),'fro')+TINY) ...
+           + norm((X(inz,inx) - Xi(inz,inx)).*(x(inz,inx)>10*TINY).*(m(inz,inx)>10*TINY),'fro')./(norm(X(inz,inx),'fro')+TINY) ...
+           + norm((F(inz,inx) - Fi(inz,inx)).*(f(inz,inx)>10*TINY).*(m(inz,inx)>10*TINY),'fro')./(norm(F(inz,inx),'fro')+TINY);
 
 TCtime = TCtime + toc - toc(eqtime);
 

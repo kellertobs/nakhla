@@ -6,12 +6,12 @@ TINY = 1e-16;
 
 % calibration run options
 runID     = 'test';              % run ID for output files; [system name_wt.% SiO2_wt.% H2O] 
-holdfig   = 1;                   % set to 1 to hold figures, to 0 for new figures
+holdfig   = 0;                   % set to 1 to hold figures, to 0 for new figures
 linestyle = '-';                 % set line style for plots
 save_plot = 0;                   % turn on (1) to save output file in /out directory
 
 % set phase diagram parameters
-calID    =  'morb';             % phase diagram calibration
+calID    =  'default';           % phase diagram calibration
 
 % set model buoyancy parameters
 dx       =  1e-3;                % crystal size [m]
@@ -19,9 +19,9 @@ df       =  1e-3;                % bubble size [m]
 g0       =  10.;                 % gravity [m/s2]
 
 % set ranges for control variables T, c, v, P
-T = linspace(1400,700,400).';    % temperature range [degC]
-c = linspace(0.51,0.51,400).';   % major component range [wt SiO2]
-v = linspace(0.02,0.02,400).';   % volatile component range [wt H2O]
+T = linspace(1250,850,400).';    % temperature range [degC]
+c = linspace(0.43,0.70,400).';   % major component range [wt SiO2]
+v = linspace(0.00,0.00,400).';   % volatile component range [wt H2O]
 P = linspace(125,125,400).'*1e6; % pressure range [Pa]
 
 % equilibrium phase fractions and compositions

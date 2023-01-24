@@ -12,7 +12,7 @@ cal.oxd    = [  42.7    0.0    0.0    0.0   57.3    0.0    0.0    0.0      % for
 
 cal.cmpStr = {'for','fay','opx','cpx','ant','alb','kfs','qtz'};
 cal.cmp    = [  97.5    2.5    0.0    0.0    0.0    0.0    0.0    0.0      % cphs0 => dunite
-                 8.0    2.0   17.0   28.0   37.0    8.0    0.0    0.0      % perCx => pyroxenite
+                 8.0    1.5   17.0   28.0   37.5    8.0    0.0    0.0      % perCx => pyroxenite
                  3.0    1.0   11.0   37.0   27.0   19.5    1.0    0.5      % perCm => basalt
                  0.0    0.0    2.0   11.0    6.0   12.0   31.0   38.0];    % cphs1 => rhyolite
 
@@ -26,7 +26,7 @@ cal.cphs0    =  cal.cmp_oxd(1,1)/100; % phase diagram lower bound composition [w
 cal.cphs1    =  cal.cmp_oxd(4,1)/100; % phase diagram upper bound composition [wt SiO2]
 cal.Tphs0    =  850;                  % phase diagram lower bound temperature [degC]
 cal.Tphs1    =  1850;                 % phase diagram upper bound temperature [degC]
-cal.PhDg     =  [8.0,4.0,1.2,1.2];    % phase diagram curvature factor (> 1)
+cal.PhDg     =  [8.0,3.5,1.3,1.3];    % phase diagram curvature factor (> 1)
 cal.perCm    =  cal.cmp_oxd(3,1)/100; % peritectic liquidus composition [wt SiO2]
 cal.perCx    =  cal.cmp_oxd(2,1)/100; % peritectic solidus  composition [wt SiO2]
 cal.perT     =  1125;                 % peritectic temperature [degC]
@@ -53,9 +53,9 @@ cal.bP    =  1e-8;                                                         % flu
 cal.Bphi    = 2.0;              % Einstein-Roscoe powerlaw coefficient bubbles
 cal.Bchi    = 2.0;              % Einstein-Roscoe powerlaw coefficient crystals
 cal.chi_pck = 0.60;             % rheologically critical crystal fraction
-cal.gamma   = 3.00;             % step-function steepness coefficient
-cal.delta   = 30;               % solid viscosity melt-weakening slope
-cal.xi      = 3.2e-4;           % solid viscosity level
+cal.gamma   = 2.50;             % step-function steepness coefficient
+cal.delta   = 27;               % solid viscosity melt-weakening slope
+cal.xi      = 4.5e-4;           % solid viscosity level
 cal.etaf0   = 0.1;              % fluid viscosity constant
 
 % specify segregation coefficient parameters

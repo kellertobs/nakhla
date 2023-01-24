@@ -15,7 +15,7 @@ plot_cv  =  0;                   % switch on to live plot iterative convergence
 % set model domain parameters
 D        =  10;                  % chamber depth [m]
 L        =  10;                  % chamber width [m]
-N        =  100 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
+N        =  150 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
 h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
@@ -34,7 +34,7 @@ te0      =  [1,1,1,1];           % trace elements top layer [wt ppm]
 ir0      =  [1, 1];              % isotope ratios top layer [delta]
 
 % set thermo-chemical boundary parameters
-bnd_w    =  h;                % boundary layer width [m]
+bnd_w    =  0.05;                % boundary layer width [m]
 tau_T    =  12*hr;               % wall cooling/assimilation time [s]
 Twall    =  300;                 % wall temperature [degC] (nan = insulating)
 
@@ -48,13 +48,14 @@ dx       =  1e-3;                % crystal size [m]
 df       =  1e-3;                % bubble size [m]
 
 % set numerical model parameters
-CFL      =  0.75;                % (physical) time stepping courant number (multiplies stable step) [0,1]
+theta    =  1/2;                 % time stepping mode (0 explicit Euler, 1/2 Crank-Nicolson, 1 implicit Euler)
+CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
-rtol     =  1e-4;                % outer its relative tolerance
-atol     =  1e-7;                % outer its absolute tolerance
+rtol     =  1e-5;                % outer its relative tolerance
+atol     =  1e-8;                % outer its absolute tolerance
 maxit    =  50;                  % maximum outer its
 lambda   =  0.50;                % iterative lag parameter equilibration
-mink     =  1e-8;                % minimum diffusivity for phase, component fractions
+mink     =  1e-9;                % minimum diffusivity for phase, component fractions
 
 
 %*****  RUN NAKHLA MODEL  *************************************************

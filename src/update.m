@@ -1,32 +1,77 @@
 %%*****  UPDATE PARAMETERS & AUXILIARY FIELDS  ****************************
 tic;
 
-% update oxide compositions
+% update mineral-like component compositions
 wt0 = (cal.perCm-cm)./(cal.perCm-cal.cphs0);
 wt1 = (cal.cphs1-cm)./(cal.cphs1-cal.perCm);
-cm_oxd = reshape((wt0(:) .* cal.cmp_oxd(1,:) + (1-wt0(:)) .* cal.cmp_oxd(3,:)) .* (cm(:)<=cal.perCm) ...
-               + (wt1(:) .* cal.cmp_oxd(3,:) + (1-wt1(:)) .* cal.cmp_oxd(4,:)) .* (cm(:)> cal.perCm) ...
-                 ,Nz,Nx,cal.nc);
+cm_cmp1 = reshape((wt0(:) .* cal.cmp(1,:) + (1-wt0(:)) .* cal.cmp(3,:)),Nz,Nx,cal.nc);
+cm_cmp2 = reshape((wt1(:) .* cal.cmp(3,:) + (1-wt1(:)) .* cal.cmp(4,:)),Nz,Nx,cal.nc);
+
+wt0 = (cal.perCm-[cal.cphs0,cal.cphs1])./(cal.perCm-cal.cphs0);
+wt1 = (cal.cphs1-[cal.cphs0,cal.cphs1])./(cal.cphs1-cal.perCm);
+mincmp = zeros(1,1,cal.nc);
+maxcmp = zeros(1,1,cal.nc);
+mincmp(1,:,:) = min(min((wt0(:) .* cal.cmp(1,:) + (1-wt0(:)) .* cal.cmp(3,:)),(wt1(:) .* cal.cmp(3,:) + (1-wt1(:)) .* cal.cmp(4,:))));
+maxcmp(1,:,:) = max(max((wt0(:) .* cal.cmp(1,:) + (1-wt0(:)) .* cal.cmp(3,:)),(wt1(:) .* cal.cmp(3,:) + (1-wt1(:)) .* cal.cmp(4,:))));
+cm_cmp1 = (cm_cmp1-mincmp)./(maxcmp-mincmp);
+cm_cmp2 = (cm_cmp2-mincmp)./(maxcmp-mincmp);
+
+a = 200;
+b = 0.05;
+ind1 = repmat(cm,1,1,cal.nc)<=cal.perCm-b;
+ind2 = repmat(cm,1,1,cal.nc)> cal.perCm+b;
+ind3 = repmat(cm,1,1,cal.nc)< cal.perCm+b & cm>=cal.perCm-b;
+
+cm_cmp = zeros(size(cm_cmp1));
+cm_cmp(ind1)  =  cm_cmp1(ind1);
+cm_cmp(ind2)  =  cm_cmp2(ind2);
+scl = ((cal.cmp(4,:)-cal.cmp(3,:))./(cal.cphs1-cal.perCm)./100 - (cal.cmp(3,:)-cal.cmp(1,:))./(cal.perCm-cal.cphs0)./100);
+scl = reshape(sign(scl).*(cal.cmp(2,:)-squeeze(mincmp).')./(squeeze(maxcmp).'-squeeze(mincmp).').*ones(Nz*Nx,cal.nc),Nz,Nx,cal.nc);
+cm_cmp(ind3)  = (cm_cmp1(ind3).^(scl(ind3)*a)+cm_cmp2(ind3).^(scl(ind3)*a)).^(1./(scl(ind3)*a));
+cm_cmp = mincmp + cm_cmp.*(maxcmp-mincmp);
 
 wt0 = (cal.perCx-cx)./(cal.perCx-cal.cphs0);
 wt1 = (cal.cphs1-cx)./(cal.cphs1-cal.perCx);
-cx_oxd = reshape((wt0(:) .* cal.cmp_oxd(1,:) + (1-wt0(:)) .* cal.cmp_oxd(2,:)) .* (cx(:)<=cal.perCx) ...
-               + (wt1(:) .* cal.cmp_oxd(2,:) + (1-wt1(:)) .* cal.cmp_oxd(4,:)) .* (cx(:)> cal.perCx) ...
-                 ,Nz,Nx,cal.nc);
+cx_cmp1 = reshape((wt0(:) .* cal.cmp(1,:) + (1-wt0(:)) .* cal.cmp(2,:)),Nz,Nx,cal.nc);
+cx_cmp2 = reshape((wt1(:) .* cal.cmp(2,:) + (1-wt1(:)) .* cal.cmp(4,:)),Nz,Nx,cal.nc);
 
+wt0 = (cal.perCx-[cal.cphs0,cal.cphs1])./(cal.perCx-cal.cphs0);
+wt1 = (cal.cphs1-[cal.cphs0,cal.cphs1])./(cal.cphs1-cal.perCx);
+mincmp = zeros(1,1,cal.nc);
+maxcmp = zeros(1,1,cal.nc);
+mincmp(1,:,:) = min(min((wt0(:) .* cal.cmp(1,:) + (1-wt0(:)) .* cal.cmp(2,:)),(wt1(:) .* cal.cmp(2,:) + (1-wt1(:)) .* cal.cmp(4,:))));
+maxcmp(1,:,:) = max(max((wt0(:) .* cal.cmp(1,:) + (1-wt0(:)) .* cal.cmp(2,:)),(wt1(:) .* cal.cmp(2,:) + (1-wt1(:)) .* cal.cmp(4,:))));
+cx_cmp1 = (cx_cmp1-mincmp)./(maxcmp-mincmp);
+cx_cmp2 = (cx_cmp2-mincmp)./(maxcmp-mincmp);
+
+a = 200;
+b = 0.05;
+ind1 = repmat(cx,1,1,cal.nc)<=cal.perCx-b;
+ind2 = repmat(cx,1,1,cal.nc)> cal.perCx+b;
+ind3 = repmat(cx,1,1,cal.nc)< cal.perCx+b & cx>=cal.perCx-b;
+
+cx_cmp = zeros(size(cx_cmp1));
+cx_cmp(ind1)  =  cx_cmp1(ind1);
+cx_cmp(ind2)  =  cx_cmp2(ind2);
+scl = ((cal.cmp(4,:)-cal.cmp(2,:))./(cal.cphs1-cal.perCx)./100 - (cal.cmp(2,:)-cal.cmp(1,:))./(cal.perCx-cal.cphs0)./100);
+scl = reshape(sign(scl).*(cal.cmp(2,:)-squeeze(mincmp).')./(squeeze(maxcmp).'-squeeze(mincmp).').*ones(Nz*Nx,cal.nc),Nz,Nx,cal.nc);
+cx_cmp(ind3)  = (cx_cmp1(ind3).^(scl(ind3)*a)+cx_cmp2(ind3).^(scl(ind3)*a)).^(1./(scl(ind3)*a));
+cx_cmp = mincmp + cx_cmp.*(maxcmp-mincmp);
+
+c_cmp = (m.*cm_cmp + x.*cx_cmp)./(1-f);
+
+% update oxide compositions
+cm_oxd = reshape(reshape(cm_cmp,Nz*Nx,cal.nc)*cal.oxd/100,Nz,Nx,cal.nc);
+cx_oxd = reshape(reshape(cx_cmp,Nz*Nx,cal.nc)*cal.oxd/100,Nz,Nx,cal.nc);
 c_oxd = (m.*cm_oxd + x.*cx_oxd)./(1-f);
 
-cm_cmp = reshape(reshape(cm_oxd,Nz*Nx,cal.nc)/cal.oxd*100,Nz,Nx,cal.nc);
-cx_cmp = reshape(reshape(cx_oxd,Nz*Nx,cal.nc)/cal.oxd*100,Nz,Nx,cal.nc);
- c_cmp = reshape(reshape( c_oxd,Nz*Nx,cal.nc)/cal.oxd*100,Nz,Nx,cal.nc);
-
 % update phase densities
-rhom = squeeze(sum(permute(cm_cmp/100,[3,1,2])./cal.rhom0.')).^-1 .* (1 - cal.aT.*(T-cal.perT-273.15) - cal.gH.*vm); if size(rhom,2)~=size(T,2); rhom = rhom(1,:).'; end
-rhox = squeeze(sum(permute(cx_cmp/100,[3,1,2])./cal.rhox0.')).^-1 .* (1 - cal.aT.*(T-cal.perT-273.15)             ); if size(rhox,2)~=size(T,2); rhox = rhox(1,:).'; end
-rhof = cal.rhof0 .* (1 - cal.aT.*(T-cal.perT-273.15) + cal.bP.*(Pt-Ptop ));
+rhom = lambda.*rhom + (1-lambda).*squeeze(sum(permute(cm_cmp/100,[3,1,2])./cal.rhom0.')).^-1 .* (1 - cal.aT.*(T-cal.perT-273.15) - cal.gH.*vm); if size(rhom,2)~=size(T,2); rhom = rhom(1,:).'; end
+rhox = lambda.*rhox + (1-lambda).*squeeze(sum(permute(cx_cmp/100,[3,1,2])./cal.rhox0.')).^-1 .* (1 - cal.aT.*(T-cal.perT-273.15)             ); if size(rhox,2)~=size(T,2); rhox = rhox(1,:).'; end
+rhof = lambda.*rhof + (1-lambda).*cal.rhof0 .* (1 - cal.aT.*(T-cal.perT-273.15) + cal.bP.*(Pt-Ptop ));
 
 % convert weight to volume fraction, update bulk density
-rho   = 1./(m./rhom + x./rhox + f./rhof);
+rho    = 1./(m./rhom + x./rhox + f./rhof);
 
 rhofz = (rho(1:end-1,:)+rho(2:end,:))/2;
 rhofx = (rho(:,1:end-1)+rho(:,2:end))/2;
@@ -85,7 +130,7 @@ kwx = abs((rhox-rho).*g0.*Ksgr_x*dx*10);                                   % seg
 kwf = abs((rhof-rho).*g0.*Ksgr_f*df*10);                                   % segregation fluctuation diffusivity
 kx  = chi.*(kwx + kW + mink);                                              % solid fraction diffusion 
 kf  = phi.*(kwf + kW + mink);                                              % fluid fraction diffusion 
-kT  = kT0 + (f.*kwf + x.*kwx + kW + mink).*rho.*cP;                        % heat diffusion
+kT  = kT0 + (phi.*kwf + chi.*kwx + kW + mink).*rho.*cP;                    % heat diffusion
 ks  = kT./T;                                                               % entropy diffusion
 
 % update velocity divergence
@@ -134,16 +179,16 @@ else
 end
 
 % update volume source
-if step>0
+if step>0 && iter>2
     Div_rhoV = + advect(M(inz,inx),Um(inz,:),Wm(:,inx),h,{ADVN,''},[1,2],BCA) ...  % melt  advection
-               + advect(X(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA) ...  % solid advection
+               + advect(X(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA) ...  % xtal  advection
                + advect(F(inz,inx),Uf(inz,:),Wf(:,inx),h,{ADVN,''},[1,2],BCA);     % fluid advection
-    F_DivV   = (rho(inz,inx)-rhoo(inz,inx))./dt + theta.*Div_rhoV + (1-theta).*Div_rhoVo; % get residual of mixture mass conservation
-    VolSrc   = Div_V(inz,inx) - 0.95*F_DivV./rho(inz,inx);  % correct volume source term by scaled residual
+    F_DivV   = (rho(inz,inx)-rhoo(inz,inx))./dt + theta.*Div_rhoV + (1-theta).*Div_rhoVo;  % get residual of mixture mass conservation
+    VolSrc   = Div_V(inz,inx) - F_DivV./rho(inz,inx);% - min(1,norm(F_DivV)./norm(Div_V+1e-12)).*(Div_V(inz,inx)-Div_Vo(inz,inx));  % correct volume source term by scaled residual
 end
 
-UBG    = - (1-sds)*mean(VolSrc,'all')./2 .* (L/2-XXu);
-WBG    = - (1+sds)*mean(VolSrc,'all')./2 .* (D/2-ZZw);
+UBG    = - 1*mean(VolSrc,'all')./2 .* (L/2-XXu);
+WBG    = - 1*mean(VolSrc,'all')./2 .* (D/2-ZZw);
 
 UDtime = UDtime + toc;
 end

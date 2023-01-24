@@ -242,22 +242,24 @@ Wx  = W;  Ux  = U;
 Wm  = W;  Um  = U;
 
 eIIref =  1e-6;  
-Div_V  =  0.*P;  Div_Vo = 0;  Div_rhoV = 0.*P(inz,inx);  Div_rhoVo = Div_rhoV;
+Div_V  =  0.*P;  Div_Vi = 0.*P(inz,inx);  Div_rhoV = 0.*P(inz,inx);  Div_rhoVo = Div_rhoV;
 exx    =  0.*P;  ezz = 0.*P;  exz = zeros(Nz-1,Nx-1);  eII = 0.*P;  
 txx    =  0.*P;  tzz = 0.*P;  txz = zeros(Nz-1,Nx-1);  tII = 0.*P; 
 VolSrc =  0.*P(inz,inx);  MassErr = 0;  drhodt = 0.*P;  drhodto = 0.*P;
-rho    =  rhom0.*ones(size(Tp));
+rhom   =  rhom0.*ones(size(Tp)); 
+rhox   =  rhox0.*ones(size(Tp));
+rhof   =  rhof0.*ones(size(Tp));
+rho    =  rhom0.*ones(size(Tp)); rhoo = rho; 
 rhoref =  mean(rho(inz,inx),'all');
 Pt     =  Ptop + rhoref.*g0.*ZZ .* 1.01;
 
 % get volume fractions and bulk density
 step    = 0;
-theta   = 1/2;
 EQtime  = 0;
 FMtime  = 0;
 TCtime  = 0;
 UDtime  = 0;
-res  = 1;  tol = 1e-13;  x = zeros(size(Tp));  f = v/2;
+res  = 1;  tol = 1e-12;  x = zeros(size(Tp));  f = v/2;
 while res > tol
     Pti = Pt; xi = x; fi = f;
     
@@ -291,15 +293,14 @@ while res > tol
          + norm(x(:)-xi(:),2)./(norm(x(:),2)+TINY) ...
          + norm(f(:)-fi(:),2)./(norm(f(:),2)+TINY);
 end
-rhoo = rho;
 dto  = dt; 
 
 % get bulk enthalpy, silica, volatile content densities
-S  = rho.*(cP.*log(T/(cal.Tphs1+273.15)) + x.*Dsx + f.*Dsf - Adbt.*(Pt-Ptop));  
+S  = rho.*(cP.*log(T/(cal.Tphs1+273.15)) + x.*Dsx + f.*Dsf - Adbt.*(Pt-Ptop));  So = S;
 S0 = rho.*(cP.*log(cal.Tphs1+273.15) + x.*Dsx + f.*Dsf - Adbt.*Ptop);  
-C  = rho.*(m.*cm + x.*cx);
+C  = rho.*(m.*cm + x.*cx); Co = C;
 V  = rho.*(m.*vm + f.*vf);
-X  = rho.*x;
+X  = rho.*x; Xo = X;
 F  = rho.*f;
 M  = rho.*m;
 

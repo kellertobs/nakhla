@@ -19,7 +19,7 @@ perCx = (perCx-cphs0)./(cphs1-cphs0);
 iter    = 1;
 maxit   = 100;
 resnorm = 1;
-tol     = 1e-15;
+tol     = 1e-12;
 eps     = 1e-6;
 
 vmq_c0 = (4.7773e-7.*P.^0.6 + 1e-11.*P) .* exp(2565*(1./(T0+273.15)-1./(perTd+273.15))); % Katz et al., 2003; Moore et al., 1998
@@ -85,8 +85,8 @@ end
 
 T   = max(0,min(1,(T0 - P*clap -Tphs0)./(Tphs1-Tphs0)));
 
-a = 15;
-b = 0.04;
+a = 20;
+b = 0.05;
 ind1 = T>=perT+b;
 ind2 = T< perT-b;
 ind3 = T>=perT-b & T<perT+b;

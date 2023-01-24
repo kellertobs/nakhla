@@ -2,10 +2,8 @@
 init;
     
 % physical time stepping loop
-while time <= tend && step <= Nt
+while time <= tend && step <= Nt && any(m(:)>TINY)
     
-%     if step==1; theta=1; else; theta=1/2; end
-
     fprintf(1,'*****  step %d;  dt = %4.4e;  time = %4.4e [hr]\n\n',step,dt./3600,time./3600);
     TTtime  = tic;
     EQtime  = 0;
@@ -14,6 +12,7 @@ while time <= tend && step <= Nt
     UDtime  = 0;
 
     % store previous solution
+    To = T; co = c; vo = v; %cm_cmpo = cm_cmp; cx_cmpo = cx_cmp;
     So      = S;
     Co      = C;
     Vo      = V;
@@ -44,12 +43,12 @@ while time <= tend && step <= Nt
         
         % solve thermo-chemical equations
         thermochem;
-                
-        % update non-linear parameters and auxiliary variables
-        update;
 
         % solve fluid-mechanics equations
         fluidmech;
+
+        % update non-linear parameters and auxiliary variables
+        update;
 
         % update geochemical evolution
         geochem;
@@ -93,5 +92,8 @@ while time <= tend && step <= Nt
     step = step+1;
     
 end
+
+% save final state of model
+output;
 
 diary off

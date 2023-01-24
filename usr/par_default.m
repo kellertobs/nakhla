@@ -18,8 +18,8 @@ Nt       =  3e5;                 % number of time steps to take
 hr       =  3600;                % conversion seconds to hours
 yr       =  24*365.25*hr;        % conversion seconds to years
 tend     =  1*yr;                % end time for simulation [s]
-dt       =  100;                 % initial time step [s]
-dtmax    =  100;                 % maximum time step [s]
+dt       =  1;                   % initial time step [s]
+dtmax    =  1;                   % maximum time step [s]
 
 % set initial thermo-chemical state
 seed     =  15;                  % random perturbation seed
@@ -79,6 +79,7 @@ df       =  1e-3;                % bubble size [m]
 g0       =  10.;                 % gravity [m/s2]
 
 % set numerical model parameters
+theta    =  1/2;                 % time stepping mode (0 explicit Euler, 1/2 Crank-Nicolson, 1 implicit Euler)
 CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
 rtol     =  1e-3;                % outer its relative tolerance
