@@ -30,7 +30,7 @@ end
 dSdt = advn_S + diff_S + diss_h + bnd_S;
 
 % semi-implicit update of bulk entropy density
-S(inz,inx)   = So(inz,inx) + (theta.*dSdt + (1-theta).*dSdto).*dt;    
+S(inz,inx) = (alpha2*So(inz,inx) + alpha3*Soo(inz,inx) + (beta1*dSdt + beta2*dSdto + beta3*dSdtoo)*dt)/alpha1;
 
 % boundary conditions
 S([1 end],:) = S([2 end-1],:);                                             
@@ -50,8 +50,8 @@ if ~isnan(cwall); bnd_C = (rho(inz,inx).*cwall-C(inz,inx))./tau_a .* bndshape; e
 dCdt = advn_C + bnd_C;                                            
     
 % semi-implicit update of major component density
-C(inz,inx)   = Co(inz,inx) + (theta.*dCdt + (1-theta).*dCdto).*dt;         
-C            = max(cal.cphs0.*rho,min(cal.cphs1.*rho,C));
+C(inz,inx) = (alpha2*Co(inz,inx) + alpha3*Coo(inz,inx) + (beta1*dCdt + beta2*dCdto + beta3*dCdtoo)*dt)/alpha1;
+C          = max(cal.cphs0.*rho,min(cal.cphs1.*rho,C));
 
 % boundary conditions
 C([1 end],:) = C([2 end-1],:);
@@ -72,8 +72,8 @@ if any([v0;v1;vwall;v(:)]>10*TINY)
     dVdt = advn_V + bnd_V;                                                 
     
     % semi-implicit update of volatile component density
-    V(inz,inx)   = Vo(inz,inx) + (theta.*dVdt + (1-theta).*dVdto).*dt;
-    V            = max(0,min(rho,V));
+    V(inz,inx) = (alpha2*Vo(inz,inx) + alpha3*Voo(inz,inx) + (beta1*dVdt + beta2*dVdto + beta3*dVdtoo)*dt)/alpha1;
+    V          = max(0,min(rho,V));
 
     % boundary conditions
     V([1 end],:) = V([2 end-1],:);                                         
@@ -127,7 +127,7 @@ advn_X = - advect(X(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);
 dXdt   = advn_X + Gx;
 
 % semi-implicit update of crystal fraction
-X(inz,inx) = Xo(inz,inx) + (theta.*dXdt + (1-theta).*dXdto).*dt;
+X(inz,inx) = (alpha2*Xo(inz,inx) + alpha3*Xoo(inz,inx) + (beta1*dXdt + beta2*dXdto + beta3*dXdtoo)*dt)/alpha1;
 X = max(0, X );
 
 % boundary conditions
@@ -148,7 +148,7 @@ if any([v0;v1;vwall;v(:)]>10*TINY)
     dFdt   = advn_F + Gf;
 
     % semi-implicit update of bubble fraction
-    F(inz,inx) = Fo(inz,inx) + (theta.*dFdt + (1-theta).*dFdto).*dt;
+    F(inz,inx) = (alpha2*Fo(inz,inx) + alpha3*Foo(inz,inx) + (beta1*dFdt + beta2*dFdto + beta3*dFdtoo)*dt)/alpha1;
     F = max(0,min(V, F ));
 
     % boundary conditions

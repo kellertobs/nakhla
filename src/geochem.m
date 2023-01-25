@@ -26,7 +26,7 @@ end
 dTEdt = adv_TE + bnd_TE;
 
 % update trace element concentrations
-TE(inz,inx,:)   = TEo(inz,inx,:) + (theta.*dTEdt + (1-theta).*dTEdto).*dt; % explicit update
+TE(inz,inx,:) = (alpha2*TEo(inz,inx,:) + alpha3*TEoo(inz,inx,:) + (beta1*dTEdt + beta2*dTEdto + beta3*dTEdtoo)*dt)/alpha1;
 TE = max(0, TE );                                                          % enforce min bound
 TE([1 end],:,:) = TE([2 end-1],:,:);                                       % boundary conditions
 TE(:,[1 end],:) = TE(:,[2 end-1],:);
@@ -54,7 +54,7 @@ end
 dIRdt = adv_IR + bnd_IR;
 
 % update isotope ratio concentrations
-IR(inz,inx,:)   = IRo(inz,inx,:) + (theta.*dIRdt + (1-theta).*dIRdto).*dt; % explicit update
+IR(inz,inx,:) = (alpha2*IRo(inz,inx,:) + alpha3*IRoo(inz,inx,:) + (beta1*dIRdt + beta2*dIRdto + beta3*dIRdtoo)*dt)/alpha1;
 IR([1 end],:,:) = IR([2 end-1],:,:);                                       % boundary conditions
 IR(:,[1 end],:) = IR(:,[2 end-1],:);
 

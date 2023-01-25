@@ -33,7 +33,7 @@ ir0      =  [1,1];               % isotope ratios top layer [delta]
 
 % set thermo-chemical boundary parameters
 bnd_w    =  0.05;                % boundary layer width [m]
-tau_T    =  12*hr;               % wall cooling/assimilation time [s]
+tau_T    =  8*hr;                % wall cooling/assimilation time [s]
 Twall    =  300;                 % wall temperature [degC] (nan = insulating)
 
 % set thermo-chemical material parameters
@@ -49,8 +49,8 @@ df       =  1e-3;                % bubble size [m]
 theta    =  1/2;                 % time stepping mode (0 explicit Euler, 1/2 Crank-Nicolson, 1 implicit Euler)
 CFL      =  0.25;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
-rtol     =  1e-5;                % outer its relative tolerance
-atol     =  1e-8;                % outer its absolute tolerance
+rtol     =  1e-6;                % outer its relative tolerance
+atol     =  1e-9;                % outer its absolute tolerance
 maxit    =  50;                  % maximum outer its
 lambda   =  0.50;                % iterative lag parameter equilibration
 mink     =  1e-9;                % minimum diffusivity for phase, component fractions

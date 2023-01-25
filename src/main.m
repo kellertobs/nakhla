@@ -4,6 +4,17 @@ init;
 % physical time stepping loop
 while time <= tend && step <= Nt && any(m(:)>TINY)
     
+    if step==1      % first step: 1st-order implicit-Euler method
+        alpha1 = 1; alpha2 = 1; alpha3 = 0;
+        beta1  = 1; beta2  = 0; beta3  = 0;
+    elseif step==2  % second step: 2nd-order Crank-Nicolson method
+        alpha1 = 1;   alpha2 = 1;   alpha3 = 0;
+        beta1  = 1/2; beta2  = 1/2; beta3  = 0;
+    else            % other steps: 2nd-order three-point backward-difference / dampened Crank-Nicolson method
+        alpha1 = 3/2; alpha2 = 4/2; alpha3 = -1/2;
+        beta1  = 3/4; beta2  = 2/4; beta3  = -1/4;
+    end
+
     fprintf(1,'*****  step %d;  dt = %4.4e;  time = %4.4e [hr]\n\n',step,dt./3600,time./3600);
     TTtime  = tic;
     EQtime  = 0;
@@ -12,26 +23,24 @@ while time <= tend && step <= Nt && any(m(:)>TINY)
     UDtime  = 0;
 
     % store previous solution
-    To = T; co = c; vo = v; %cm_cmpo = cm_cmp; cx_cmpo = cx_cmp;
-    So      = S;
-    Co      = C;
-    Vo      = V;
-    Xo      = X;
-    Fo      = F;
-    TEo     = TE;
-    IRo     = IR;
-    dSdto   = dSdt;
-    dCdto   = dCdt;
-    dVdto   = dVdt;
-    dXdto   = dXdt;
-    dFdto   = dFdt;
-    dTEdto  = dTEdt;
-    dIRdto  = dIRdt;
-    rhoo    = rho;
-    Div_rhoVo = Div_rhoV;
+    Soo = So; So = S;
+    Coo = Co; Co = C;
+    Voo = Vo; Vo = V;
+    Xoo = Xo; Xo = X;
+    Foo = Fo; Fo = F;
+    TEoo = TEo; TEo = TE;
+    IRoo = IRo; IRo = IR;
+    dSdtoo = dSdto; dSdto = dSdt;
+    dCdtoo = dCdto; dCdto = dCdt;
+    dVdtoo = dVdto; dVdto = dVdt;
+    dXdtoo = dXdto; dXdto = dXdt;
+    dFdtoo = dFdto; dFdto = dFdt;
+    dTEdtoo = dTEdto; dTEdto = dTEdt;
+    dIRdtoo = dIRdto; dIRdto = dIRdt;
+    rhooo = rhoo; rhoo = rho;
+    Div_rhoVoo = Div_rhoVo; Div_rhoVo = Div_rhoV;
     Div_Vo  = Div_V;
     dto     = dt;
-    Gxi     = Gx;
     
     % reset residuals and iteration count
     resnorm  = 1;

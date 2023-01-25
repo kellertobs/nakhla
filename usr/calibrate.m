@@ -98,7 +98,7 @@ for i = 1:5
     vmq_c0 = (4.7773e-7.*Ptop.^0.6 + 1e-11.*Ptop) .* exp(2565*(1./(TT+273.15)-1./(cal.perT+273.15))); % Katz et al., 2003; Moore et al., 1998
     vmq_c1 = (3.5494e-3.*Ptop.^0.5 + 9.623e-8.*Ptop - 1.5223e-11.*Ptop.^1.5)./(TT+273.15) + 1.2436e-14.*Ptop.^1.5; % Liu et al., 2015
     vmq0   = (1-cc).*vmq_c0 + cc.*vmq_c1;
-    perTs  = cal.perT -cal.dTH2O(2).*vmq0(round((perTs-Tphs1s)./(Tphs0s-Tphs1s)*500)).^0.75;
+    perTs  = cal.perT -cal.dTH2O(2).*vmq0(round((perTs-Tphs1s)./(Tphs0s-Tphs1s)*200)).^0.75;
     Tphs0s = cal.Tphs0-cal.dTH2O(1).*vmq0(1  ).^0.75;
     Tphs1s = cal.Tphs1-cal.dTH2O(3).*vmq0(end).^0.75;
 end

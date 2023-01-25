@@ -16,7 +16,7 @@ maxcmp(1,:,:) = max(max((wt0(:) .* cal.cmp(1,:) + (1-wt0(:)) .* cal.cmp(3,:)),(w
 cm_cmp1 = (cm_cmp1-mincmp)./(maxcmp-mincmp);
 cm_cmp2 = (cm_cmp2-mincmp)./(maxcmp-mincmp);
 
-a = 200;
+a = 250;
 b = 0.05;
 ind1 = repmat(cm,1,1,cal.nc)<=cal.perCm-b;
 ind2 = repmat(cm,1,1,cal.nc)> cal.perCm+b;
@@ -44,7 +44,7 @@ maxcmp(1,:,:) = max(max((wt0(:) .* cal.cmp(1,:) + (1-wt0(:)) .* cal.cmp(2,:)),(w
 cx_cmp1 = (cx_cmp1-mincmp)./(maxcmp-mincmp);
 cx_cmp2 = (cx_cmp2-mincmp)./(maxcmp-mincmp);
 
-a = 200;
+a = 250;
 b = 0.05;
 ind1 = repmat(cx,1,1,cal.nc)<=cal.perCx-b;
 ind2 = repmat(cx,1,1,cal.nc)> cal.perCx+b;
@@ -66,9 +66,9 @@ cx_oxd = reshape(reshape(cx_cmp,Nz*Nx,cal.nc)*cal.oxd/100,Nz,Nx,cal.nc);
 c_oxd = (m.*cm_oxd + x.*cx_oxd)./(1-f);
 
 % update phase densities
-rhom = lambda.*rhom + (1-lambda).*squeeze(sum(permute(cm_cmp/100,[3,1,2])./cal.rhom0.')).^-1 .* (1 - cal.aT.*(T-cal.perT-273.15) - cal.gH.*vm); if size(rhom,2)~=size(T,2); rhom = rhom(1,:).'; end
-rhox = lambda.*rhox + (1-lambda).*squeeze(sum(permute(cx_cmp/100,[3,1,2])./cal.rhox0.')).^-1 .* (1 - cal.aT.*(T-cal.perT-273.15)             ); if size(rhox,2)~=size(T,2); rhox = rhox(1,:).'; end
-rhof = lambda.*rhof + (1-lambda).*cal.rhof0 .* (1 - cal.aT.*(T-cal.perT-273.15) + cal.bP.*(Pt-Ptop ));
+rhom = squeeze(sum(permute(cm_cmp/100,[3,1,2])./cal.rhom0.')).^-1 .* (1 - cal.aT.*(T-cal.perT-273.15) - cal.gH.*vm); if size(rhom,2)~=size(T,2); rhom = rhom(1,:).'; end
+rhox = squeeze(sum(permute(cx_cmp/100,[3,1,2])./cal.rhox0.')).^-1 .* (1 - cal.aT.*(T-cal.perT-273.15)             ); if size(rhox,2)~=size(T,2); rhox = rhox(1,:).'; end
+rhof = cal.rhof0 .* (1 - cal.aT.*(T-cal.perT-273.15) + cal.bP.*(Pt-Ptop ));
 
 % convert weight to volume fraction, update bulk density
 rho    = 1./(m./rhom + x./rhox + f./rhof);
@@ -179,12 +179,12 @@ else
 end
 
 % update volume source
-if step>0 && iter>2
+if step>0
     Div_rhoV = + advect(M(inz,inx),Um(inz,:),Wm(:,inx),h,{ADVN,''},[1,2],BCA) ...  % melt  advection
                + advect(X(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA) ...  % xtal  advection
                + advect(F(inz,inx),Uf(inz,:),Wf(:,inx),h,{ADVN,''},[1,2],BCA);     % fluid advection
-    F_DivV   = (rho(inz,inx)-rhoo(inz,inx))./dt + theta.*Div_rhoV + (1-theta).*Div_rhoVo;  % get residual of mixture mass conservation
-    VolSrc   = Div_V(inz,inx) - F_DivV./rho(inz,inx);% - min(1,norm(F_DivV)./norm(Div_V+1e-12)).*(Div_V(inz,inx)-Div_Vo(inz,inx));  % correct volume source term by scaled residual
+    F_DivV   = (alpha1*rho(inz,inx) - alpha2*rhoo(inz,inx) - alpha3*rhooo(inz,inx))./dt + (beta1*Div_rhoV + beta2*Div_rhoVo + beta3*Div_rhoVoo);  % get residual of mixture mass conservation
+    VolSrc   = Div_V(inz,inx) - F_DivV./rho(inz,inx);  % correct volume source term by scaled residual
 end
 
 UBG    = - 1*mean(VolSrc,'all')./2 .* (L/2-XXu);

@@ -299,10 +299,10 @@ dto  = dt;
 S  = rho.*(cP.*log(T/(cal.Tphs1+273.15)) + x.*Dsx + f.*Dsf - Adbt.*(Pt-Ptop));  So = S;
 S0 = rho.*(cP.*log(cal.Tphs1+273.15) + x.*Dsx + f.*Dsf - Adbt.*Ptop);  
 C  = rho.*(m.*cm + x.*cx); Co = C;
-V  = rho.*(m.*vm + f.*vf);
+V  = rho.*(m.*vm + f.*vf); Vo = V;
 X  = rho.*x; Xo = X;
-F  = rho.*f;
-M  = rho.*m;
+F  = rho.*f; Fo = F;
+M  = rho.*m; Mo = M;
 
 % get phase entropies
 sm = S./rho - x.*Dsx - f.*Dsf;
@@ -332,35 +332,35 @@ TE = zeros(Nz,Nx,cal.nte);
 for i = 1:cal.nte
     TE(:,:,i)  = rho.*(m.*tem(:,:,i) + x.*tex(:,:,i));
 end
+TEo = TE;
 
 IR = zeros(Nz,Nx,cal.nir);
 for i = 1:cal.nir
     IR(:,:,i)  = rho.*(m.*irm(:,:,i) + x.*irx(:,:,i));
 end
+IRo = IR;
 
 % initialise phase change rates
 Gx = 0.*x(inz,inx);  Gf = 0.*f(inz,inx);  Gm = 0.*m(inz,inx);
 
 % initialise auxiliary variables 
-dSdt   = 0.*T(inz,inx);  diss_h = 0.*T(inz,inx);
-dCdt   = 0.*c(inz,inx);
-dVdt   = 0.*v(inz,inx);
-dFdt   = 0.*f(inz,inx);
-dMdt   = 0.*m(inz,inx);
-dXdt   = 0.*x(inz,inx);
-dTEdt  = 0.*te(inz,inx);
-dIRdt  = 0.*ir(inz,inx);
+dSdt   = 0.*T(inz,inx);  dSdto  = dSdt; diss_h = 0.*T(inz,inx);
+dCdt   = 0.*c(inz,inx);  dCdto  = dCdt;
+dVdt   = 0.*v(inz,inx);  dVdto  = dVdt;
+dFdt   = 0.*f(inz,inx);  dFdto  = dFdt;
+dXdt   = 0.*x(inz,inx);  dXdto  = dXdt;
+dTEdt  = 0.*te(inz,inx,:); dTEdto = dTEdt;
+dIRdt  = 0.*ir(inz,inx,:); dIRdto = dIRdt;
 
 % initialise timing and iterative parameters
 step    = 0;
 time    = 0;
 iter    = 0;
 hist    = [];
-dsumMdt = 0;
-dsumSdt = 0;
-dsumCdt = 0;
-dsumVdt = 0;
-dsumCdt_oxd = 0;
+dsumMdt = 0; dsumMdto = 0;
+dsumSdt = 0; dsumSdto = 0;
+dsumCdt = 0; dsumCdto = 0;
+dsumVdt = 0; dsumVdto = 0;
 
 % overwrite fields from file if restarting run
 if restart

@@ -346,22 +346,20 @@ end
 if ~exist('fh7','var'); fh7 = figure(VIS{:});
 else; set(0, 'CurrentFigure', fh7); clf;
 end
-TT = linspace(cal.Tphs0+Ptop*cal.clap,cal.Tphs1+Ptop*cal.clap,200);
-cc = [linspace(cal.cphs1,(cal.perCx+cal.perCm)/2,round((cal.perT-cal.Tphs0)./(cal.Tphs1-cal.Tphs0)*200)), ...
-      linspace((cal.perCx+cal.perCm)/2,cal.cphs0,round((cal.perT-cal.Tphs1)./(cal.Tphs0-cal.Tphs1)*200))];
-[~,CCx,CCm,~,~,~] = equilibrium(0.5*ones(size(TT)),0*ones(size(TT)),TT,cc,0*TT,Ptop*ones(size(TT)),cal,TINY);
-plot(CCx.*100,TT,'k-',LW{:}); axis tight; hold on; box on;
-plot(CCm.*100,TT,'k-',LW{:});
+TT = [linspace(cal.Tphs0+Ptop*cal.clap,cal.perT+Ptop*cal.clap,200),linspace(cal.perT+Ptop*cal.clap,cal.Tphs1+Ptop*cal.clap,200)];
+cc = [linspace(cal.cphs1,(cal.perCx+cal.perCm)/2,200),linspace((cal.perCx+cal.perCm)/2,cal.cphs0,200)];
+[~,CCx,CCm,~,~,~] = equilibrium(0*TT,0*TT,TT,cc,0*TT,Ptop*ones(size(TT)),cal,TINY);
+plot(CCx.*100,TT,'k-','LineWidth',2); axis tight; hold on; box on;
+plot(CCm.*100,TT,'k-','LineWidth',2);
 perTs  = cal.perT;
 Tphs0s = cal.Tphs0;
 Tphs1s = cal.Tphs1;
 vv = 0.10*ones(size(TT));
 xx = 0.50*ones(size(TT));
 ff = 0.05*ones(size(TT));
-for i = 1:10
-    TT = linspace(Tphs0s+Ptop*cal.clap,Tphs1s+Ptop*cal.clap,200);
-    cc = [linspace(cal.cphs1,(cal.perCx+cal.perCm)/2,round((perTs-Tphs0s)./(Tphs1s-Tphs0s)*200)), ...
-          linspace((cal.perCx+cal.perCm)/2,cal.cphs0,round((perTs-Tphs1s)./(Tphs0s-Tphs1s)*200))];
+for i = 1:5
+    TT = [linspace(Tphs0s+Ptop*cal.clap,perTs+Ptop*cal.clap,200),linspace(perTs+Ptop*cal.clap,Tphs1s+Ptop*cal.clap,200)];
+    cc = [linspace(cal.cphs1,(cal.perCx+cal.perCm)/2,200),linspace((cal.perCx+cal.perCm)/2,cal.cphs0,200)];
     vmq_c0 = (4.7773e-7.*Ptop.^0.6 + 1e-11.*Ptop) .* exp(2565*(1./(TT+273.15)-1./(cal.perT+273.15))); % Katz et al., 2003; Moore et al., 1998
     vmq_c1 = (3.5494e-3.*Ptop.^0.5 + 9.623e-8.*Ptop - 1.5223e-11.*Ptop.^1.5)./(TT+273.15) + 1.2436e-14.*Ptop.^1.5; % Liu et al., 2015
     vmq0   = (1-cc).*vmq_c0 + cc.*vmq_c1;
@@ -369,9 +367,9 @@ for i = 1:10
     Tphs0s = cal.Tphs0-cal.dTH2O(1).*vmq0(1  ).^0.75;
     Tphs1s = cal.Tphs1-cal.dTH2O(3).*vmq0(end).^0.75;
 end
-[~,CCx,CCm,~,~,~] = equilibrium(0.5*ones(size(TT)),zeros(size(TT)),TT,cc,vmq0+0.001,Ptop*ones(size(TT)),cal,TINY);
-plot(CCx.*100,TT,'k-',LW{:}); axis tight; hold on; box on;
-plot(CCm.*100,TT,'k-',LW{:});
+[~,CCx,CCm,~,~,~] = equilibrium(0*TT,0*TT,TT,cc,vmq0,Ptop*ones(size(TT)),cal,TINY);
+plot(CCx.*100,TT,'k-','LineWidth',2); axis tight; hold on; box on;
+plot(CCm.*100,TT,'k-','LineWidth',2);
 
 Tplt = T-273.15 - (Pt-Ptop)*cal.clap;
 cplt = c./(1-f);
