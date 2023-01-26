@@ -103,13 +103,16 @@ for dti = DT
         TCtime  = 0;
         UDtime  = 0;
 
-        if step==1
+        if     strcmp(TINT,'bwei') || step==1  % first step  / 1st-order backward-Euler implicit scheme
             alpha1 = 1; alpha2 = 1; alpha3 = 0;
             beta1  = 1; beta2  = 0; beta3  = 0;
-        elseif step==2
+        elseif strcmp(TINT,'cnsi') || step==2  % second step / 2nd-order Crank-Nicolson semi-implicit scheme
             alpha1 = 1;   alpha2 = 1;   alpha3 = 0;
             beta1  = 1/2; beta2  = 1/2; beta3  = 0;
-        else
+        elseif strcmp(TINT,'bd3i')            % other steps / 2nd-order 3-point backward-difference implicit scheme
+            alpha1 = 3/2; alpha2 = 4/2; alpha3 = -1/2;
+            beta1  = 1; beta2  = 0; beta3  = 0;
+        elseif strcmp(TINT,'bd3s')            % other steps / 2nd-order 3-point backward-difference semi-implicit scheme
             alpha1 = 3/2; alpha2 = 4/2; alpha3 = -1/2;
             beta1  = 3/4; beta2  = 2/4; beta3  = -1/4;
         end
@@ -195,11 +198,10 @@ for dti = DT
     title('Numerical convergence in time','Interpreter','latex','FontSize',20)
 
     if dt == DT(1)
-        p7 = loglog(DT,geomean([EM,ES,EC,EV,EX,EF]).*(DT./DT(1)).^1,'k-' ,'LineWidth',2);  % plot trend for comparison
-        p8 = loglog(DT,geomean([EM,ES,EC,EV,EX,EF]).*(DT./DT(1)).^2,'k--','LineWidth',2);  % plot trend for comparison
+        p7 = loglog(DT,geomean([EM,ES,EC,EV,EX,EF]).*(DT./DT(1)).^2,'k-','LineWidth',2);  % plot trend for comparison
     end
     if dt == DT(end)
-        legend([p1,p2,p3,p4,p5,p6,p7,p8],{'error $M$','error $S$','error $C$','error $V$','error $X$','error $F$','linear','quadratic'},'Interpreter','latex','box','on','location','southeast')
+        legend([p1,p2,p3,p4,p5,p6,p7],{'error $M$','error $S$','error $C$','error $V$','error $X$','error $F$','quadratic'},'Interpreter','latex','box','on','location','southeast')
     end
     drawnow;
 

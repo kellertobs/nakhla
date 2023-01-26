@@ -24,7 +24,7 @@ for rtol = RTOL
     c0       =  0.51;                % major component top layer [wt SiO2]
     dcr      =  1e-4;                % amplitude of random noise [wt SiO2]
     v0       =  0.04;                % volatile component top layer [wt H2O]
-    dvr      =  1e-5;                % amplitude of random noise [wt H2O]
+    dvr      = -1e-4;                % amplitude of random noise [wt H2O]
 
     % closed boundaries for gas flux
     fin      =  0;
