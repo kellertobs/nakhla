@@ -79,13 +79,13 @@ df       =  1e-3;                % bubble size [m]
 g0       =  10.;                 % gravity [m/s2]
 
 % set numerical model parameters
-theta    =  1/2;                 % time stepping mode (0 explicit Euler, 1/2 Crank-Nicolson, 1 implicit Euler)
-CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
+TINT     =  'bd3i';              % time integration scheme ('bwei','cnsi','bd3i','bd3s')
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
-rtol     =  1e-3;                % outer its relative tolerance
-atol     =  1e-6;                % outer its absolute tolerance
+CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
+rtol     =  1e-6;                % outer its relative tolerance
+atol     =  1e-9;                % outer its absolute tolerance
 maxit    =  50;                  % maximum outer its
-lambda   =  0.25;                % iterative lag parameter equilibration
-etareg   =  1e0;                 % viscosity regularisation parameter
+lambda   =  0.50;                % iterative lag parameter equilibration
 mink     =  1e-9;                % minimum diffusivity for phase, component fractions
+etareg   =  1e0;                 % viscosity regularisation parameter
 

@@ -179,16 +179,17 @@ else
 end
 
 % update volume source
-if step>0
+if step>0 && ~restart
     Div_rhoV = + advect(M(inz,inx),Um(inz,:),Wm(:,inx),h,{ADVN,''},[1,2],BCA) ...  % melt  advection
                + advect(X(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA) ...  % xtal  advection
                + advect(F(inz,inx),Uf(inz,:),Wf(:,inx),h,{ADVN,''},[1,2],BCA);     % fluid advection
     F_DivV   = (alpha1*rho(inz,inx) - alpha2*rhoo(inz,inx) - alpha3*rhooo(inz,inx))./dt + (beta1*Div_rhoV + beta2*Div_rhoVo + beta3*Div_rhoVoo);  % get residual of mixture mass conservation
     VolSrc   = Div_V(inz,inx) - F_DivV./rho(inz,inx);  % correct volume source term by scaled residual
-end
 
-UBG    = - 1*mean(VolSrc,'all')./2 .* (L/2-XXu);
-WBG    = - 1*mean(VolSrc,'all')./2 .* (D/2-ZZw);
+    UBG    = - mean(VolSrc,'all')./2 .* (L/2-XXu);
+    WBG    = - mean(VolSrc,'all')./2 .* (D/2-ZZw);
+
+end
 
 UDtime = UDtime + toc;
 end

@@ -46,9 +46,9 @@ dx       =  1e-3;                % crystal size [m]
 df       =  1e-3;                % bubble size [m]
 
 % set numerical model parameters
-theta    =  1/2;                 % time stepping mode (0 explicit Euler, 1/2 Crank-Nicolson, 1 implicit Euler)
-CFL      =  0.25;                % (physical) time stepping courant number (multiplies stable step) [0,1]
+TINT     =  'bd3i';              % time integration scheme ('bwei','cnsi','bd3i','bd3s')
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
+CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 rtol     =  1e-6;                % outer its relative tolerance
 atol     =  1e-9;                % outer its absolute tolerance
 maxit    =  50;                  % maximum outer its

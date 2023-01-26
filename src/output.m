@@ -283,7 +283,7 @@ else % create 2D plots
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\bar{c}/(1-f)$ [wt\% SiO$_2$]'],TX{:},FS{:}); set(gca,'YTickLabel',[]); xlabel('Width [m]',TX{:},FS{:});
     set(fh2,'CurrentAxes',ax(23));
     imagesc(Xc(2:end-1),Zc(2:end-1),v(2:end-1,2:end-1)./(1-x(2:end-1,2:end-1)).*100.*(v(2:end-1,2:end-1)>1e-9)); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\bar{v}$ [wt\% H$_2$O]'],TX{:},FS{:}); set(gca,'YTickLabel',[]);
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\bar{v}/(1-x)$ [wt\% H$_2$O]'],TX{:},FS{:}); set(gca,'YTickLabel',[]);
     sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
 
     % plot phase fractions and reaction rates in Fig. 3
@@ -422,7 +422,7 @@ end
 drawnow
 
 % save output to file
-if save_op
+if save_op && ~restart
     if Nx <= 10 && Nz <= 10  % print 0D plots
         name = [opdir,'/',runID,'/',runID,'_tch_',num2str(floor(step/nop))];
         print(fh1,name,'-dpng','-r300','-image');

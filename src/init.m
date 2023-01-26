@@ -245,11 +245,11 @@ eIIref =  1e-6;
 Div_V  =  0.*P;  Div_Vi = 0.*P(inz,inx);  Div_rhoV = 0.*P(inz,inx);  Div_rhoVo = Div_rhoV;
 exx    =  0.*P;  ezz = 0.*P;  exz = zeros(Nz-1,Nx-1);  eII = 0.*P;  
 txx    =  0.*P;  tzz = 0.*P;  txz = zeros(Nz-1,Nx-1);  tII = 0.*P; 
-VolSrc =  0.*P(inz,inx);  MassErr = 0;  drhodt = 0.*P;  drhodto = 0.*P;
+VolSrc =  0.*P(inz,inx); meanVolSrc = 0;  MassErr = 0;  drhodt = 0.*P;  drhodto = 0.*P;
 rhom   =  rhom0.*ones(size(Tp)); 
 rhox   =  rhox0.*ones(size(Tp));
 rhof   =  rhof0.*ones(size(Tp));
-rho    =  rhom0.*ones(size(Tp)); rhoo = rho; 
+rho    =  rhom0.*ones(size(Tp));
 rhoref =  mean(rho(inz,inx),'all');
 Pt     =  Ptop + rhoref.*g0.*ZZ .* 1.01;
 
@@ -293,7 +293,9 @@ while res > tol
          + norm(x(:)-xi(:),2)./(norm(x(:),2)+TINY) ...
          + norm(f(:)-fi(:),2)./(norm(f(:),2)+TINY);
 end
+rhoo = rho;
 dto  = dt; 
+ho   = h;
 
 % get bulk enthalpy, silica, volatile content densities
 S  = rho.*(cP.*log(T/(cal.Tphs1+273.15)) + x.*Dsx + f.*Dsf - Adbt.*(Pt-Ptop));  So = S;
@@ -375,10 +377,28 @@ if restart
         name = [opdir,'/',runID,'/',runID,'_hist'];
         load(name,'hist');
 
-        xq = x; fq = f;
+        M   = rho-F-X;
+        xq  = x; fq = f;
         SOL = [W(:);U(:);P(:)];
-        rhoo = rho; Div_rhoVo = Div_rhoV;
-        update;
+
+        So = S;
+        Co = C;
+        Vo = V;
+        Xo = X;
+        Fo = F;
+        TEo = TE;
+        IRo = IR;
+        dSdto = dSdt;
+        dCdto = dCdt;
+        dVdto = dVdt;
+        dXdto = dXdt;
+        dFdto = dFdt;
+        dTEdto = dTEdt;
+        dIRdto = dIRdt;
+        rhoo = rho;
+        Div_rhoVo = Div_rhoV;
+
+        update; output; restart = 0;
     else % continuation file does not exist, start from scratch
         fprintf('\n   !!! restart file does not exist !!! \n   => starting run from scratch %s \n\n',runID);
         update;
