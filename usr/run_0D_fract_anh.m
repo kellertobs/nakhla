@@ -20,7 +20,7 @@ h        =  D/(N-2);             % grid spacing (equal in both dimensions, do no
 
 % set model timing parameters
 Nt       =  2000;                % number of time steps to take
-tend     =  12*hr;               % end time for simulation [s]
+tend     =  8*hr;                % end time for simulation [s]
 dt       =  36;                  % initial time step [s]
 dtmax    =  36;                  % maximum time step [s]
 
@@ -32,7 +32,7 @@ v0       =  0.00;                % volatile component top layer [wt H2O]
 % set thermo-chemical boundary parameters
 Ptop     =  1.25e8;              % top pressure [Pa]
 bnd_w    =  D;                   % boundary layer width [m]
-tau_T    =  12*hr;               % wall cooling/assimilation time [s]
+tau_T    =  8*hr;                % wall cooling/assimilation time [s]
 Twall    =  300;                 % wall temperature [degC] (nan = insulating)
 
 % set thermo-chemical material parameters

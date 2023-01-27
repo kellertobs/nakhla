@@ -48,7 +48,7 @@ dx       =  1e-3;                % crystal size [m]
 df       =  1e-3;                % bubble size [m]
 
 % set numerical model parameters
-TINT     =  'bd3s';              % time integration scheme ('bwei','cnsi','bd3i','bd3s')
+TINT     =  'bd3i';              % time integration scheme ('bwei','cnsi','bd3i','bd3s')
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
 CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 rtol     =  1e-4;                % outer its relative tolerance

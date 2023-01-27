@@ -19,7 +19,7 @@ hr       =  3600;                % conversion seconds to hours
 yr       =  24*365.25*hr;        % conversion seconds to years
 tend     =  1*yr;                % end time for simulation [s]
 dt       =  1;                   % initial time step [s]
-dtmax    =  1;                   % maximum time step [s]
+dtmax    =  1e3;                 % maximum time step [s]
 
 % set initial thermo-chemical state
 seed     =  15;                  % random perturbation seed
