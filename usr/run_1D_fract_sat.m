@@ -49,9 +49,9 @@ df       =  1e-3;                % bubble size [m]
 TINT     =  'bd3i';              % time integration scheme ('bwei','cnsi','bd3i','bd3s')
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
 CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
-rtol     =  1e-6;                % outer its relative tolerance
-atol     =  1e-9;                % outer its absolute tolerance
-maxit    =  50;                  % maximum outer its
+rtol     =  1e-4;                % outer its relative tolerance
+atol     =  1e-7;                % outer its absolute tolerance
+maxit    =  30;                  % maximum outer its
 lambda   =  0.50;                % iterative lag parameter equilibration
 mink     =  1e-9;                % minimum diffusivity for phase, component fractions
 

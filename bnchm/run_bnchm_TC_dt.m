@@ -36,6 +36,7 @@ dirg     =  [1, 1];              % isotope ratios centred gaussian [delta]
 fin = 0; fout = 0; Twall = nan;
 
 % set numerical model parameters
+TINT     =  'bd3s';              % time integration scheme ('bwei','cnsi','bd3i','bd3s')
 CFL      =  1.00;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
 rtol     =  1e-6;                % outer its relative tolerance

@@ -6,7 +6,7 @@ run('./par_default')
 
 % set run parameters
 runID    =  '1D_fract_anh';      % run identifier
-restart  = -1;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
+restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  500;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot results
 save_op  =  1;                   % switch on to save output to file
@@ -49,9 +49,9 @@ df       =  1e-3;                % bubble size [m]
 TINT     =  'bd3i';              % time integration scheme ('bwei','cnsi','bd3i','bd3s')
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
 CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
-rtol     =  1e-6;                % outer its relative tolerance
-atol     =  1e-9;                % outer its absolute tolerance
-maxit    =  50;                  % maximum outer its
+rtol     =  1e-4;                % outer its relative tolerance
+atol     =  1e-7;                % outer its absolute tolerance
+maxit    =  30;                  % maximum outer its
 lambda   =  0.50;                % iterative lag parameter equilibration
 mink     =  1e-9;                % minimum diffusivity for phase, component fractions
 

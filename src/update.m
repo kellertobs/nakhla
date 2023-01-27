@@ -97,8 +97,8 @@ etam      = reshape(grdmodel08(wtm,T(:)-273.15),Nz,Nx);
 hh     = (1-cal.xi).*erf(sqrt(pi)./(2.*(1-cal.xi)).*(chi./cal.chi_pck).*(1+(chi./cal.chi_pck).^cal.gamma));
 eta    = etam .* (1+(chi./cal.chi_pck).^cal.delta) .* (1-hh).^-cal.Bchi .* (1-phi).^-cal.Bphi;
 
-if ~calibrt; etamax = 1e+6.*min(eta(:)); else; etamax = 1e+32.*min(eta(:)); end
-eta    = (1./etamax + 1./(eta*etareg)).^-1;
+if ~calibrt; etamax = 1e+9.*min(eta(:)); else; etamax = 1e+32.*min(eta(:)); end
+eta    = (etamax.^-0.5 + (eta*etareg).^-0.5).^-2;
 etaco  = (eta(1:end-1,1:end-1).*eta(2:end,1:end-1) ...
        .* eta(1:end-1,2:end  ).*eta(2:end,2:end  )).^0.25;
 
