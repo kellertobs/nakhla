@@ -87,5 +87,6 @@ atol     =  1e-9;                % outer its absolute tolerance
 maxit    =  50;                  % maximum outer its
 lambda   =  0.50;                % iterative lag parameter equilibration
 mink     =  1e-9;                % minimum diffusivity for phase, component fractions
-etareg   =  1e0;                 % viscosity regularisation parameter
+cnvreg   =  1e0;                 % convection regularisation parameter
+sgrreg   =  1e0;                 % segregation regularisation parameter
 

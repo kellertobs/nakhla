@@ -71,14 +71,14 @@ Drhox = 0.01*abs(rhox0-rhom0);
 Drhof = 0.01*abs(cal.rhof0-rhom0) * (max([v0,v1,vwall])>TINY);
 Drho0 = DrhoT + Drhoc + Drhox + Drhof;
 
-uT    = DrhoT*g0*(D/10)^2/etam0/etareg;
-uc    = Drhoc*g0*(D/10)^2/etam0/etareg;
-ux    = Drhox*g0*(D/10)^2/etam0/etareg;
-uf    = Drhof*g0*(D/10)^2/etam0/etareg * (max([v0,v1,vwall])>TINY);
-u0    = Drho0*g0*(D/10)^2/etam0/etareg;
+uT    = DrhoT*g0*(D/10)^2/etam0/cnvreg;
+uc    = Drhoc*g0*(D/10)^2/etam0/cnvreg;
+ux    = Drhox*g0*(D/10)^2/etam0/cnvreg;
+uf    = Drhof*g0*(D/10)^2/etam0/cnvreg * (max([v0,v1,vwall])>TINY);
+u0    = Drho0*g0*(D/10)^2/etam0/cnvreg;
 
-wx0   = abs(rhox0-rhom0)*g0*dx^2/etam0;
-wf0   = abs(rhof0-rhom0)*g0*df^2/etam0 * (max([v0,v1,vwall])>TINY);
+wx0   = abs(rhox0-rhom0)*g0*dx^2/etam0/sgrreg;
+wf0   = abs(rhof0-rhom0)*g0*df^2/etam0/sgrreg * (max([v0,v1,vwall])>TINY);
 
 ud0   = kT0/rhom0/cP/(D/10);
 
@@ -97,9 +97,9 @@ Ruf   = wf0/u0;
 RwT   = uwT/u0;
 Rwc   = uwc/u0;
 
-Re    = u0*rhom0*(D/10)/etam0/etareg;
-Rex   = wx0*rhom0*dx/etam0;
-Ref   = wf0*rhom0*df/etam0;
+Re    = u0*rhom0*(D/10)/etam0/cnvreg;
+Rex   = wx0*rhom0*dx/etam0/sgrreg;
+Ref   = wf0*rhom0*df/etam0/sgrreg;
 
 fprintf('    crystal Re: %1.3e \n'  ,Rex);
 fprintf('     bubble Re: %1.3e \n'  ,Ref);

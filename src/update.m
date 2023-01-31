@@ -97,15 +97,16 @@ etam      = reshape(grdmodel08(wtm,T(:)-273.15),Nz,Nx);
 hh     = (1-cal.xi).*erf(sqrt(pi)./(2.*(1-cal.xi)).*(chi./cal.chi_pck).*(1+(chi./cal.chi_pck).^cal.gamma));
 eta    = etam .* (1+(chi./cal.chi_pck).^cal.delta) .* (1-hh).^-cal.Bchi .* (1-phi).^-cal.Bphi;
 
-if ~calibrt; etamax = 1e+9.*min(eta(:)); else; etamax = 1e+32.*min(eta(:)); end
-eta    = (etamax.^-0.5 + (eta*etareg).^-0.5).^-2;
+% phase segregation coefficients
+Ksgr_x = 2/9*cal.dx^2./eta/sgrreg                                                                       + TINY.^2;
+Ksgr_f = 2/9*cal.df^2./eta/sgrreg + cal.dx^2/cal.bf./cal.etaf0/sgrreg.*phi.^(cal.nf-1).*(1-phi).^cal.mf + TINY.^2;
+Ksgr_m =                            cal.dx^2/cal.bm./    etam /sgrreg.*mu .^(cal.nm-1).*(1-mu ).^cal.mm + TINY.^2;
+
+% bound and regularise viscosity
+if ~calibrt; etamax = 1e+6.*min(eta(:)); else; etamax = 1e+32.*min(eta(:)); end
+eta    = (etamax.^-0.5 + (eta*cnvreg).^-0.5).^-2;
 etaco  = (eta(1:end-1,1:end-1).*eta(2:end,1:end-1) ...
        .* eta(1:end-1,2:end  ).*eta(2:end,2:end  )).^0.25;
-
-% phase segregation coefficients
-Ksgr_x = 2/9*cal.dx^2./eta                                                                + TINY.^2;
-Ksgr_f = 2/9*cal.df^2./eta + cal.dx^2/cal.bf./cal.etaf0.*phi.^(cal.nf-1).*(1-phi).^cal.mf + TINY.^2;
-Ksgr_m =                     cal.dx^2/cal.bm./    etam .*mu .^(cal.nm-1).*(1-mu ).^cal.mm + TINY.^2;
 
 if ~calibrt % skip the following if called from calibration script
 
@@ -184,7 +185,7 @@ if step>0 && ~restart
                + advect(X(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA) ...  % xtal  advection
                + advect(F(inz,inx),Uf(inz,:),Wf(:,inx),h,{ADVN,''},[1,2],BCA);     % fluid advection
     F_DivV   = (alpha1*rho(inz,inx) - alpha2*rhoo(inz,inx) - alpha3*rhooo(inz,inx))./dt + (beta1*Div_rhoV + beta2*Div_rhoVo + beta3*Div_rhoVoo);  % get residual of mixture mass conservation
-    VolSrc   = Div_V(inz,inx) - F_DivV./rho(inz,inx);  % correct volume source term by scaled residual
+    VolSrc   = Div_V(inz,inx) - F_DivV./rho(inz,inx)/1.5;  % correct volume source term by scaled residual
 
     UBG    = - mean(VolSrc,'all')./2 .* (L/2-XXu);
     WBG    = - mean(VolSrc,'all')./2 .* (D/2-ZZw);

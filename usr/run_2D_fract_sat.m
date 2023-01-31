@@ -5,7 +5,7 @@ clear; close all;
 run('./par_default')
 
 % set run parameters
-runID    =  '2D_fract_sat';      % run identifier
+runID    =  '2D_fract_sat_csni';      % run identifier
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  100;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot results
@@ -25,9 +25,9 @@ tend     =  1*yr;                % end time for simulation [s]
 % set initial thermo-chemical state
 T0       =  1140;                % temperature top layer [deg C]
 c0       =  0.51;                % major component top layer [wt SiO2]
-dcr      =  1e-4;                % amplitude of random noise [wt SiO2]
+dcr      =  1e-5;                % amplitude of random noise [wt SiO2]
 v0       =  0.04;                % volatile component top layer [wt H2O]
-dvr      = -1e-4;                % amplitude of random noise [wt H2O]
+dvr      = -1e-5;                % amplitude of random noise [wt H2O]
 
 % set model trace and isotope geochemistry parameters (must match # trace elements and isotope ratios in calibration!)
 te0      =  [1,1,1,1];           % trace elements top layer [wt ppm]
@@ -35,7 +35,7 @@ ir0      =  [1, 1];              % isotope ratios top layer [delta]
 
 % set thermo-chemical boundary parameters
 bnd_w    =  h;                   % boundary layer width [m]
-tau_T    =  8*hr;                % wall cooling/assimilation time [s]
+tau_T    =  4*hr;                % wall cooling/assimilation time [s]
 Twall    =  300;                 % wall temperature [degC] (nan = insulating)
 
 % set thermo-chemical material parameters
@@ -44,11 +44,11 @@ Dsf      =  400;                 % entropy change of exsolution [J/kg]
 tau_r    =  0;                   % reaction time scale (set to zero for quasi-equilibrium mode)
 
 % set model buoyancy parameters
-dx       =  1e-3;                % crystal size [m]
-df       =  1e-3;                % bubble size [m]
+dx       =  3e-4;                % crystal size [m]
+df       =  3e-4;                % bubble size [m]
 
 % set numerical model parameters
-TINT     =  'bd3i';              % time integration scheme ('bwei','cnsi','bd3i','bd3s')
+TINT     =  'cnsi';              % time integration scheme ('bwei','cnsi','bd3i','bd3s')
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
 CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 rtol     =  1e-4;                % outer its relative tolerance
@@ -56,6 +56,8 @@ atol     =  1e-7;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its
 lambda   =  0.50;                % iterative lag parameter equilibration
 mink     =  1e-9;                % minimum diffusivity for phase, component fractions
+cnvreg   =  10;                  % convection regularisation parameter
+dtmax    =  5;
 
 
 %*****  RUN NAKHLA MODEL  *************************************************
