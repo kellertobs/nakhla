@@ -5,7 +5,7 @@ clear; close all;
 run('./par_default')
 
 % set run parameters
-runID    =  '2D_fract_sat_csni';      % run identifier
+runID    =  '2D_fract_sat';      % run identifier
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  100;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot results
@@ -35,7 +35,7 @@ ir0      =  [1, 1];              % isotope ratios top layer [delta]
 
 % set thermo-chemical boundary parameters
 bnd_w    =  h;                   % boundary layer width [m]
-tau_T    =  4*hr;                % wall cooling/assimilation time [s]
+tau_T    =  8*hr;                % wall cooling/assimilation time [s]
 Twall    =  300;                 % wall temperature [degC] (nan = insulating)
 
 % set thermo-chemical material parameters
@@ -48,7 +48,7 @@ dx       =  3e-4;                % crystal size [m]
 df       =  3e-4;                % bubble size [m]
 
 % set numerical model parameters
-TINT     =  'cnsi';              % time integration scheme ('bwei','cnsi','bd3i','bd3s')
+TINT     =  'bd3s';              % time integration scheme ('bwei','cnsi','bd3i','bd3s')
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
 CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 rtol     =  1e-4;                % outer its relative tolerance

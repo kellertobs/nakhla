@@ -42,8 +42,8 @@ Dsf      =  400;                 % entropy change of exsolution [J/kg]
 tau_r    =  0;                   % reaction time scale (set to zero for quasi-equilibrium mode)
 
 % set model buoyancy parameters
-dx       =  1e-3;                % crystal size [m]
-df       =  1e-3;                % bubble size [m]
+dx       =  3e-4;                % crystal size [m]
+df       =  3e-4;                % bubble size [m]
 
 % set numerical model parameters
 TINT     =  'bd3i';              % time integration scheme ('bwei','cnsi','bd3i','bd3s')

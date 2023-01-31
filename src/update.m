@@ -185,7 +185,7 @@ if step>0 && ~restart
                + advect(X(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA) ...  % xtal  advection
                + advect(F(inz,inx),Uf(inz,:),Wf(:,inx),h,{ADVN,''},[1,2],BCA);     % fluid advection
     F_DivV   = (alpha1*rho(inz,inx) - alpha2*rhoo(inz,inx) - alpha3*rhooo(inz,inx))./dt + (beta1*Div_rhoV + beta2*Div_rhoVo + beta3*Div_rhoVoo);  % get residual of mixture mass conservation
-    VolSrc   = Div_V(inz,inx) - F_DivV./rho(inz,inx)/1.5;  % correct volume source term by scaled residual
+    VolSrc   = Div_V(inz,inx) - F_DivV./rho(inz,inx)/2;  % correct volume source term by scaled residual
 
     UBG    = - mean(VolSrc,'all')./2 .* (L/2-XXu);
     WBG    = - mean(VolSrc,'all')./2 .* (D/2-ZZw);

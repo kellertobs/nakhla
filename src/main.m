@@ -11,10 +11,10 @@ while time <= tend && step <= Nt && any(m(:)>TINY)
     TCtime  = 0;
     UDtime  = 0;
 
-    if     strcmp(TINT,'bwei') || step==1  % first step  / 1st-order backward-Euler implicit scheme
+    if     strcmp(TINT,'bwei') || step<=2 % first step  / 1st-order backward-Euler implicit scheme
         alpha1 = 1;   alpha2 = 1;   alpha3 = 0;
         beta1  = 1;   beta2  = 0;   beta3  = 0;
-    elseif strcmp(TINT,'cnsi') || step==2  % second step / 2nd-order Crank-Nicolson semi-implicit scheme
+    elseif strcmp(TINT,'cnsi')            % second step / 2nd-order Crank-Nicolson semi-implicit scheme
         alpha1 = 1;   alpha2 = 1;   alpha3 = 0;
         beta1  = 1/2; beta2  = 1/2; beta3  = 0;
     elseif strcmp(TINT,'bd3i')            % other steps / 2nd-order 3-point backward-difference implicit scheme
