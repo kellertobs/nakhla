@@ -25,8 +25,10 @@ end
 % get total rate of change
 dTEdt = adv_TE + bnd_TE;
 
+res_TE = (a1*(TE(inz,inx,:)-TEo(inz,inx,:))/dt + a2*(TE(inz,inx,:)-TEoo(inz,inx,:))/(dt+dto)) - (b1*dTEdt + b2*dTEdto);
+
 % update trace element concentrations
-TE(inz,inx,:) = (alpha2*TEo(inz,inx,:) + alpha3*TEoo(inz,inx,:) + (beta1*dTEdt + beta2*dTEdto + beta3*dTEdtoo)*dt)/alpha1;
+TE(inz,inx,:) = TE(inz,inx,:) - lambda*res_TE*dt/a1;
 TE = max(0, TE );                                                          % enforce min bound
 TE([1 end],:,:) = TE([2 end-1],:,:);                                       % boundary conditions
 TE(:,[1 end],:) = TE(:,[2 end-1],:);
@@ -53,8 +55,10 @@ end
 % get total rate of change
 dIRdt = adv_IR + bnd_IR;
 
+res_IR = (a1*(IR(inz,inx,:)-IRo(inz,inx,:))/dt + a2*(IR(inz,inx,:)-IRoo(inz,inx,:))/(dt+dto)) - (b1*dIRdt + b2*dIRdto);
+
 % update isotope ratio concentrations
-IR(inz,inx,:) = (alpha2*IRo(inz,inx,:) + alpha3*IRoo(inz,inx,:) + (beta1*dIRdt + beta2*dIRdto + beta3*dIRdtoo)*dt)/alpha1;
+IR(inz,inx,:) = IR(inz,inx,:) - lambda*res_IR*dt/a1;
 IR([1 end],:,:) = IR([2 end-1],:,:);                                       % boundary conditions
 IR(:,[1 end],:) = IR(:,[2 end-1],:);
 

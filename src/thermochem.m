@@ -1,10 +1,6 @@
 %% *****  THERMO-CHEMICAL EVOLUTION  **************************************
 tic;
 
-% store previous iteration
-Si = S; Ci = C; Vi = V; Xi = X; Fi = F;
-
-
 %***  update heat content (entropy)
 
 % heat advection
@@ -27,10 +23,12 @@ if ~isnan(Twall)
 end
 
 % total rate of change
-dSdt = advn_S + diff_S + diss_h + bnd_S;
+dSdt  = advn_S + diff_S + diss_h + bnd_S;
+
+res_S = (a1*(S(inz,inx)-So(inz,inx))/dt + a2*(S(inz,inx)-Soo(inz,inx))/(dt+dto)) - (b1*dSdt + b2*dSdto);
 
 % semi-implicit update of bulk entropy density
-S(inz,inx) = (alpha2*So(inz,inx) + alpha3*Soo(inz,inx) + (beta1*dSdt + beta2*dSdto + beta3*dSdtoo)*dt)/alpha1;
+S(inz,inx) = S(inz,inx) - lambda*res_S*dt/a1;
 
 % boundary conditions
 S([1 end],:) = S([2 end-1],:);                                             
@@ -48,9 +46,11 @@ if ~isnan(cwall); bnd_C = (rho(inz,inx).*cwall-C(inz,inx))./tau_a .* bndshape; e
 
 % total rate of change
 dCdt = advn_C + bnd_C;                                            
-    
+
+res_C = (a1*(C(inz,inx)-Co(inz,inx))/dt + a2*(C(inz,inx)-Coo(inz,inx))/(dt+dto)) - (b1*dCdt + b2*dCdto);
+
 % semi-implicit update of major component density
-C(inz,inx) = (alpha2*Co(inz,inx) + alpha3*Coo(inz,inx) + (beta1*dCdt + beta2*dCdto + beta3*dCdtoo)*dt)/alpha1;
+C(inz,inx) = C(inz,inx) - lambda*res_C*dt/a1;
 C          = max(cal.cphs0.*rho,min(cal.cphs1.*rho,C));
 
 % boundary conditions
@@ -71,8 +71,10 @@ if any([v0;v1;vwall;v(:)]>10*TINY)
     % total rate of change
     dVdt = advn_V + bnd_V;                                                 
     
+    res_V = (a1*(V(inz,inx)-Vo(inz,inx))/dt + a2*(V(inz,inx)-Voo(inz,inx))/(dt+dto)) - (b1*dVdt + b2*dVdto);
+
     % semi-implicit update of volatile component density
-    V(inz,inx) = (alpha2*Vo(inz,inx) + alpha3*Voo(inz,inx) + (beta1*dVdt + beta2*dVdto + beta3*dVdtoo)*dt)/alpha1;
+    V(inz,inx) = V(inz,inx) - lambda*res_V*dt/a1;
     V          = max(0,min(rho,V));
 
     % boundary conditions
@@ -118,7 +120,7 @@ EQtime = EQtime + toc(eqtime);
 %***  update crystal fraction
 
 % crystallisation rate
-Gx = lambda * Gx + (1-lambda) * (xq(inz,inx).*rho(inz,inx)-X(inz,inx))./max(tau_r,3*dt);
+Gx = (xq(inz,inx).*rho(inz,inx)-X(inz,inx))./max(tau_r,3*dt);
 
 % crystallinity advection
 advn_X = - advect(X(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);
@@ -126,8 +128,10 @@ advn_X = - advect(X(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);
 % total rate of change
 dXdt   = advn_X + Gx;
 
+res_X = (a1*(X(inz,inx)-Xo(inz,inx))/dt + a2*(X(inz,inx)-Xoo(inz,inx))/(dt+dto)) - (b1*dXdt + b2*dXdto);
+
 % semi-implicit update of crystal fraction
-X(inz,inx) = (alpha2*Xo(inz,inx) + alpha3*Xoo(inz,inx) + (beta1*dXdt + beta2*dXdto + beta3*dXdtoo)*dt)/alpha1;
+X(inz,inx) = X(inz,inx) - lambda*res_X*dt/a1;
 X = max(0, X );
 
 % boundary conditions
@@ -139,7 +143,7 @@ X(:,[1 end]) = X(:,[2 end-1]);
 if any([v0;v1;vwall;v(:)]>10*TINY)
 
     % fluid exsolution rate
-    Gf = lambda * Gf + (1-lambda) * (fq(inz,inx).*rho(inz,inx)-F(inz,inx))./max(tau_r,3*dt);
+    Gf = (fq(inz,inx).*rho(inz,inx)-F(inz,inx))./max(tau_r,3*dt);
 
     % fluid bubble advection
     advn_F = - advect(F(inz,inx),Uf(inz,:),Wf(:,inx),h,{ADVN,''},[1,2],BCA);
@@ -147,8 +151,10 @@ if any([v0;v1;vwall;v(:)]>10*TINY)
     % total rate of change
     dFdt   = advn_F + Gf;
 
+    res_F = (a1*(F(inz,inx)-Fo(inz,inx))/dt + a2*(F(inz,inx)-Foo(inz,inx))/(dt+dto)) - (b1*dFdt + b2*dFdto);
+
     % semi-implicit update of bubble fraction
-    F(inz,inx) = (alpha2*Fo(inz,inx) + alpha3*Foo(inz,inx) + (beta1*dFdt + beta2*dFdto + beta3*dFdtoo)*dt)/alpha1;
+    F(inz,inx) = F(inz,inx) - lambda*res_F*dt/a1;
     F = max(0,min(V, F ));
 
     % boundary conditions
@@ -184,11 +190,11 @@ vf = v./max(TINY,m./Kf + f); vf(m==1) = vfq(m==1);
 %% *****  UPDATE TC RESIDUALS  ********************************************
 
 % get residual of thermochemical equations from iterative update
-resnorm_TC = norm( S(inz,inx) - Si(inz,inx),'fro')./(norm(S(inz,inx),'fro')+TINY) ...
-           + norm( C(inz,inx) - Ci(inz,inx),'fro')./(norm(C(inz,inx),'fro')+TINY) ...
-           + norm( V(inz,inx) - Vi(inz,inx),'fro')./(norm(V(inz,inx),'fro')+TINY) ...
-           + norm((X(inz,inx) - Xi(inz,inx)).*(x(inz,inx)>10*TINY).*(m(inz,inx)>10*TINY),'fro')./(norm(X(inz,inx),'fro')+TINY) ...
-           + norm((F(inz,inx) - Fi(inz,inx)).*(f(inz,inx)>10*TINY).*(m(inz,inx)>10*TINY),'fro')./(norm(F(inz,inx),'fro')+TINY);
+resnorm_TC = norm(res_S,'fro')./(a1*norm(S(inz,inx)/dt,'fro')+TINY) ...
+           + norm(res_C,'fro')./(a1*norm(C(inz,inx)/dt,'fro')+TINY) ...
+           + norm(res_V,'fro')./(a1*norm(V(inz,inx)/dt,'fro')+TINY) ...
+           + norm(res_X.*(x(inz,inx)>10*TINY).*(m(inz,inx)>10*TINY),'fro')./(norm(a1*X(inz,inx)/dt,'fro')+TINY) ...
+           + norm(res_F.*(f(inz,inx)>10*TINY).*(m(inz,inx)>10*TINY),'fro')./(norm(a1*F(inz,inx)/dt,'fro')+TINY);
 
 TCtime = TCtime + toc - toc(eqtime);
 

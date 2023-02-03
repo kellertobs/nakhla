@@ -41,10 +41,11 @@ dsumVdt = sum(sum(bnd_V*h*h*1)) ...
         + sum(  M(2,2:end-1).*vm(2,2:end-1).*Wm(1,2:end-1)*h*1) - sum(M(end-1,2:end-1).*vm(end-1,2:end-1).*Wm(end,2:end-1)*h*1) ...
         + sum(  M(2:end-1,2).*vm(2:end-1,2).*Um(2:end-1,1)*h*1) - sum(M(2:end-1,end-1).*vm(2:end-1,end-1).*Um(2:end-1,end)*h*1);  % [kg/s]
 
-if step>=1; hist.DM(stp) = (alpha2*hist.DM(stp-1) + alpha3*hist.DM(max(1,stp-2)) + (beta1*dsumMdt + beta2*dsumMdto + beta3*dsumMdtoo)*dt)/alpha1; else; hist.DM(stp) = 0; end  % [kg]
-if step>=1; hist.DS(stp) = (alpha2*hist.DS(stp-1) + alpha3*hist.DS(max(1,stp-2)) + (beta1*dsumSdt + beta2*dsumSdto + beta3*dsumSdtoo)*dt)/alpha1; else; hist.DS(stp) = 0; end  % [kg]
-if step>=1; hist.DC(stp) = (alpha2*hist.DC(stp-1) + alpha3*hist.DC(max(1,stp-2)) + (beta1*dsumCdt + beta2*dsumCdto + beta3*dsumCdtoo)*dt)/alpha1; else; hist.DC(stp) = 0; end  % [kg]
-if step>=1; hist.DV(stp) = (alpha2*hist.DV(stp-1) + alpha3*hist.DV(max(1,stp-2)) + (beta1*dsumVdt + beta2*dsumVdto + beta3*dsumVdtoo)*dt)/alpha1 .* any(v(:)>1e-6); else; hist.DV(stp) = 0; end  % [kg]
+
+if step>=1; hist.DM(stp) = (a1/dt*hist.DM(stp-1) + a2/(dt+dto)*hist.DM(max(1,stp-2)) + (b1*dsumMdt + b2*dsumMdto)) / (a1/dt+a2/(dt+dto)); else; hist.DM(stp) = 0; end  % [kg]
+if step>=1; hist.DS(stp) = (a1/dt*hist.DS(stp-1) + a2/(dt+dto)*hist.DS(max(1,stp-2)) + (b1*dsumSdt + b2*dsumSdto)) / (a1/dt+a2/(dt+dto)); else; hist.DS(stp) = 0; end  % [kg]
+if step>=1; hist.DC(stp) = (a1/dt*hist.DC(stp-1) + a2/(dt+dto)*hist.DC(max(1,stp-2)) + (b1*dsumCdt + b2*dsumCdto)) / (a1/dt+a2/(dt+dto)); else; hist.DC(stp) = 0; end  % [kg]
+if step>=1; hist.DV(stp) = (a1/dt*hist.DV(stp-1) + a2/(dt+dto)*hist.DV(max(1,stp-2)) + (b1*dsumVdt + b2*dsumVdto)) / (a1/dt+a2/(dt+dto)) .* any(v(:)>1e-6); else; hist.DV(stp) = 0; end  % [kg]
 
 % record conservation error of mass M, heat H, major component C, volatile component V
 hist.EM(stp) = (hist.sumM(stp) - hist.DM(stp))./hist.sumM(1) - 1;  % [kg/kg]

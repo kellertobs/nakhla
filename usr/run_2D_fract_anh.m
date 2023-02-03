@@ -48,16 +48,16 @@ dx       =  3e-4;                % crystal size [m]
 df       =  3e-4;                % bubble size [m]
 
 % set numerical model parameters
-TINT     =  'bd3s';              % time integration scheme ('bwei','cnsi','bd3i','bd3s')
+TINT     =  'bd2im';             % time integration scheme ('be1im','bd2im','cn2si')
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
 CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 rtol     =  1e-4;                % outer its relative tolerance
-atol     =  1e-7;                % outer its absolute tolerance
-maxit    =  20;                  % maximum outer its
-lambda   =  0.50;                % iterative lag parameter equilibration
-mink     =  1e-9;                % minimum diffusivity for phase, component fractions
+atol     =  1e-9;                % outer its absolute tolerance
+maxit    =  50;                  % maximum outer its
+lambda   =  0.75;                % iterative step size
+mink     =  1e-8;                % minimum diffusivity for phase, component fractions
 cnvreg   =  10;                  % convection regularisation parameter
-dtmax    =  20;
+dtmax    =  20;                  % maximum time step [s]
 
 %*****  RUN NAKHLA MODEL  *************************************************
 run('../src/main')

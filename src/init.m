@@ -231,9 +231,9 @@ for i = 1:cal.nir
     if any(bndinit(:)) && ~isnan(irwall(i)); ir(:,:,i)  = ir(:,:,i) + (irwall(i)-ir(:,:,i)).*bndinit; end; irin = ir;
 end
 
-U   =  zeros(size((XX(:,1:end-1)+XX(:,2:end))));  UBG = U; Ui = U;  res_U = 0.*U;
-W   =  zeros(size((XX(1:end-1,:)+XX(2:end,:))));  WBG = W; Wi = W;  res_W = 0.*W; wf = 0.*W; wc = 0.*W;
-P   =  0.*Tp;  Pi = P;  res_P = 0.*P;  meanQ = 0;  Vel = 0.*P;
+U   =  zeros(size((XX(:,1:end-1)+XX(:,2:end))));  UBG = U; Ui = U;
+W   =  zeros(size((XX(1:end-1,:)+XX(2:end,:))));  WBG = W; Wi = W; wf = 0.*W; wc = 0.*W;
+P   =  0.*Tp;  Pi = P;  meanQ = 0;  Vel = 0.*P;
 SOL = [W(:);U(:);P(:)];
 
 % initialise auxiliary fields
@@ -242,10 +242,10 @@ Wx  = W;  Ux  = U;
 Wm  = W;  Um  = U;
 
 eIIref =  1e-6;  
-Div_V  =  0.*P;  Div_Vi = 0.*P(inz,inx);  Div_rhoV = 0.*P(inz,inx);  Div_rhoVo = Div_rhoV;
+Div_V  =  0.*P;  Div_Vi = 0.*P(inz,inx);  drhodt = 0.*P(inz,inx);  drhodto = drhodt;
 exx    =  0.*P;  ezz = 0.*P;  exz = zeros(Nz-1,Nx-1);  eII = 0.*P;  
 txx    =  0.*P;  tzz = 0.*P;  txz = zeros(Nz-1,Nx-1);  tII = 0.*P; 
-VolSrc =  0.*P(inz,inx); meanVolSrc = 0;  MassErr = 0;  drhodt = 0.*P;  drhodto = 0.*P;
+VolSrc =  0.*P(inz,inx); 
 rhom   =  rhom0.*ones(size(Tp)); 
 rhox   =  rhox0.*ones(size(Tp));
 rhof   =  rhof0.*ones(size(Tp));
@@ -298,12 +298,12 @@ dto  = dt;
 ho   = h;
 
 % get bulk enthalpy, silica, volatile content densities
-S  = rho.*(cP.*log(T/(cal.Tphs1+273.15)) + x.*Dsx + f.*Dsf - Adbt.*(Pt-Ptop));  So = S;
+S  = rho.*(cP.*log(T/(cal.Tphs1+273.15)) + x.*Dsx + f.*Dsf - Adbt.*(Pt-Ptop));  So = S;  res_S = 0.*S(inz,inx);
 S0 = rho.*(cP.*log(cal.Tphs1+273.15) + x.*Dsx + f.*Dsf - Adbt.*Ptop);  
-C  = rho.*(m.*cm + x.*cx); Co = C;
-V  = rho.*(m.*vm + f.*vf); Vo = V;
-X  = rho.*x; Xo = X;
-F  = rho.*f; Fo = F;
+C  = rho.*(m.*cm + x.*cx); Co = C;  res_C = 0.*C(inz,inx);
+V  = rho.*(m.*vm + f.*vf); Vo = V;  res_V = 0.*V(inz,inx);
+X  = rho.*x; Xo = X;  res_X = 0.*X(inz,inx);
+F  = rho.*f; Fo = F;  res_F = 0.*F(inz,inx);
 M  = rho.*m; Mo = M;
 
 % get phase entropies

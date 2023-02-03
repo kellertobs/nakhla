@@ -74,10 +74,9 @@ for nn = NN
 
     if nn == NN(1)
         p6 = loglog(DOFS,0.95*FMtime*(DOFS./DOFS(1)).^1,'k-','LineWidth',2);  % plot linear trend for comparison
-        p7 = loglog(DOFS,0.95*FMtime*(DOFS./DOFS(1)).^2,'k--','LineWidth',2);  % plot quadratic trend for comparison
     end
     if nn == NN(end)
-        legend([p5,p6,p7],{'time to solution','linear','quadratic'},'Interpreter','latex','box','on','location','southeast')
+        legend([p5,p6],{'time to solution','linear'},'Interpreter','latex','box','on','location','southeast')
     end
 
 end

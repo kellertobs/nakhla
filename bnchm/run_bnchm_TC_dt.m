@@ -36,12 +36,13 @@ dirg     =  [1, 1];              % isotope ratios centred gaussian [delta]
 fin = 0; fout = 0; Twall = nan;
 
 % set numerical model parameters
-TINT     =  'bd3s';              % time integration scheme ('bwei','cnsi','bd3i','bd3s')
 CFL      =  1.00;                % (physical) time stepping courant number (multiplies stable step) [0,1]
+TINT     =  'bd2im';             % time integration scheme ('be1im','bd2im','cn2si')
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
 rtol     =  1e-6;                % outer its relative tolerance
 atol     =  1e-9;                % outer its absolute tolerance
-maxit    =  50;                  % maximum outer its
+lambda   =  1.00;                % iterative step size
+tau_r    =  1e16;                % disable reaction
 
 % create output directory
 if ~isfolder([opdir,'/',runID])
@@ -74,7 +75,6 @@ for dti = DT
 
     % set parameters for non-dissipative, non-reactive flow
     diss(:) = 0;
-    tau_r   = 1e32;
     resnorm_VP = 0;
 
     rhoin = rho;
@@ -104,18 +104,15 @@ for dti = DT
         TCtime  = 0;
         UDtime  = 0;
 
-        if     strcmp(TINT,'bwei') || step==1  % first step  / 1st-order backward-Euler implicit scheme
-            alpha1 = 1; alpha2 = 1; alpha3 = 0;
-            beta1  = 1; beta2  = 0; beta3  = 0;
-        elseif strcmp(TINT,'cnsi') || step==2  % second step / 2nd-order Crank-Nicolson semi-implicit scheme
-            alpha1 = 1;   alpha2 = 1;   alpha3 = 0;
-            beta1  = 1/2; beta2  = 1/2; beta3  = 0;
-        elseif strcmp(TINT,'bd3i')            % other steps / 2nd-order 3-point backward-difference implicit scheme
-            alpha1 = 3/2; alpha2 = 4/2; alpha3 = -1/2;
-            beta1  = 1; beta2  = 0; beta3  = 0;
-        elseif strcmp(TINT,'bd3s')            % other steps / 2nd-order 3-point backward-difference semi-implicit scheme
-            alpha1 = 3/2; alpha2 = 4/2; alpha3 = -1/2;
-            beta1  = 3/4; beta2  = 2/4; beta3  = -1/4;
+        if     strcmp(TINT,'be1im') || step==1 % first step / 1st-order backward-Euler implicit scheme
+            a1 = 1; a2 = 0;
+            b1 = 1; b2 = 0;
+        elseif strcmp(TINT,'bd2im') || step==2 % second step / 2nd-order 3-point backward-difference implicit scheme
+            a1 = 2; a2 = -1;
+            b1 = 1; b2 =  0;
+        elseif strcmp(TINT,'cn2si')            % other steps / 2nd-order Crank-Nicolson semi-implicit scheme
+            a1 = 1;   a2 = 0;
+            b1 = 1/2; b2 = 1/2;
         end
 
         % store previous solution
@@ -124,6 +121,7 @@ for dti = DT
         Voo = Vo; Vo = V;
         Xoo = Xo; Xo = X;
         Foo = Fo; Fo = F;
+        rhooo = rhoo; rhoo = rho;
         TEoo = TEo; TEo = TE;
         IRoo = IRo; IRo = IR;
         dSdtoo = dSdto; dSdto = dSdt;
@@ -131,10 +129,9 @@ for dti = DT
         dVdtoo = dVdto; dVdto = dVdt;
         dXdtoo = dXdto; dXdto = dXdt;
         dFdtoo = dFdto; dFdto = dFdt;
+        drhodtoo = drhodto; drhodto = drhodt;
         dTEdtoo = dTEdto; dTEdto = dTEdt;
         dIRdtoo = dIRdto; dIRdto = dIRdt;
-        rhooo = rhoo; rhoo = rho;
-        Div_rhoVoo = Div_rhoVo; Div_rhoVo = Div_rhoV;
         Div_Vo  = Div_V;
         dto     = dt;
 
@@ -208,5 +205,5 @@ for dti = DT
 
 end
 
-name = [opdir,'/',runID,'/',runID,'_bnchm'];
+name = [opdir,'/',runID,'/',runID,'_',TINT];
 print(fh15,name,'-dpng','-r300','-vector');

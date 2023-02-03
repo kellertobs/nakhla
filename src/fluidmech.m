@@ -282,7 +282,7 @@ LL  = [ KV  -GG  ; ...
 
 RR  = [RV; RP];
 
-SCL = sqrt(abs(diag(LL)));
+SCL = (abs(diag(LL))).^0.5;
 SCL = diag(sparse(1./(SCL+1)));
 
 LL  = SCL*LL*SCL;
@@ -352,7 +352,7 @@ if ~bnchm
     %% update time step
     dtk = (h/2)^2./max([kT(:)./rho(:)./cP;kx(:);kf(:)])/2;                 % diffusive time step size
     dta = CFL*h/2/max(abs([Ux(:);Wx(:);Uf(:);Wf(:);Um(:);Wm(:)]+1e-16));   % advective time step size
-    dt  = min([2*dto,dtmax,min(dtk,dta)]);                                 % physical time step size
+    dt  = min([0.1*min(dtk,dta)+0.9*dto,dtmax]);                                 % physical time step size
 end
 
 end
