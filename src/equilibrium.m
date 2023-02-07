@@ -21,6 +21,7 @@ maxit   = 100;
 resnorm = 1;
 tol     = 1e-13;
 eps     = 1e-6;
+DOF     = length(xq(:));
 
 vmq_c0 = (4.7773e-7.*P.^0.6 + 1e-11.*P) .* exp(2565*(1./(T0+273.15)-1./(perTd+273.15))); % Katz et al., 2003; Moore et al., 1998
 vmq_c1 = (3.5494e-3.*P.^0.5 + 9.623e-8.*P - 1.5223e-11.*P.^1.5)./(T0+273.15) + 1.2436e-14.*P.^1.5; % Liu et al., 2015
@@ -28,42 +29,36 @@ vmq0   = (1-c).*vmq_c0 + c.*vmq_c1;
 
 while resnorm > tol && iter < maxit
    
-    beta = 0.5;
+    beta = 0.9;
 
-    [resx,resf,~,cmq,~,~] = res_xf(xq,fq,T0,c,v,P,Tphs0d,Tphs1d,cphs0,cphs1,perTd,perCx,perCm,clap,dTH2O,vmq0,PhDg,TINY);
+    [resx,resf,cxq,cmq,vfq,vmq] = res_xf(xq,fq,T0,c,v,P,Tphs0d,Tphs1d,cphs0,cphs1,perTd,perCx,perCm,clap,dTH2O,vmq0,PhDg,TINY);
     
-    [resx_xp,~,~,~,~,~] = res_xf(xq+eps,fq,T0,c,v,P,Tphs0d,Tphs1d,cphs0,cphs1,perTd,perCx,perCm,clap,dTH2O,vmq0,PhDg,TINY);
-    [resx_xm,~,~,~,~,~] = res_xf(xq-eps,fq,T0,c,v,P,Tphs0d,Tphs1d,cphs0,cphs1,perTd,perCx,perCm,clap,dTH2O,vmq0,PhDg,TINY);
-    
-    dresx_dx = (resx_xp-resx_xm)/2/eps;
+    vmq0 = (1-cmq).*vmq_c0 + cmq.*vmq_c1;
+
+    dresx_dx = cmq-cxq;
 
     if any(v(:)>10*TINY)
-        vmq0   = (1-cmq).*vmq_c0 + cmq.*vmq_c1;
-
-        [~,resf_fp,~,~,~,~] = res_xf(xq,fq+eps,T0,c,v,P,Tphs0d,Tphs1d,cphs0,cphs1,perTd,perCx,perCm,clap,dTH2O,vmq0,PhDg,TINY);
-        [~,resf_fm,~,~,~,~] = res_xf(xq,fq-eps,T0,c,v,P,Tphs0d,Tphs1d,cphs0,cphs1,perTd,perCx,perCm,clap,dTH2O,vmq0,PhDg,TINY);
-        
-        dresf_df = (resf_fp-resf_fm)/2/eps;
+        dresf_df = vmq-vfq;
     else
         resf     = fq;
         dresf_df = ones(size(fq));
     end
     
-    xq = max(0,min(1-fq,xq - beta*(resx./dresx_dx)));
-    fq = max(0,min(1   ,fq - beta*(resf./dresf_df)));
-    
-    indx = xq>0 & xq<1 & xq+fq<1;
-    indf = fq>0 & fq<1 & xq+fq<1;
+    xq = max(0,min(1-fq,xq - beta*resx./dresx_dx));
+    fq = max(0,min(1   ,fq - beta*resf./dresf_df));
 
-    resnorm = (norm(resx(indx(:)),2) + norm(resf(indf(:)),2))/sqrt(length(xq(:)));
+    resnorm = norm(resx./dresx_dx,'fro') ...
+            + norm(resf./dresf_df,'fro');
 
     iter    = iter+1;
 end
 
+if iter>=maxit; error('!!! equilibrium solver did not converge !!!'); end
+
 [~,~,cxq,cmq,vfq,vmq] = res_xf(xq,fq,T0,c,v,P,Tphs0d,Tphs1d,cphs0,cphs1,perTd,perCx,perCm,clap,dTH2O,vmq0,PhDg,TINY);
 
-
 end
+
 
 function [resx,resf,cxq,cmq,vfq,vmq] = res_xf(xq,fq,T0,c,v,P,Tphs0d,Tphs1d,cphs0,cphs1,perTd,perCx,perCm,clap,dTH2O,vmq0,PhDg,TINY)
 
@@ -86,7 +81,7 @@ end
 T   = max(0,min(1,(T0 - P*clap -Tphs0)./(Tphs1-Tphs0)));
 
 a = 20;
-b = 0.06;
+b = 0.04;
 ind1 = T>=perT+b;
 ind2 = T< perT-b;
 ind3 = T>=perT-b & T<perT+b;
