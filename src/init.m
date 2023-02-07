@@ -232,7 +232,7 @@ for i = 1:cal.nir
 end
 
 U   =  zeros(size((XX(:,1:end-1)+XX(:,2:end))));  UBG = U; Ui = U;
-W   =  zeros(size((XX(1:end-1,:)+XX(2:end,:))));  WBG = W; Wi = W; wf = 0.*W; wc = 0.*W;
+W   =  zeros(size((XX(1:end-1,:)+XX(2:end,:))));  WBG = W; Wi = W; wf = 0.*W; wx = 0.*W; wm = 0.*W;
 P   =  0.*Tp;  Pi = P;  meanQ = 0;  Vel = 0.*P;
 SOL = [W(:);U(:);P(:)];
 

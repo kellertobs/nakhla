@@ -1,6 +1,24 @@
 % store previous iteration
 SOLi = SOL; tic;
 
+if ~bnchm && step>0
+
+%***  update mixture mass density
+drhodt  = - advect(M(inz,inx),Um(inz,:),Wm(:,inx),h,{ADVN,''},[1,2],BCA) ...  % melt  advection
+          - advect(X(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA) ...  % xtal  advection
+          - advect(F(inz,inx),Uf(inz,:),Wf(:,inx),h,{ADVN,''},[1,2],BCA);     % fluid advection
+
+% residual of mixture mass evolution
+res_rho = (a1*rho(inz,inx)-a2*rhoo(inz,inx)-a3*rhooo(inz,inx))/dt - (b1*drhodt + b2*drhodto + b3*drhodtoo);
+
+% volume source and background velocity passed to fluid-mechanics solver
+VolSrc  = Div_V(inz,inx) - lambda*res_rho./rho(inz,inx);  % correct volume source term by scaled residual
+
+UBG     = - mean(VolSrc,'all')./2 .* (L/2-XXu);
+WBG     = - mean(VolSrc,'all')./2 .* (D/2-ZZw);
+
+end
+
 %% 0-D run does not require fluidmech solve
 if Nz==3 && Nx==3  
     W  = WBG; Wm = W;  Wx = W;  Wf = W;
@@ -311,14 +329,31 @@ if ~bnchm
 
     % get residual of fluid mechanics equations from iterative update
     resSOL = SOL - SOLi;
-    resW  = full(reshape(resSOL(MapW(:))        ,(Nz-1), Nx   ));          % matrix z-velocity
-    resU  = full(reshape(resSOL(MapU(:))        , Nz   ,(Nx-1)));          % matrix x-velocity
-    resP  = full(reshape(resSOL(MapP(:)+(NW+NU)), Nz   , Nx   ));          % matrix dynamic pressure
-%     resnorm_VP = norm(resW(:  ,inx),'fro')./(norm(W(:  ,inx),'fro')+TINY) ...
-%                + norm(resU(inz,:  ),'fro')./(norm(U(inz,:  ),'fro')+TINY) ...
-%                + norm(resP(inz,inx),'fro')./(norm(P(inz,inx),'fro')+TINY);
+%     res_W  = full(reshape(resSOL(MapW(:))        ,(Nz-1), Nx   ));         % matrix z-velocity
+%     res_U  = full(reshape(resSOL(MapU(:))        , Nz   ,(Nx-1)));         % matrix x-velocity
+%     res_P  = full(reshape(resSOL(MapP(:)+(NW+NU)), Nz   , Nx   ));         % matrix dynamic pressure
+%     resnorm_VP = norm(res_W(:  ,inx),'fro')./(norm(Vel(inz,inx),'fro')+TINY) ...
+%                + norm(res_U(inz,:  ),'fro')./(norm(Vel(inz,inx),'fro')+TINY) ...
+%                + norm(res_P(inz,inx),'fro')./(norm(P(inz,inx),'fro')+TINY);
     resnorm_VP = 0;
 
+    % phase segregation speeds
+    wm = ((rhom(1:end-1,:)+rhom(2:end,:))/2-mean(rhofz,2)).*g0.*(Ksgr_m(1:end-1,:).*Ksgr_m(2:end,:)).^0.5; % melt segregation speed
+    wm(1  ,:)     = min(1,1-top).*wm(1  ,:);
+    wm(end,:)     = min(1,1-bot).*wm(end,:);
+    wm(:,[1 end]) = -sds*wm(:,[2 end-1]);
+
+    wx = ((rhox(1:end-1,:)+rhox(2:end,:))/2-mean(rhofz,2)).*g0.*(Ksgr_x(1:end-1,:).*Ksgr_x(2:end,:)).^0.5; % solid segregation speed
+    wx(1  ,:)     = min(1,1-top).*wx(1  ,:);
+    wx(end,:)     = min(1,1-bot).*wx(end,:);
+    wx(:,[1 end]) = -sds*wx(:,[2 end-1]);
+
+    wf = ((rhof(1:end-1,:)+rhof(2:end,:))/2-mean(rhofz,2)).*g0.*(Ksgr_f(1:end-1,:).*Ksgr_f(2:end,:)).^0.5; % fluid segregation speed
+    wf(1  ,:)     = min(1,1-top+fout).*wf(1  ,:);
+    wf(end,:)     = min(1,1-bot+fin ).*wf(end,:);
+    wf(:,[1 end]) = -sds*wf(:,[2 end-1]);
+
+    % phase diffusion fluxes
     qxz    = - (kx(1:end-1,:)+kx(2:end,:))./2 .* ddz(chi,h);  % z-flux
     qxx    = - (kx(:,1:end-1)+kx(:,2:end))./2 .* ddx(chi,h);  % x-flux
 

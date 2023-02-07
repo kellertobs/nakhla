@@ -9,7 +9,7 @@ runID    =  '1D_fract_anh';      % run identifier
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  500;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot results
-save_op  =  1;                   % switch on to save output to file
+save_op  =  0;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
 
 % set model domain parameters
@@ -42,18 +42,19 @@ Dsf      =  400;                 % entropy change of exsolution [J/kg]
 tau_r    =  0;                   % reaction time scale (set to zero for quasi-equilibrium mode)
 
 % set model buoyancy parameters
-dx       =  3e-4;                % crystal size [m]
-df       =  3e-4;                % bubble size [m]
+dx       =  1e-3;                % crystal size [m]
+df       =  1e-3;                % bubble size [m]
 
 % set numerical model parameters
-TINT     =  'bd2im';             % time integration scheme ('be1im','bd2im','cn2si')
+TINT     =  'bd2im';             % time integration scheme ('be1im','bd2im','cn2si','bd2si')
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
 CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 rtol     =  1e-4;                % outer its relative tolerance
-atol     =  1e-9;                % outer its absolute tolerance
+atol     =  1e-7;                % outer its absolute tolerance
 maxit    =  50;                  % maximum outer its
-lambda   =  0.75;                % iterative step size
+lambda   =  0.50;                % iterative step size
 mink     =  1e-8;                % minimum diffusivity for phase, component fractions
+
 
 %*****  RUN NAKHLA MODEL  *************************************************
 run('../src/main')

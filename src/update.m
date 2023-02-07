@@ -17,7 +17,7 @@ cm_cmp1 = (cm_cmp1-mincmp)./(maxcmp-mincmp);
 cm_cmp2 = (cm_cmp2-mincmp)./(maxcmp-mincmp);
 
 a = 250;
-b = 0.05;
+b = 0.025;
 ind1 = repmat(cm,1,1,cal.nc)<=cal.perCm-b;
 ind2 = repmat(cm,1,1,cal.nc)> cal.perCm+b;
 ind3 = repmat(cm,1,1,cal.nc)< cal.perCm+b & cm>=cal.perCm-b;
@@ -45,7 +45,7 @@ cx_cmp1 = (cx_cmp1-mincmp)./(maxcmp-mincmp);
 cx_cmp2 = (cx_cmp2-mincmp)./(maxcmp-mincmp);
 
 a = 250;
-b = 0.05;
+b = 0.025;
 ind1 = repmat(cx,1,1,cal.nc)<=cal.perCx-b;
 ind2 = repmat(cx,1,1,cal.nc)> cal.perCx+b;
 ind3 = repmat(cx,1,1,cal.nc)< cal.perCx+b & cx>=cal.perCx-b;
@@ -110,21 +110,6 @@ etaco  = (eta(1:end-1,1:end-1).*eta(2:end,1:end-1) ...
 
 if ~calibrt % skip the following if called from calibration script
 
-wm = ((rhom(1:end-1,:)+rhom(2:end,:))/2-mean(rhofz,2)).*g0.*(Ksgr_m(1:end-1,:).*Ksgr_m(2:end,:)).^0.5; % melt segregation speed
-wm(1  ,:)     = min(1,1-top).*wm(1  ,:);
-wm(end,:)     = min(1,1-bot).*wm(end,:);
-wm(:,[1 end]) = -sds*wm(:,[2 end-1]);
-
-wx = ((rhox(1:end-1,:)+rhox(2:end,:))/2-mean(rhofz,2)).*g0.*(Ksgr_x(1:end-1,:).*Ksgr_x(2:end,:)).^0.5; % solid segregation speed
-wx(1  ,:)     = min(1,1-top).*wx(1  ,:);
-wx(end,:)     = min(1,1-bot).*wx(end,:);
-wx(:,[1 end]) = -sds*wx(:,[2 end-1]);
-
-wf = ((rhof(1:end-1,:)+rhof(2:end,:))/2-mean(rhofz,2)).*g0.*(Ksgr_f(1:end-1,:).*Ksgr_f(2:end,:)).^0.5; % fluid segregation speed
-wf(1  ,:)     = min(1,1-top+fout).*wf(1  ,:);
-wf(end,:)     = min(1,1-bot+fin ).*wf(end,:);
-wf(:,[1 end]) = -sds*wf(:,[2 end-1]);
-
 % diffusion parameters
 kW  = Vel/10*h/10;                                                         % convection fluctuation diffusivity
 kwx = abs((rhox-rho).*g0.*Ksgr_x*dx*10);                                   % segregation fluctuation diffusivity
@@ -177,22 +162,6 @@ else
         +  mu(inz,inx)./Ksgr_m(inz,inx) .* ((wm(inz,inx)+wm(inz,inx))./2).^2 ...
         + chi(inz,inx)./Ksgr_x(inz,inx) .* ((wx(inz,inx)+wx(inz,inx))./2).^2 ...
         + phi(inz,inx)./Ksgr_f(inz,inx) .* ((wf(inz,inx)+wf(inz,inx))./2).^2;
-end
-
-% update volume source
-if step>0 && ~restart
-    drhodt  = - advect(M(inz,inx),Um(inz,:),Wm(:,inx),h,{ADVN,''},[1,2],BCA) ...  % melt  advection
-              - advect(X(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA) ...  % xtal  advection
-              - advect(F(inz,inx),Uf(inz,:),Wf(:,inx),h,{ADVN,''},[1,2],BCA);     % fluid advection
-    res_rho = (a1*(rho(inz,inx)-rhoo(inz,inx))/dt + a2*(rho(inz,inx)-rhooo(inz,inx))/(dt+dto)) - (b1*drhodt + b2*drhodto);
-    % res_DivV   = (alpha1*rho(inz,inx) - alpha2*rhoo(inz,inx) - alpha3*rhooo(inz,inx))./dt + (beta1*Div_rhoV + beta2*Div_rhoVo + beta3*Div_rhoVoo);  % get residual of mixture mass conservation
-    % res_DivV   = (alpha1*rho(inz,inx) - alpha2*rhoo(inz,inx) - alpha3*rhooo(inz,inx))./dt + Div_rhoV;  % get residual of mixture mass conservation
-    % res_DivV   = (rho(inz,inx) - rhoo(inz,inx))./dt + Div_rhoV;  % get residual of mixture mass conservation
-    VolSrc   = Div_V(inz,inx) - lambda*res_rho./rho(inz,inx);  % correct volume source term by scaled residual
-
-    UBG    = - mean(VolSrc,'all')./2 .* (L/2-XXu);
-    WBG    = - mean(VolSrc,'all')./2 .* (D/2-ZZw);
-
 end
 
 UDtime = UDtime + toc;

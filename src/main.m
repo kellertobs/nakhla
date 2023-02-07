@@ -12,14 +12,17 @@ while time <= tend && step <= Nt && any(m(:)>TINY)
     UDtime  = 0;
 
     if     strcmp(TINT,'be1im') || step==1 % first step / 1st-order backward-Euler implicit scheme
-        a1 = 1; a2 = 0;
-        b1 = 1; b2 = 0;
+        a1 = 1; a2 = 1; a3 = 0;
+        b1 = 1; b2 = 0; b3 = 0;
     elseif strcmp(TINT,'bd2im') || step==2 % second step / 2nd-order 3-point backward-difference implicit scheme
-        a1 = 2; a2 = -1;
-        b1 = 1; b2 =  0;
+        a1 = 3/2; a2 = 4/2; a3 = -1/2;
+        b1 = 1;   b2 =  0;  b3 = 0;
     elseif strcmp(TINT,'cn2si')            % other steps / 2nd-order Crank-Nicolson semi-implicit scheme
-        a1 = 1;   a2 = 0;
-        b1 = 1/2; b2 = 1/2;
+        a1 = 1;   a2 = 1;   a3 = 0;
+        b1 = 1/2; b2 = 1/2; b3 = 0;
+    elseif strcmp(TINT,'bd2si')            % other steps / 2nd-order 3-point backward-difference semi-implicit scheme
+        a1 = 3/2; a2 = 4/2; a3 = -1/2;
+        b1 = 3/4; b2 = 2/4; b3 = -1/4;
     end
 
     % store previous solution
@@ -73,8 +76,8 @@ while time <= tend && step <= Nt && any(m(:)>TINY)
 
     % print diagnostics
     fprintf(1,'\n         total time to solution = %3.3f sec\n\n',toc(TTtime));
-    fprintf(1,'         thermo-chemical solve  = %1.3e sec\n'  ,TCtime/(iter-1));
-    fprintf(1,'         phase equilibr. solve  = %1.3e sec\n'  ,EQtime/(iter-1));
+    fprintf(1,'         thermo-chemical solve  = %1.3e sec\n'  ,TCtime/(iter-1)/inner_TC);
+    fprintf(1,'         phase equilibr. solve  = %1.3e sec\n'  ,EQtime/(iter-1)/inner_TC);
     fprintf(1,'         coefficients update    = %1.3e sec\n'  ,UDtime/(iter-1));
     fprintf(1,'         fluid-mechanics solve  = %1.3e sec\n\n',FMtime/(iter-1));
     
