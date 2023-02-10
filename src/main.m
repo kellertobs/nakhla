@@ -2,7 +2,7 @@
 init;
     
 % physical time stepping loop
-while time <= tend && step <= Nt && any(m(:)>TINY)
+while time <= tend && step <= Nt && any(m(:)>TINY^0.5)
     
     fprintf(1,'*****  step %d;  dt = %4.4e;  time = %4.4e [hr]\n\n',step,dt./3600,time./3600);
     TTtime  = tic;
@@ -31,6 +31,7 @@ while time <= tend && step <= Nt && any(m(:)>TINY)
     Voo = Vo; Vo = V;
     Xoo = Xo; Xo = X;
     Foo = Fo; Fo = F;
+    Moo = Mo; Mo = M;
     rhooo = rhoo; rhoo = rho;
     TEoo = TEo; TEo = TE;
     IRoo = IRo; IRo = IR;
@@ -39,6 +40,7 @@ while time <= tend && step <= Nt && any(m(:)>TINY)
     dVdtoo = dVdto; dVdto = dVdt;
     dXdtoo = dXdto; dXdto = dXdt;
     dFdtoo = dFdto; dFdto = dFdt;
+    dMdtoo = dMdto; dMdto = dMdt;
     drhodtoo = drhodto; drhodto = drhodt;
     dTEdtoo = dTEdto; dTEdto = dTEdt;
     dIRdtoo = dIRdto; dIRdto = dIRdt;
@@ -77,7 +79,7 @@ while time <= tend && step <= Nt && any(m(:)>TINY)
     % print diagnostics
     fprintf(1,'\n         total time to solution = %3.3f sec\n\n',toc(TTtime));
     fprintf(1,'         thermo-chemical solve  = %1.3e sec\n'  ,TCtime/(iter-1)/inner_TC);
-    fprintf(1,'         phase equilibr. solve  = %1.3e sec\n'  ,EQtime/(iter-1)/inner_TC);
+    fprintf(1,'         phase equilibr. solve  = %1.3e sec\n'  ,EQtime/(iter-1));
     fprintf(1,'         coefficients update    = %1.3e sec\n'  ,UDtime/(iter-1));
     fprintf(1,'         fluid-mechanics solve  = %1.3e sec\n\n',FMtime/(iter-1));
     

@@ -89,28 +89,28 @@ elseif Nx <= 10  % create 1D plots
     end
     sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
     subplot(1,5,1)
-    plot(T(2:end-1,2:end-1)-273.15,Zc(2:end-1).',CL{[1,2]},LW{:}); axis ij tight; box on;
+    plot(T-273.15,Zc.',CL{[1,2]},LW{:}); axis ij tight; box on;
     title('$T [^\circ$C]',TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,5,2)
-    plot(cx(2:end-1,2:end-1)*100,Zc(2:end-1).',CL{[1,4]},LW{:}); axis ij tight; box on; hold on;
-    plot(cm(2:end-1,2:end-1)*100,Zc(2:end-1).',CL{[1,3]},LW{:});
-    plot(c(2:end-1,2:end-1)./(1-f(2:end-1,2:end-1))*100,Zc(2:end-1).',CL{[1,2]},LW{:});
+    plot(cx*100,Zc.',CL{[1,4]},LW{:}); axis ij tight; box on; hold on;
+    plot(cm*100,Zc.',CL{[1,3]},LW{:});
+    plot(c./(1-f)*100,Zc.',CL{[1,2]},LW{:});
     title('$\bar{c}/(1-f)$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,5,3)
-    semilogx(max(1e-6,vf(2:end-1,2:end-1)*100).*any(v(:)>10*TINY),Zc(2:end-1).',CL{[1,5]},LW{:}); axis ij tight; box on; hold on;
-    semilogx(max(1e-6,vm(2:end-1,2:end-1)*100).*any(v(:)>10*TINY),Zc(2:end-1).',CL{[1,3]},LW{:});
-    semilogx(max(1e-6,v (2:end-1,2:end-1)./(1-x(2:end-1,2:end-1))*100).*any(v(:)>10*TINY),Zc(2:end-1).',CL{[1,2]},LW{:});
+    semilogx(max(1e-6,vf*100).*any(v(:)>10*TINY),Zc.',CL{[1,5]},LW{:}); axis ij tight; box on; hold on;
+    semilogx(max(1e-6,vm*100).*any(v(:)>10*TINY),Zc.',CL{[1,3]},LW{:});
+    semilogx(max(1e-6,v ./(1-x)*100).*any(v(:)>10*TINY),Zc.',CL{[1,2]},LW{:});
     title('$\bar{v}/(1-x)$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,5,4)
-    plot(mu (2:end-1,2:end-1)*100.*(mu (2:end-1,2:end-1)>1e-9),Zc(2:end-1).',CL{[1,3]},LW{:}); axis ij tight; box on; hold on;
-    plot(chi(2:end-1,2:end-1)*100.*(chi(2:end-1,2:end-1)>1e-9),Zc(2:end-1).',CL{[1,4]},LW{:});
-    plot(phi(2:end-1,2:end-1)*100.*(phi(2:end-1,2:end-1)>1e-9),Zc(2:end-1).',CL{[1,5]},LW{:});
+    plot(mu *100.*(mu >1e-9),Zc.',CL{[1,3]},LW{:}); axis ij tight; box on; hold on;
+    plot(chi*100.*(chi>1e-9),Zc.',CL{[1,4]},LW{:});
+    plot(phi*100.*(phi>1e-9),Zc.',CL{[1,5]},LW{:});
     title('$\mu$, $\chi$, $\phi$ [vol\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,5,5)
-    plot(-(phi(1:end-1,2:end-1)+phi(2:end,2:end-1))/2.*wf(:,2:end-1)*hr,Zf.',CL{[1,5]},LW{:}); axis ij tight; box on; hold on;
-    plot(-(chi(1:end-1,2:end-1)+chi(2:end,2:end-1))/2.*wx(:,2:end-1)*hr,Zf.',CL{[1,4]},LW{:});
-    plot(-( mu(1:end-1,2:end-1)+ mu(2:end,2:end-1))/2.*wm(:,2:end-1)*hr,Zf.',CL{[1,3]},LW{:});
-    plot(-                                             W (:,2:end-1)*hr,Zf.',CL{[1,2]},LW{:});
+    plot(-(phi([1,1:end],:)+phi([1:end,end],:))/2.*wf(:,2:end-1)*hr,Zf.',CL{[1,5]},LW{:}); axis ij tight; box on; hold on;
+    plot(-(chi([1,1:end],:)+chi([1:end,end],:))/2.*wx(:,2:end-1)*hr,Zf.',CL{[1,4]},LW{:});
+    plot(-(mu ([1,1:end],:)+mu ([1:end,end],:))/2.*wm(:,2:end-1)*hr,Zf.',CL{[1,3]},LW{:});
+    plot(-                                         W (:,2:end-1)*hr,Zf.',CL{[1,2]},LW{:});
     title('$W$, $w_\Delta^f$, $w_\Delta^x$ [m/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
 
     if ~exist('fh2','var'); fh2 = figure(VIS{:});
@@ -118,23 +118,23 @@ elseif Nx <= 10  % create 1D plots
     end 
     sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
     subplot(1,5,1)
-    plot(rhox(2:end-1,2:end-1),Zc(2:end-1).',CL{[1,4]},LW{:}); axis ij tight; box on; hold on;
-    plot(rhom(2:end-1,2:end-1),Zc(2:end-1).',CL{[1,3]},LW{:});
-    plot(rho (2:end-1,2:end-1),Zc(2:end-1).',CL{[1,2]},LW{:});
+    plot(rhox,Zc.',CL{[1,4]},LW{:}); axis ij tight; box on; hold on;
+    plot(rhom,Zc.',CL{[1,3]},LW{:});
+    plot(rho ,Zc.',CL{[1,2]},LW{:});
     title('$\bar{\rho}$ [kg/m$^3$]',TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,5,2)
-    semilogx(min(eta(2:end-1,2:end-1),etam(2:end-1,2:end-1)),Zc(2:end-1).',CL{[1,3]},LW{:}); axis ij tight; box on; hold on;
-    semilogx(eta(2:end-1,2:end-1),Zc(2:end-1).',CL{[1,2]},LW{:});
+    semilogx(min(eta,etam),Zc.',CL{[1,3]},LW{:}); axis ij tight; box on; hold on;
+    semilogx(eta,Zc.',CL{[1,2]},LW{:});
     title('$\bar{\eta}$ [Pas]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,5,3)
-    plot(    Gx./rho(2:end-1,2:end-1)*hr.*(chi(2:end-1,2:end-1)>1e-9),Zc(2:end-1).',CL{[1,4]},LW{:}); axis ij tight; box on; hold on;
-    plot(10.*Gf./rho(2:end-1,2:end-1)*hr.*(phi(2:end-1,2:end-1)>1e-9),Zc(2:end-1).',CL{[1,5]},LW{:});
+    plot(    Gx./rho*hr.*(chi>1e-9),Zc.',CL{[1,4]},LW{:}); axis ij tight; box on; hold on;
+    plot(10.*Gf./rho*hr.*(phi>1e-9),Zc.',CL{[1,5]},LW{:});
     title('$10 \times \Gamma_f/\bar{\rho}$, $\Gamma_x/\bar{\rho}$ [wt/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,5,4)
-    plot(VolSrc,Zc(2:end-1).',CL{[1,2]},LW{:}); axis ij tight; box on;
+    plot(VolSrc,Zc.',CL{[1,2]},LW{:}); axis ij tight; box on;
     title('$\dot{V}$ [1/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,5,5)
-    plot(P (2:end-1,2:end-1),Zc(2:end-1).',CL{[1,2]},LW{:}); axis ij tight; box on;
+    plot(P(2:end-1,2:end-1),Zc.',CL{[1,2]},LW{:}); axis ij tight; box on;
     title('$P$ [Pa]',TX{:},FS{:}); set(gca,TL{:},TS{:});
 
     if ~exist('fh3','var'); fh3 = figure(VIS{:});
@@ -143,17 +143,17 @@ elseif Nx <= 10  % create 1D plots
     sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
     subplot(1,3,1)
     for i=1:cal.nc
-        plot(squeeze( c_cmp(2:end-1,2:end-1,i)),Zc(2:end-1).',LW{:},'color',ocean(round((i-1)*213/cal.nc)+1,:)); axis ij tight; box on; hold on;
+        plot(squeeze( c_cmp(:,:,i)),Zc.',LW{:},'color',ocean(round((i-1)*213/cal.nc)+1,:)); axis ij tight; box on; hold on;
     end
     title('Bulk cmps [wt\%]',TX{:},FS{:});ylabel('Depth [m]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,3,2)
     for i=1:cal.nc
-        plot(squeeze(cx_cmp(2:end-1,2:end-1,i)),Zc(2:end-1).',LW{:},'color',ocean(round((i-1)*213/cal.nc)+1,:)); axis ij tight; box on; hold on;
+        plot(squeeze(cx_cmp(:,:,i)),Zc.',LW{:},'color',ocean(round((i-1)*213/cal.nc)+1,:)); axis ij tight; box on; hold on;
     end
     title('Xtal cmps [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,3,3)
     for i=1:cal.nc
-        plot(squeeze(cm_cmp(2:end-1,2:end-1,i)),Zc(2:end-1).',LW{:},'color',ocean(round((i-1)*213/cal.nc)+1,:)); axis ij tight; box on; hold on;
+        plot(squeeze(cm_cmp(:,:,i)),Zc.',LW{:},'color',ocean(round((i-1)*213/cal.nc)+1,:)); axis ij tight; box on; hold on;
     end
     title('Melt cmps [wt\%]',TX{:},FS{:}); legend(cal.cmpStr,TX{:},FS{:},'Location','east'); set(gca,TL{:},TS{:});
  
@@ -163,17 +163,17 @@ elseif Nx <= 10  % create 1D plots
     sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
     subplot(1,3,1)
     for i=1:cal.nc
-        plot(squeeze( c_oxd(2:end-1,2:end-1,i)),Zc(2:end-1).',LW{:},'color',ocean(round((i-1)*213/cal.nc)+1,:)); axis ij tight; box on; hold on;
+        plot(squeeze( c_oxd(:,:,i)),Zc.',LW{:},'color',ocean(round((i-1)*213/cal.nc)+1,:)); axis ij tight; box on; hold on;
     end
     title('Bulk oxds [wt\%]',TX{:},FS{:});ylabel('Depth [m]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,3,2)
     for i=1:cal.nc
-        plot(squeeze(cx_oxd(2:end-1,2:end-1,i)),Zc(2:end-1).',LW{:},'color',ocean(round((i-1)*213/cal.nc)+1,:)); axis ij tight; box on; hold on;
+        plot(squeeze(cx_oxd(:,:,i)),Zc.',LW{:},'color',ocean(round((i-1)*213/cal.nc)+1,:)); axis ij tight; box on; hold on;
     end
     title('Xtal oxds [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,3,3)
     for i=1:cal.nc
-        plot(squeeze(cm_oxd(2:end-1,2:end-1,i)),Zc(2:end-1).',LW{:},'color',ocean(round((i-1)*213/cal.nc)+1,:)); axis ij tight; box on; hold on;
+        plot(squeeze(cm_oxd(:,:,i)),Zc.',LW{:},'color',ocean(round((i-1)*213/cal.nc)+1,:)); axis ij tight; box on; hold on;
     end
     title('Melt oxds [wt\%]',TX{:},FS{:}); legend(cal.oxdStr,TX{:},FS{:},'Location','east'); set(gca,TL{:},TS{:});
 
@@ -260,83 +260,83 @@ else % create 2D plots
     % plot velocity-pressure solution in Fig. 1
     set(0,'CurrentFigure',fh1)
     set(fh1,'CurrentAxes',ax(11));
-    imagesc(Xc(2:end-1),Zc(2:end-1),-W(:      ,2:end-1).*hr); axis ij equal tight; box on; cb = colorbar;
+    imagesc(Xc,Zc,-W(:      ,2:end-1).*hr); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$W$ [m/hr]'],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel('Depth [m]',TX{:},FS{:}); 
     set(fh1,'CurrentAxes',ax(12));
-    imagesc(Xc(2:end-1),Zc(2:end-1), U(2:end-1,:      ).*hr); axis ij equal tight; box on; cb = colorbar;
+    imagesc(Xc,Zc, U(2:end-1,:      ).*hr); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$U$ [m/hr]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
     set(fh1,'CurrentAxes',ax(13));
-    imagesc(Xc(2:end-1),Zc(2:end-1), P(2:end-1,2:end-1)); axis ij equal tight; box on; cb = colorbar;
+    imagesc(Xc,Zc, P); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$P$ [Pa]'],TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:}); xlabel('Width [m]',TX{:},FS{:});
     set(fh1,'CurrentAxes',ax(14));
-    imagesc(Xc(2:end-1),Zc(2:end-1),Div_V(2:end-1,2:end-1)); axis ij equal tight; box on; cb = colorbar;
+    imagesc(Xc,Zc,Div_V); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\nabla \cdot \mathbf{v}$ [1/s]'],TX{:},FS{:}); xlabel('Width [m]',TX{:},FS{:}); set(gca,'YTickLabel',[]);
     sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
 
     % plot temperature and composition in Fig. 2
     set(0,'CurrentFigure',fh2)
     set(fh2,'CurrentAxes',ax(21));
-    imagesc(Xc(2:end-1),Zc(2:end-1),T(2:end-1,2:end-1)-273.15); axis ij equal tight; box on; cb = colorbar;
+    imagesc(Xc,Zc,T-273.15); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$T [^\circ$C]'],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel('Depth [m]',TX{:},FS{:}); 
     set(fh2,'CurrentAxes',ax(22));
-    imagesc(Xc(2:end-1),Zc(2:end-1),c(2:end-1,2:end-1)./(1-f(2:end-1,2:end-1)).*100); axis ij equal tight; box on; cb = colorbar;
+    imagesc(Xc,Zc,c./(1-f).*100); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\bar{c}/(1-f)$ [wt\% SiO$_2$]'],TX{:},FS{:}); set(gca,'YTickLabel',[]); xlabel('Width [m]',TX{:},FS{:});
     set(fh2,'CurrentAxes',ax(23));
-    imagesc(Xc(2:end-1),Zc(2:end-1),v(2:end-1,2:end-1)./(1-x(2:end-1,2:end-1)).*100.*(v(2:end-1,2:end-1)>1e-9)); axis ij equal tight; box on; cb = colorbar;
+    imagesc(Xc,Zc,v./(1-x).*100.*(v>1e-9)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\bar{v}/(1-x)$ [wt\% H$_2$O]'],TX{:},FS{:}); set(gca,'YTickLabel',[]);
     sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
 
     % plot phase fractions and reaction rates in Fig. 3
     set(0,'CurrentFigure',fh3)
     set(fh3,'CurrentAxes',ax(31));
-    imagesc(Xc(2:end-1),Zc(2:end-1),chi(2:end-1,2:end-1).*100.*(chi(2:end-1,2:end-1)>1e-9) ); axis ij equal tight; box on; cb = colorbar;
+    imagesc(Xc,Zc,chi.*100.*(chi>1e-9) ); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\chi$ [vol\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel('Depth [m]',TX{:},FS{:}); 
     set(fh3,'CurrentAxes',ax(32));
-    imagesc(Xc(2:end-1),Zc(2:end-1),phi(2:end-1,2:end-1).*100.*(phi(2:end-1,2:end-1)>1e-9)); axis ij equal tight; box on; cb = colorbar;
+    imagesc(Xc,Zc,phi.*100.*(phi>1e-9)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\phi$ [vol\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
     set(fh3,'CurrentAxes',ax(33));
-    imagesc(Xc(2:end-1),Zc(2:end-1),Gx./rho(2:end-1,2:end-1)*hr*100.*(chi(2:end-1,2:end-1)>1e-9)); axis ij equal tight; box on; cb = colorbar;
+    imagesc(Xc,Zc,Gx./rho*hr*100.*(chi>1e-9)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\Gamma_x/\bar{\rho}$ [wt\%/hr]'],TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:}); xlabel('Width [m]',TX{:},FS{:});
     set(fh3,'CurrentAxes',ax(34));
-    imagesc(Xc(2:end-1),Zc(2:end-1),Gf./rho(2:end-1,2:end-1)*hr*100.*(phi(2:end-1,2:end-1)>1e-9)); axis ij equal tight; box on; cb = colorbar;
+    imagesc(Xc,Zc,Gf./rho*hr*100.*(phi>1e-9)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\Gamma_f/\bar{\rho}$ [wt\%/hr]'],TX{:},FS{:}); xlabel('Width [m]',TX{:},FS{:}); set(gca,'YTickLabel',[]);
     sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
 
     % plot density, rheology, and segregation speeds in Fig. 4
     set(0,'CurrentFigure',fh4)
     set(fh4,'CurrentAxes',ax(41));
-    imagesc(Xc(2:end-1),Zc(2:end-1),      rho(2:end-1,2:end-1) ); axis ij equal tight; box on; cb = colorbar;
+    imagesc(Xc,Zc,      rho ); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\bar{\rho}$ [kg/m$^3$]'],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel('Depth [m]',TX{:},FS{:}); 
     set(fh4,'CurrentAxes',ax(42));
-    imagesc(Xc(2:end-1),Zc(2:end-1),log10(eta(2:end-1,2:end-1))); axis ij equal tight; box on; cb = colorbar;
+    imagesc(Xc,Zc,log10(eta)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\bar{\eta}$ [log$_{10}$ Pas]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
     set(fh4,'CurrentAxes',ax(43));
-    imagesc(Xc(2:end-1),Zc(2:end-1),-(chi(1:end-1,2:end-1)+chi(2:end,2:end-1))/2.*wx(:,2:end-1).*hr); axis ij equal tight; box on; cb = colorbar;
+    imagesc(Xc,Zc,-(chi([1,1:end],:)+chi([1:end,end],:))/2.*wx(:,2:end-1).*hr); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$w_\Delta^x$ [m/hr]'],TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:}); xlabel('Width [m]',TX{:},FS{:});
     set(fh4,'CurrentAxes',ax(44));
-    imagesc(Xc(2:end-1),Zc(2:end-1),-(phi(1:end-1,2:end-1)+phi(2:end,2:end-1))/2.*wf(:,2:end-1).*hr.*(any(phi(2:end-1,2:end-1)>1e-9))); axis ij equal tight; box on; cb = colorbar;
+    imagesc(Xc,Zc,-(phi([1,1:end],:)+phi([1:end,end],:))/2.*wf(:,2:end-1).*hr.*(any(phi>1e-9))); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$w_\Delta^f$ [m/hr]'],TX{:},FS{:}); xlabel('Width [m]',TX{:},FS{:}); set(gca,'YTickLabel',[]);
     sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
 
     % plot geochemical variables in Fig. 5
     set(0,'CurrentFigure',fh5)
     set(fh5,'CurrentAxes',ax(51));
-    imagesc(Xc(2:end-1),Zc(2:end-1),te(2:end-1,2:end-1,1)./(1-f(inz,inx))); axis ij equal tight; box on; cb = colorbar;
+    imagesc(Xc,Zc,te(:,:,1)./(1-f)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['trace element 1'],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel('Depth [m]',TX{:},FS{:}); 
     set(fh5,'CurrentAxes',ax(52));
-    imagesc(Xc(2:end-1),Zc(2:end-1),te(2:end-1,2:end-1,2)./(1-f(inz,inx))); axis ij equal tight; box on; cb = colorbar;
+    imagesc(Xc,Zc,te(:,:,2)./(1-f)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['trace element 2'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
     set(fh5,'CurrentAxes',ax(53));
-    imagesc(Xc(2:end-1),Zc(2:end-1),ir(2:end-1,2:end-1,1)./(1-f(inz,inx))); axis ij equal tight; box on; cb = colorbar;
+    imagesc(Xc,Zc,ir(:,:,1)./(1-f)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['isotope ratio 1'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
     set(fh5,'CurrentAxes',ax(54));
-    imagesc(Xc(2:end-1),Zc(2:end-1),te(2:end-1,2:end-1,3)./(1-f(inz,inx))); axis ij equal tight; box on; cb = colorbar;
+    imagesc(Xc,Zc,te(:,:,3)./(1-f)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['trace element 3'],TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:});
     set(fh5,'CurrentAxes',ax(55));
-    imagesc(Xc(2:end-1),Zc(2:end-1),te(2:end-1,2:end-1,4)./(1-f(inz,inx))); axis ij equal tight; box on; cb = colorbar;
+    imagesc(Xc,Zc,te(:,:,4)./(1-f)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['trace element 4'],TX{:},FS{:}); set(gca,'YTickLabel',[]); xlabel('Width [m]',TX{:},FS{:});
     set(fh5,'CurrentAxes',ax(56));
-    imagesc(Xc(2:end-1),Zc(2:end-1),ir(2:end-1,2:end-1,2)./(1-f(inz,inx))); axis ij equal tight; box on; cb = colorbar;
+    imagesc(Xc,Zc,ir(:,:,2)./(1-f)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['isotope ratio 2'],TX{:},FS{:}); set(gca,'YTickLabel',[]);
     sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
 
@@ -373,9 +373,9 @@ plot(CCm.*100,TT,'k-','LineWidth',2);
 
 Tplt = T-273.15 - (Pt-Ptop)*cal.clap;
 cplt = c./(1-f);
-plot(cplt(2:end-1,2:end-1).*100,Tplt(2:end-1,2:end-1),'.',CL{[1,2]},LW{:},'MarkerSize',15);
-plot(cx  (2:end-1,2:end-1).*100,Tplt(2:end-1,2:end-1),'.',CL{[1,4]},LW{:},'MarkerSize',15);
-plot(cm  (2:end-1,2:end-1).*100,Tplt(2:end-1,2:end-1),'.',CL{[1,3]},LW{:},'MarkerSize',15);
+plot(cplt.*100,Tplt,'.',CL{[1,2]},LW{:},'MarkerSize',15);
+plot(cx  .*100,Tplt,'.',CL{[1,4]},LW{:},'MarkerSize',15);
+plot(cm  .*100,Tplt,'.',CL{[1,3]},LW{:},'MarkerSize',15);
 
 set(gca,'TickLabelInterpreter','latex','FontSize',15)
 title('Phase Diagram','Interpreter','latex','FontSize',18)
@@ -459,9 +459,9 @@ if save_op && ~restart
     end
 
     name = [opdir,'/',runID,'/',runID,'_',num2str(floor(step/nop))];
-    save(name,'U','W','P','Pt','f','x','m','phi','chi','mu','X','F','S','C','V','T','c','v','cm','cx','vm','vf','TE','IR','te','ir','dSdt','dCdt','dVdt','dFdt','dXdt','dTEdt','dIRdt','Gf','Gx','rho','eta','eII','tII','dt','time','step','VolSrc','wf','wx','wm');
+    save(name,'U','W','P','Pt','f','x','m','phi','chi','mu','X','F','M','S','C','V','T','c','v','cm','cx','vm','vf','TE','IR','te','ir','dSdt','dCdt','dVdt','dFdt','dXdt','dMdt','drhodt','dTEdt','dIRdt','Gf','Gx','rho','eta','eII','tII','dt','time','step','VolSrc','wf','wx','wm');
     name = [opdir,'/',runID,'/',runID,'_cont'];
-    save(name,'U','W','P','Pt','f','x','m','phi','chi','mu','X','F','S','C','V','T','c','v','cm','cx','vm','vf','TE','IR','te','ir','dSdt','dCdt','dVdt','dFdt','dXdt','dTEdt','dIRdt','Gf','Gx','rho','eta','eII','tII','dt','time','step','VolSrc','wf','wx','wm');
+    save(name,'U','W','P','Pt','f','x','m','phi','chi','mu','X','F','M','S','C','V','T','c','v','cm','cx','vm','vf','TE','IR','te','ir','dSdt','dCdt','dVdt','dFdt','dXdt','dMdt','drhodt','dTEdt','dIRdt','Gf','Gx','rho','eta','eII','tII','dt','time','step','VolSrc','wf','wx','wm');
     name = [opdir,'/',runID,'/',runID,'_hist'];
     save(name,'hist');
 

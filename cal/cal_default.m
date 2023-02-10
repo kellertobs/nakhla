@@ -61,9 +61,11 @@ cal.etaf0   = 0.1;              % fluid viscosity constant
 % specify segregation coefficient parameters
 cal.dx      = 1e-3;             % crystal size [m]
 cal.df      = 1e-3;             % bubble size [m]
-cal.bm      = 50;               % melt permeability geometric factor (k0 = dx^2/bm)
-cal.nm      = 3;                % melt permeability powerlaw (k0*mu^nm*(1-mu)^mm)
-cal.mm      = 2;                % melt permeability powerlaw (k0*mu^nm*(1-mu)^mm)
-cal.bf      = 50;               % fluid permeability geometric factor (k0 = dx^2/bm)
-cal.nf      = 4;                % fluid permeability powerlaw (k0*phi^nf*(1-phi)^mf)
-cal.mf      = 2;                % fluid permeability powerlaw (k0*phi^nf*(1-phi)^mf)
+cal.bm      = 1e32;             % melt permeability geometric factor (k0 = dx^2/bm)
+cal.cm      = 0.001;            % melt percolation threshold
+cal.nm      = 3;                % melt permeability powerlaw (k0*(mu-cm)^nm*(1-mu)^mm)
+cal.mm      = 2;                % melt permeability powerlaw (k0*(mu-cm)^nm*(1-mu)^mm)
+cal.bf      = 1e32;             % fluid permeability geometric factor (k0 = dx^2/bm)
+cal.cf      = 0.1;              % fluid percolation threshold
+cal.nf      = 4;                % fluid permeability powerlaw (k0*(phi-cf)^nf*(1-phi)^mf)
+cal.mf      = 2;                % fluid permeability powerlaw (k0*(phi-cf)^nf*(1-phi)^mf)

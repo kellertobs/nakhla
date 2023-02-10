@@ -37,11 +37,11 @@ fin = 0; fout = 0; Twall = nan;
 
 % set numerical model parameters
 CFL      =  1.00;                % (physical) time stepping courant number (multiplies stable step) [0,1]
-TINT     =  'bd2im';             % time integration scheme ('be1im','bd2im','cn2si')
+TINT     =  'bd2si';             % time integration scheme ('be1im','bd2im','cn2si','bd2si')
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
 rtol     =  1e-6;                % outer its relative tolerance
 atol     =  1e-9;                % outer its absolute tolerance
-lambda   =  1.00;                % iterative step size
+lambda   =  0.50;                % iterative step size
 tau_r    =  1e16;                % disable reaction
 
 % create output directory
@@ -76,6 +76,7 @@ for dti = DT
     % set parameters for non-dissipative, non-reactive flow
     diss(:) = 0;
     resnorm_VP = 0;
+    res_rho = 0.*rho;
 
     rhoin = rho;
     Sin = S;
@@ -85,7 +86,7 @@ for dti = DT
     Fin = F;
 
     figure(100); clf;
-        plot(XX(N/2,inx),Xin(N/2,inx)./rhoin(N/2,inx),'k',XX(N/2,inx),X(N/2,inx)./rho(N/2,inx),'r','LineWidth',1.5); axis tight; box on;
+    plot(XX(N/2,:),Xin(N/2,:)./rhoin(N/2,:),'k',XX(N/2,:),X(N/2,:)./rho(N/2,:),'r','LineWidth',1.5); axis tight; box on;
     drawnow;
 
     dt    = dti;
@@ -105,14 +106,17 @@ for dti = DT
         UDtime  = 0;
 
         if     strcmp(TINT,'be1im') || step==1 % first step / 1st-order backward-Euler implicit scheme
-            a1 = 1; a2 = 0;
-            b1 = 1; b2 = 0;
+            a1 = 1; a2 = 1; a3 = 0;
+            b1 = 1; b2 = 0; b3 = 0;
         elseif strcmp(TINT,'bd2im') || step==2 % second step / 2nd-order 3-point backward-difference implicit scheme
-            a1 = 2; a2 = -1;
-            b1 = 1; b2 =  0;
+            a1 = 3/2; a2 = 4/2; a3 = -1/2;
+            b1 = 1;   b2 =  0;  b3 = 0;
         elseif strcmp(TINT,'cn2si')            % other steps / 2nd-order Crank-Nicolson semi-implicit scheme
-            a1 = 1;   a2 = 0;
-            b1 = 1/2; b2 = 1/2;
+            a1 = 1;   a2 = 1;   a3 = 0;
+            b1 = 1/2; b2 = 1/2; b3 = 0;
+        elseif strcmp(TINT,'bd2si')            % other steps / 2nd-order 3-point backward-difference semi-implicit scheme
+            a1 = 3/2; a2 = 4/2; a3 = -1/2;
+            b1 = 3/4; b2 = 2/4; b3 = -1/4;
         end
 
         % store previous solution
@@ -121,6 +125,7 @@ for dti = DT
         Voo = Vo; Vo = V;
         Xoo = Xo; Xo = X;
         Foo = Fo; Fo = F;
+        Moo = Mo; Mo = M;
         rhooo = rhoo; rhoo = rho;
         TEoo = TEo; TEo = TE;
         IRoo = IRo; IRo = IR;
@@ -129,6 +134,7 @@ for dti = DT
         dVdtoo = dVdto; dVdto = dVdt;
         dXdtoo = dXdto; dXdto = dXdt;
         dFdtoo = dFdto; dFdto = dFdt;
+        dMdtoo = dMdto; dMdto = dMdt;
         drhodtoo = drhodto; drhodto = drhodt;
         dTEdtoo = dTEdto; dTEdto = dTEdt;
         dIRdtoo = dIRdto; dIRdto = dIRdt;
@@ -170,7 +176,7 @@ for dti = DT
         step = step+1;
 
         figure(100); clf;
-        plot(XX(N/2,inx),Xin(N/2,inx)./rhoin(N/2,inx),'k',XX(N/2,inx),X(N/2,inx)./rho(N/2,inx),'r','LineWidth',1.5); axis tight; box on;
+        plot(XX(N/2,:),Xin(N/2,:)./rhoin(N/2,:),'k',XX(N/2,:),X(N/2,:)./rho(N/2,:),'r','LineWidth',1.5); axis tight; box on;
         drawnow;
     end
 

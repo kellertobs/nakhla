@@ -88,12 +88,13 @@ drawnow;
 [x,z]  = meshgrid(x_mms,zw_mms);
 W_mms  = double(subs(W_mms)); fprintf(1,' . ');
 rhofz  = double(subs(rho_mms)); fprintf(1,' . ');
+rhofz  = rhofz(2:end-1,2:end-1);
 [x,z]  = meshgrid(xu_mms,z_mms);
 U_mms  = double(subs(U_mms)); fprintf(1,' . ');
 [x,z]  = meshgrid(x_mms,z_mms);
 P_mms  = double(subs(P_mms)); fprintf(1,' . ');
-rho    = double(subs(rho_mms)); fprintf(1,' . ');
 eta    = double(subs(eta_mms)); fprintf(1,' . ');
+eta    = eta(2:end-1,2:end-1);
 VolSrc = double(subs(src_mms)); fprintf(1,' . ');
 VolSrc = VolSrc(2:end-1,2:end-1);
 [x,z]  = meshgrid(xu_mms,zw_mms);
@@ -102,18 +103,17 @@ etaco  = double(subs(eta_mms)); fprintf(1,' . ');
 WBG    = 0.*W_mms;
 UBG    = 0.*U_mms;
 SOL    = [W_mms(:);U_mms(:);P_mms(:)];
-dt     = 0;
 
 % get mapping arrays
-Nx = length(x_mms);
-Nz = length(z_mms);
+Nx = length(x_mms)-2;
+Nz = length(z_mms)-2;
 
-NP =  Nz   * Nx   ;
-NW = (Nz-1)* Nx   ;
-NU =  Nz   *(Nx-1);
-MapP = reshape(1:NP,Nz  ,Nx  );
-MapW = reshape(1:NW,Nz-1,Nx  );
-MapU = reshape(1:NU,Nz  ,Nx-1) + NW;
+NP = (Nz+2) * (Nx+2);
+NW = (Nz+1) * (Nx+2);
+NU = (Nz+2) * (Nx+1);
+MapP = reshape(1:NP,Nz+2,Nx+2);
+MapW = reshape(1:NW,Nz+1,Nx+2);
+MapU = reshape(1:NU,Nz+2,Nx+1) + NW;
 
 % set boundary conditions to free slip
 sds = -1;

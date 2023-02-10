@@ -9,13 +9,13 @@ runID    =  '1D_fract_anh';      % run identifier
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  500;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot results
-save_op  =  0;                   % switch on to save output to file
+save_op  =  1;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
 
 % set model domain parameters
 D        =  10;                  % chamber depth [m]
-N        =  500 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
-h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
+N        =  500;                 % number of grid points in z-direction (incl. 2 ghosts)
+h        =  D/N;                 % grid spacing (equal in both dimensions, do not set) [m]
 L        =  h;                   % chamber width [m]
 
 % set model timing parameters
@@ -48,9 +48,9 @@ df       =  1e-3;                % bubble size [m]
 % set numerical model parameters
 TINT     =  'bd2im';             % time integration scheme ('be1im','bd2im','cn2si','bd2si')
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
-CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
+CFL      =  0.25;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 rtol     =  1e-4;                % outer its relative tolerance
-atol     =  1e-7;                % outer its absolute tolerance
+atol     =  1e-8;                % outer its absolute tolerance
 maxit    =  50;                  % maximum outer its
 lambda   =  0.50;                % iterative step size
 mink     =  1e-8;                % minimum diffusivity for phase, component fractions

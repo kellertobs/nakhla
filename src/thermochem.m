@@ -7,85 +7,70 @@ tic;
 %***  update heat content (entropy)
 
 % heat advection
-advn_S = - advect(M(inz,inx).*sm(inz,inx),Um(inz,:),Wm(:,inx),h,{ADVN,''},[1,2],BCA) ...  % melt  advection
-         - advect(X(inz,inx).*sx(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA) ...  % solid advection
-         - advect(F(inz,inx).*sf(inz,inx),Uf(inz,:),Wf(:,inx),h,{ADVN,''},[1,2],BCA);     % fluid advection
+advn_S = - advect(M.*sm,Um(2:end-1,:),Wm(:,2:end-1),h,{ADVN,''},[1,2],BCA) ...  % melt  advection
+         - advect(X.*sx,Ux(2:end-1,:),Wx(:,2:end-1),h,{ADVN,''},[1,2],BCA) ...  % solid advection
+         - advect(F.*sf,Uf(2:end-1,:),Wf(:,2:end-1),h,{ADVN,''},[1,2],BCA);     % fluid advection
 
-qSz    = - (ks(1:end-1,:)+ks(2:end,:))./2 .* ddz(T,h);  % z-flux
-qSx    = - (ks(:,1:end-1)+ks(:,2:end))./2 .* ddx(T,h);  % x-flux
-diff_S =(- ddz(qSz(:,inx),h)  ...
-         - ddx(qSx(inz,:),h));
+diff_S = diffus(T,ks,h,[1,2],BCD);
 
 % heat dissipation
-diss_h = diss ./ T(inz,inx);
+diss_h = diss ./ T;
 
 % boundary layers
 if ~isnan(Twall)
-    bnd_T = ((Twall+273.15)-T(inz,inx))./tau_T .* bndshape;
-    bnd_S = rho(inz,inx).*cP.*bnd_T./T(inz,inx);
+    bnd_T = ((Twall+273.15)-T)./tau_T .* bndshape;
+    bnd_S = rho.*cP.*bnd_T./T;
 end
 
 % total rate of change
 dSdt  = advn_S + diff_S + diss_h + bnd_S;
 
 % residual of entropy evolution
-res_S = (a1*S(inz,inx)-a2*So(inz,inx)-a3*Soo(inz,inx))/dt - (b1*dSdt + b2*dSdto + b3*dSdtoo);
+res_S = (a1*S-a2*So-a3*Soo)/dt - (b1*dSdt + b2*dSdto + b3*dSdtoo);
 
 % semi-implicit update of bulk entropy density
-S(inz,inx) = S(inz,inx) - lambda*res_S*dt;
-
-% boundary conditions
-S([1 end],:) = S([2 end-1],:);                                             
-S(:,[1 end]) = S(:,[2 end-1]);
+S = S - lambda*res_S*dt;
 
 
 %***  update major component (SiO2)
 
 % major component advection
-advn_C = - advect(M(inz,inx).*cm(inz,inx),Um(inz,:),Wm(:,inx),h,{ADVN,''},[1,2],BCA) ...  % melt  advection
-         - advect(X(inz,inx).*cx(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);     % solid advection
+advn_C = - advect(M.*cm,Um(2:end-1,:),Wm(:,2:end-1),h,{ADVN,''},[1,2],BCA) ...  % melt  advection
+         - advect(X.*cx,Ux(2:end-1,:),Wx(:,2:end-1),h,{ADVN,''},[1,2],BCA);     % solid advection
 
 % boundary layers
-if ~isnan(cwall); bnd_C = (rho(inz,inx).*cwall-C(inz,inx))./tau_a .* bndshape; end
+if ~isnan(cwall); bnd_C = (rho.*cwall-C)./tau_a .* bndshape; end
 
 % total rate of change
 dCdt = advn_C + bnd_C;                                            
 
 % residual of major component evolution
-res_C = (a1*C(inz,inx)-a2*Co(inz,inx)-a3*Coo(inz,inx))/dt - (b1*dCdt + b2*dCdto + b3*dCdtoo);
+res_C = (a1*C-a2*Co-a3*Coo)/dt - (b1*dCdt + b2*dCdto + b3*dCdtoo);
 
 % semi-implicit update of major component density
-C(inz,inx) = C(inz,inx) - lambda*res_C*dt;
+C = C - lambda*res_C*dt;
 C          = max(cal.cphs0.*rho,min(cal.cphs1.*rho,C));
-
-% boundary conditions
-C([1 end],:) = C([2 end-1],:);
-C(:,[1 end]) = C(:,[2 end-1]);  
     
 
 %***  update volatile component (H2O)
 if any([v0;v1;vwall;v(:)]>10*TINY)
 
     % volatile component advection
-    advn_V = - advect(M(inz,inx).*vm(inz,inx),Um(inz,:),Wm(:,inx),h,{ADVN,''},[1,2],BCA) ...  % melt  advection
-             - advect(F(inz,inx).*vf(inz,inx),Uf(inz,:),Wf(:,inx),h,{ADVN,''},[1,2],BCA);     % fluid advection
+    advn_V = - advect(M.*vm,Um(2:end-1,:),Wm(:,2:end-1),h,{ADVN,''},[1,2],BCA) ...  % melt  advection
+             - advect(F.*vf,Uf(2:end-1,:),Wf(:,2:end-1),h,{ADVN,''},[1,2],BCA);     % fluid advection
 
     % boundary layers
-    if ~isnan(vwall); bnd_V = (rho(inz,inx).*vwall-V(inz,inx))./tau_a .* bndshape; end 
+    if ~isnan(vwall); bnd_V = (rho.*vwall-V)./tau_a .* bndshape; end 
     
     % total rate of change
     dVdt = advn_V + bnd_V;                                                 
     
     % residual of volatile component evolution
-    res_V = (a1*V(inz,inx)-a2*Vo(inz,inx)-a3*Voo(inz,inx))/dt - (b1*dVdt + b2*dVdto + b3*dVdtoo);
+    res_V = (a1*V-a2*Vo-a3*Voo)/dt - (b1*dVdt + b2*dVdto + b3*dVdtoo);
 
     % semi-implicit update of volatile component density
-    V(inz,inx) = V(inz,inx) - lambda*res_V*dt;
+    V = V - lambda*res_V*dt;
     V          = max(0,min(rho,V));
-
-    % boundary conditions
-    V([1 end],:) = V([2 end-1],:);                                         
-    V(:,[1 end]) = V(:,[2 end-1]);
 end
 
 
@@ -97,83 +82,57 @@ v = V./rho;
 eqtime = tic;
 
 %*** update phase equilibrium
-[xq(inz,inx),cxq(inz,inx),cmq(inz,inx),fq(inz,inx),vfq(inz,inx),vmq(inz,inx)] = equilibrium(xq(inz,inx),fq(inz,inx),T(inz,inx)-273.15,c(inz,inx),v(inz,inx),Pt(inz,inx),cal,TINY);
-
-% boundary conditions
-xq([1 end],:) = xq([2 end-1],:);
-xq(:,[1 end]) = xq(:,[2 end-1]);
-fq([1 end],:) = fq([2 end-1],:);
-fq(:,[1 end]) = fq(:,[2 end-1]);
-
-cxq([1 end],:) = cxq([2 end-1],:);
-cxq(:,[1 end]) = cxq(:,[2 end-1]);
-cmq([1 end],:) = cmq([2 end-1],:);
-cmq(:,[1 end]) = cmq(:,[2 end-1]);
-
-vfq([1 end],:) = vfq([2 end-1],:);
-vfq(:,[1 end]) = vfq(:,[2 end-1]);
-vmq([1 end],:) = vmq([2 end-1],:);
-vmq(:,[1 end]) = vmq(:,[2 end-1]);
+[xq,cxq,cmq,fq,vfq,vmq] = equilibrium(xq,fq,T-273.15,c,v,Pt,cal,TINY);
 
 mq = 1-xq-fq;
 
 eqtime = toc(eqtime);
 EQtime = EQtime + eqtime;
 
-%***  update crystal fraction
 
-% crystallisation rate
-Gx = (xq(inz,inx).*rho(inz,inx)-X(inz,inx))./max(tau_r,5*dt);
+%***  update phase fractions
 
-% crystallinity advection
-advn_X = - advect(X(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);
+% phase mass transfer rates
+Gx = (xq.*rho-X)./max(tau_r,4*dt);
+Gf = (fq.*rho-F)./max(tau_r,4*dt);
+Gm = -Gx-Gf;
 
-% total rate of change
+% phase advection rates
+advn_X   = - advect(X,Ux(2:end-1,:),Wx(:,2:end-1),h,{ADVN,''},[1,2],BCA);
+advn_F   = - advect(F,Uf(2:end-1,:),Wf(:,2:end-1),h,{ADVN,''},[1,2],BCA);
+advn_M   = - advect(M,Um(2:end-1,:),Wm(:,2:end-1),h,{ADVN,''},[1,2],BCA);
+advn_rho = advn_X+advn_F+advn_M;
+
+% total rates of change
 dXdt   = advn_X + Gx;
+dFdt   = advn_F + Gf;
+dMdt   = advn_M + Gm;
 
-% residual of crystal fraction evolution
-res_X = (a1*X(inz,inx)-a2*Xo(inz,inx)-a3*Xoo(inz,inx))/dt - (b1*dXdt + b2*dXdto + b3*dXdtoo);
+% residual of phase density evolution
+res_X = (a1*X-a2*Xo-a3*Xoo)/dt - (b1*dXdt + b2*dXdto + b3*dXdtoo);
+res_F = (a1*F-a2*Fo-a3*Foo)/dt - (b1*dFdt + b2*dFdto + b3*dFdtoo);
+res_M = (a1*M-a2*Mo-a3*Moo)/dt - (b1*dMdt + b2*dMdto + b3*dMdtoo);
 
-% semi-implicit update of crystal fraction
-X(inz,inx) = X(inz,inx) - lambda*res_X*dt;
+% update of phase density evolution
+X = X - lambda*res_X*dt;
+F = F - lambda*res_F*dt;
+M = M - lambda*res_M*dt;
+
+% apply minimum bound
 X = max(0, X );
-
-% boundary conditions
-X([1 end],:) = X([2 end-1],:);
-X(:,[1 end]) = X(:,[2 end-1]);
-
-
-%***  update bubble fraction
-if any([v0;v1;vwall;v(:)]>10*TINY)
-
-    % fluid exsolution rate
-    Gf = (fq(inz,inx).*rho(inz,inx)-F(inz,inx))./max(tau_r,5*dt);
-
-    % fluid bubble advection
-    advn_F = - advect(F(inz,inx),Uf(inz,:),Wf(:,inx),h,{ADVN,''},[1,2],BCA);
-
-    % total rate of change
-    dFdt   = advn_F + Gf;
-
-    % residual of bubble fraction evolution
-    res_F = (a1*F(inz,inx)-a2*Fo(inz,inx)-a3*Foo(inz,inx))/dt - (b1*dFdt + b2*dFdto + b3*dFdtoo);
-
-    % semi-implicit update of bubble fraction
-    F(inz,inx) = F(inz,inx) - lambda*res_F*dt;
-    F = max(0,min(V, F ));
-
-    % boundary conditions
-    F([1 end],:) = F([2 end-1],:);                                         
-    F(:,[1 end]) = F(:,[2 end-1]);
-    
-end
-
-M = rho-X-F;
+F = max(0, F );
+M = max(0, M );
 
 % update phase fractions
-x = max(0,min(1,X./rho));
-f = max(0,min(1,F./rho));
-m = max(0,min(1,M./rho));
+x = X./rho;
+f = F./rho;
+m = M./rho;
+
+% normalise to unit sum
+sumphs = x+f+m;
+x = x./sumphs;
+f = f./sumphs;
+m = m./sumphs;
 
 % update phase entropies
 sm = (S - X.*Dsx - F.*Dsf)./rho;
@@ -181,17 +140,19 @@ sx = sm + Dsx;
 sf = sm + Dsf;
 
 % update phase compositions
+
 % major component
 Kc = cxq./cmq;
-cm = c./(m + x.*Kc); cm(m==0) = cmq(m==0);
-cx = c./(m./Kc + x); cx(m==1) = cxq(m==1);
+cm = c./(m + x.*Kc);
+cx = c./(m./Kc + x);
 
 % volatile component
 Kf = vfq./max(TINY,vmq);
-vm = v./max(TINY,m + f.*Kf); vm(m==0) = vmq(m==0);
-vf = v./max(TINY,m./Kf + f); vf(m==1) = vfq(m==1);
+vm = v./max(TINY,m + f.*Kf);
+vf = v./max(TINY,m./Kf + f);
 
 
-TCtime = TCtime + toc - eqtime;
+TCtime = TCtime + toc;
 
 end
+

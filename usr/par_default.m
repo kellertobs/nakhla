@@ -10,8 +10,8 @@ plot_cv  =  0;                   % switch on to live plot iterative convergence
 % set model domain parameters
 D        =  10;                  % chamber depth [m]
 L        =  10;                  % chamber width [m]
-N        =  100 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
-h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
+N        =  100;                 % number of grid points in z-direction (incl. 2 ghosts)
+h        =  D/N;                 % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
 Nt       =  3e5;                 % number of time steps to take
@@ -91,4 +91,11 @@ mink     =  1e-9;                % minimum diffusivity for phase, component frac
 etacntr  =  1e+6;                % maximum viscosity contrast
 cnvreg   =  1e0;                 % convection regularisation parameter
 sgrreg   =  1e0;                 % segregation regularisation parameter
+
+% set various options
+calibrt  =  0;                   % not in calibrate mode
+TINY     =  1e-16;               % minimum cutoff phase, component fractions
+BCA      =  {'',''};             % boundary condition on advection (top/bot, sides)
+BCD      =  {'',''};             % boundary condition on advection (top/bot, sides)
+bnchm    =  0;                   % not a benchmark run
 

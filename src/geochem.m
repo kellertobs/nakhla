@@ -2,8 +2,8 @@
 
 % *****  Trace Elements  **************************************************
 
-bnd_TE = zeros(Nz-2,Nx-2,cal.nte);
-adv_TE = zeros(Nz-2,Nx-2,cal.nte);
+bnd_TE = zeros(Nz,Nx,cal.nte);
+adv_TE = zeros(Nz,Nx,cal.nte);
 Kte    = zeros(Nz,Nx,cal.nte);
 for i = 1:cal.nte
     
@@ -15,30 +15,28 @@ for i = 1:cal.nte
     tex(:,:,i) = te(:,:,i)./(m./Kte(:,:,i) + x);
 
     % get trace element advection
-    adv_TE(:,:,i) = - advect(M(inz,inx).*tem(inz,inx,i),Um(inz,:),Wm(:,inx),h,{ADVN,''},[1,2],BCA) ...
-                    - advect(X(inz,inx).*tex(inz,inx,i),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);
+    adv_TE(:,:,i) = - advect(M.*tem(:,:,i),Um(2:end-1,:),Wm(:,2:end-1),h,{ADVN,''},[1,2],BCA) ...
+                    - advect(X.*tex(:,:,i),Ux(2:end-1,:),Wx(:,2:end-1),h,{ADVN,''},[1,2],BCA);
 
     % get trace element assimilation
-    if ~isnan(tewall(i)); bnd_TE(:,:,i) = bnd_TE(:,:,i) + (rho(inz,inx).*tewall(i)-TE(inz,inx,i))./tau_a .* bndshape; end
+    if ~isnan(tewall(i)); bnd_TE(:,:,i) = bnd_TE(:,:,i) + (rho.*tewall(i)-TE(:,:,i))./tau_a .* bndshape; end
 end
 
 % get total rate of change
 dTEdt = adv_TE + bnd_TE;
 
 % residual of trace element evolution
-res_TE = (a1*TE(inz,inx,:)-a2*TEo(inz,inx,:)-a3*TEoo(inz,inx,:))/dt - (b1*dTEdt + b2*dTEdto + b3*dTEdtoo);
+res_TE = (a1*TE-a2*TEo-a3*TEoo)/dt - (b1*dTEdt + b2*dTEdto + b3*dTEdtoo);
 
 % update trace element concentrations
-TE(inz,inx,:) = TE(inz,inx,:) - lambda*res_TE*dt;
+TE = TE - lambda*res_TE*dt;
 TE = max(0, TE );                                                          % enforce min bound
-TE([1 end],:,:) = TE([2 end-1],:,:);                                       % boundary conditions
-TE(:,[1 end],:) = TE(:,[2 end-1],:);
 
 
 % *****  Isotope Ratios  **************************************************
 
-bnd_IR = zeros(Nz-2,Nx-2,cal.nir);
-adv_IR = zeros(Nz-2,Nx-2,cal.nir);
+bnd_IR = zeros(Nz,Nx,cal.nir);
+adv_IR = zeros(Nz,Nx,cal.nir);
 for i = 1:cal.nir
 
     % update trace element phase compositions
@@ -46,23 +44,21 @@ for i = 1:cal.nir
     irx(:,:,i) = ir(:,:,i)./(1-f);
 
     % get isotope ratio advection
-    adv_IR(:,:,i) = - advect(M(inz,inx).*irm(inz,inx,i),Um(inz,:),Wm(:,inx),h,{ADVN,''},[1,2],BCA) ...
-                    - advect(X(inz,inx).*irx(inz,inx,i),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);
+    adv_IR(:,:,i) = - advect(M.*irm(:,:,i),Um(2:end-1,:),Wm(:,2:end-1),h,{ADVN,''},[1,2],BCA) ...
+                    - advect(X.*irx(:,:,i),Ux(2:end-1,:),Wx(:,2:end-1),h,{ADVN,''},[1,2],BCA);
 
     % get isotope ratio assimilation
-    if ~isnan(irwall(i)); bnd_IR(:,:,i) = bnd_IR(:,:,i) + (rho(inz,inx).*irwall(i)-IR(inz,inx,i))./tau_a .* bndshape; end
+    if ~isnan(irwall(i)); bnd_IR(:,:,i) = bnd_IR(:,:,i) + (rho.*irwall(i)-IR(:,:,i))./tau_a .* bndshape; end
 end
 
 % get total rate of change
 dIRdt = adv_IR + bnd_IR;
 
 % residual of isotope ratio evolution
-res_IR = (a1*IR(inz,inx,:)-a2*IRo(inz,inx,:)-a3*IRoo(inz,inx,:))/dt - (b1*dIRdt + b2*dIRdto + b3*dIRdtoo);
+res_IR = (a1*IR-a2*IRo-a3*IRoo)/dt - (b1*dIRdt + b2*dIRdto + b3*dIRdtoo);
 
 % update isotope ratio concentrations
-IR(inz,inx,:) = IR(inz,inx,:) - lambda*res_IR*dt;
-IR([1 end],:,:) = IR([2 end-1],:,:);                                       % boundary conditions
-IR(:,[1 end],:) = IR(:,[2 end-1],:);
+IR = IR - lambda*res_IR*dt;
 
 % convert from mixture density to concentration
 for i = 1:cal.nte; te(:,:,i) = TE(:,:,i)./rho; end

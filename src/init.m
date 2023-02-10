@@ -17,10 +17,6 @@ fprintf('\n   run ID: %s \n\n',runID);
 
 load ocean;                  % load custom colormap
 run(['../cal/cal_',calID]);  % load melt model calibration
-calibrt =  0;                % not in calibrate mode
-TINY    =  1e-16;            % minimum cutoff phase, component fractions
-BCA     =  {'',''};          % boundary condition on advection (top/bot, sides)
-bnchm   =  0;                % not a benchmark run
 
 % calculate dimensionless numbers characterising the system dynamics
 res = 1; x0 = 0; f0 = 0;
@@ -121,39 +117,36 @@ fprintf('   chemical Rw: %1.3e \n\n',Rwc);
 % get coordinate arrays
 Xc        = -h/2:h:L+h/2;
 Zc        = -h/2:h:D+h/2;
-[XX,ZZ]   = meshgrid(Xc,Zc);
 Xf        = (Xc(1:end-1)+Xc(2:end))./2;
 Zf        = (Zc(1:end-1)+Zc(2:end))./2;
 [XXu,ZZu] = meshgrid(Xf,Zc);
 [XXw,ZZw] = meshgrid(Xc,Zf);
+Xc        = Xc(2:end-1);
+Zc        = Zc(2:end-1);
+[XX,ZZ]   = meshgrid(Xc,Zc);
 
 Nx = length(Xc);
 Nz = length(Zc);
-
-inz = 2:Nz-1;
-inx = 2:Nx-1;
 
 % get smoothed initialisation field
 rng(seed);
 smth = smth*Nx*Nz*1e-4;
 rp   = randn(Nz,Nx);
 for i = 1:round(smth)
-    rp(2:end-1,2:end-1) = rp(2:end-1,2:end-1) + diff(rp(:,2:end-1),2,1)./8 + diff(rp(2:end-1,:),2,2)./8;
-    rp = rp - mean(mean(rp(2:end-1,2:end-1)));
-    rp([1 end],:) = 0;
-    rp(:,[1 end]) = 0;
+    rp = rp + diffus(rp,1/8*ones(size(rp)),1,[1,2],BCD);
+    rp = rp - mean(mean(rp));
 end
 rp = rp./max(abs(rp(:)));
 
 gp = exp(-(XX-D/2).^2/(D/8)^2 - (ZZ-D/2).^2/(D/8)^2);
 
 % get mapping arrays
-NP =  Nz   * Nx   ;
-NW = (Nz-1)* Nx   ;
-NU =  Nz   *(Nx-1);
-MapP = reshape(1:NP,Nz  ,Nx  );
-MapW = reshape(1:NW,Nz-1,Nx  );
-MapU = reshape(1:NU,Nz  ,Nx-1) + NW;
+NP = (Nz+2) * (Nx+2);
+NW = (Nz+1) * (Nx+2);
+NU = (Nz+2) * (Nx+1);
+MapP = reshape(1:NP,Nz+2,Nx+2);
+MapW = reshape(1:NW,Nz+1,Nx+2);
+MapU = reshape(1:NU,Nz+2,Nx+1) + NW;
 
 if bnd_h>0
     switch bndmode
@@ -165,13 +158,13 @@ if bnd_h>0
             bndinit = (1+erf(-(D-ZZ-bnd_h)/bnd_w))/2;
         case 3  % top/bot only
             bndinit = (1+erf( ( -ZZ+bnd_h)/bnd_w))/2 ...
-                + (1+erf(-(D-ZZ-bnd_h)/bnd_w))/2;
+                    + (1+erf(-(D-ZZ-bnd_h)/bnd_w))/2;
         case 4 % all walls
             bndinit = (1+erf( ( -ZZ+bnd_h)/bnd_w))/2 ...
-                + (1+erf(-(D-ZZ-bnd_h)/bnd_w))/2 ...
-                + (1+erf( ( -XX+bnd_h)/bnd_w))/2 ...
-                + (1+erf(-(L-XX-bnd_h)/bnd_w))/2;
-                + (1+erf(-(D-ZZ-bnd_h)/bnd_w))/2;
+                    + (1+erf(-(D-ZZ-bnd_h)/bnd_w))/2 ...
+                    + (1+erf( ( -XX+bnd_h)/bnd_w))/2 ...
+                    + (1+erf(-(L-XX-bnd_h)/bnd_w))/2;
+                    + (1+erf(-(D-ZZ-bnd_h)/bnd_w))/2;
         case 5 % only walls
             bndinit = (1+erf( ( -XX+bnd_h)/bnd_w))/2 ...
                     + (1+erf(-(L-XX-bnd_h)/bnd_w))/2;
@@ -183,22 +176,22 @@ end
 
 switch bndmode
     case 0  % none
-        bndshape = zeros(size(ZZ(inz,inx)));
+        bndshape = zeros(size(ZZ));
     case 1  % top only
-        bndshape = exp( ( -ZZ(inz,inx))/bnd_w);
+        bndshape = exp( ( -ZZ)/bnd_w);
     case 2  % bot only
-        bndshape = exp(-(D-ZZ(inz,inx))/bnd_w);
+        bndshape = exp(-(D-ZZ)/bnd_w);
     case 3  % top/bot only
-        bndshape = exp( ( -ZZ(inz,inx))/bnd_w) ...
-                 + exp(-(D-ZZ(inz,inx))/bnd_w);
+        bndshape = exp( ( -ZZ)/bnd_w) ...
+                 + exp(-(D-ZZ)/bnd_w);
     case 4 % all walls
-        bndshape = exp( ( -ZZ(inz,inx))/bnd_w) ...
-                 + exp(-(D-ZZ(inz,inx))/bnd_w) ...
-                 + exp( ( -XX(inz,inx))/bnd_w) ...
-                 + exp(-(L-XX(inz,inx))/bnd_w);
+        bndshape = exp( ( -ZZ)/bnd_w) ...
+                 + exp(-(D-ZZ)/bnd_w) ...
+                 + exp( ( -XX)/bnd_w) ...
+                 + exp(-(L-XX)/bnd_w);
     case 5 % only walls
-        bndshape = exp( ( -XX(inz,inx))/bnd_w) ...
-                 + exp(-(L-XX(inz,inx))/bnd_w);
+        bndshape = exp( ( -XX)/bnd_w) ...
+                 + exp(-(L-XX)/bnd_w);
 end
 bndshape = max(0,min(1,bndshape));
 
@@ -231,9 +224,9 @@ for i = 1:cal.nir
     if any(bndinit(:)) && ~isnan(irwall(i)); ir(:,:,i)  = ir(:,:,i) + (irwall(i)-ir(:,:,i)).*bndinit; end; irin = ir;
 end
 
-U   =  zeros(size((XX(:,1:end-1)+XX(:,2:end))));  UBG = U; Ui = U;
-W   =  zeros(size((XX(1:end-1,:)+XX(2:end,:))));  WBG = W; Wi = W; wf = 0.*W; wx = 0.*W; wm = 0.*W;
-P   =  0.*Tp;  Pi = P;  meanQ = 0;  Vel = 0.*P;
+U   =  zeros(Nz+2,Nx+1);  UBG = U; Ui = U;
+W   =  zeros(Nz+1,Nx+2);  WBG = W; Wi = W; wf = 0.*W; wx = 0.*W; wm = 0.*W;
+P   =  zeros(Nz+2,Nx+2);  Vel = 0.*Tp;
 SOL = [W(:);U(:);P(:)];
 
 % initialise auxiliary fields
@@ -241,17 +234,20 @@ Wf  = W;  Uf  = U;
 Wx  = W;  Ux  = U;
 Wm  = W;  Um  = U;
 
-eIIref =  1e-6;  
-Div_V  =  0.*P;  Div_Vi = 0.*P(inz,inx);  drhodt = 0.*P(inz,inx);  drhodto = drhodt;
-exx    =  0.*P;  ezz = 0.*P;  exz = zeros(Nz-1,Nx-1);  eII = 0.*P;  
-txx    =  0.*P;  tzz = 0.*P;  txz = zeros(Nz-1,Nx-1);  tII = 0.*P; 
-VolSrc =  0.*P(inz,inx); 
-rhom   =  rhom0.*ones(size(Tp)); 
-rhox   =  rhox0.*ones(size(Tp));
-rhof   =  rhof0.*ones(size(Tp));
-rho    =  rhom0.*ones(size(Tp));
-rhoref =  mean(rho(inz,inx),'all');
-Pt     =  Ptop + rhoref.*g0.*ZZ .* 1.01;
+eIIref = 1e-6;  
+Div_V  = 0.*c;  Div_Vi = 0.*c;  advn_rho = 0.*c;  drhodt = 0.*c;  drhodto = drhodt;
+exx    = 0.*c;  ezz = 0.*c;  exz = zeros(Nz-1,Nx-1);  eII = 0.*c;  
+txx    = 0.*c;  tzz = 0.*c;  txz = zeros(Nz-1,Nx-1);  tII = 0.*c; 
+VolSrc = 0.*c; 
+rhom   = rhom0.*ones(size(c)); 
+rhox   = rhox0.*ones(size(c));
+rhof   = rhof0.*ones(size(c));
+rho    = rhom0.*ones(size(c));
+rhoref = mean(rho,'all');
+Pt     = Ptop + rhoref.*g0.*ZZ;
+xq     = ones(size(c))/10;  fq = v/2;
+cmq    = c; cxq = c; 
+vmq    = v; vfq = ones(size(v)); 
 
 % get volume fractions and bulk density
 step    = 0;
@@ -259,35 +255,39 @@ EQtime  = 0;
 FMtime  = 0;
 TCtime  = 0;
 UDtime  = 0;
-res  = 1;  tol = 1e-12;  x = zeros(size(Tp));  f = v/2;
+res  = 1;  tol = 1e-12;  
 while res > tol
-    Pti = Pt; xi = x; fi = f;
+    Pti = Pt; xi = xq; fi = fq;
     
-    rhoref =  mean(rho(inz,inx),'all');
-    rhofz  = (rho(1:end-1,:)+rho(2:end,:))/2;
-    Adbt   =  cal.aT./rhoref;
-    Pt( 2:end, :) = repmat(cumsum(mean(rhofz,2).*g0.*h),1,Nx);
-    Pt            = Pt - Pt(2,:)/2 + Ptop;
-    Pt([1 end],:) = Pt([2 end-1],:);
-    Pt(:,[1 end]) = Pt(:,[2 end-1]);
-    if Nz<=10; Pt = Ptop.*ones(size(Tp)); end
+    rhoref = mean(rho,'all');
+    Adbt   = cal.aT./rhoref;
+    if Nz==1; Pt = Ptop.*ones(size(Tp)); else
+        rhofz  = (rho(1:end-1,:)+rho(2:end,:))/2;
+        Pt(1,:)     = repmat(mean(rhofz(1,:),2).*g0.*h/2,1,Nx) + Ptop;
+        Pt(2:end,:) = Pt(1,:) + repmat(cumsum(mean(rhofz,2).*g0.*h),1,Nx);
+    end
 
-    T    =  (Tp+273.15).*exp(Adbt./cP.*Pt);
+    T      =  (Tp+273.15).*exp(Adbt./cP.*Pt);
 
-    [xq,cxq,cmq,fq,vfq,vmq] = equilibrium(x,f,T-273.15,c,v,Pt,cal,TINY);
-    
+    eqtime = tic;
+
+    [xq,cxq,cmq,fq,vfq,vmq] = equilibrium(xq,fq,T-273.15,c,v,Pt,cal,TINY);
+
+    mq = 1-xq-fq;
+
+    x  = xq;  f = fq;  m = mq;
+    cm = cmq; cx = cxq;
+    vm = vmq; vf = vfq;
+
+    eqtime = toc(eqtime);
+    EQtime = EQtime + eqtime;
+
+    update;
+
     v  = vin .*(1-x);
     c  = cin .*(1-f);
     te = tein.*(1-f);
     ir = irin.*(1-f);
-
-    x  = xq;  f = fq;  m = 1-x-f;
-    cm = cmq; cx = cxq;
-    vm = vmq; vf = vfq;
-    Kc = cxq./cmq;
-    Kf = vfq./vmq;
-
-    update;
 
     res  = norm(Pt(:)-Pti(:),2)./norm(Pt(:),2) ...
          + norm(x(:)-xi(:),2)./(norm(x(:),2)+TINY) ...
@@ -298,12 +298,12 @@ dto  = dt;
 ho   = h;
 
 % get bulk enthalpy, silica, volatile content densities
-S  = rho.*(cP.*log(T/(cal.Tphs1+273.15)) + x.*Dsx + f.*Dsf - Adbt.*(Pt-Ptop));  So = S;  res_S = 0.*S(inz,inx);
+S  = rho.*(cP.*log(T/(cal.Tphs1+273.15)) + x.*Dsx + f.*Dsf - Adbt.*(Pt-Ptop));  So = S;  res_S = 0.*S;
 S0 = rho.*(cP.*log(cal.Tphs1+273.15) + x.*Dsx + f.*Dsf - Adbt.*Ptop);  
-C  = rho.*(m.*cm + x.*cx); Co = C;  res_C = 0.*C(inz,inx);
-V  = rho.*(m.*vm + f.*vf); Vo = V;  res_V = 0.*V(inz,inx);
-X  = rho.*x; Xo = X;  res_X = 0.*X(inz,inx);
-F  = rho.*f; Fo = F;  res_F = 0.*F(inz,inx);
+C  = rho.*(m.*cm + x.*cx); Co = C;  res_C = 0.*C;
+V  = rho.*(m.*vm + f.*vf); Vo = V;  res_V = 0.*V;
+X  = rho.*x; Xo = X;  res_X = 0.*X;
+F  = rho.*f; Fo = F;  res_F = 0.*F;
 M  = rho.*m; Mo = M;
 
 % get phase entropies
@@ -343,16 +343,17 @@ end
 IRo = IR;
 
 % initialise phase change rates
-Gx = 0.*x(inz,inx);  Gf = 0.*f(inz,inx);  Gm = 0.*m(inz,inx);
+Gx = 0.*x;  Gf = 0.*f;  Gm = 0.*m;
 
 % initialise auxiliary variables 
-dSdt   = 0.*T(inz,inx);  dSdto  = dSdt; diss_h = 0.*T(inz,inx);
-dCdt   = 0.*c(inz,inx);  dCdto  = dCdt;
-dVdt   = 0.*v(inz,inx);  dVdto  = dVdt;
-dFdt   = 0.*f(inz,inx);  dFdto  = dFdt;
-dXdt   = 0.*x(inz,inx);  dXdto  = dXdt;
-dTEdt  = 0.*te(inz,inx,:); dTEdto = dTEdt;
-dIRdt  = 0.*ir(inz,inx,:); dIRdto = dIRdt;
+dSdt   = 0.*T;  dSdto  = dSdt; diss_h = 0.*T;
+dCdt   = 0.*c;  dCdto  = dCdt;
+dVdt   = 0.*v;  dVdto  = dVdt;
+dFdt   = 0.*f;  dFdto  = dFdt;
+dXdt   = 0.*x;  dXdto  = dXdt;
+dMdt   = 0.*m;  dMdto  = dMdt;
+dTEdt  = 0.*te; dTEdto = dTEdt;
+dIRdt  = 0.*ir; dIRdto = dIRdt;
 
 % initialise timing and iterative parameters
 step    = 0;
@@ -373,12 +374,11 @@ if restart
     end
     if exist(name,'file')
         fprintf('\n   restart from %s \n\n',name);
-        load(name,'U','W','P','Pt','f','x','m','phi','chi','mu','X','F','S','C','V','T','c','v','cm','cx','vm','vf','TE','IR','te','ir','dSdt','dCdt','dVdt','dFdt','dXdt','dTEdt','dIRdt','Gf','Gx','rho','eta','eII','tII','dt','time','step','VolSrc','wf','wx','wm');
+        load(name,'U','W','P','Pt','f','x','m','phi','chi','mu','X','F','M','S','C','V','T','c','v','cm','cx','vm','vf','TE','IR','te','ir','dSdt','dCdt','dVdt','dFdt','dXdt','dMdt','drhodt','dTEdt','dIRdt','Gf','Gx','rho','eta','eII','tII','dt','time','step','VolSrc','wf','wx','wm');
         name = [opdir,'/',runID,'/',runID,'_hist'];
         load(name,'hist');
 
-        M   = rho-F-X;
-        xq  = x; fq = f;
+        xq  = x; fq = f; mq = 1-x-f;
         SOL = [W(:);U(:);P(:)];
 
         So = S;
@@ -386,6 +386,8 @@ if restart
         Vo = V;
         Xo = X;
         Fo = F;
+        Mo = M;
+        rhoo = rho;
         TEo = TE;
         IRo = IR;
         dSdto = dSdt;
@@ -393,10 +395,10 @@ if restart
         dVdto = dVdt;
         dXdto = dXdt;
         dFdto = dFdt;
+        dMdto = dMdt;
+        drhodto = drhodt;
         dTEdto = dTEdt;
         dIRdto = dIRdt;
-        rhoo = rho;
-        Div_rhoVo = Div_rhoV;
 
         update; output; restart = 0;
     else % continuation file does not exist, start from scratch

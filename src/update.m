@@ -66,19 +66,22 @@ cx_oxd = reshape(reshape(cx_cmp,Nz*Nx,cal.nc)*cal.oxd/100,Nz,Nx,cal.nc);
 c_oxd = (m.*cm_oxd + x.*cx_oxd)./(1-f);
 
 % update phase densities
-rhom = squeeze(sum(permute(cm_cmp/100,[3,1,2])./cal.rhom0.')).^-1 .* (1 - cal.aT.*(T-cal.perT-273.15) - cal.gH.*vm); if size(rhom,2)~=size(T,2); rhom = rhom(1,:).'; end
-rhox = squeeze(sum(permute(cx_cmp/100,[3,1,2])./cal.rhox0.')).^-1 .* (1 - cal.aT.*(T-cal.perT-273.15)             ); if size(rhox,2)~=size(T,2); rhox = rhox(1,:).'; end
+rhom = reshape(sum(reshape(cm_cmp/100,Nz*Nx,cal.nc)./cal.rhom0,2).^-1,Nz,Nx) .* (1 - cal.aT.*(T-cal.perT-273.15) - cal.gH.*vm);
+rhox = reshape(sum(reshape(cx_cmp/100,Nz*Nx,cal.nc)./cal.rhox0,2).^-1,Nz,Nx) .* (1 - cal.aT.*(T-cal.perT-273.15));
 rhof = cal.rhof0 .* (1 - cal.aT.*(T-cal.perT-273.15) + cal.bP.*(Pt-Ptop ));
 
+% rhom = squeeze(sum(permute(cm_cmp/100,[3,1,2])./cal.rhom0.')).^-1 .* (1 - cal.aT.*(T-cal.perT-273.15) - cal.gH.*vm); if size(rhom,2)~=size(T,2); rhom = rhom(1,:).'; end
+% rhox = squeeze(sum(permute(cx_cmp/100,[3,1,2])./cal.rhox0.')).^-1 .* (1 - cal.aT.*(T-cal.perT-273.15)             ); if size(rhox,2)~=size(T,2); rhox = rhox(1,:).'; end
+% rhof = cal.rhof0 .* (1 - cal.aT.*(T-cal.perT-273.15) + cal.bP.*(Pt-Ptop ));
+
 % convert weight to volume fraction, update bulk density
-rho    = 1./(m./rhom + x./rhox + f./rhof);
+rho   = 1./(m./rhom + x./rhox + f./rhof);
 
 rhofz = (rho(1:end-1,:)+rho(2:end,:))/2;
-rhofx = (rho(:,1:end-1)+rho(:,2:end))/2;
 
-chi   = max(TINY,min(1-TINY, x.*rho./rhox ));
-phi   = max(TINY,min(1-TINY, f.*rho./rhof ));
-mu    = max(TINY,min(1-TINY, m.*rho./rhom ));                                  
+chi   = max(TINY^0.5,min(1-TINY^0.5, x.*rho./rhox ));
+phi   = max(TINY^0.5,min(1-TINY^0.5, f.*rho./rhof ));
+mu    = max(TINY^0.5,min(1-TINY^0.5, m.*rho./rhom ));                                  
 
 % update effective viscosity
 wtm      = zeros(Nz*Nx,12);
@@ -98,15 +101,15 @@ hh     = (1-cal.xi).*erf(sqrt(pi)./(2.*(1-cal.xi)).*(chi./cal.chi_pck).*(1+(chi.
 eta    = etam .* (1+(chi./cal.chi_pck).^cal.delta) .* (1-hh).^-cal.Bchi .* (1-phi).^-cal.Bphi;
 
 % phase segregation coefficients
-Ksgr_x = 2/9*cal.dx^2./eta/sgrreg                                                                       + TINY.^2;
-Ksgr_f = 2/9*cal.df^2./eta/sgrreg + cal.dx^2/cal.bf./cal.etaf0/sgrreg.*phi.^(cal.nf-1).*(1-phi).^cal.mf + TINY.^2;
-Ksgr_m =                            cal.dx^2/cal.bm./    etam /sgrreg.*mu .^(cal.nm-1).*(1-mu ).^cal.mm + TINY.^2;
+Ksgr_x = 2/9*cal.dx^2./eta/sgrreg                                                                      ;
+Ksgr_f = 2/9*cal.df^2./eta/sgrreg + cal.dx^2/cal.bf./cal.etaf0/sgrreg.*max(TINY^0.5,phi-cal.cf).^(cal.nf-1).*(1-phi).^cal.mf;
+Ksgr_m =                            cal.dx^2/cal.bm./    etam /sgrreg.*max(TINY^0.5,mu -cal.mf).^(cal.nm-1).*(1-mu ).^cal.mm;
 
 % bound and regularise viscosity
 if ~calibrt; etamax = etacntr.*min(eta(:)); else; etamax = 1e+32.*min(eta(:)); end
 eta    = (etamax.^-0.5 + (eta*cnvreg).^-0.5).^-2;
-etaco  = (eta(1:end-1,1:end-1).*eta(2:end,1:end-1) ...
-       .* eta(1:end-1,2:end  ).*eta(2:end,2:end  )).^0.25;
+etaco  = (eta([1,1:end],[1  ,1:end]).*eta([1:end,end],[1  ,1:end]) ...
+       .* eta([1,1:end],[1:end,end]).*eta([1:end,end],[1:end,end])).^0.25;
 
 if ~calibrt % skip the following if called from calibration script
 
@@ -120,19 +123,13 @@ kT  = kT0 + (phi.*kwf + chi.*kwx + kW + mink).*rho.*cP;                    % hea
 ks  = kT./T;                                                               % entropy diffusion
 
 % update velocity divergence
-Div_V(2:end-1,2:end-1) = ddz(W(:,2:end-1),h) ...                           % get velocity divergence
-                       + ddx(U(2:end-1,:),h);
-Div_V([1 end],:) = Div_V([2 end-1],:);                                     % apply boundary conditions
-Div_V(:,[1 end]) = Div_V(:,[2 end-1]);
+Div_V = ddz(W(:,2:end-1),h) + ddx(U(2:end-1,:),h);                         % get velocity divergence
+      
 
 % update strain rates
-exx(:,2:end-1) = diff(U,1,2)./h - Div_V(:,2:end-1)./2;                     % x-normal strain rate
-exx([1 end],:) = exx([2 end-1],:);                                         % apply boundary conditions
-exx(:,[1 end]) = exx(:,[2 end-1]);
-ezz(2:end-1,:) = diff(W,1,1)./h - Div_V(2:end-1,:)./2;                     % z-normal strain rate
-ezz([1 end],:) = ezz([2 end-1],:);                                         % apply boundary conditions
-ezz(:,[1 end]) = ezz(:,[2 end-1]);
-exz            = 1/2.*(diff(U,1,1)./h+diff(W,1,2)./h);                     % shear strain rate
+exx = diff(U(2:end-1,:),1,2)./h - Div_V./2;                                % x-normal strain rate
+ezz = diff(W(:,2:end-1),1,1)./h - Div_V./2;                                % z-normal strain rate
+exz = 1/2.*(diff(U,1,1)./h+diff(W,1,2)./h);                                % shear strain rate
 
 % update stresses
 txx = eta   .* exx;                                                        % x-normal stress
@@ -140,28 +137,26 @@ tzz = eta   .* ezz;                                                        % z-n
 txz = etaco .* exz;                                                        % xz-shear stress
 
 % update tensor magnitudes
-eII(2:end-1,2:end-1) = 1e-16 + (0.5.*(exx(2:end-1,2:end-1).^2 + ezz(2:end-1,2:end-1).^2 ...  % get strain rate magnitude
-                             + 2.*(exz(1:end-1,1:end-1).^2.*exz(2:end,1:end-1).^2.*exz(1:end-1,2:end).^2.*exz(2:end,2:end).^2).^0.25)).^0.5;
-eII(:,[1 end]) = eII(:,[2 end-1]);
-eII([1 end],:) = eII([2 end-1],:);
+eII = (0.5.*(exx.^2 + ezz.^2 ...
+       + 2.*(exz(1:end-1,1:end-1).^2+exz(2:end,1:end-1).^2 ...
+       +     exz(1:end-1,2:end  ).^2+exz(2:end,2:end  ).^2)/4)).^0.5 + TINY;
 
-tII(2:end-1,2:end-1) = 1e-16 + (0.5.*(txx(2:end-1,2:end-1).^2 + tzz(2:end-1,2:end-1).^2 ...  % get stress magnitude
-                             + 2.*(txz(1:end-1,1:end-1).^2.*txz(2:end,1:end-1).^2.*txz(1:end-1,2:end).^2.*txz(2:end,2:end).^2).^0.25)).^0.5;  
-tII(:,[1 end]) = tII(:,[2 end-1]);
-tII([1 end],:) = tII([2 end-1],:);
+tII = (0.5.*(txx.^2 + tzz.^2 ...
+       + 2.*(txz(1:end-1,1:end-1).^2+txz(2:end,1:end-1).^2 ...
+       +     txz(1:end-1,2:end  ).^2+txz(2:end,2:end).^2)/4)).^0.5 + TINY;
 
 % heat dissipation (entropy production) rate
-if Nz==3 && Nx==3  
-    diss = 0.*T(inz,inx);  % no dissipation in 0-D mode (no diffusion, no shear deformation, no segregation)
+if Nz==1 && Nx==1  
+    diss = 0.*T;  % no dissipation in 0-D mode (no diffusion, no shear deformation, no segregation)
 else
-    [grdTx,grdTz] = gradient(T,h);
-    diss = ks(inz,inx).*(grdTz(inz,inx).^2 + grdTx(inz,inx).^2) ...
-        + exx(inz,inx).*txx(inz,inx) + ezz(inz,inx).*tzz(inz,inx) ...
+    [grdTx,grdTz] = gradient(T([1,1:end,end],[1,1:end,end]),h);
+    diss = ks.*(grdTz(2:end-1,2:end-1).^2 + grdTx(2:end-1,2:end-1).^2) ...
+        + exx.*txx + ezz.*tzz ...
         + 2.*(exz(1:end-1,1:end-1)+exz(2:end,1:end-1)+exz(1:end-1,2:end)+exz(2:end,2:end))./4 ...
            .*(txz(1:end-1,1:end-1)+txz(2:end,1:end-1)+txz(1:end-1,2:end)+txz(2:end,2:end))./4 ...
-        +  mu(inz,inx)./Ksgr_m(inz,inx) .* ((wm(inz,inx)+wm(inz,inx))./2).^2 ...
-        + chi(inz,inx)./Ksgr_x(inz,inx) .* ((wx(inz,inx)+wx(inz,inx))./2).^2 ...
-        + phi(inz,inx)./Ksgr_f(inz,inx) .* ((wf(inz,inx)+wf(inz,inx))./2).^2;
+        +  mu./Ksgr_m .* ((wm(1:end-1,2:end-1)+wm(2:end,2:end-1))./2).^2 ...
+        + chi./Ksgr_x .* ((wx(1:end-1,2:end-1)+wx(2:end,2:end-1))./2).^2 ...
+        + phi./Ksgr_f .* ((wf(1:end-1,2:end-1)+wf(2:end,2:end-1))./2).^2;
 end
 
 UDtime = UDtime + toc;

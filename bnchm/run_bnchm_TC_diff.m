@@ -35,10 +35,11 @@ finit = 0; fout = 0; Twall = nan;
 
 % set numerical model parameters
 CFL      =  1.00;                % (physical) time stepping courant number (multiplies stable step) [0,1]
-TINT     =  'bd3s';              % time integration scheme ('bwei','cnsi','bd3i','bd3s')
+TINT     =  'bd2si';             % time integration scheme ('be1im','bd2im','cn2si','bd2si')
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
 rtol     =  1e-6;                % outer its relative tolerance
 atol     =  1e-12;               % outer its absolute tolerance
+lambda   =  0.50;                % iterative step size
 maxit    =  50;                  % maximum outer its
 
 % create output directory
@@ -79,7 +80,7 @@ Vinit = V;
 Xinit = X;
 Finit = F;
 
-dt    =  1e+2;
+dt    = (h/2)^2./max(kT(:)./rho(:)./cP)/2;
 dtmax =  1e+5;
 time  =  0;
 
@@ -93,18 +94,18 @@ while time <= tend && step <= Nt
     TCtime  = 0;
     UDtime  = 0;
 
-    if     strcmp(TINT,'bwei') || step<=2 % first step  / 1st-order backward-Euler implicit scheme
-        alpha1 = 1;   alpha2 = 1;   alpha3 = 0;
-        beta1  = 1;   beta2  = 0;   beta3  = 0;
-    elseif strcmp(TINT,'cnsi')            % second step / 2nd-order Crank-Nicolson semi-implicit scheme
-        alpha1 = 1;   alpha2 = 1;   alpha3 = 0;
-        beta1  = 1/2; beta2  = 1/2; beta3  = 0;
-    elseif strcmp(TINT,'bd3i')            % other steps / 2nd-order 3-point backward-difference implicit scheme
-        alpha1 = 3/2; alpha2 = 4/2; alpha3 = -1/2;
-        beta1  = 1;   beta2  = 0;   beta3  = 0;
-    elseif strcmp(TINT,'bd3s')            % other steps / 2nd-order 3-point backward-difference semi-implicit scheme
-        alpha1 = 3/2; alpha2 = 4/2; alpha3 = -1/2;
-        beta1  = 3/4; beta2  = 2/4; beta3  = -1/4;
+    if     strcmp(TINT,'be1im') || step==1 % first step / 1st-order backward-Euler implicit scheme
+        a1 = 1; a2 = 1; a3 = 0;
+        b1 = 1; b2 = 0; b3 = 0;
+    elseif strcmp(TINT,'bd2im') || step==2 % second step / 2nd-order 3-point backward-difference implicit scheme
+        a1 = 3/2; a2 = 4/2; a3 = -1/2;
+        b1 = 1;   b2 =  0;  b3 = 0;
+    elseif strcmp(TINT,'cn2si')            % other steps / 2nd-order Crank-Nicolson semi-implicit scheme
+        a1 = 1;   a2 = 1;   a3 = 0;
+        b1 = 1/2; b2 = 1/2; b3 = 0;
+    elseif strcmp(TINT,'bd2si')            % other steps / 2nd-order 3-point backward-difference semi-implicit scheme
+        a1 = 3/2; a2 = 4/2; a3 = -1/2;
+        b1 = 3/4; b2 = 2/4; b3 = -1/4;
     end
 
     % store previous solution
@@ -113,6 +114,8 @@ while time <= tend && step <= Nt
     Voo = Vo; Vo = V;
     Xoo = Xo; Xo = X;
     Foo = Fo; Fo = F;
+    Moo = Mo; Mo = M;
+    rhooo = rhoo; rhoo = rho;
     TEoo = TEo; TEo = TE;
     IRoo = IRo; IRo = IR;
     dSdtoo = dSdto; dSdto = dSdt;
@@ -120,10 +123,10 @@ while time <= tend && step <= Nt
     dVdtoo = dVdto; dVdto = dVdt;
     dXdtoo = dXdto; dXdto = dXdt;
     dFdtoo = dFdto; dFdto = dFdt;
+    dMdtoo = dMdto; dMdto = dMdt;
+    drhodtoo = drhodto; drhodto = drhodt;
     dTEdtoo = dTEdto; dTEdto = dTEdt;
     dIRdtoo = dIRdto; dIRdto = dIRdt;
-    rhooo = rhoo; rhoo = rho;
-    Div_rhoVoo = Div_rhoVo; Div_rhoVo = Div_rhoV;
     Div_Vo  = Div_V;
     dto     = dt;
 
@@ -135,6 +138,8 @@ while time <= tend && step <= Nt
     % non-linear iteration loop
     while resnorm/resnorm0 >= rtol && resnorm >= atol && iter <= maxit
 
+        dt = (h/2)^2./max(kT(:)./rho(:)./cP)/2;
+
         % solve thermo-chemical equations
         thermochem;
 
@@ -143,7 +148,6 @@ while time <= tend && step <= Nt
 
         wx(:) = 0;  wm(:) = 0;  wf(:) = 0;
         diss(:) = 0;
-        dt = (h/2)^2./max(kT(:)./rho(:)./cP)/2;
 
         % solve fluid-mechanics equations
         g0 = 0.; fluidmech;
@@ -169,17 +173,17 @@ while time <= tend && step <= Nt
 
     figure(100); clf;
     subplot(3,2,1)
-    plot(XX(N/2,inx),Sinit(N/2,inx)./rhoin(N/2,inx),'k',XX(N/2,inx),S(N/2,inx)./rho(N/2,inx),'r','LineWidth',1.5); axis tight; box on;
+    plot(XX(N/2,:),Sinit(N/2,:)./rhoin(N/2,:),'k',XX(N/2,:),S(N/2,:)./rho(N/2,:),'r','LineWidth',1.5); axis tight; box on;
     subplot(3,2,2)
-    plot(XX(N/2,inx),Tinit(N/2,inx)-273.15         ,'k',XX(N/2,inx),T(N/2,inx)-273.15       ,'r','LineWidth',1.5); axis tight; box on;
+    plot(XX(N/2,:),Tinit(N/2,:)-273.15         ,'k',XX(N/2,:),T(N/2,:)-273.15       ,'r','LineWidth',1.5); axis tight; box on;
     subplot(3,2,3)
-    plot(XX(N/2,inx),Cinit(N/2,inx)./rhoin(N/2,inx)./(1-finit(N/2,inx)),'k',XX(N/2,inx),C(N/2,inx)./rho(N/2,inx)./(1-f(N/2,inx)),'r','LineWidth',1.5); axis tight; box on;
+    plot(XX(N/2,:),Cinit(N/2,:)./rhoin(N/2,:)./(1-finit(N/2,:)),'k',XX(N/2,:),C(N/2,:)./rho(N/2,:)./(1-f(N/2,:)),'r','LineWidth',1.5); axis tight; box on;
     subplot(3,2,4)
-    plot(XX(N/2,inx),Vinit(N/2,inx)./rhoin(N/2,inx)./(1-xinit(N/2,inx)),'k',XX(N/2,inx),V(N/2,inx)./rho(N/2,inx)./(1-x(N/2,inx)),'r','LineWidth',1.5); axis tight; box on;
+    plot(XX(N/2,:),Vinit(N/2,:)./rhoin(N/2,:)./(1-xinit(N/2,:)),'k',XX(N/2,:),V(N/2,:)./rho(N/2,:)./(1-x(N/2,:)),'r','LineWidth',1.5); axis tight; box on;
     subplot(3,2,5)
-    plot(XX(N/2,inx),Xinit(N/2,inx)./rhoin(N/2,inx),'k',XX(N/2,inx),X(N/2,inx)./rho(N/2,inx),'r','LineWidth',1.5); axis tight; box on;
+    plot(XX(N/2,:),Xinit(N/2,:)./rhoin(N/2,:),'k',XX(N/2,:),X(N/2,:)./rho(N/2,:),'r','LineWidth',1.5); axis tight; box on;
     subplot(3,2,6)
-    plot(XX(N/2,inx),Finit(N/2,inx)./rhoin(N/2,inx),'k',XX(N/2,inx),F(N/2,inx)./rho(N/2,inx),'r','LineWidth',1.5); axis tight; box on;
+    plot(XX(N/2,:),Finit(N/2,:)./rhoin(N/2,:),'k',XX(N/2,:),F(N/2,:)./rho(N/2,:),'r','LineWidth',1.5); axis tight; box on;
     drawnow;
 
 end

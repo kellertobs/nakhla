@@ -31,11 +31,11 @@ for rtol = RTOL
     fout     =  0;
 
     % set numerical model parameters
-    TINT     =  'bd2im';             % time integration scheme ('be1im','bd2im','cn2si')
+    TINT     =  'bd2si';             % time integration scheme ('be1im','bd2im','cn2si','bd2si')
     CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
-    atol     =  rtol/1e3;            % outer its absolute tolerance
+    atol     =  rtol/1e6;            % outer its absolute tolerance
     maxit    =  50;                  % maximum outer its
-    lambda   =  1.00;                % iterative step size
+    lambda   =  0.50;                % iterative step size
 
     % create output directory
     if ~isfolder([opdir,'/',runID])

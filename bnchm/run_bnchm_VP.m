@@ -14,8 +14,8 @@ for nn = NN
     bnchm    =  1;                   % set flag for mms benchmark in fluidmech
 
     % set model domain parameters
-    N        =  nn + 2;              % number of grid points in z-direction (incl. 2 ghosts)
-    h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
+    N        =  nn;                  % number of grid points in z-direction (incl. 2 ghosts)
+    h        =  D/N;                 % grid spacing (equal in both dimensions, do not set) [m]
 
     % update inner indeces
     inz = 2:N-1;
