@@ -17,19 +17,21 @@ perCm = (perCm-cphs0)./(cphs1-cphs0);
 perCx = (perCx-cphs0)./(cphs1-cphs0);
 
 iter    = 1;
-maxit   = 100;
+maxit   = 50;
 resnorm = 1;
-tol     = 1e-13;
-eps     = 1e-6;
-DOF     = length(xq(:));
+tol     = 1e-12;
+alpha   = 0.50;
+beta    = 0.25;
+xi = xq; fi = fq;
 
 vmq_c0 = (4.7773e-7.*P.^0.6 + 1e-11.*P) .* exp(2565*(1./(T0+273.15)-1./(perTd+273.15))); % Katz et al., 2003; Moore et al., 1998
 vmq_c1 = (3.5494e-3.*P.^0.5 + 9.623e-8.*P - 1.5223e-11.*P.^1.5)./(T0+273.15) + 1.2436e-14.*P.^1.5; % Liu et al., 2015
 vmq0   = (1-c).*vmq_c0 + c.*vmq_c1;
 
 while resnorm > tol && iter < maxit
-   
-    beta = 0.9;
+
+    xii = xi; xi = xq;  
+    fii = fi; fi = fq;
 
     [resx,resf,cxq,cmq,vfq,vmq] = res_xf(xq,fq,T0,c,v,P,Tphs0d,Tphs1d,cphs0,cphs1,perTd,perCx,perCm,clap,dTH2O,vmq0,PhDg,TINY);
     
@@ -43,19 +45,20 @@ while resnorm > tol && iter < maxit
         resf     = fq;
         dresf_df = ones(size(fq));
     end
-    
-    xq = max(0,min(1-fq,xq - beta*resx./dresx_dx));
-    fq = max(0,min(1   ,fq - beta*resf./dresf_df));
 
-    resnorm = norm(resx./dresx_dx,'fro') ...
-            + norm(resf./dresf_df,'fro');
+    xq = xq - alpha.*resx./dresx_dx + beta*(xii-xi);
+    fq = fq - alpha.*resf./dresf_df + beta*(fii-fi);
+
+    resnorm = norm(resx./dresx_dx)./sqrt(length(xq(:))) ...
+            + norm(resf./dresf_df)./sqrt(length(xq(:)));
 
     iter    = iter+1;
 end
 
-if iter>=maxit; error('!!! equilibrium solver did not converge !!!'); end
-
 [~,~,cxq,cmq,vfq,vmq] = res_xf(xq,fq,T0,c,v,P,Tphs0d,Tphs1d,cphs0,cphs1,perTd,perCx,perCm,clap,dTH2O,vmq0,PhDg,TINY);
+
+xq = max(0,min(1-fq, xq ));
+fq = max(0,min(1   , fq ));
 
 end
 
