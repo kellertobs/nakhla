@@ -52,12 +52,10 @@ TINT     =  'bd2im';             % time integration scheme ('be1im','bd2im','cn2
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
 CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 rtol     =  1e-4;                % outer its relative tolerance
-atol     =  1e-7;                % outer its absolute tolerance
+atol     =  1e-8;                % outer its absolute tolerance
 maxit    =  50;                  % maximum outer its
-lambda   =  0.50;                % iterative step size
-mink     =  1e-8;                % minimum diffusivity for phase, component fractions
-cnvreg   =  10;                  % convection regularisation parameter
-dtmax    =  20;                  % maximum time step [s]
+mink     =  1e-7;                % minimum diffusivity for phase, component fractions
+dtmax    =  25;                  % maximum time step [s]
 
 
 %*****  RUN NAKHLA MODEL  *************************************************

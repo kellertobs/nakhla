@@ -1,8 +1,16 @@
 %% *****  THERMO-CHEMICAL EVOLUTION  **************************************
 
+tic;
+
 for itTC = 1:inner_TC
 
-tic;
+% store previous iterations
+Sii = Si;  Si = S;
+Cii = Ci;  Ci = C;
+Vii = Vi;  Vi = V;
+Xii = Xi;  Xi = X;
+Fii = Fi;  Fi = F;
+Mii = Mi;  Mi = M;
 
 %***  update heat content (entropy)
 
@@ -29,7 +37,10 @@ dSdt  = advn_S + diff_S + diss_h + bnd_S;
 res_S = (a1*S-a2*So-a3*Soo)/dt - (b1*dSdt + b2*dSdto + b3*dSdtoo);
 
 % semi-implicit update of bulk entropy density
-S = S - lambda*res_S*dt;
+S = S - beta*res_S*dt + beta*(Sii-Si);
+
+% convert entropy desnity to temperature
+T = (cal.Tphs1+273.15)*exp((S - X.*Dsx - F.*Dsf)./rho./cP + Adbt./cP.*(Pt-Ptop));
 
 
 %***  update major component (SiO2)
@@ -48,9 +59,12 @@ dCdt = advn_C + bnd_C;
 res_C = (a1*C-a2*Co-a3*Coo)/dt - (b1*dCdt + b2*dCdto + b3*dCdtoo);
 
 % semi-implicit update of major component density
-C = C - lambda*res_C*dt;
+C = C - beta*res_C*dt + beta*(Cii-Ci);
 C          = max(cal.cphs0.*rho,min(cal.cphs1.*rho,C));
-    
+
+% convert major component density to concentration
+c = C./rho;
+
 
 %***  update volatile component (H2O)
 if any([v0;v1;vwall;v(:)]>10*TINY)
@@ -69,25 +83,22 @@ if any([v0;v1;vwall;v(:)]>10*TINY)
     res_V = (a1*V-a2*Vo-a3*Voo)/dt - (b1*dVdt + b2*dVdto + b3*dVdtoo);
 
     % semi-implicit update of volatile component density
-    V = V - lambda*res_V*dt;
+    V = V - beta*res_V*dt + beta*(Vii-Vi);
     V          = max(0,min(rho,V));
+
+    % convert volatile component density to concentration
+    v = V./rho;
 end
 
-
-% convert entropy and component densities to temperature and concentrations
-T = (cal.Tphs1+273.15)*exp((S - X.*Dsx - F.*Dsf)./rho./cP + Adbt./cP.*(Pt-Ptop));
-c = C./rho;
-v = V./rho;
-
-eqtime = tic;
-
-%*** update phase equilibrium
-[xq,cxq,cmq,fq,vfq,vmq] = equilibrium(xq,fq,T-273.15,c,v,Pt,cal,TINY);
-
-mq = 1-xq-fq;
-
-eqtime = toc(eqtime);
-EQtime = EQtime + eqtime;
+% eqtime = tic;
+% 
+% %*** update phase equilibrium
+% [xq,cxq,cmq,fq,vfq,vmq] = equilibrium(xq,fq,T-273.15,c,v,Pt,cal,TINY);
+% 
+% mq = 1-xq-fq;
+% 
+% eqtime = toc(eqtime);
+% EQtime = EQtime + eqtime;
 
 
 %***  update phase fractions
@@ -114,9 +125,9 @@ res_F = (a1*F-a2*Fo-a3*Foo)/dt - (b1*dFdt + b2*dFdto + b3*dFdtoo);
 res_M = (a1*M-a2*Mo-a3*Moo)/dt - (b1*dMdt + b2*dMdto + b3*dMdtoo);
 
 % update of phase density evolution
-X = X - lambda*res_X*dt;
-F = F - lambda*res_F*dt;
-M = M - lambda*res_M*dt;
+X = X - beta*res_X*dt + beta*(Xii-Xi);
+F = F - beta*res_F*dt + beta*(Fii-Fi);
+M = M - beta*res_M*dt + beta*(Mii-Mi);
 
 % apply minimum bound
 X = max(0, X );
@@ -151,8 +162,17 @@ Kf = vfq./max(TINY,vmq);
 vm = v./max(TINY,m + f.*Kf);
 vf = v./max(TINY,m./Kf + f);
 
+end
 
 TCtime = TCtime + toc;
 
-end
+eqtime = tic;
+
+%*** update phase equilibrium
+[xq,cxq,cmq,fq,vfq,vmq] = equilibrium(xq,fq,T-273.15,c,v,Pt,cal,TINY);
+
+mq = 1-xq-fq;
+
+eqtime = toc(eqtime);
+EQtime = EQtime + eqtime;
 

@@ -1,5 +1,5 @@
 % store previous iteration
-SOLi = SOL; tic;
+SOLi = SOL; Div_Vii = Div_Vi; Div_Vi = Div_V; tic;
 
 if ~bnchm && step>0
 
@@ -10,7 +10,7 @@ drhodt  = advn_rho;
 res_rho = (a1*rho-a2*rhoo-a3*rhooo)/dt - (b1*drhodt + b2*drhodto + b3*drhodtoo);
 
 % volume source and background velocity passed to fluid-mechanics solver
-VolSrc  = Div_V - lambda*res_rho./rho;  % correct volume source term by scaled residual
+VolSrc  = Div_V - beta*res_rho./rho + beta*(Div_Vii-Div_Vi);  % correct volume source term by scaled residual
 
 UBG     = - mean(VolSrc,'all')./2 .* (L/2-XXu);
 WBG     = - mean(VolSrc,'all')./2 .* (D/2-ZZw);

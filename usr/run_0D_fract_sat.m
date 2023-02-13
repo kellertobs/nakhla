@@ -49,7 +49,6 @@ CFL      =  1.00;                % (physical) time stepping courant number (mult
 rtol     =  1e-6;                % outer its relative tolerance
 atol     =  1e-9;                % outer its absolute tolerance
 maxit    =  50;                  % maximum outer its
-lambda   =  0.50;                % iterative lag parameter equilibration
 
 
 %*****  RUN NAKHLA MODEL  *************************************************

@@ -5,7 +5,7 @@ clear; close all;
 run('./par_default')
 
 % set run parameters
-runID    =  '1D_fract_anh';      % run identifier
+runID    =  '1D_fract_anh_rtol4';      % run identifier
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  500;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot results
@@ -52,8 +52,7 @@ CFL      =  0.25;                % (physical) time stepping courant number (mult
 rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-8;                % outer its absolute tolerance
 maxit    =  50;                  % maximum outer its
-lambda   =  0.50;                % iterative step size
-mink     =  1e-8;                % minimum diffusivity for phase, component fractions
+mink     =  1e-7;                % minimum diffusivity for phase, component fractions
 
 
 %*****  RUN NAKHLA MODEL  *************************************************

@@ -78,7 +78,7 @@ while time <= tend && step <= Nt && any(m(:)>TINY^0.5)
 
     % print diagnostics
     fprintf(1,'\n         total time to solution = %3.3f sec\n\n',toc(TTtime));
-    fprintf(1,'         thermo-chemical solve  = %1.3e sec\n'  ,TCtime/(iter-1)/inner_TC);
+    fprintf(1,'         thermo-chemical solve  = %1.3e sec\n'  ,TCtime/(iter-1));
     fprintf(1,'         phase equilibr. solve  = %1.3e sec\n'  ,EQtime/(iter-1));
     fprintf(1,'         coefficients update    = %1.3e sec\n'  ,UDtime/(iter-1));
     fprintf(1,'         fluid-mechanics solve  = %1.3e sec\n\n',FMtime/(iter-1));
