@@ -1,8 +1,5 @@
 % ***** TRACE & ISOTOPE GEOCHEMISTRY  *************************************
 
-TEii = TEi;  TEi = TE;
-IRii = IRi;  IRi = IR;
-
 % *****  Trace Elements  **************************************************
 
 bnd_TE = zeros(Nz,Nx,cal.nte);
@@ -28,12 +25,11 @@ end
 % get total rate of change
 dTEdt = adv_TE + bnd_TE;
 
-% residual of trace element evolution
-res_TE = (a1*TE-a2*TEo-a3*TEoo)/dt - (b1*dTEdt + b2*dTEdto + b3*dTEdtoo);
-
 % update trace element concentrations
-TE = TE - alpha*res_TE*dt + beta*(TEii-TEi);
-TE = max(0, TE );                                                          % enforce min bound
+TE = (a2*TEo+a3*TEoo + (b1*dTEdt + b2*dTEdto + b3*dTEdtoo)*dt)/a1;
+
+% enforce min bound
+TE = max(0, TE );                                                          
 
 
 % *****  Isotope Ratios  **************************************************
@@ -57,11 +53,9 @@ end
 % get total rate of change
 dIRdt = adv_IR + bnd_IR;
 
-% residual of isotope ratio evolution
-res_IR = (a1*IR-a2*IRo-a3*IRoo)/dt - (b1*dIRdt + b2*dIRdto + b3*dIRdtoo);
-
 % update isotope ratio concentrations
-IR = IR - alpha*res_IR*dt + beta*(IRii-IRi);
+IR = (a2*IRo+a3*IRoo + (b1*dIRdt + b2*dIRdto + b3*dIRdtoo)*dt)/a1;
+
 
 % convert from mixture density to concentration
 for i = 1:cal.nte; te(:,:,i) = TE(:,:,i)./rho; end

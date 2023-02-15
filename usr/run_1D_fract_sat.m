@@ -14,9 +14,9 @@ plot_cv  =  0;                   % switch on to live plot iterative convergence
 
 % set model domain parameters
 D        =  10;                  % chamber depth [m]
-N        =  500 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
-h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
-L        =  h;                   % chamber width [m]
+N        =  500;                 % number of grid points in z-direction
+h        =  D/N;                 % grid spacing (equal in both dimensions, do not set) [m]
+L        =  h;                   % chamber width (equal to h for 1-D mode) [m]
 
 % set model timing parameters
 Nt       =  3e5;                 % number of time steps to take
@@ -33,7 +33,7 @@ ir0      =  [1,1];               % isotope ratios top layer [delta]
 
 % set thermo-chemical boundary parameters
 bnd_w    =  0.05;                % boundary layer width [m]
-tau_T    =  8*hr;                % wall cooling/assimilation time [s]
+tau_T    =  12*hr;               % wall cooling/assimilation time [s]
 Twall    =  300;                 % wall temperature [degC] (nan = insulating)
 
 % set thermo-chemical material parameters

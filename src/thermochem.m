@@ -2,16 +2,6 @@
 
 tic;
 
-for itTC = 1:inner_TC
-
-% store previous iterations
-Sii = Si;  Si = S;
-Cii = Ci;  Ci = C;
-Vii = Vi;  Vi = V;
-Xii = Xi;  Xi = X;
-Fii = Fi;  Fi = F;
-Mii = Mi;  Mi = M;
-
 %***  update heat content (entropy)
 
 % heat advection
@@ -37,7 +27,8 @@ dSdt  = advn_S + diff_S + diss_h + bnd_S;
 res_S = (a1*S-a2*So-a3*Soo)/dt - (b1*dSdt + b2*dSdto + b3*dSdtoo);
 
 % semi-implicit update of bulk entropy density
-S = S - beta*res_S*dt + beta*(Sii-Si);
+S = S - alpha*res_S*dt;
+% S = (a2*So+a3*Soo + (b1*dSdt + b2*dSdto + b3*dSdtoo)*dt)/a1;
 
 % convert entropy desnity to temperature
 T = (cal.Tphs1+273.15)*exp((S - X.*Dsx - F.*Dsf)./rho./cP + Adbt./cP.*(Pt-Ptop));
@@ -59,8 +50,11 @@ dCdt = advn_C + bnd_C;
 res_C = (a1*C-a2*Co-a3*Coo)/dt - (b1*dCdt + b2*dCdto + b3*dCdtoo);
 
 % semi-implicit update of major component density
-C = C - beta*res_C*dt + beta*(Cii-Ci);
-C          = max(cal.cphs0.*rho,min(cal.cphs1.*rho,C));
+C = C - alpha*res_C*dt;
+% C = (a2*Co+a3*Coo + (b1*dCdt + b2*dCdto + b3*dCdtoo)*dt)/a1;
+
+% apply minimum/maximum bounds
+C = max(cal.cphs0.*rho,min(cal.cphs1.*rho,C));
 
 % convert major component density to concentration
 c = C./rho;
@@ -83,36 +77,44 @@ if any([v0;v1;vwall;v(:)]>10*TINY)
     res_V = (a1*V-a2*Vo-a3*Voo)/dt - (b1*dVdt + b2*dVdto + b3*dVdtoo);
 
     % semi-implicit update of volatile component density
-    V = V - beta*res_V*dt + beta*(Vii-Vi);
-    V          = max(0,min(rho,V));
+    V = V - alpha*res_V*dt;
+%     V = (a2*Vo+a3*Voo + (b1*dVdt + b2*dVdto + b3*dVdtoo)*dt)/a1;
+
+    % apply minimum bound
+    V = max(0,V );
 
     % convert volatile component density to concentration
     v = V./rho;
 end
 
-% eqtime = tic;
-% 
-% %*** update phase equilibrium
-% [xq,cxq,cmq,fq,vfq,vmq] = equilibrium(xq,fq,T-273.15,c,v,Pt,cal,TINY);
-% 
-% mq = 1-xq-fq;
-% 
-% eqtime = toc(eqtime);
-% EQtime = EQtime + eqtime;
+
+%*** update phase equilibrium
+eqtime = tic;
+
+[xq,cxq,cmq,fq,vfq,vmq] = equilibrium(xq,fq,T-273.15,c,v,Pt,cal,TINY);
+
+mq = 1-xq-fq;
+
+eqtime = toc(eqtime);
+EQtime = EQtime + eqtime;
 
 
 %***  update phase fractions
-
-% phase mass transfer rates
-Gx = (xq.*rho-X)./max(tau_r,4*dt);
-Gf = (fq.*rho-F)./max(tau_r,4*dt);
-Gm = -Gx-Gf;
 
 % phase advection rates
 advn_X   = - advect(X,Ux(2:end-1,:),Wx(:,2:end-1),h,{ADVN,''},[1,2],BCA);
 advn_F   = - advect(F,Uf(2:end-1,:),Wf(:,2:end-1),h,{ADVN,''},[1,2],BCA);
 advn_M   = - advect(M,Um(2:end-1,:),Wm(:,2:end-1),h,{ADVN,''},[1,2],BCA);
 advn_rho = advn_X+advn_F+advn_M;
+
+% phase mass transfer rates
+res_Gx = Gx - (xq-x).*rho./max(tau_r,4*dt);
+Gx     = Gx - alpha.*res_Gx;
+res_Gf = Gf - (fq-f).*rho./max(tau_r,4*dt);
+Gf     = Gf - alpha.*res_Gf;
+res_Gm = Gm - (mq-m).*rho./max(tau_r,4*dt);
+Gm     = Gm - alpha.*res_Gm;
+% Gm = -Gx-Gf;
 
 % total rates of change
 dXdt   = advn_X + Gx;
@@ -124,55 +126,38 @@ res_X = (a1*X-a2*Xo-a3*Xoo)/dt - (b1*dXdt + b2*dXdto + b3*dXdtoo);
 res_F = (a1*F-a2*Fo-a3*Foo)/dt - (b1*dFdt + b2*dFdto + b3*dFdtoo);
 res_M = (a1*M-a2*Mo-a3*Moo)/dt - (b1*dMdt + b2*dMdto + b3*dMdtoo);
 
-% update of phase density evolution
-X = X - beta*res_X*dt + beta*(Xii-Xi);
-F = F - beta*res_F*dt + beta*(Fii-Fi);
-M = M - beta*res_M*dt + beta*(Mii-Mi);
+% semi-implicit update of phase fraction densities
+X = X - alpha*res_X*dt;
+F = F - alpha*res_F*dt;
+M = M - alpha*res_M*dt;
+% X = (a2*Xo+a3*Xoo + (b1*dXdt + b2*dXdto + b3*dXdtoo)*dt)/a1;
+% F = (a2*Fo+a3*Foo + (b1*dFdt + b2*dFdto + b3*dFdtoo)*dt)/a1;
+% M = (a2*Mo+a3*Moo + (b1*dMdt + b2*dMdto + b3*dMdtoo)*dt)/a1;
 
 % apply minimum bound
 X = max(0, X );
 F = max(0, F );
 M = max(0, M );
 
-% update phase fractions
-x = X./rho;
-f = F./rho;
-m = M./rho;
 
-% normalise to unit sum
-sumphs = x+f+m;
-x = x./sumphs;
-f = f./sumphs;
-m = m./sumphs;
+% update phase fractions
+x = X./(X+M+F);
+f = F./(X+M+F);
+m = M./(X+M+F);
 
 % update phase entropies
 sm = (S - X.*Dsx - F.*Dsf)./rho;
 sx = sm + Dsx;
 sf = sm + Dsf;
 
-% update phase compositions
-
-% major component
+% update major component phase composition
 Kc = cxq./cmq;
 cm = c./(m + x.*Kc);
 cx = c./(m./Kc + x);
 
-% volatile component
+% update volatile component phase composition
 Kf = vfq./max(TINY,vmq);
 vm = v./max(TINY,m + f.*Kf);
 vf = v./max(TINY,m./Kf + f);
 
-end
-
-TCtime = TCtime + toc;
-
-eqtime = tic;
-
-%*** update phase equilibrium
-[xq,cxq,cmq,fq,vfq,vmq] = equilibrium(xq,fq,T-273.15,c,v,Pt,cal,TINY);
-
-mq = 1-xq-fq;
-
-eqtime = toc(eqtime);
-EQtime = EQtime + eqtime;
-
+TCtime = TCtime + toc - eqtime;

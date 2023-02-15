@@ -41,7 +41,6 @@ TINT     =  'bd2si';             % time integration scheme ('be1im','bd2im','cn2
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
 rtol     =  1e-6;                % outer its relative tolerance
 atol     =  1e-9;                % outer its absolute tolerance
-lambda   =  0.50;                % iterative step size
 tau_r    =  1e16;                % disable reaction
 
 % create output directory

@@ -35,7 +35,6 @@ for rtol = RTOL
     CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
     atol     =  rtol/1e6;            % outer its absolute tolerance
     maxit    =  50;                  % maximum outer its
-    lambda   =  0.50;                % iterative step size
 
     % create output directory
     if ~isfolder([opdir,'/',runID])

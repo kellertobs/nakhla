@@ -18,7 +18,7 @@ Nt       =  3e5;                 % number of time steps to take
 hr       =  3600;                % conversion seconds to hours
 yr       =  24*365.25*hr;        % conversion seconds to years
 tend     =  1*yr;                % end time for simulation [s]
-dt       =  1;                   % initial time step [s]
+dt       =  0.1;                 % initial time step [s]
 dtmax    =  1e3;                 % maximum time step [s]
 
 % set initial thermo-chemical state
@@ -85,9 +85,7 @@ CFL      =  0.50;                % (physical) time stepping courant number (mult
 rtol     =  1e-6;                % outer its relative tolerance
 atol     =  1e-9;                % outer its absolute tolerance
 maxit    =  50;                  % maximum outer its
-alpha    =  0.50;                % iterative step size
-beta     =  0.25;                % iterative damping
-inner_TC =  4;                   % number of inner iterations on TC solve
+alpha    =  0.60;                % iterative step size
 mink     =  1e-9;                % minimum diffusivity for phase, component fractions
 etacntr  =  1e+6;                % maximum viscosity contrast
 cnvreg   =  1e0;                 % convection regularisation parameter

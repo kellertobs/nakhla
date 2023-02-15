@@ -235,7 +235,7 @@ Wx  = W;  Ux  = U;
 Wm  = W;  Um  = U;
 
 eIIref = 1e-6;  
-Div_V  = 0.*c;  Div_Vi = Div_V;  advn_rho = 0.*c;  drhodt = 0.*c;  drhodto = drhodt;
+Div_V  = 0.*c;  advn_rho = 0.*c;  drhodt = 0.*c;  drhodto = drhodt;
 exx    = 0.*c;  ezz = 0.*c;  exz = zeros(Nz-1,Nx-1);  eII = 0.*c;  
 txx    = 0.*c;  tzz = 0.*c;  txz = zeros(Nz-1,Nx-1);  tII = 0.*c; 
 VolSrc = 0.*c; 
@@ -298,13 +298,13 @@ dto  = dt;
 ho   = h;
 
 % get bulk enthalpy, silica, volatile content densities
-S  = rho.*(cP.*log(T/(cal.Tphs1+273.15)) + x.*Dsx + f.*Dsf - Adbt.*(Pt-Ptop));  So = S;  res_S = 0.*S;  Si = S;
+S  = rho.*(cP.*log(T/(cal.Tphs1+273.15)) + x.*Dsx + f.*Dsf - Adbt.*(Pt-Ptop));  So = S;  res_S = 0.*S;
 S0 = rho.*(cP.*log(cal.Tphs1+273.15) + x.*Dsx + f.*Dsf - Adbt.*Ptop);  
-C  = rho.*(m.*cm + x.*cx); Co = C;  res_C = 0.*C;  Ci = C;
-V  = rho.*(m.*vm + f.*vf); Vo = V;  res_V = 0.*V;  Vi = V;
-X  = rho.*x; Xo = X;  res_X = 0.*X; Xi = X;
-F  = rho.*f; Fo = F;  res_F = 0.*F; Fi = F;
-M  = rho.*m; Mo = M;  res_M = 0.*M; Mi = M;
+C  = rho.*(m.*cm + x.*cx); Co = C;  res_C = 0.*C;
+V  = rho.*(m.*vm + f.*vf); Vo = V;  res_V = 0.*V;
+X  = rho.*x; Xo = X;  res_X = 0.*X;
+F  = rho.*f; Fo = F;  res_F = 0.*F;
+M  = rho.*m; Mo = M;  res_M = 0.*M;
 
 % get phase entropies
 sm = S./rho - x.*Dsx - f.*Dsf;
@@ -343,7 +343,7 @@ end
 IRo = IR;  IRi = IR;
 
 % initialise phase change rates
-Gx = 0.*x;  Gf = 0.*f;  Gm = 0.*m;
+Gx  = 0.*x;  Gf  = 0.*f;  Gm  = 0.*m;
 
 % initialise auxiliary variables 
 dSdt   = 0.*T;  dSdto  = dSdt; diss_h = 0.*T;

@@ -31,7 +31,7 @@ dteg     =  [1,1,1,1];           % trace elements centred gaussian [wt ppm]
 ir0      =  [1,1];               % isotope ratios top layer [delta]
 dirg     =  [1,1];               % isotope ratios centred gaussian [delta]
 
-finit = 0; fout = 0; Twall = nan;
+fin = 0; fout = 0; Twall = nan;
 
 % set numerical model parameters
 CFL      =  1.00;                % (physical) time stepping courant number (multiplies stable step) [0,1]
@@ -39,7 +39,6 @@ TINT     =  'bd2si';             % time integration scheme ('be1im','bd2im','cn2
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
 rtol     =  1e-6;                % outer its relative tolerance
 atol     =  1e-12;               % outer its absolute tolerance
-lambda   =  0.50;                % iterative step size
 maxit    =  50;                  % maximum outer its
 
 % create output directory
