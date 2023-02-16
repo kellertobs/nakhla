@@ -136,46 +136,31 @@ elseif Nx <= 10  % create 1D plots
     subplot(1,5,5)
     plot(P(2:end-1,2:end-1),Zc.',CL{[1,2]},LW{:}); axis ij tight; box on;
     title('$P$ [Pa]',TX{:},FS{:}); set(gca,TL{:},TS{:});
-
-    if ~exist('fh3','var'); fh3 = figure(VIS{:});
-    else; set(0, 'CurrentFigure', fh3); clf;
-    end 
-    sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
-    subplot(1,3,1)
-    for i=1:cal.nc
-        plot(squeeze( c_cmp(:,:,i)),Zc.',LW{:},'color',ocean(round((i-1)*213/cal.nc)+1,:)); axis ij tight; box on; hold on;
-    end
-    title('Bulk cmps [wt\%]',TX{:},FS{:});ylabel('Depth [m]',TX{:},FS{:}); set(gca,TL{:},TS{:});
-    subplot(1,3,2)
-    for i=1:cal.nc
-        plot(squeeze(cx_cmp(:,:,i)),Zc.',LW{:},'color',ocean(round((i-1)*213/cal.nc)+1,:)); axis ij tight; box on; hold on;
-    end
-    title('Xtal cmps [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
-    subplot(1,3,3)
-    for i=1:cal.nc
-        plot(squeeze(cm_cmp(:,:,i)),Zc.',LW{:},'color',ocean(round((i-1)*213/cal.nc)+1,:)); axis ij tight; box on; hold on;
-    end
-    title('Melt cmps [wt\%]',TX{:},FS{:}); legend(cal.cmpStr,TX{:},FS{:},'Location','east'); set(gca,TL{:},TS{:});
  
-    if ~exist('fh4','var'); fh4 = figure(VIS{:});
+    if ~exist('fh3','var'); fh3 = figure(VIS{:});
     else; set(0, 'CurrentFigure', fh4); clf;
     end 
     sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
-    subplot(1,3,1)
+    subplot(1,4,1)
     for i=1:cal.nc
         plot(squeeze( c_oxd(:,:,i)),Zc.',LW{:},'color',ocean(round((i-1)*213/cal.nc)+1,:)); axis ij tight; box on; hold on;
     end
     title('Bulk oxds [wt\%]',TX{:},FS{:});ylabel('Depth [m]',TX{:},FS{:}); set(gca,TL{:},TS{:});
-    subplot(1,3,2)
-    for i=1:cal.nc
-        plot(squeeze(cx_oxd(:,:,i)),Zc.',LW{:},'color',ocean(round((i-1)*213/cal.nc)+1,:)); axis ij tight; box on; hold on;
-    end
-    title('Xtal oxds [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
-    subplot(1,3,3)
+    subplot(1,4,2)
     for i=1:cal.nc
         plot(squeeze(cm_oxd(:,:,i)),Zc.',LW{:},'color',ocean(round((i-1)*213/cal.nc)+1,:)); axis ij tight; box on; hold on;
     end
-    title('Melt oxds [wt\%]',TX{:},FS{:}); legend(cal.oxdStr,TX{:},FS{:},'Location','east'); set(gca,TL{:},TS{:});
+    title('Melt oxds [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+    subplot(1,4,3)
+    for i=1:cal.nc
+        plot(squeeze(cx_oxd(:,:,i)),Zc.',LW{:},'color',ocean(round((i-1)*213/cal.nc)+1,:)); axis ij tight; box on; hold on;
+    end
+    title('Xtal oxds [wt\%]',TX{:},FS{:}); legend(cal.oxdStr,TX{:},FS{:},'Location','west'); set(gca,TL{:},TS{:});
+    subplot(1,4,4)
+    for i=1:cal.nc
+        plot(squeeze(x.*cx_cmp(:,:,i)),Zc.',LW{:},'color',ocean(round((i-1)*213/cal.nc)+1,:)); axis ij tight; box on; hold on;
+    end
+    title('Xtal cmps [wt\%]',TX{:},FS{:}); legend(cal.cmpStr,TX{:},FS{:},'Location','west'); set(gca,TL{:},TS{:});
 
 else % create 2D plots
 
@@ -439,8 +424,6 @@ if save_op && ~restart
         print(fh2,name,'-dpng','-r300','-image');
         name = [opdir,'/',runID,'/',runID,'_cmp_',num2str(floor(step/nop))];
         print(fh3,name,'-dpng','-r300','-image');
-        name = [opdir,'/',runID,'/',runID,'_oxd_',num2str(floor(step/nop))];
-        print(fh4,name,'-dpng','-r300','-image');
         name = [opdir,'/',runID,'/',runID,'_eql',num2str(floor(step/nop))];
         print(fh7,name,'-dpng','-r300','-image');
     else
