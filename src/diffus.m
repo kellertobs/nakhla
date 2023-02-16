@@ -65,8 +65,12 @@ if nargout>1
     % return diffusive fluxes on grid faces
     qz = zeros(size(f,dim(1))+1,size(f,dim(2))+2);
     qx = zeros(size(f,dim(1))+2,size(f,dim(2))+1);
-    qz(1:end-1,2:end-1) = qzm; qz(end,2:end-1) = qzp(end,:);
-    qx(2:end-1,1:end-1) = qxm; qx(2:end-1,end) = qxp(:,end);
+    qz(1:end-1,2:end-1) = qzm; 
+    qz(end    ,2:end-1) = qzp(end,:);
+    qz(:      ,[1,end]) = qz(:,[2,end-1]);
+    qx(2:end-1,1:end-1) = qxm; 
+    qx(2:end-1,end    ) = qxp(:,end);
+    qx([1,end],:      ) = qx([2,end-1],:);
 end
 
 end
@@ -74,33 +78,15 @@ end
 
 %%  utility function
 
-function [vmpos, vmneg, vppos, vpneg] = facevels (v, dim)
-% return - and + components of cell face velocities separated into vm, vp
-
-if     dim==1, vm = v(1:end-1,:,:);    vp = v(2:end,:,:);
-elseif dim==2, vm = v(:,1:end-1,:);    vp = v(:,2:end,:);
-elseif dim==3, vm = v(:,:,1:end-1);    vp = v(:,:,2:end);
-end
-
-% now split the velocities into positive and negative
-vmpos = 0.5*(vm + abs(vm));    % positive velocity
-vmneg = 0.5*(vm - abs(vm));    % negative velocity
-
-vppos = 0.5*(vp + abs(vp));    % positive velocity
-vpneg = 0.5*(vp - abs(vp));    % negative velocity
-end
-
-
-
 function [fm, fp] = makestencil (f, dim, BC)
 %
 % makes stencil for calculating differences
 % use circshift which is faster than slicing
 % default assumes periodic BCs, anything else just repeats boundary nodes
 %
-% |   i-3   |   i-2   |   i-1   |    i    |   i+1   |   i+2   |   i+3   |
-% |----o----|----o----|----o----|----o----|----o----|----o----|----o----|
-% |   fmmm  |   fmm   |    fm   |   fcc   |    fp   |   fpp   |   fppp  |
+% |   i-1   |    i    |   i+1   |
+% |----o----|----o----|----o----|
+% |    fm   |   fcc   |    fp   |
 
 sten7 = (nargout>4) ;
 
@@ -116,30 +102,30 @@ fp  = circshift(f, -  shift);
 if ~strcmp(BC,'periodic') && size(f,dim)>1
     if ischar(BC)
         if dim==1
-            fm (    1    ,:,:) =  f( 1 ,:,:);
-            fp (      end,:,:) =  f(end,:,:);
+            fm (1  ,:,:) =  f( 1 ,:,:);
+            fp (end,:,:) =  f(end,:,:);
 
         elseif dim==2
-            fm (:,    1    ,:) =  f(:, 1 ,:);
-            fp (:,      end,:) =  f(:,end,:);
+            fm (:,1  ,:) =  f(:, 1 ,:);
+            fp (:,end,:) =  f(:,end,:);
 
         elseif dim==3
-            fm (:,:,    1    ) =  f(:,:, 1 );
-            fp (:,:,      end) =  f(:,:,end);
+            fm (:,:,1  ) =  f(:,:, 1 );
+            fp (:,:,end) =  f(:,:,end);
 
         end
     else
         if dim==1
-            fm (    1    ,:,:) = BC(1);
-            fp (      end,:,:) = BC(2);
+            fm (1  ,:,:) = BC(1);
+            fp (end,:,:) = BC(2);
 
         elseif dim==2
-            fm (:,    1    ,:) = BC(1);
-            fp (:,      end,:) = BC(2);
+            fm (:,1  ,:) = BC(1);
+            fp (:,end,:) = BC(2);
 
         elseif dim==3
-            fm (:,:,    1    ) = BC(1);
-            fp (:,:,      end) = BC(2);
+            fm (:,:,1  ) = BC(1);
+            fp (:,:,end) = BC(2);
 
         end
     end

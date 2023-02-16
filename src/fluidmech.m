@@ -1,3 +1,5 @@
+tic;
+
 if ~bnchm && step>0
 
 %***  update mixture mass density
@@ -326,18 +328,15 @@ if ~bnchm
 
     % phase segregation speeds
     wm(2:end-1,2:end-1) = ((rhom(1:end-1,:)+rhom(2:end,:))/2-mean(rhofz,2)).*g0.*(Ksgr_m(1:end-1,:).*Ksgr_m(2:end,:)).^0.5; % melt segregation speed
-    wm(1  ,:)     = min(1,1-top).*wm(2    ,:);
-    wm(end,:)     = min(1,1-bot).*wm(end-1,:);
+    wm([1,end],:) = min(1,1-[top;bot]).*wm([2,end-1],:);
     wm(:,[1 end]) = -sds*wm(:,[2 end-1]);
 
     wx(2:end-1,2:end-1) = ((rhox(1:end-1,:)+rhox(2:end,:))/2-mean(rhofz,2)).*g0.*(Ksgr_x(1:end-1,:).*Ksgr_x(2:end,:)).^0.5; % solid segregation speed
-    wx(1  ,:)     = min(1,1-top).*wx(2    ,:);
-    wx(end,:)     = min(1,1-bot).*wx(end-1,:);
+    wx([1,end],:) = min(1,1-[top;bot]).*wx([2,end-1],:);
     wx(:,[1 end]) = -sds*wx(:,[2 end-1]);
 
     wf(2:end-1,2:end-1) = ((rhof(1:end-1,:)+rhof(2:end,:))/2-mean(rhofz,2)).*g0.*(Ksgr_f(1:end-1,:).*Ksgr_f(2:end,:)).^0.5; % fluid segregation speed
-    wf(1  ,:)     = min(1,1-top+fout).*wf(2    ,:);
-    wf(end,:)     = min(1,1-bot+fin ).*wf(end-1,:);
+    wf([1,end],:) = min(1,1-[top-fout;bot-fin]).*wf([2,end-1],:);
     wf(:,[1 end]) = -sds*wf(:,[2 end-1]);
 
     % phase diffusion fluxes and speeds
@@ -345,12 +344,14 @@ if ~bnchm
     [~,qfz,qfx] = diffus(phi,kf,h,[1,2],BCD);
     qmz  = -qxz-qfz;  qmx = -qxx-qfx;
 
-    wqf = qfz./((phi([1,1:end],[1,1:end,end])+phi([1:end,end],[1,1:end,end]))./2);
-    uqf = qfx./((phi([1,1:end,end],[1,1:end])+phi([1,1:end,end],[1:end,end]))./2);
-    wqx = qxz./((chi([1,1:end],[1,1:end,end])+chi([1:end,end],[1,1:end,end]))./2);
-    uqx = qxx./((chi([1,1:end,end],[1,1:end])+chi([1,1:end,end],[1:end,end]))./2);
-    wqm = qmz./((mu ([1,1:end],[1,1:end,end])+mu ([1:end,end],[1,1:end,end]))./2);
-    uqm = qmx./((mu ([1,1:end,end],[1,1:end])+mu ([1,1:end,end],[1:end,end]))./2);
+    wqf = qfz./max(TINY^0.5,(phi([1,1:end],[1,1:end,end])+phi([1:end,end],[1,1:end,end]))./2);
+    uqf = qfx./max(TINY^0.5,(phi([1,1:end,end],[1,1:end])+phi([1,1:end,end],[1:end,end]))./2);
+
+    wqx = qxz./max(TINY^0.5,(chi([1,1:end],[1,1:end,end])+chi([1:end,end],[1,1:end,end]))./2);
+    uqx = qxx./max(TINY^0.5,(chi([1,1:end,end],[1,1:end])+chi([1,1:end,end],[1:end,end]))./2);
+
+    wqm = qmz./max(TINY^0.5,(mu ([1,1:end],[1,1:end,end])+mu ([1:end,end],[1,1:end,end]))./2);
+    uqm = qmx./max(TINY^0.5,(mu ([1,1:end,end],[1,1:end])+mu ([1,1:end,end],[1:end,end]))./2);
 
     % update phase velocities
     Wf   = W + wf + wqf;  % mvp z-velocity

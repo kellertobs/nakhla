@@ -75,9 +75,9 @@ rho   = 1./(m./rhom + x./rhox + f./rhof);
 
 rhofz = (rho(1:end-1,:)+rho(2:end,:))/2;
 
-chi   = max(1e-6,min(1-1e-6, x.*rho./rhox ));
-phi   = max(1e-6,min(1-1e-6, f.*rho./rhof ));
-mu    = max(1e-6,min(1-1e-6, m.*rho./rhom ));                                  
+chi   = max(0,min(1, x.*rho./rhox ));
+phi   = max(0,min(1, f.*rho./rhof ));
+mu    = max(0,min(1, m.*rho./rhom ));
 
 % update effective viscosity
 wtm      = zeros(Nz*Nx,12);
@@ -93,13 +93,13 @@ wtm(:,11) = reshape(100.*vm(:,: ),Nz*Nx,1); % H2O
 etam      = reshape(grdmodel08(wtm,T(:)-273.15),Nz,Nx);
 
 % effective mixture shear viscosity (Costa et al., 2009)
-hh     = (1-cal.xi).*erf(sqrt(pi)./(2.*(1-cal.xi)).*(chi./cal.chi_pck).*(1+(chi./cal.chi_pck).^cal.gamma));
-eta    = etam .* (1+(chi./cal.chi_pck).^cal.delta) .* (1-hh).^-cal.Bchi .* (1-phi).^-cal.Bphi;
+hh     = (1-cal.xi).*erf(sqrt(pi)./(2.*(1-cal.xi)).*(max(TINY^0.5,chi)./cal.chi_pck).*(1+(max(TINY^0.5,chi)./cal.chi_pck).^cal.gamma));
+eta    = etam .* (1+(max(TINY^0.5,chi)./cal.chi_pck).^cal.delta) .* (1-hh).^-cal.Bchi .* max(TINY^0.5,1-phi).^-cal.Bphi;
 
 % phase segregation coefficients
 Ksgr_x = 2/9*cal.dx^2./eta/sgrreg                                                                      ;
-Ksgr_f = 2/9*cal.df^2./eta/sgrreg + cal.dx^2/cal.bf./cal.etaf0/sgrreg.*max(TINY^0.5,phi-cal.cf).^(cal.nf-1).*(1-phi).^cal.mf;
-Ksgr_m =                            cal.dx^2/cal.bm./    etam /sgrreg.*max(TINY^0.5,mu -cal.cm).^(cal.nm-1).*(1-mu ).^cal.mm;
+Ksgr_f = 2/9*cal.df^2./eta/sgrreg + cal.dx^2/cal.bf./cal.etaf0/sgrreg.*max(TINY^0.5,phi-cal.cf).^(cal.nf-1).*max(TINY^0.5,1-phi).^cal.mf;
+Ksgr_m =                            cal.dx^2/cal.bm./    etam /sgrreg.*max(TINY^0.5,mu -cal.cm).^(cal.nm-1).*max(TINY^0.5,1-mu ).^cal.mm;
 
 % bound and regularise viscosity
 if ~calibrt; etamax = etacntr.*min(eta(:)); else; etamax = 1e+32.*min(eta(:)); end
@@ -113,8 +113,8 @@ if ~calibrt % skip the following if called from calibration script
 kW  = Vel/10*h/10;                                                         % convection fluctuation diffusivity
 kwx = abs((rhox-rho).*g0.*Ksgr_x*dx*10);                                   % segregation fluctuation diffusivity
 kwf = abs((rhof-rho).*g0.*Ksgr_f*df*10);                                   % segregation fluctuation diffusivity
-kx  = chi.*(kwx + kW + mink);                                              % solid fraction diffusion 
-kf  = phi.*(kwf + kW + mink);                                              % fluid fraction diffusion 
+kx  = chi.*mu.*(kwx + kW + mink);                                          % solid fraction diffusion 
+kf  = phi.*mu.*(kwf + kW + mink);                                          % fluid fraction diffusion 
 kT  = kT0 + (phi.*kwf + chi.*kwx + kW + mink).*rho.*cP;                    % heat diffusion
 ks  = kT./T;                                                               % entropy diffusion
 
