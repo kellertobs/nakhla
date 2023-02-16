@@ -70,18 +70,14 @@ rhom = reshape(sum(reshape(cm_cmp/100,Nz*Nx,cal.nc)./cal.rhom0,2).^-1,Nz,Nx) .* 
 rhox = reshape(sum(reshape(cx_cmp/100,Nz*Nx,cal.nc)./cal.rhox0,2).^-1,Nz,Nx) .* (1 - cal.aT.*(T-cal.perT-273.15));
 rhof = cal.rhof0 .* (1 - cal.aT.*(T-cal.perT-273.15) + cal.bP.*(Pt-Ptop ));
 
-% rhom = squeeze(sum(permute(cm_cmp/100,[3,1,2])./cal.rhom0.')).^-1 .* (1 - cal.aT.*(T-cal.perT-273.15) - cal.gH.*vm); if size(rhom,2)~=size(T,2); rhom = rhom(1,:).'; end
-% rhox = squeeze(sum(permute(cx_cmp/100,[3,1,2])./cal.rhox0.')).^-1 .* (1 - cal.aT.*(T-cal.perT-273.15)             ); if size(rhox,2)~=size(T,2); rhox = rhox(1,:).'; end
-% rhof = cal.rhof0 .* (1 - cal.aT.*(T-cal.perT-273.15) + cal.bP.*(Pt-Ptop ));
-
 % convert weight to volume fraction, update bulk density
 rho   = 1./(m./rhom + x./rhox + f./rhof);
 
 rhofz = (rho(1:end-1,:)+rho(2:end,:))/2;
 
-chi   = max(TINY^0.5,min(1-TINY^0.5, x.*rho./rhox ));
-phi   = max(TINY^0.5,min(1-TINY^0.5, f.*rho./rhof ));
-mu    = max(TINY^0.5,min(1-TINY^0.5, m.*rho./rhom ));                                  
+chi   = max(1e-6,min(1-1e-6, x.*rho./rhox ));
+phi   = max(1e-6,min(1-1e-6, f.*rho./rhof ));
+mu    = max(1e-6,min(1-1e-6, m.*rho./rhom ));                                  
 
 % update effective viscosity
 wtm      = zeros(Nz*Nx,12);

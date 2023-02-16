@@ -19,7 +19,7 @@ h        =  D/N;                 % grid spacing (equal in both dimensions, do no
 L        =  h;                   % chamber width (equal to h for 1-D mode) [m]
 
 % set model timing parameters
-Nt       =  3e5;                 % number of time steps to take
+Nt       =  5e5;                 % number of time steps to take
 tend     =  1*yr;                % end time for simulation [s]
 
 % set initial thermo-chemical state
@@ -48,7 +48,7 @@ df       =  1e-3;                % bubble size [m]
 % set numerical model parameters
 TINT     =  'bd2im';             % time integration scheme ('be1im','bd2im','cn2si','bd2si')
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
-CFL      =  0.25;                % (physical) time stepping courant number (multiplies stable step) [0,1]
+CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-8;                % outer its absolute tolerance
 maxit    =  50;                  % maximum outer its

@@ -156,7 +156,7 @@ ylabel('Density [kg/m$^3$]','Interpreter','latex','FontSize',15)
 % plot mixture rheology
 figure(6); if ~holdfig; clf; end
 semilogy(T,eta,'k',T,etam,'r','LineStyle',linestyle,'LineWidth',2); hold on; box on; axis tight;
-legend('crystals','melt','fluid','mixture','Interpreter','latex','FontSize',15,'box','off','location','best')
+legend('mixture','melt','Interpreter','latex','FontSize',15,'box','off','location','best')
 set(gca,'TickLabelInterpreter','latex','FontSize',13)
 title('Viscosity model','Interpreter','latex','FontSize',18)
 xlabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',15)
