@@ -138,7 +138,7 @@ elseif Nx <= 10  % create 1D plots
     title('$P$ [Pa]',TX{:},FS{:}); set(gca,TL{:},TS{:});
  
     if ~exist('fh3','var'); fh3 = figure(VIS{:});
-    else; set(0, 'CurrentFigure', fh4); clf;
+    else; set(0, 'CurrentFigure', fh3); clf;
     end 
     sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
     subplot(1,4,1)
