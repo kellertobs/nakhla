@@ -54,8 +54,7 @@ CFL      =  0.75;                % (physical) time stepping courant number (mult
 rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-8;                % outer its absolute tolerance
 maxit    =  15;                  % maximum outer its
-mink     =  1e-7;                % minimum diffusivity for phase, component fractions
-cnvreg   =  1e1;                 % convection regularisation parameter
+cnvreg   =  10;                  % convection regularisation parameter
 
 
 %*****  RUN NAKHLA MODEL  *************************************************

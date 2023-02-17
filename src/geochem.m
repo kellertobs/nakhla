@@ -25,6 +25,9 @@ end
 % get total rate of change
 dTEdt = adv_TE + bnd_TE;
 
+% residual of trace element evolution
+res_TE = (a1*TE-a2*TEo-a3*TEoo)/dt - (b1*dTEdt + b2*dTEdto + b3*dTEdtoo);
+
 % update trace element concentrations
 TE = (a2*TEo+a3*TEoo + (b1*dTEdt + b2*dTEdto + b3*dTEdtoo)*dt)/a1;
 
@@ -53,10 +56,13 @@ end
 % get total rate of change
 dIRdt = adv_IR + bnd_IR;
 
+% residual of isotope evolution
+res_IR = (a1*IR-a2*IRo-a3*IRoo)/dt - (b1*dIRdt + b2*dIRdto + b3*dIRdtoo);
+
 % update isotope ratio concentrations
 IR = (a2*IRo+a3*IRoo + (b1*dIRdt + b2*dIRdto + b3*dIRdtoo)*dt)/a1;
 
 
-% convert from mixture density to concentration
+% convert from densites to concentrations
 for i = 1:cal.nte; te(:,:,i) = TE(:,:,i)./rho; end
 for i = 1:cal.nir; ir(:,:,i) = IR(:,:,i)./rho; end

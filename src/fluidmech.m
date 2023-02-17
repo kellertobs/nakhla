@@ -9,7 +9,7 @@ drhodt  = advn_rho;
 res_rho = (a1*rho-a2*rhoo-a3*rhooo)/dt - (b1*drhodt + b2*drhodto + b3*drhodtoo);
 
 % volume source and background velocity passed to fluid-mechanics solver
-VolSrc  = Div_V - alpha*res_rho./rho;  % correct volume source term by scaled residual
+VolSrc  = Div_V - res_rho./rho/a1/b1;  % correct volume source term by scaled residual
 
 UBG     = - mean(VolSrc,'all')./2 .* (L/2-XXu);
 WBG     = - mean(VolSrc,'all')./2 .* (D/2-ZZw);

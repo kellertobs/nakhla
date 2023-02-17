@@ -25,8 +25,9 @@ dtmax    =  1e3;                 % maximum time step [s]
 seed     =  15;                  % random perturbation seed
 smth     =  10;                  % regularisation of initial random perturbation
 zlay     =  2.0;                 % layer thickness (relative to domain depth D)
-wlay_T   =  1*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
-wlay_c   =  1*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
+dlay     =  0.2;                 % random perturbation to layer thickness (relative to grid spacing h)
+wlay_T   =  0*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
+wlay_c   =  0*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
 T0       =  1250;                % temperature top layer [deg C]
 T1       =  1250;                % temperature base layer [deg C]
 dTr      =  0;                   % amplitude of random noise [deg C]
@@ -67,7 +68,7 @@ irwall   =  [nan,nan];           % wall isotope ratios [delta] (nan = no assimil
 
 % set thermo-chemical material parameters
 calID    =  'default';           % phase diagram calibration
-kT0      =  5;                   % thermal conductivity [W/m/K]
+kT0      =  4;                   % thermal conductivity [W/m/K]
 cP       =  1200;                % heat capacity [J/kg/K]
 Dsx      = -300;                 % entropy change of crystallisation [J/kg]
 Dsf      =  400;                 % entropy change of exsolution [J/kg]

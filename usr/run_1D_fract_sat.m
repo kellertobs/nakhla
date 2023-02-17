@@ -52,7 +52,6 @@ CFL      =  0.50;                % (physical) time stepping courant number (mult
 rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-8;                % outer its absolute tolerance
 maxit    =  50;                  % maximum outer its
-mink     =  1e-7;                % minimum diffusivity for phase, component fractions
 
 
 %*****  RUN NAKHLA MODEL  *************************************************

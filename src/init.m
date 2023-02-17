@@ -209,18 +209,18 @@ else;                        bot = -1; end  % free slip for other types
 if bndmode==5;               top = -1; bot = -1; end % free slip top/bot for 'only walls(5)'
 
 % initialise solution fields
-Tp  =  T0 + (T1-T0) .* (1+erf((ZZ/D-zlay)/wlay_T))/2 + dTr.*rp + dTg.*gp;  if any(bndinit(:)) && ~isnan(Twall); Tp = Tp + (Twall-Tp).*bndinit; end % potential temperature [C]
-c   =  c0 + (c1-c0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dcr.*rp + dcg.*gp;  if any(bndinit(:)) && ~isnan(cwall); c  = c  + (cwall-c ).*bndinit; end; cin = c; % major component
-v   =  v0 + (v1-v0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dvr.*rp + dvg.*gp;  if any(bndinit(:)) && ~isnan(vwall); v  = v  + (vwall-v ).*bndinit; end; vin = v; % volatile component
+Tp  =  T0 + (T1-T0) .* (1+erf((ZZ/D-zlay+rp*h*dlay)/wlay_T))/2 + dTr.*rp + dTg.*gp;  if any(bndinit(:)) && ~isnan(Twall); Tp = Tp + (Twall-Tp).*bndinit; end % potential temperature [C]
+c   =  c0 + (c1-c0) .* (1+erf((ZZ/D-zlay+rp*h*dlay)/wlay_c))/2 + dcr.*rp + dcg.*gp;  if any(bndinit(:)) && ~isnan(cwall); c  = c  + (cwall-c ).*bndinit; end; cin = c; % major component
+v   =  v0 + (v1-v0) .* (1+erf((ZZ/D-zlay+rp*h*dlay)/wlay_c))/2 + dvr.*rp + dvg.*gp;  if any(bndinit(:)) && ~isnan(vwall); v  = v  + (vwall-v ).*bndinit; end; vin = v; % volatile component
 
 te = zeros(Nz,Nx,cal.nte);
 for i = 1:cal.nte
-    te(:,:,i)  =  te0(i) + (te1(i)-te0(i)) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dter(i).*rp + dteg(i).*gp;  % trace elements
+    te(:,:,i)  =  te0(i) + (te1(i)-te0(i)) .* (1+erf((ZZ/D-zlay+rp*h*dlay)/wlay_c))/2 + dter(i).*rp + dteg(i).*gp;  % trace elements
     if any(bndinit(:)) && ~isnan(tewall(i)); te(:,:,i)  = te(:,:,i) + (tewall(i)-te(:,:,i)).*bndinit; end; tein = te; 
 end
 ir = zeros(Nz,Nx,cal.nir);
 for i = 1:cal.nir
-    ir(:,:,i)  =  ir0(i) + (ir1(i)-ir0(i)) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dirr(i).*rp + dirg(i).*gp;  % isotope ratios  
+    ir(:,:,i)  =  ir0(i) + (ir1(i)-ir0(i)) .* (1+erf((ZZ/D-zlay+rp*h*dlay)/wlay_c))/2 + dirr(i).*rp + dirg(i).*gp;  % isotope ratios  
     if any(bndinit(:)) && ~isnan(irwall(i)); ir(:,:,i)  = ir(:,:,i) + (irwall(i)-ir(:,:,i)).*bndinit; end; irin = ir;
 end
 
