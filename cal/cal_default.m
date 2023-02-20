@@ -14,7 +14,7 @@ cal.cmpStr = {'for','fay','opx','cpx','ant','alb','kfs','qtz'};
 cal.cmp    = [  97.5    2.5    0.0    0.0    0.0    0.0    0.0    0.0      % cphs0 => dunite
                  8.0    1.5   17.0   28.0   37.5    8.0    0.0    0.0      % perCx => pyroxenite
                  3.0    1.0   11.0   37.0   27.0   19.5    1.0    0.5      % perCm => basalt
-                 0.0    0.0    2.0   11.0    6.0   12.0   31.0   38.0];    % cphs1 => rhyolite
+                 0.0    0.0    0.0   13.0    6.0   12.0   31.0   38.0];    % cphs1 => rhyolite
 
 cal.oxd = cal.oxd./sum(cal.oxd,2)*100;
 cal.cmp = cal.cmp./sum(cal.cmp,2)*100;
@@ -44,7 +44,7 @@ cal.Kte_cmp  =  [0.01  0.01  0.01  0.01  0.01  0.01  0.01  0.01  % component-wis
 % specify density parameters
 cal.rhox0 = [3270,4390,3000,3250,2730,2620,2580,2650];                     % solid  component reference densities [kg/m3]
 cal.rhom0 = [2710,3580,2580,2850,2530,2310,2290,2360];                     % liquid component reference densities [kg/m3]
-cal.rhof0 = 500;                                                           % fluid reference density [kg/m3]
+cal.rhof0 =  500;                                                          % fluid reference density [kg/m3]
 cal.aT    =  4e-5;                                                         % thermal expansivity [1/K]
 cal.gH    =  0.75;                                                         % hydrous melt expansivity [1/(wt H2O)]
 cal.bP    =  1e-8;                                                         % fluid compressibility [1/Pa]

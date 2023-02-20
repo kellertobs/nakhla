@@ -103,7 +103,7 @@ Ksgr_m =                            cal.dx^2/cal.bm./    etam /sgrreg.*max(TINY^
 
 % bound and regularise viscosity
 if ~calibrt; etamax = etacntr.*min(eta(:)); else; etamax = 1e+32.*min(eta(:)); end
-eta    = (etamax.^-0.5 + (eta*cnvreg).^-0.5).^-2;
+eta    = (etamax.^-0.5 + eta.^-0.5).^-2 .* cnvreg;
 etaco  = (eta([1,1:end],[1  ,1:end]).*eta([1:end,end],[1  ,1:end]) ...
        .* eta([1,1:end],[1:end,end]).*eta([1:end,end],[1:end,end])).^0.25;
 
@@ -115,7 +115,7 @@ kwx = abs((rhox-rho).*g0.*Ksgr_x*dx*10);                                   % seg
 kwf = abs((rhof-rho).*g0.*Ksgr_f*df*10);                                   % segregation fluctuation diffusivity
 kx  = chi.*mu.*(kwx + kW + mink);                                          % solid fraction diffusion 
 kf  = phi.*mu.*(kwf + kW + mink);                                          % fluid fraction diffusion 
-kT  = kT0 + (phi.*kwf + chi.*kwx + kW + mink).*rho.*cP;                    % heat diffusion
+kT  = kT0 + mu.*rho.*cP.*(phi.*kwf + chi.*kwx + kW + mink);                % heat diffusion
 ks  = kT./T;                                                               % entropy diffusion
 
 % update velocity divergence

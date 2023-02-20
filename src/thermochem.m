@@ -15,10 +15,11 @@ diff_S = diffus(T,ks,h,[1,2],BCD);
 diss_h = diss ./ T;
 
 % boundary layers
-if ~isnan(Twall)
-    bnd_T = ((Twall+273.15)-T)./tau_T .* bndshape;
-    bnd_S = rho.*cP.*bnd_T./T;
-end
+bnd_T = zeros(size(S));
+if ~isnan(Twall(1)); bnd_T = bnd_T + ((Twall(1)+273.15)-T)./tau_T .* topshape; end
+if ~isnan(Twall(2)); bnd_T = bnd_T + ((Twall(2)+273.15)-T)./tau_T .* botshape; end
+if ~isnan(Twall(3)); bnd_T = bnd_T + ((Twall(3)+273.15)-T)./tau_T .* sdsshape; end
+bnd_S = rho.*cP.*bnd_T./T;
 
 % total rate of change
 dSdt  = advn_S + diff_S + diss_h + bnd_S;
@@ -40,7 +41,10 @@ advn_C = - advect(M.*cm,Um(2:end-1,:),Wm(:,2:end-1),h,{ADVN,''},[1,2],BCA) ...  
          - advect(X.*cx,Ux(2:end-1,:),Wx(:,2:end-1),h,{ADVN,''},[1,2],BCA);     % solid advection
 
 % boundary layers
-if ~isnan(cwall); bnd_C = (rho.*cwall-C)./tau_a .* bndshape; end
+bnd_C = zeros(size(C));
+if ~isnan(cwall(1)); bnd_C = bnd_C + (rho.*cwall(1).*(1-f)-C).*mu./tau_a .* topshape; end
+if ~isnan(cwall(2)); bnd_C = bnd_C + (rho.*cwall(2).*(1-f)-C).*mu./tau_a .* botshape; end
+if ~isnan(cwall(3)); bnd_C = bnd_C + (rho.*cwall(3).*(1-f)-C).*mu./tau_a .* sdsshape; end
 
 % total rate of change
 dCdt = advn_C + bnd_C;                                            
@@ -59,30 +63,31 @@ c = C./rho;
 
 
 %***  update volatile component (H2O) density
-if any([v0;v1;vwall;v(:)]>10*TINY)
 
-    % volatile component advection
-    advn_V = - advect(M.*vm,Um(2:end-1,:),Wm(:,2:end-1),h,{ADVN,''},[1,2],BCA) ...  % melt  advection
-             - advect(F.*vf,Uf(2:end-1,:),Wf(:,2:end-1),h,{ADVN,''},[1,2],BCA);     % fluid advection
+% volatile component advection
+advn_V = - advect(M.*vm,Um(2:end-1,:),Wm(:,2:end-1),h,{ADVN,''},[1,2],BCA) ...  % melt  advection
+    - advect(F.*vf,Uf(2:end-1,:),Wf(:,2:end-1),h,{ADVN,''},[1,2],BCA);     % fluid advection
 
-    % boundary layers
-    if ~isnan(vwall); bnd_V = (rho.*vwall-V)./tau_a .* bndshape; end 
-    
-    % total rate of change
-    dVdt = advn_V + bnd_V;                                                 
-    
-    % residual of volatile component evolution
-    res_V = (a1*V-a2*Vo-a3*Voo)/dt - (b1*dVdt + b2*dVdto + b3*dVdtoo);
+% boundary layers
+bnd_V = zeros(size(V));
+if ~isnan(vwall(1)); bnd_V = bnd_V + (rho.*vwall(1)-V).*mu./tau_a .* topshape; end
+if ~isnan(vwall(2)); bnd_V = bnd_V + (rho.*vwall(2)-V).*mu./tau_a .* botshape; end
+if ~isnan(vwall(3)); bnd_V = bnd_V + (rho.*vwall(3)-V).*mu./tau_a .* sdsshape; end
 
-    % semi-implicit update of volatile component density
-    V = (a2*Vo+a3*Voo + (b1*dVdt + b2*dVdto + b3*dVdtoo)*dt)/a1;
+% total rate of change
+dVdt = advn_V + bnd_V;
 
-    % apply minimum bound
-    V = max(0,V );
+% residual of volatile component evolution
+res_V = (a1*V-a2*Vo-a3*Voo)/dt - (b1*dVdt + b2*dVdto + b3*dVdtoo);
 
-    % convert volatile component density to concentration
-    v = V./rho;
-end
+% semi-implicit update of volatile component density
+V = (a2*Vo+a3*Voo + (b1*dVdt + b2*dVdto + b3*dVdtoo)*dt)/a1;
+
+% apply minimum bound
+V = max(0,V );
+
+% convert volatile component density to concentration
+v = V./rho;
 
 
 %*** update phase equilibrium

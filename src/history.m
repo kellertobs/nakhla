@@ -277,15 +277,14 @@ hist.Xultram(stp) = sum(sum(rho.*indultram.*x.*h^2))./sum(sum(rho.*indultram.*h^
 hist.Tultram(stp) = sum(sum(rho.*indultram.*T.*h^2))./sum(sum(rho.*indultram.*h^2));
 
 % differentiation index
-nobnd = false(size(c));
-nobnd = bndshape<1e-2;
+nobnd = topshape<1e-3 & botshape<1e-3 & sdsshape<1e-3;
 if any(nobnd(:))
     hist.Rdiff(stp) = (max(max(c(nobnd)))-min(min(c(nobnd))))./(cal.cphs1-cal.cphs0);
 end
 
 % index of assimilation
 if step>1
-    hist.Ra (stp) = hist.Ra (stp-1) + sum(sum(bndshape.*rho./tau_a.*h^2))./sum(sum(rho.*h^2)).*dt;
+    hist.Ra (stp) = hist.Ra (stp-1) + sum(sum((topshape+botshape+sdsshape).*rho./tau_a.*h^2))./sum(sum(rho.*h^2)).*dt;
 else
     hist.Ra(stp,1) = 0;
 end

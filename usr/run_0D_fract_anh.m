@@ -30,15 +30,14 @@ c0       =  0.51;                % major component top layer [wt SiO2]
 v0       =  0.00;                % volatile component top layer [wt H2O]
 
 % set thermo-chemical boundary parameters
-Ptop     =  1.25e8;              % top pressure [Pa]
-bnd_w    =  D;                   % boundary layer width [m]
+bndmode  =  1;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
+bnd_w    =  1e16;                % boundary layer width [m]
 tau_T    =  12*hr;               % wall cooling/assimilation time [s]
-Twall    =  300;                 % wall temperature [degC] (nan = insulating)
+Twall    =  [300,300,nan];       % [top,bot,sds] wall rock temperature [degC] (nan = insulating)
+Ptop     =  1.25e8;              % top pressure [Pa]
 
 % set thermo-chemical material parameters
 calID    =  'default';           % phase diagram calibration
-kT0      =  5;                   % thermal conductivity [W/m/K]
-cP       =  1200;                % heat capacity [J/kg/K]
 Dsx      = -300;                 % entropy change of crystallisation [J/kg]
 Dsf      =  400;                 % entropy change of exsolution [J/kg]
 

@@ -5,7 +5,7 @@ clear; close all;
 run('./par_default')
 
 % set run parameters
-runID    =  '0D_fract_sat';      % run identifier
+runID    =  '0D_fract_hyd';      % run identifier
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  100;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot results
@@ -25,9 +25,9 @@ dt       =  36;                  % initial time step [s]
 dtmax    =  36;                  % maximum time step [s]
 
 % set initial thermo-chemical state
-T0       =  1220;                % temperature top layer [deg C]
+T0       =  1260;                % temperature top layer [deg C]
 c0       =  0.51;                % major component top layer [wt SiO2]
-v0       =  0.04;                % volatile component top layer [wt H2O]
+v0       =  0.02;                % volatile component top layer [wt H2O]
 
 % set thermo-chemical boundary parameters
 bndmode  =  1;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)

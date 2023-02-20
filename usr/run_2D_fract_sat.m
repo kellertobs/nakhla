@@ -19,7 +19,7 @@ N        =  100 + 2;             % number of grid points in z-direction (incl. 2
 h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
-Nt       =  3e5;                 % number of time steps to take
+Nt       =  5e5;                 % number of time steps to take
 tend     =  1*yr;                % end time for simulation [s]
 
 % set initial thermo-chemical state
@@ -27,16 +27,19 @@ T0       =  1140;                % temperature top layer [deg C]
 c0       =  0.51;                % major component top layer [wt SiO2]
 dcr      =  1e-4;                % amplitude of random noise [wt SiO2]
 v0       =  0.04;                % volatile component top layer [wt H2O]
-dvr      = -1e-4;                % amplitude of random noise [wt H2O]
+dvr      =  1e-4;                % amplitude of random noise [wt H2O]
 
 % set model trace and isotope geochemistry parameters (must match # trace elements and isotope ratios in calibration!)
 te0      =  [1,1,1,1];           % trace elements top layer [wt ppm]
-ir0      =  [1, 1];              % isotope ratios top layer [delta]
+ir0      =  [0, 1];              % isotope ratios top layer [delta]
+dirr     =  [1, 0];              % isotope ratios random noise [delta]
 
 % set thermo-chemical boundary parameters
+bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
 bnd_w    =  h;                   % boundary layer width [m]
 tau_T    =  12*hr;               % wall cooling/assimilation time [s]
-Twall    =  300;                 % wall temperature [degC] (nan = insulating)
+Twall    =  [300,300,nan];       % [top,bot,sds] wall rock temperature [degC] (nan = insulating)
+Ptop     =  1.25e8;              % top pressure [Pa]
 
 % set thermo-chemical material parameters
 Dsx      = -300;                 % entropy change of crystallisation [J/kg]
@@ -48,12 +51,12 @@ dx       =  1e-3;                % crystal size [m]
 df       =  1e-3;                % bubble size [m]
 
 % set numerical model parameters
-TINT     =  'bd2si';             % time integration scheme ('be1im','bd2im','cn2si','bd2si')
+TINT     =  'bd2im';             % time integration scheme ('be1im','bd2im','cn2si','bd2si')
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
-CFL      =  0.75;                % (physical) time stepping courant number (multiplies stable step) [0,1]
+CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-8;                % outer its absolute tolerance
-maxit    =  15;                  % maximum outer its
+maxit    =  20;                  % maximum outer its
 cnvreg   =  10;                  % convection regularisation parameter
 
 

@@ -27,8 +27,8 @@ if Nx <= 10 && Nz <= 10  % create 0D plots
     subplot(4,1,3)
     semilogy(hist.time/hr,hist.vf(:,2)*100,CL{[1,4]},LW{:}); axis xy tight; box on; hold on;
     semilogy(hist.time/hr,hist.vm(:,2)*100,CL{[1,3]},LW{:});
-    semilogy(hist.time/hr,hist.v(:,2)./(1-hist.x(:,2))*100,CL{[1,2]},LW{:});
-    title('$\bar{v}/(1-x)$ [wt\% H$_2$O]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+    semilogy(hist.time/hr,hist.v (:,2)*100,CL{[1,2]},LW{:});
+    title('$\bar{v}$ [wt\% H$_2$O]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(4,1,4)
     plot(hist.time/hr,hist.mu (:,2)*100.*(hist.mu (:,2)>1e-9),CL{[1,3]},LW{:}); axis xy tight; box on; hold on;
     plot(hist.time/hr,hist.chi(:,2)*100.*(hist.chi(:,2)>1e-9),CL{[1,4]},LW{:});
@@ -99,8 +99,8 @@ elseif Nx <= 10  % create 1D plots
     subplot(1,5,3)
     semilogx(max(1e-6,vf*100).*any(v(:)>10*TINY),Zc.',CL{[1,5]},LW{:}); axis ij tight; box on; hold on;
     semilogx(max(1e-6,vm*100).*any(v(:)>10*TINY),Zc.',CL{[1,3]},LW{:});
-    semilogx(max(1e-6,v ./(1-x)*100).*any(v(:)>10*TINY),Zc.',CL{[1,2]},LW{:});
-    title('$\bar{v}/(1-x)$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+    semilogx(max(1e-6,v *100).*any(v(:)>10*TINY),Zc.',CL{[1,2]},LW{:});
+    title('$\bar{v}$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,5,4)
     plot(mu *100.*(mu >1e-9),Zc.',CL{[1,3]},LW{:}); axis ij tight; box on; hold on;
     plot(chi*100.*(chi>1e-9),Zc.',CL{[1,4]},LW{:});
@@ -267,8 +267,8 @@ else % create 2D plots
     imagesc(Xc,Zc,c./(1-f).*100); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\bar{c}/(1-f)$ [wt\% SiO$_2$]'],TX{:},FS{:}); set(gca,'YTickLabel',[]); xlabel('Width [m]',TX{:},FS{:});
     set(fh2,'CurrentAxes',ax(23));
-    imagesc(Xc,Zc,v./(1-x).*100.*(v>1e-9)); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\bar{v}/(1-x)$ [wt\% H$_2$O]'],TX{:},FS{:}); set(gca,'YTickLabel',[]);
+    imagesc(Xc,Zc,v.*100.*(v>1e-9)); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\bar{v}$ [wt\% H$_2$O]'],TX{:},FS{:}); set(gca,'YTickLabel',[]);
     sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
 
     % plot phase fractions and reaction rates in Fig. 3

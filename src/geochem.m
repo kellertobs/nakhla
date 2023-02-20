@@ -19,7 +19,9 @@ for i = 1:cal.nte
                     - advect(X.*tex(:,:,i),Ux(2:end-1,:),Wx(:,2:end-1),h,{ADVN,''},[1,2],BCA);
 
     % get trace element assimilation
-    if ~isnan(tewall(i)); bnd_TE(:,:,i) = bnd_TE(:,:,i) + (rho.*tewall(i)-TE(:,:,i))./tau_a .* bndshape; end
+    if ~isnan(tewall(1,i)); bnd_TE(:,:,i) = bnd_TE(:,:,i) + (rho.*tewall(1,i).*(1-f)-TE(:,:,i)).*mu./tau_a .* topshape; end
+    if ~isnan(tewall(2,i)); bnd_TE(:,:,i) = bnd_TE(:,:,i) + (rho.*tewall(2,i).*(1-f)-TE(:,:,i)).*mu./tau_a .* botshape; end
+    if ~isnan(tewall(3,i)); bnd_TE(:,:,i) = bnd_TE(:,:,i) + (rho.*tewall(3,i).*(1-f)-TE(:,:,i)).*mu./tau_a .* sdsshape; end
 end
 
 % get total rate of change
@@ -50,7 +52,9 @@ for i = 1:cal.nir
                     - advect(X.*irx(:,:,i),Ux(2:end-1,:),Wx(:,2:end-1),h,{ADVN,''},[1,2],BCA);
 
     % get isotope ratio assimilation
-    if ~isnan(irwall(i)); bnd_IR(:,:,i) = bnd_IR(:,:,i) + (rho.*irwall(i)-IR(:,:,i))./tau_a .* bndshape; end
+    if ~isnan(irwall(1,i)); bnd_IR(:,:,i) = bnd_IR(:,:,i) + (rho.*irwall(1,i).*(1-f)-IR(:,:,i)).*mu./tau_a .* topshape; end
+    if ~isnan(irwall(2,i)); bnd_IR(:,:,i) = bnd_IR(:,:,i) + (rho.*irwall(2,i).*(1-f)-IR(:,:,i)).*mu./tau_a .* botshape; end
+    if ~isnan(irwall(3,i)); bnd_IR(:,:,i) = bnd_IR(:,:,i) + (rho.*irwall(3,i).*(1-f)-IR(:,:,i)).*mu./tau_a .* sdsshape; end
 end
 
 % get total rate of change

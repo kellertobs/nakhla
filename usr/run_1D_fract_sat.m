@@ -32,14 +32,15 @@ te0      =  [1,1,1,1];           % trace elements top layer [wt ppm]
 ir0      =  [1,1];               % isotope ratios top layer [delta]
 
 % set thermo-chemical boundary parameters
-bnd_w    =  0.05;                % boundary layer width [m]
+bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
+bnd_w    =  h;                   % boundary layer width [m]
 tau_T    =  12*hr;               % wall cooling/assimilation time [s]
-Twall    =  300;                 % wall temperature [degC] (nan = insulating)
+Twall    =  [300,300,nan];       % [top,bot,sds] wall rock temperature [degC] (nan = insulating)
+Ptop     =  1.25e8;              % top pressure [Pa]
 
 % set thermo-chemical material parameters
 Dsx      = -300;                 % entropy change of crystallisation [J/kg]
 Dsf      =  400;                 % entropy change of exsolution [J/kg]
-tau_r    =  0;                   % reaction time scale (set to zero for quasi-equilibrium mode)
 
 % set model buoyancy parameters
 dx       =  1e-3;                % crystal size [m]
@@ -51,7 +52,7 @@ ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fro
 CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-8;                % outer its absolute tolerance
-maxit    =  50;                  % maximum outer its
+maxit    =  30;                  % maximum outer its
 
 
 %*****  RUN NAKHLA MODEL  *************************************************

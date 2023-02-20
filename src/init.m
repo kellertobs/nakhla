@@ -148,56 +148,61 @@ MapP = reshape(1:NP,Nz+2,Nx+2);
 MapW = reshape(1:NW,Nz+1,Nx+2);
 MapU = reshape(1:NU,Nz+2,Nx+1) + NW;
 
-if bnd_h>0
+% set up shape functions for initial boundary layers
+topinit = zeros(size(ZZ));
+botinit = zeros(size(ZZ));
+sdsinit = zeros(size(XX));
+if any(bnd_h)
     switch bndmode
         case 0  % none
-            bndinit = zeros(size(ZZ));
         case 1  % top only
-            bndinit = (1+erf( ( -ZZ+bnd_h)/bnd_w))/2;
+            topinit = (1+erf( ( -ZZ+bnd_h(1))/bnd_w))/2;
         case 2  % bot only
-            bndinit = (1+erf(-(D-ZZ-bnd_h)/bnd_w))/2;
+            botinit = (1+erf(-(D-ZZ-bnd_h(2))/bnd_w))/2;
         case 3  % top/bot only
-            bndinit = (1+erf( ( -ZZ+bnd_h)/bnd_w))/2 ...
-                    + (1+erf(-(D-ZZ-bnd_h)/bnd_w))/2;
+            topinit = (1+erf( ( -ZZ+bnd_h(1))/bnd_w))/2;
+            botinit = (1+erf(-(D-ZZ-bnd_h(2))/bnd_w))/2;
         case 4 % all walls
-            bndinit = (1+erf( ( -ZZ+bnd_h)/bnd_w))/2 ...
-                    + (1+erf(-(D-ZZ-bnd_h)/bnd_w))/2 ...
-                    + (1+erf( ( -XX+bnd_h)/bnd_w))/2 ...
-                    + (1+erf(-(L-XX-bnd_h)/bnd_w))/2;
-                    + (1+erf(-(D-ZZ-bnd_h)/bnd_w))/2;
+            topinit = (1+erf( ( -ZZ+bnd_h(1))/bnd_w))/2;
+            botinit = (1+erf(-(D-ZZ-bnd_h(2))/bnd_w))/2;
+            sdsinit = (1+erf( ( -XX+bnd_h(3))/bnd_w))/2 ...
+                    + (1+erf(-(L-XX-bnd_h(3))/bnd_w))/2;
         case 5 % only walls
-            bndinit = (1+erf( ( -XX+bnd_h)/bnd_w))/2 ...
-                    + (1+erf(-(L-XX-bnd_h)/bnd_w))/2;
+            sdsinit = (1+erf( ( -XX+bnd_h(3))/bnd_w))/2 ...
+                    + (1+erf(-(L-XX-bnd_h(3))/bnd_w))/2;
     end
-    bndinit = max(0,min(1,bndinit));
-else
-    bndinit = zeros(size(ZZ));
+    sdsinit = max(0,sdsinit-topinit-botinit);
 end
 
-switch bndmode
-    case 0  % none
-        bndshape = zeros(size(ZZ));
-    case 1  % top only
-        bndshape = exp( ( -ZZ)/bnd_w);
-    case 2  % bot only
-        bndshape = exp(-(D-ZZ)/bnd_w);
-    case 3  % top/bot only
-        bndshape = exp( ( -ZZ)/bnd_w) ...
-                 + exp(-(D-ZZ)/bnd_w);
-    case 4 % all walls
-        bndshape = exp( ( -ZZ)/bnd_w) ...
-                 + exp(-(D-ZZ)/bnd_w) ...
-                 + exp( ( -XX)/bnd_w) ...
-                 + exp(-(L-XX)/bnd_w);
-    case 5 % only walls
-        bndshape = exp( ( -XX)/bnd_w) ...
-                 + exp(-(L-XX)/bnd_w);
+% set up shape functions for transient boundary layers
+topshape = zeros(size(ZZ));
+botshape = zeros(size(ZZ));
+sdsshape = zeros(size(XX));
+if ~any(bnd_h)
+    switch bndmode
+        case 0  % none
+        case 1  % top only
+            topshape = exp( ( -ZZ)/bnd_w);
+        case 2  % bot only
+            botshape = exp(-(D-ZZ)/bnd_w);
+        case 3  % top/bot only
+            topshape = exp( ( -ZZ)/bnd_w);
+            botshape = exp(-(D-ZZ)/bnd_w);
+        case 4 % all walls
+            topshape = exp( ( -ZZ)/bnd_w);
+            botshape = exp(-(D-ZZ)/bnd_w);
+            sdsshape = exp( ( -XX)/bnd_w) ...
+                + exp(-(L-XX)/bnd_w);
+        case 5 % only walls
+            sdsshape = exp( ( -XX)/bnd_w) ...
+                + exp(-(L-XX)/bnd_w);
+    end
+    sdsshape = max(0,sdsshape - topshape - botshape);
 end
-bndshape = max(0,min(1,bndshape));
 
-bnd_S = zeros(size(bndshape));
-bnd_C = zeros(size(bndshape));
-bnd_V = zeros(size(bndshape));
+bnd_S = zeros(size(topshape));
+bnd_C = zeros(size(topshape));
+bnd_V = zeros(size(topshape));
 
 % set specified boundaries to no slip, else to free slip
 if bndmode>=4;               sds = +1;      % no slip sides for 'all sides(4)'
@@ -209,20 +214,48 @@ else;                        bot = -1; end  % free slip for other types
 if bndmode==5;               top = -1; bot = -1; end % free slip top/bot for 'only walls(5)'
 
 % initialise solution fields
-Tp  =  T0 + (T1-T0) .* (1+erf((ZZ/D-zlay+rp*h*dlay)/wlay_T))/2 + dTr.*rp + dTg.*gp;  if any(bndinit(:)) && ~isnan(Twall); Tp = Tp + (Twall-Tp).*bndinit; end % potential temperature [C]
-c   =  c0 + (c1-c0) .* (1+erf((ZZ/D-zlay+rp*h*dlay)/wlay_c))/2 + dcr.*rp + dcg.*gp;  if any(bndinit(:)) && ~isnan(cwall); c  = c  + (cwall-c ).*bndinit; end; cin = c; % major component
-v   =  v0 + (v1-v0) .* (1+erf((ZZ/D-zlay+rp*h*dlay)/wlay_c))/2 + dvr.*rp + dvg.*gp;  if any(bndinit(:)) && ~isnan(vwall); v  = v  + (vwall-v ).*bndinit; end; vin = v; % volatile component
+Tp  =  T0 + (T1-T0) .* (1+erf((ZZ/D-zlay+rp*h*dlay)/wlay_T))/2 + dTr.*rp + dTg.*gp;  % potential temperature [C]
+c   =  c0 + (c1-c0) .* (1+erf((ZZ/D-zlay+rp*h*dlay)/wlay_c))/2 + dcr.*rp + dcg.*gp;  % major component
+v   =  v0 + (v1-v0) .* (1+erf((ZZ/D-zlay+rp*h*dlay)/wlay_c))/2 + dvr.*rp + dvg.*gp;  % volatile component
 
 te = zeros(Nz,Nx,cal.nte);
 for i = 1:cal.nte
     te(:,:,i)  =  te0(i) + (te1(i)-te0(i)) .* (1+erf((ZZ/D-zlay+rp*h*dlay)/wlay_c))/2 + dter(i).*rp + dteg(i).*gp;  % trace elements
-    if any(bndinit(:)) && ~isnan(tewall(i)); te(:,:,i)  = te(:,:,i) + (tewall(i)-te(:,:,i)).*bndinit; end; tein = te; 
 end
 ir = zeros(Nz,Nx,cal.nir);
 for i = 1:cal.nir
     ir(:,:,i)  =  ir0(i) + (ir1(i)-ir0(i)) .* (1+erf((ZZ/D-zlay+rp*h*dlay)/wlay_c))/2 + dirr(i).*rp + dirg(i).*gp;  % isotope ratios  
-    if any(bndinit(:)) && ~isnan(irwall(i)); ir(:,:,i)  = ir(:,:,i) + (irwall(i)-ir(:,:,i)).*bndinit; end; irin = ir;
 end
+
+% apply initial boundary layers
+if any(topinit(:)) && ~isnan(Twall(1)); Tp = Tp + (Twall(1)-Tp).*topinit; end
+if any(botinit(:)) && ~isnan(Twall(2)); Tp = Tp + (Twall(2)-Tp).*botinit; end
+if any(sdsinit(:)) && ~isnan(Twall(3)); Tp = Tp + (Twall(3)-Tp).*sdsinit; end
+Tin = Tp;
+
+if any(topinit(:)) && ~isnan(cwall(1)); c  = c  + (cwall(1)-c ).*topinit; end
+if any(botinit(:)) && ~isnan(cwall(2)); c  = c  + (cwall(2)-c ).*botinit; end
+if any(sdsinit(:)) && ~isnan(cwall(3)); c  = c  + (cwall(3)-c ).*sdsinit; end
+cin = c;
+
+if any(topinit(:)) && ~isnan(vwall(1)); v  = v  + (vwall(1)-v ).*topinit; end
+if any(botinit(:)) && ~isnan(vwall(2)); v  = v  + (vwall(2)-v ).*botinit; end
+if any(sdsinit(:)) && ~isnan(vwall(3)); v  = v  + (vwall(3)-v ).*sdsinit; end
+vin = v;
+
+for i = 1:cal.nte
+    if any(topinit(:)) && ~isnan(tewall(1,i)); te(:,:,i) = te(:,:,i) + (tewall(1,i)-te(:,:,i)).*topinit; end
+    if any(botinit(:)) && ~isnan(tewall(2,i)); te(:,:,i) = te(:,:,i) + (tewall(2,i)-te(:,:,i)).*botinit; end
+    if any(sdsinit(:)) && ~isnan(tewall(3,i)); te(:,:,i) = te(:,:,i) + (tewall(3,i)-te(:,:,i)).*sdsinit; end
+end
+tein = te; 
+
+for i = 1:cal.nir
+    if any(topinit(:)) && ~isnan(irwall(1,i)); ir(:,:,i) = ir(:,:,i) + (irwall(1,i)-ir(:,:,i)).*topinit; end
+    if any(botinit(:)) && ~isnan(irwall(2,i)); ir(:,:,i) = ir(:,:,i) + (irwall(2,i)-ir(:,:,i)).*botinit; end
+    if any(sdsinit(:)) && ~isnan(irwall(3,i)); ir(:,:,i) = ir(:,:,i) + (irwall(3,i)-ir(:,:,i)).*sdsinit; end
+end
+irin = ir;
 
 U   =  zeros(Nz+2,Nx+1);  UBG = U; Ui = U;
 W   =  zeros(Nz+1,Nx+2);  WBG = W; Wi = W; wf = 0.*W; wx = 0.*W; wm = 0.*W;
@@ -284,7 +317,6 @@ while res > tol
 
     update;
 
-    v  = vin .*(1-x);
     c  = cin .*(1-f);
     te = tein.*(1-f);
     ir = irin.*(1-f);

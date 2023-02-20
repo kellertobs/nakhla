@@ -18,7 +18,7 @@ Nt       =  3e5;                 % number of time steps to take
 hr       =  3600;                % conversion seconds to hours
 yr       =  24*365.25*hr;        % conversion seconds to years
 tend     =  1*yr;                % end time for simulation [s]
-dt       =  0.1;                 % initial time step [s]
+dt       =  1;                   % initial time step [s]
 dtmax    =  1e3;                 % maximum time step [s]
 
 % set initial thermo-chemical state
@@ -53,18 +53,22 @@ dirg     =  [0, 0];              % isotope ratios centred gaussian [delta]
 
 % set thermo-chemical boundary parameters
 Ptop     =  125e6;               % top pressure [Pa]
-bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls)
+bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
 bnd_w    =  h;                   % boundary layer width [m]
-bnd_h    =  0;                   % internal wall rock layer thickness [m]
+bnd_h    =  [0,0,0];             % internal wall rock layer thickness [m]
 fin      =  1;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
 fout     =  1;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
 tau_T    =  12*hr;               % wall cooling/assimilation time [s]
 tau_a    =  24*hr;               % wall cooling/assimilation tie [s]
-Twall    =  300;                 % wall temperature [degC] (nan = insulating)
-cwall    =  nan;                 % wall major component [wt SiO2] (nan = no assimilation)
-vwall    =  nan;                 % wall volatile component [wt H2O] (nan = no assimilation)
-tewall   =  [nan,nan,nan,nan];   % wall trace elements [wt ppm] (nan = no assimilation)
-irwall   =  [nan,nan];           % wall isotope ratios [delta] (nan = no assimilation)
+Twall    =  [300,300,nan];       % [top,bot,sds] wall rock temperature [degC] (nan = insulating)
+cwall    =  [nan,nan,nan];       % [top,bot,sds] wall rock major component [wt SiO2] (nan = no assimilation)
+vwall    =  [nan,nan,nan];       % [top,bot,sds] wall rock volatile component [wt H2O] (nan = no assimilation)
+tewall   =  [nan,nan,nan,nan; ...
+             nan,nan,nan,nan; ...
+             nan,nan,nan,nan];   % [top,bot,sds] wall rock trace elements [wt ppm] (nan = no assimilation)
+irwall   =  [nan,nan; ...
+             nan,nan; ...
+             nan,nan];           % [top,bot,sds] wall rock isotope ratios [delta] (nan = no assimilation)
 
 % set thermo-chemical material parameters
 calID    =  'default';           % phase diagram calibration
@@ -87,7 +91,7 @@ rtol     =  1e-6;                % outer its relative tolerance
 atol     =  1e-9;                % outer its absolute tolerance
 maxit    =  50;                  % maximum outer its
 alpha    =  2/3;                 % iterative step size
-mink     =  1e-9;                % minimum diffusivity for phase, component fractions
+mink     =  1e-7;                % minimum diffusivity for phase, component fractions
 etacntr  =  1e+6;                % maximum viscosity contrast
 cnvreg   =  1e0;                 % convection regularisation parameter
 sgrreg   =  1e0;                 % segregation regularisation parameter
