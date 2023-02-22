@@ -36,7 +36,7 @@ ir0      =  [-1,5];              % isotope ratios top layer [delta]
 % set thermo-chemical boundary parameters
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
 bnd_h    =  [10*h,10*h,0];       % boundary layer width [m]
-bnd_w    =  h;                   % boundary layer width [m]
+bnd_w    =  1.5*h;               % boundary layer width [m]
 tau_T    =  12*hr;               % wall cooling/assimilation time [s]
 tau_a    =  24*hr;               % wall cooling/assimilation time [s]
 Twall    =  [500,500,nan];       % [top,bot,sds] wall rock temperature [degC] (nan = insulating)
@@ -66,6 +66,7 @@ rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-8;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its
 cnvreg   =  10;                  % convection regularisation parameter
+dtmax    =  5;                   % maximum time step [s]
 
 
 %*****  RUN NAKHLA MODEL  *************************************************

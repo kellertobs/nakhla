@@ -90,7 +90,6 @@ CFL      =  0.50;                % (physical) time stepping courant number (mult
 rtol     =  1e-6;                % outer its relative tolerance
 atol     =  1e-9;                % outer its absolute tolerance
 maxit    =  50;                  % maximum outer its
-alpha    =  2/3;                 % iterative step size
 mink     =  1e-7;                % minimum diffusivity for phase, component fractions
 etacntr  =  1e+6;                % maximum viscosity contrast
 cnvreg   =  1e0;                 % convection regularisation parameter

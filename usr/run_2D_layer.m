@@ -64,6 +64,7 @@ rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-8;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its
 cnvreg   =  10;                  % convection regularisation parameter
+dtmax    =  5;                   % maximum time step [s]
 
 
 %*****  RUN NAKHLA MODEL  *************************************************

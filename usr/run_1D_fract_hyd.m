@@ -23,7 +23,7 @@ Nt       =  5e5;                 % number of time steps to take
 tend     =  1*yr;                % end time for simulation [s]
 
 % set initial thermo-chemical state
-T0       =  1180;                % temperature top layer [deg C]
+T0       =  1175;                % temperature top layer [deg C]
 c0       =  0.51;                % major component top layer [wt SiO2]
 v0       =  0.02;                % volatile component top layer [wt H2O]
 

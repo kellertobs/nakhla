@@ -33,8 +33,8 @@ v1       =  0.02;                % volatile component base layer [wt H2O]
 dvr      =  1e-4;                % amplitude of random noise [wt H2O]
 zlay     =  0.8;                 % layer thickness (relative to domain depth D)
 dlay     =  0.0;                 % random perturbation to layer thickness (relative to grid spacing h)
-wlay_T   =  1*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
-wlay_c   =  1*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
+wlay_T   =  1.5*h/D;             % thickness of smooth layer boundary (relative to domain depth D)
+wlay_c   =  1.5*h/D;             % thickness of smooth layer boundary (relative to domain depth D)
 
 % set model trace and isotope geochemistry parameters (must match # trace elements and isotope ratios in calibration!)
 te0      =  [1,1,1,1];           % trace elements top layer [wt ppm]
@@ -63,8 +63,9 @@ CFL      =  0.50;                % (physical) time stepping courant number (mult
 rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-8;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its
-cnvreg   =  1;                   % convection regularisation parameter
-dtmax    =  20;
+cnvreg   =  10;                  % convection regularisation parameter
+dtmax    =  5;                   % maximum time step [s]
+
 
 %*****  RUN NAKHLA MODEL  *************************************************
 run('../src/main')
