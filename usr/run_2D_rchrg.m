@@ -13,8 +13,8 @@ save_op  =  1;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
 
 % set model domain parameters
-D        =  10;                  % chamber depth [m]
-N        =  100;                 % number of grid points in z-direction
+D        =  20;                  % chamber depth [m]
+N        =  120;                 % number of grid points in z-direction
 h        =  D/N;                 % grid spacing (equal in both dimensions, do not set) [m]
 L        =  D;                   % chamber width (equal to h for 1-D mode) [m]
 
@@ -23,18 +23,18 @@ Nt       =  5e5;                 % number of time steps to take
 tend     =  1*yr;                % end time for simulation [s]
 
 % set initial thermo-chemical state
-T0       =  730;                 % temperature top layer [deg C]
+T0       =  735;                 % temperature top layer [deg C]
 T1       =  1175;                % temperature base layer [deg C]
 c0       =  0.70;                % major component top layer [wt SiO2]
 c1       =  0.51;                % major component base layer [wt SiO2]
 dcr      =  1e-4;                % amplitude of random noise [wt SiO2]
-v0       =  0.04;                % volatile component top layer [wt H2O]
+v0       =  0.03;                % volatile component top layer [wt H2O]
 v1       =  0.02;                % volatile component base layer [wt H2O]
 dvr      =  1e-4;                % amplitude of random noise [wt H2O]
 zlay     =  0.8;                 % layer thickness (relative to domain depth D)
 dlay     =  0.0;                 % random perturbation to layer thickness (relative to grid spacing h)
-wlay_T   =  1.5*h/D;             % thickness of smooth layer boundary (relative to domain depth D)
-wlay_c   =  1.5*h/D;             % thickness of smooth layer boundary (relative to domain depth D)
+wlay_T   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
+wlay_c   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
 
 % set model trace and isotope geochemistry parameters (must match # trace elements and isotope ratios in calibration!)
 te0      =  [1,1,1,1];           % trace elements top layer [wt ppm]

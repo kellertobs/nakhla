@@ -322,8 +322,8 @@ while res > tol
     ir = irin.*(1-f);
 
     res  = norm(Pt(:)-Pti(:),2)./norm(Pt(:),2) ...
-         + norm(x(:)-xi(:),2)./(norm(x(:),2)+TINY) ...
-         + norm(f(:)-fi(:),2)./(norm(f(:),2)+TINY);
+         + norm((x(:)-xi(:)).*(x(:)>TINY^0.5),2)./(norm(x(:),2)+TINY) ...
+         + norm((f(:)-fi(:)).*(f(:)>TINY^0.5),2)./(norm(f(:),2)+TINY);
 end
 rhoo = rho;
 dto  = dt; 

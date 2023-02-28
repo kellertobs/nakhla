@@ -15,7 +15,7 @@ plot_cv  =  0;                   % switch on to live plot iterative convergence
 % set model domain parameters
 D        =  10;                  % chamber depth [m]
 L        =  10;                  % chamber width [m]
-N        =  100 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
+N        =  120 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
 h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
@@ -32,9 +32,9 @@ v0       =  0.01;                % volatile component top layer [wt H2O]
 v1       =  0.03;                % volatile component base layer [wt H2O]
 dvr      =  0e-4;                % amplitude of random noise [wt H2O]
 zlay     =  0.8;                 % layer thickness (relative to domain depth D)
-dlay     =  0.25;                % random perturbation to layer thickness (relative to grid spacing h)
-wlay_T   =  1.0*h/D;             % thickness of smooth layer boundary (relative to domain depth D)
-wlay_c   =  0.5*h/D;             % thickness of smooth layer boundary (relative to domain depth D)
+dlay     =  0.1;                 % random perturbation to layer thickness (relative to grid spacing h)
+wlay_T   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
+wlay_c   =  1*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
 
 % set model trace and isotope geochemistry parameters (must match # trace elements and isotope ratios in calibration!)
 te0      =  [0.1,0.3,1,3];       % trace elements top layer [wt ppm]
@@ -45,7 +45,7 @@ ir1      =  [ 1,-1];             % isotope ratios base layer [delta]
 % set thermo-chemical boundary parameters
 bnd_w    =  h;                   % boundary layer width [m]
 tau_T    =  12*hr;               % wall cooling/assimilation time [s]
-Twall    =  300;                 % wall temperature [degC] (nan = insulating)
+Twall    =  [300,300,nan];       % [top,bot,sds] wall rock temperature [degC] (nan = insulating)
 Ptop     =  1.25e8;              % top pressure [Pa]
 
 % set thermo-chemical material parameters

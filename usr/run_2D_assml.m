@@ -14,7 +14,7 @@ plot_cv  =  0;                   % switch on to live plot iterative convergence
 
 % set model domain parameters
 D        =  10;                  % chamber depth [m]
-N        =  100;                 % number of grid points in z-direction
+N        =  120;                 % number of grid points in z-direction
 h        =  D/N;                 % grid spacing (equal in both dimensions, do not set) [m]
 L        =  D;                   % chamber width (equal to h for 1-D mode) [m]
 
@@ -36,12 +36,12 @@ ir0      =  [-1,5];              % isotope ratios top layer [delta]
 % set thermo-chemical boundary parameters
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
 bnd_h    =  [10*h,10*h,0];       % boundary layer width [m]
-bnd_w    =  1.5*h;               % boundary layer width [m]
+bnd_w    =  2*h;                 % boundary layer width [m]
 tau_T    =  12*hr;               % wall cooling/assimilation time [s]
 tau_a    =  24*hr;               % wall cooling/assimilation time [s]
 Twall    =  [500,500,nan];       % [top,bot,sds] wall rock temperature [degC] (nan = insulating)
 cwall    =  [0.70,0.70,nan];     % [top,bot,sds] wall rock major component [wt SiO2] (nan = no assimilation)
-vwall    =  [0.04,0.04,nan];     % [top,bot,sds] wall rock volatile component [wt H2O] (nan = no assimilation)
+vwall    =  [0.05,0.05,nan];     % [top,bot,sds] wall rock volatile component [wt H2O] (nan = no assimilation)
 tewall   =  [0.01,0.1,3,10; ...
              0.01,0.1,3,10; ...
              nan,nan,nan,nan];   % [top,bot,sds] wall rock trace elements [wt ppm] (nan = no assimilation)
