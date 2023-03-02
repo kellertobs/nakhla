@@ -33,7 +33,7 @@ dteg     =  [1,1,1,1];           % trace elements centred gaussian [wt ppm]
 ir0      =  [1, 1];              % isotope ratios top layer [delta]
 dirg     =  [1, 1];              % isotope ratios centred gaussian [delta]
 
-fin = 0; fout = 0; Twall = nan;
+fin = 0; fout = 0; Twall = [nan,nan,nan];
 
 % set numerical model parameters
 CFL      =  1.00;                % (physical) time stepping courant number (multiplies stable step) [0,1]
