@@ -19,8 +19,8 @@ N        =  1;                   % number of grid points in z-direction
 h        =  D/N;                 % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
-Nt       =  1300;                % number of time steps to take
-tend     =  13*hr;               % end time for simulation [s]
+Nt       =  1400;                % number of time steps to take
+tend     =  14*hr;               % end time for simulation [s]
 dt       =  36;                  % initial time step [s]
 dtmax    =  36;                  % maximum time step [s]
 

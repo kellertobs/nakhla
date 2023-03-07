@@ -60,26 +60,21 @@ if Nx <= 10 && Nz <= 10  % create 0D plots
     if ~exist('fh3','var'); fh3 = figure(VIS{:});
     else; set(0, 'CurrentFigure', fh3); clf;
     end
-    subplot(4,1,1)
-    for i=1:cal.nc
-        plot(hist.time/hr,squeeze(hist.cx_cmp(:,2,i)),'-',LW{:},'color',ocean(round((i-1)*213/cal.nc)+1,:)); axis xy tight; box on; hold on
+    subplot(3,1,1)
+    for i=1:cal.noxd
+        plot(hist.time/hr,squeeze(hist.cm_oxd(:,2,i)).*100,'-',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis xy tight; box on; hold on
     end
-    title('Xtal cmps [wt\%]',TX{:},FS{:}); legend(cal.cmpStr,TX{:},FS{1},8,'Location','northeast'); set(gca,TL{:},TS{:});
-    subplot(4,1,2)
-    for i=1:cal.nc
-        plot(hist.time/hr,squeeze(hist.cm_cmp(:,2,i)),'-',LW{:},'color',ocean(round((i-1)*213/cal.nc)+1,:)); axis xy tight; box on; hold on
+    title('Melt oxds [wt\%]',TX{:},FS{:}); legend(cal.oxdStr,TX{:},FS{1},8,'Location','northeast'); set(gca,TL{:},TS{:});
+    subplot(3,1,2)
+    for i=1:cal.noxd
+        plot(hist.time/hr,squeeze(hist.cx_oxd(:,2,i)).*100,'-',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis xy tight; box on; hold on
     end
-    title('Melt cmps [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
-    subplot(4,1,3)
-    for i=1:cal.nc
-        plot(hist.time/hr,squeeze(hist.cx_oxd(:,2,i)),'-',LW{:},'color',ocean(round((i-1)*213/cal.nc)+1,:)); axis xy tight; box on; hold on
+    title('Xtal oxds [wt\%]',TX{:},FS{:});
+    subplot(3,1,3)
+    for i=1:cal.nmsy
+        plot(hist.time/hr,squeeze(hist.x(:,2).*hist.cx_msy(:,2,i)).*100,'-',LW{:},'color',ocean(round((i-1)*213/cal.nmsy)+1,:)); axis xy tight; box on; hold on
     end
-    title('Xtal oxds [wt\%]',TX{:},FS{:}); legend(cal.oxdStr,TX{:},FS{1},8,'Location','northeast'); set(gca,TL{:},TS{:});
-    subplot(4,1,4)
-    for i=1:cal.nc
-        plot(hist.time/hr,squeeze(hist.cm_oxd(:,2,i)),'-',LW{:},'color',ocean(round((i-1)*213/cal.nc)+1,:)); axis xy tight; box on; hold on
-    end
-    title('Melt oxds [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+    title('Xtal msys [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:}); legend(cal.msyStr,TX{:},FS{1},8,'Location','northeast'); set(gca,TL{:},TS{:});
     xlabel('Time [hr]',TX{:},FS{:});
 
 elseif Nx <= 10  % create 1D plots
@@ -142,25 +137,25 @@ elseif Nx <= 10  % create 1D plots
     end 
     sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
     subplot(1,4,1)
-    for i=1:cal.nc
-        plot(squeeze( c_oxd(:,:,i)),Zc.',LW{:},'color',ocean(round((i-1)*213/cal.nc)+1,:)); axis ij tight; box on; hold on;
+    for i=1:cal.noxd
+        plot(squeeze( c_oxd(:,:,i)).*100,Zc.',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis ij tight; box on; hold on;
     end
     title('Bulk oxds [wt\%]',TX{:},FS{:});ylabel('Depth [m]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,4,2)
-    for i=1:cal.nc
-        plot(squeeze(cm_oxd(:,:,i)),Zc.',LW{:},'color',ocean(round((i-1)*213/cal.nc)+1,:)); axis ij tight; box on; hold on;
+    for i=1:cal.noxd
+        plot(squeeze(cm_oxd(:,:,i)).*100,Zc.',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis ij tight; box on; hold on;
     end
     title('Melt oxds [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,4,3)
-    for i=1:cal.nc
-        plot(squeeze(cx_oxd(:,:,i)),Zc.',LW{:},'color',ocean(round((i-1)*213/cal.nc)+1,:)); axis ij tight; box on; hold on;
+    for i=1:cal.noxd
+        plot(squeeze(cx_oxd(:,:,i)).*100,Zc.',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis ij tight; box on; hold on;
     end
     title('Xtal oxds [wt\%]',TX{:},FS{:}); legend(cal.oxdStr,TX{:},FS{:},'Location','west'); set(gca,TL{:},TS{:});
     subplot(1,4,4)
-    for i=1:cal.nc
-        plot(squeeze(x.*cx_cmp(:,:,i)),Zc.',LW{:},'color',ocean(round((i-1)*213/cal.nc)+1,:)); axis ij tight; box on; hold on;
+    for i=1:cal.nmsy
+        plot(squeeze(x.*cx_msy(:,:,i)).*100,Zc.',LW{:},'color',ocean(round((i-1)*213/cal.nmsy)+1,:)); axis ij tight; box on; hold on;
     end
-    title('Xtal cmps [wt\%]',TX{:},FS{:}); legend(cal.cmpStr,TX{:},FS{:},'Location','west'); set(gca,TL{:},TS{:});
+    title('Xtal msys [wt\%]',TX{:},FS{:}); legend(cal.msyStr,TX{:},FS{:},'Location','west'); set(gca,TL{:},TS{:});
 
 else % create 2D plots
 

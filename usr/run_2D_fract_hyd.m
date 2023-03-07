@@ -5,7 +5,7 @@ clear; close all;
 run('./par_default')
 
 % set run parameters
-runID    =  '2D_fract_anh';      % run identifier
+runID    =  '2D_fract_hyd';      % run identifier
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  100;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot results
@@ -23,11 +23,11 @@ Nt       =  5e5;                 % number of time steps to take
 tend     =  1*yr;                % end time for simulation [s]
 
 % set initial thermo-chemical state
-T0       =  1250;                % temperature top layer [deg C]
+T0       =  1175;                % temperature top layer [deg C]
 c0       =  0.51;                % major component top layer [wt SiO2]
-dcr      =  1e-4;                % amplitude of random noise [wt SiO2]
-v0       =  0.00;                % volatile component top layer [wt H2O]
-dvr      =  0e-4;                % amplitude of random noise [wt H2O]
+dcr      =  1e-5;                % amplitude of random noise [wt SiO2]
+v0       =  0.02;                % volatile component top layer [wt H2O]
+dvr      =  1e-5;                % amplitude of random noise [wt H2O]
 
 % set model trace and isotope geochemistry parameters (must match # trace elements and isotope ratios in calibration!)
 te0      =  [1,1,1,1];           % trace elements top layer [wt ppm]

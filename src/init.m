@@ -37,33 +37,37 @@ fprintf('    initial f: %4.3f \n\n',f0);
 % update oxide compositions
 wt0 = (cal.perCm-cm0)./(cal.perCm-cal.cphs0);
 wt1 = (cal.cphs1-cm0)./(cal.cphs1-cal.perCm);
-cm0_oxd = (wt0(:) .* cal.cmp_oxd(1,:) + (1-wt0(:)) .* cal.cmp_oxd(3,:)) .* (cm0< cal.perCm) ...
-        + (wt1(:) .* cal.cmp_oxd(3,:) + (1-wt1(:)) .* cal.cmp_oxd(4,:)) .* (cm0>=cal.perCm);
+cm0_cmp = (wt0(:) .* [1 0 0 0] + (1-wt0(:)) .* [0 0 1 0]) .* (cm0< cal.perCm) ...
+        + (wt1(:) .* [0 0 1 0] + (1-wt1(:)) .* [0 0 0 1]) .* (cm0>=cal.perCm);
 
 wt0 = (cal.perCx-cx0)./(cal.perCx-cal.cphs0);
 wt1 = (cal.cphs1-cx0)./(cal.cphs1-cal.perCx);
-cx0_oxd = (wt0(:) .* cal.cmp_oxd(1,:) + (1-wt0(:)) .* cal.cmp_oxd(2,:)) .* (cx0< cal.perCx) ...
-        + (wt1(:) .* cal.cmp_oxd(2,:) + (1-wt1(:)) .* cal.cmp_oxd(4,:)) .* (cx0>=cal.perCx);
+cx0_cmp = (wt0(:) .* [1 0 0 0] + (1-wt0(:)) .* [0 1 0 0]) .* (cx0< cal.perCx) ...
+        + (wt1(:) .* [0 1 0 0] + (1-wt1(:)) .* [0 0 0 1]) .* (cx0>=cal.perCx);
 
-c0_oxd = (m0.*cm0_oxd + x0.*cx0_oxd)./(1-f0);
+c0_cmp = (m0.*cm0_cmp + x0.*cx0_cmp)./(1-f0);
 
-cm0_cmp = cm0_oxd/cal.oxd*100;
-cx0_cmp = cx0_oxd/cal.oxd*100;
- c0_cmp =  c0_oxd/cal.oxd*100;
+cm0_mem = cm0_cmp*cal.cmp_mem/100;
+cx0_mem = cx0_cmp*cal.cmp_mem/100;
+ c0_mem =  c0_cmp*cal.cmp_mem/100;
+
+cm0_oxd = cm0_mem*cal.mem_oxd/100;
+cx0_oxd = cx0_mem*cal.mem_oxd/100;
+ c0_oxd =  c0_mem*cal.mem_oxd/100;
 
 rhof0 = cal.rhof0;
-rhom0 = sum(cm0_cmp/100./cal.rhom0).^-1;
-rhox0 = sum(cx0_cmp/100./cal.rhox0).^-1;
+rhom0 = sum(cm0_mem./cal.rhom0).^-1;
+rhox0 = sum(cx0_mem./cal.rhox0).^-1;
 
-cm1_oxd = (0.999.*cm0_cmp + 0.001.*cal.cmp(1))*cal.oxd./100;
-cm2_oxd = (0.999.*cm0_cmp + 0.001.*cal.cmp(4))*cal.oxd./100;
+cm1_mem = (0.99.*cm0_mem + 0.01.*cal.cmp_mem(1,:)/100);
+cm2_mem = (0.99.*cm0_mem + 0.01.*cal.cmp_mem(4,:)/100);
 
 wtm = [];
 wtm([1 2 3 4 6 7 8 9 11 12]) = [cm0_oxd,100.*vm0,0];
 etam0 = grdmodel08(wtm,T0);
 
 DrhoT = cal.aT*max([abs(T0-Twall),abs(T0-T1),T0/100]);
-Drhoc = abs(sum(cm1_oxd/100./cal.rhom0).^-1-sum(cm2_oxd/100./cal.rhom0).^-1);
+Drhoc = abs(sum(cm1_mem./cal.rhom0).^-1-sum(cm2_mem./cal.rhom0).^-1);
 Drhox = 0.01*abs(rhox0-rhom0);
 Drhof = 0.01*abs(cal.rhof0-rhom0) * (max([v0,v1,vwall])>TINY);
 Drho0 = DrhoT + Drhoc + Drhox + Drhof;
@@ -349,7 +353,7 @@ Kte = zeros(Nz,Nx,cal.nte);
 tem = zeros(Nz,Nx,cal.nte);
 tex = zeros(Nz,Nx,cal.nte);
 for i = 1:cal.nte
-    for j=1:cal.nc; Kte(:,:,i) = Kte(:,:,i) + cal.Kte_cmp(i,j) .* c_cmp(:,:,j)./100; end
+    for j=1:cal.nmem; Kte(:,:,i) = Kte(:,:,i) + cal.Kte_mem(i,j) .* c_mem(:,:,j)./100; end
 
     tem(:,:,i)  = te(:,:,i)./(m + x.*Kte(:,:,i));
     tex(:,:,i)  = te(:,:,i)./(m./Kte(:,:,i) + x);

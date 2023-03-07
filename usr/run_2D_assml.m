@@ -35,10 +35,10 @@ ir0      =  [-1,5];              % isotope ratios top layer [delta]
 
 % set thermo-chemical boundary parameters
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
-bnd_h    =  [10*h,10*h,0];       % boundary layer width [m]
-bnd_w    =  2*h;                 % boundary layer width [m]
+bnd_h    =  [0,0,0];             % boundary layer width [m]
+bnd_w    =  h;                   % boundary layer width [m]
 tau_T    =  12*hr;               % wall cooling/assimilation time [s]
-tau_a    =  24*hr;               % wall cooling/assimilation time [s]
+tau_a    =  12*hr;               % wall cooling/assimilation time [s]
 Twall    =  [500,500,nan];       % [top,bot,sds] wall rock temperature [degC] (nan = insulating)
 cwall    =  [0.70,0.70,nan];     % [top,bot,sds] wall rock major component [wt SiO2] (nan = no assimilation)
 vwall    =  [0.05,0.05,nan];     % [top,bot,sds] wall rock volatile component [wt H2O] (nan = no assimilation)
@@ -59,14 +59,14 @@ dx       =  1e-3;                % crystal size [m]
 df       =  1e-3;                % bubble size [m]
 
 % set numerical model parameters
-TINT     =  'bd2im';             % time integration scheme ('be1im','bd2im','cn2si','bd2si')
+TINT     =  'bd2si';             % time integration scheme ('be1im','bd2im','cn2si','bd2si')
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
 CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-8;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its
 cnvreg   =  10;                  % convection regularisation parameter
-dtmax    =  5;                   % maximum time step [s]
+dtmax    =  10;                  % maximum time step [s]
 
 
 %*****  RUN NAKHLA MODEL  *************************************************

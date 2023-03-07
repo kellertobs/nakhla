@@ -1,73 +1,94 @@
 %%*****  UPDATE PARAMETERS & AUXILIARY FIELDS  ****************************
 tic;
 
-% update mineral-like component compositions
-wt0 = (cal.perCm-cm)./(cal.perCm-cal.cphs0);
-wt1 = (cal.cphs1-cm)./(cal.cphs1-cal.perCm);
-cm_cmp1 = reshape((wt0(:) .* cal.cmp(1,:) + (1-wt0(:)) .* cal.cmp(3,:)),Nz,Nx,cal.nc);
-cm_cmp2 = reshape((wt1(:) .* cal.cmp(3,:) + (1-wt1(:)) .* cal.cmp(4,:)),Nz,Nx,cal.nc);
+% wt0 = (cal.perCm-[cal.cphs0,cal.cphs1])./(cal.perCm-cal.cphs0);
+% wt1 = (cal.cphs1-[cal.cphs0,cal.cphs1])./(cal.cphs1-cal.perCm);
+% minmem = zeros(1,1,cal.nmem);
+% maxmem = zeros(1,1,cal.nmem);
+% minmem(1,:,:) = min(min((wt0(:) .* cal.cmp_mem(1,:) + (1-wt0(:)) .* cal.cmp_mem(3,:)),(wt1(:) .* cal.cmp_mem(3,:) + (1-wt1(:)) .* cal.cmp_mem(4,:))));
+% maxmem(1,:,:) = max(max((wt0(:) .* cal.cmp_mem(1,:) + (1-wt0(:)) .* cal.cmp_mem(3,:)),(wt1(:) .* cal.cmp_mem(3,:) + (1-wt1(:)) .* cal.cmp_mem(4,:))));
+% cm_mem1 = (cm_mem1-minmem)./(maxmem-minmem);
+% cm_mem2 = (cm_mem2-minmem)./(maxmem-minmem);
+% 
+% a = 200;
+% b = 0.02;
+% ind1 = repmat(cm,1,1,cal.nmem)<=cal.perCm-b;
+% ind2 = repmat(cm,1,1,cal.nmem)> cal.perCm+b;
+% ind3 = repmat(cm,1,1,cal.nmem)< cal.perCm+b & cm>=cal.perCm-b;
+% 
+% cm_mem = zeros(size(cm_mem1));
+% cm_mem(ind1)  =  cm_mem1(ind1);
+% cm_mem(ind2)  =  cm_mem2(ind2);
+% scl = ((cal.cmp_mem(4,:)-cal.cmp_mem(3,:))./(cal.cphs1-cal.perCm)./100 - (cal.cmp_mem(3,:)-cal.cmp_mem(1,:))./(cal.perCm-cal.cphs0)./100);
+% scl = reshape(sign(scl).*(cal.cmp_mem(3,:)-squeeze(minmem).')./(squeeze(maxmem).'-squeeze(minmem).').*ones(Nz*Nx,cal.nmem),Nz,Nx,cal.nmem);
+% cm_mem(ind3)  = (cm_mem1(ind3).^(scl(ind3)*a)+cm_mem2(ind3).^(scl(ind3)*a)).^(1./(scl(ind3)*a));
+% cm_mem = minmem + cm_mem.*(maxmem-minmem);
+% 
+% wt0 = (cal.perCx-cx)./(cal.perCx-cal.cphs0);
+% wt1 = (cal.cphs1-cx)./(cal.cphs1-cal.perCx);
+% cx_mem1 = reshape((wt0(:) .* cal.cmp_mem(1,:) + (1-wt0(:)) .* cal.cmp_mem(2,:)),Nz,Nx,cal.nmem);
+% cx_mem2 = reshape((wt1(:) .* cal.cmp_mem(2,:) + (1-wt1(:)) .* cal.cmp_mem(4,:)),Nz,Nx,cal.nmem);
+% 
+% wt0 = (cal.perCx-[cal.cphs0,cal.cphs1])./(cal.perCx-cal.cphs0);
+% wt1 = (cal.cphs1-[cal.cphs0,cal.cphs1])./(cal.cphs1-cal.perCx);
+% minmem = zeros(1,1,cal.nmem);
+% maxmem = zeros(1,1,cal.nmem);
+% minmem(1,:,:) = min(min((wt0(:) .* cal.cmp_mem(1,:) + (1-wt0(:)) .* cal.cmp_mem(2,:)),(wt1(:) .* cal.cmp_mem(2,:) + (1-wt1(:)) .* cal.cmp_mem(4,:))));
+% maxmem(1,:,:) = max(max((wt0(:) .* cal.cmp_mem(1,:) + (1-wt0(:)) .* cal.cmp_mem(2,:)),(wt1(:) .* cal.cmp_mem(2,:) + (1-wt1(:)) .* cal.cmp_mem(4,:))));
+% cx_mem1 = (cx_mem1-minmem)./(maxmem-minmem);
+% cx_mem2 = (cx_mem2-minmem)./(maxmem-minmem);
+% 
+% a = 200;
+% b = 0.02;
+% ind1 = repmat(cx,1,1,cal.nmem)<=cal.perCx-b;
+% ind2 = repmat(cx,1,1,cal.nmem)> cal.perCx+b;
+% ind3 = repmat(cx,1,1,cal.nmem)< cal.perCx+b & cx>=cal.perCx-b;
+% 
+% cx_mem = zeros(size(cx_mem1));
+% cx_mem(ind1)  =  cx_mem1(ind1);
+% cx_mem(ind2)  =  cx_mem2(ind2);
+% scl = ((cal.cmp_mem(4,:)-cal.cmp_mem(2,:))./(cal.cphs1-cal.perCx)./100 - (cal.cmp_mem(2,:)-cal.cmp_mem(1,:))./(cal.perCx-cal.cphs0)./100);
+% scl = reshape(sign(scl).*(cal.cmp_mem(2,:)-squeeze(minmem).')./(squeeze(maxmem).'-squeeze(minmem).').*ones(Nz*Nx,cal.nmem),Nz,Nx,cal.nmem);
+% cx_mem(ind3)  = (cx_mem1(ind3).^(scl(ind3)*a)+cx_mem2(ind3).^(scl(ind3)*a)).^(1./(scl(ind3)*a));
+% cx_mem = minmem + cx_mem.*(maxmem-minmem);
+% 
+% c_mem = (m.*cm_mem + x.*cx_mem)./(1-f);
 
-wt0 = (cal.perCm-[cal.cphs0,cal.cphs1])./(cal.perCm-cal.cphs0);
-wt1 = (cal.cphs1-[cal.cphs0,cal.cphs1])./(cal.cphs1-cal.perCm);
-mincmp = zeros(1,1,cal.nc);
-maxcmp = zeros(1,1,cal.nc);
-mincmp(1,:,:) = min(min((wt0(:) .* cal.cmp(1,:) + (1-wt0(:)) .* cal.cmp(3,:)),(wt1(:) .* cal.cmp(3,:) + (1-wt1(:)) .* cal.cmp(4,:))));
-maxcmp(1,:,:) = max(max((wt0(:) .* cal.cmp(1,:) + (1-wt0(:)) .* cal.cmp(3,:)),(wt1(:) .* cal.cmp(3,:) + (1-wt1(:)) .* cal.cmp(4,:))));
-cm_cmp1 = (cm_cmp1-mincmp)./(maxcmp-mincmp);
-cm_cmp2 = (cm_cmp2-mincmp)./(maxcmp-mincmp);
+% update melting model component compositions
+wt0 = (cal.perCm-cm(:))./(cal.perCm-cal.cphs0);
+wt1 = (cal.cphs1-cm(:))./(cal.cphs1-cal.perCm);
+cm_cmp = reshape((wt0 .* [1 0 0 0] + (1-wt0) .* [0 0 1 0]) .* (cm(:)< cal.perCm) ...
+       +         (wt1 .* [0 0 1 0] + (1-wt1) .* [0 0 0 1]) .* (cm(:)>=cal.perCm),Nz,Nx,cal.ncmp);
 
-a = 250;
-b = 0.025;
-ind1 = repmat(cm,1,1,cal.nc)<=cal.perCm-b;
-ind2 = repmat(cm,1,1,cal.nc)> cal.perCm+b;
-ind3 = repmat(cm,1,1,cal.nc)< cal.perCm+b & cm>=cal.perCm-b;
-
-cm_cmp = zeros(size(cm_cmp1));
-cm_cmp(ind1)  =  cm_cmp1(ind1);
-cm_cmp(ind2)  =  cm_cmp2(ind2);
-scl = ((cal.cmp(4,:)-cal.cmp(3,:))./(cal.cphs1-cal.perCm)./100 - (cal.cmp(3,:)-cal.cmp(1,:))./(cal.perCm-cal.cphs0)./100);
-scl = reshape(sign(scl).*(cal.cmp(2,:)-squeeze(mincmp).')./(squeeze(maxcmp).'-squeeze(mincmp).').*ones(Nz*Nx,cal.nc),Nz,Nx,cal.nc);
-cm_cmp(ind3)  = (cm_cmp1(ind3).^(scl(ind3)*a)+cm_cmp2(ind3).^(scl(ind3)*a)).^(1./(scl(ind3)*a));
-cm_cmp = mincmp + cm_cmp.*(maxcmp-mincmp);
-
-wt0 = (cal.perCx-cx)./(cal.perCx-cal.cphs0);
-wt1 = (cal.cphs1-cx)./(cal.cphs1-cal.perCx);
-cx_cmp1 = reshape((wt0(:) .* cal.cmp(1,:) + (1-wt0(:)) .* cal.cmp(2,:)),Nz,Nx,cal.nc);
-cx_cmp2 = reshape((wt1(:) .* cal.cmp(2,:) + (1-wt1(:)) .* cal.cmp(4,:)),Nz,Nx,cal.nc);
-
-wt0 = (cal.perCx-[cal.cphs0,cal.cphs1])./(cal.perCx-cal.cphs0);
-wt1 = (cal.cphs1-[cal.cphs0,cal.cphs1])./(cal.cphs1-cal.perCx);
-mincmp = zeros(1,1,cal.nc);
-maxcmp = zeros(1,1,cal.nc);
-mincmp(1,:,:) = min(min((wt0(:) .* cal.cmp(1,:) + (1-wt0(:)) .* cal.cmp(2,:)),(wt1(:) .* cal.cmp(2,:) + (1-wt1(:)) .* cal.cmp(4,:))));
-maxcmp(1,:,:) = max(max((wt0(:) .* cal.cmp(1,:) + (1-wt0(:)) .* cal.cmp(2,:)),(wt1(:) .* cal.cmp(2,:) + (1-wt1(:)) .* cal.cmp(4,:))));
-cx_cmp1 = (cx_cmp1-mincmp)./(maxcmp-mincmp);
-cx_cmp2 = (cx_cmp2-mincmp)./(maxcmp-mincmp);
-
-a = 250;
-b = 0.025;
-ind1 = repmat(cx,1,1,cal.nc)<=cal.perCx-b;
-ind2 = repmat(cx,1,1,cal.nc)> cal.perCx+b;
-ind3 = repmat(cx,1,1,cal.nc)< cal.perCx+b & cx>=cal.perCx-b;
-
-cx_cmp = zeros(size(cx_cmp1));
-cx_cmp(ind1)  =  cx_cmp1(ind1);
-cx_cmp(ind2)  =  cx_cmp2(ind2);
-scl = ((cal.cmp(4,:)-cal.cmp(2,:))./(cal.cphs1-cal.perCx)./100 - (cal.cmp(2,:)-cal.cmp(1,:))./(cal.perCx-cal.cphs0)./100);
-scl = reshape(sign(scl).*(cal.cmp(2,:)-squeeze(mincmp).')./(squeeze(maxcmp).'-squeeze(mincmp).').*ones(Nz*Nx,cal.nc),Nz,Nx,cal.nc);
-cx_cmp(ind3)  = (cx_cmp1(ind3).^(scl(ind3)*a)+cx_cmp2(ind3).^(scl(ind3)*a)).^(1./(scl(ind3)*a));
-cx_cmp = mincmp + cx_cmp.*(maxcmp-mincmp);
+wt0 = (cal.perCx-cx(:))./(cal.perCx-cal.cphs0);
+wt1 = (cal.cphs1-cx(:))./(cal.cphs1-cal.perCx);
+cx_cmp = reshape((wt0 .* [1 0 0 0] + (1-wt0) .* [0 1 0 0]) .* (cx(:)< cal.perCx) ...
+       +         (wt1 .* [0 1 0 0] + (1-wt1) .* [0 0 0 1]) .* (cx(:)>=cal.perCx),Nz,Nx,cal.ncmp);
 
 c_cmp = (m.*cm_cmp + x.*cx_cmp)./(1-f);
 
-% update oxide compositions
-cm_oxd = reshape(reshape(cm_cmp,Nz*Nx,cal.nc)*cal.oxd/100,Nz,Nx,cal.nc);
-cx_oxd = reshape(reshape(cx_cmp,Nz*Nx,cal.nc)*cal.oxd/100,Nz,Nx,cal.nc);
+% update mineral end-member compositions
+cm_mem = reshape(reshape(cm_cmp,Nz*Nx,cal.ncmp)*cal.cmp_mem/100,Nz,Nx,cal.nmem);
+cx_mem = reshape(reshape(cx_cmp,Nz*Nx,cal.ncmp)*cal.cmp_mem/100,Nz,Nx,cal.nmem);
+c_mem  = (m.*cm_mem + x.*cx_mem)./(1-f);
+
+% update phase oxide compositions
+cm_oxd = reshape(reshape(cm_mem,Nz*Nx,cal.nmem)*cal.mem_oxd/100,Nz,Nx,cal.noxd);
+cx_oxd = reshape(reshape(cx_mem,Nz*Nx,cal.nmem)*cal.mem_oxd/100,Nz,Nx,cal.noxd);
 c_oxd = (m.*cm_oxd + x.*cx_oxd)./(1-f);
 
+% update mineral systems composition for solid assemblage
+cx_msy = reshape(reshape(cx_mem,Nz*Nx,cal.nmem)*cal.msy_mem.',Nz,Nx,cal.nmsy);
+
+% update mineral systems oxide compositions for solid assemblage
+cx_msy_oxd = zeros(Nz,Nx,cal.nmsy,cal.noxd);
+for j = 1:cal.nmsy
+    cx_msy_oxd(:,:,j,:) = reshape(reshape(cx_mem(:,:,cal.msy_mem(j,:)==1),Nz*Nx,sum(cal.msy_mem(j,:)==1))*cal.mem_oxd(cal.msy_mem(j,:)==1,:)./sum(reshape(cx_mem(:,:,cal.msy_mem(j,:)==1),Nz*Nx,sum(cal.msy_mem(j,:)==1))+1e-32,2),Nz,Nx,1,cal.noxd);
+end
+
 % update phase densities
-rhom = reshape(sum(reshape(cm_cmp/100,Nz*Nx,cal.nc)./cal.rhom0,2).^-1,Nz,Nx) .* (1 - cal.aT.*(T-cal.perT-273.15) - cal.gH.*vm);
-rhox = reshape(sum(reshape(cx_cmp/100,Nz*Nx,cal.nc)./cal.rhox0,2).^-1,Nz,Nx) .* (1 - cal.aT.*(T-cal.perT-273.15));
+rhom = reshape(sum(reshape(cm_mem,Nz*Nx,cal.nmem)./cal.rhom0,2).^-1,Nz,Nx) .* (1 - cal.aT.*(T-cal.perT-273.15) - cal.gH.*vm);
+rhox = reshape(sum(reshape(cx_mem,Nz*Nx,cal.nmem)./cal.rhox0,2).^-1,Nz,Nx) .* (1 - cal.aT.*(T-cal.perT-273.15));
 rhof = cal.rhof0 .* (1 - cal.aT.*(T-cal.perT-273.15) + cal.bP.*(Pt-Ptop ));
 
 % convert weight to volume fraction, update bulk density

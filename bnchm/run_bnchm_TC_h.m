@@ -50,15 +50,15 @@ cd ../src
 
 NN = [50,100,200];
 
+dt    =  D/NN(2)/4;
+dtmax =  D/NN(2)/4;
+
+Nt    =  L/dt;              % number of time steps to take
+
 for Ni = NN
     
-    N     =  Ni + 2;            % number of grid points in z-direction (incl. 2 ghosts)
-    h     =  D/(N-2);           % grid spacing (equal in both dimensions, do not set) [m]
-
-    dt    =  h/4;
-    dtmax =  h/4;
-
-    Nt    =  L/dt;              % number of time steps to take
+    N     =  Ni;                % number of grid points in z-direction (incl. 2 ghosts)
+    h     =  D/N;               % grid spacing (equal in both dimensions, do not set) [m]
 
     % run advection-diffusion benchmark
     init;

@@ -16,8 +16,8 @@ plot_cv  =  0;                   % switch on to live plot iterative convergence
 % set model domain parameters
 D        =  10;                  % chamber depth [m]
 L        =  10;                  % chamber width [m]
-N        =  100 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
-h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
+N        =  100;                 % number of grid points in z-direction (incl. 2 ghosts)
+h        =  D/N;                 % grid spacing (equal in both dimensions, do not set) [m]
 
 % set initial thermo-chemical state
 T0       =  1140;                % temperature top layer [deg C]

@@ -5,7 +5,7 @@ TINY = 1e-16;
 
 
 % calibration run options
-runID     = 'test';              % run ID for output files; [system name_wt.% SiO2_wt.% H2O] 
+runID     = 'nakhla_default';              % run ID for output files; [system name_wt.% SiO2_wt.% H2O] 
 holdfig   = 0;                   % set to 1 to hold figures, to 0 for new figures
 linestyle = '-';                 % set line style for plots
 save_plot = 0;                   % turn on (1) to save output file in /out directory
@@ -19,8 +19,8 @@ df       =  1e-3;                % bubble size [m]
 g0       =  10.;                 % gravity [m/s2]
 
 % set ranges for control variables T, c, v, P
-T = linspace(1250,850,400).';    % temperature range [degC]
-c = linspace(0.43,0.70,400).';   % major component range [wt SiO2]
+T = linspace(1400,700,400).';    % temperature range [degC]
+c = linspace(0.51,0.51,400).';   % major component range [wt SiO2]
 v = linspace(0.00,0.00,400).';   % volatile component range [wt H2O]
 P = linspace(125,125,400).'*1e6; % pressure range [Pa]
 
@@ -52,6 +52,9 @@ cx_oxd = squeeze(cx_oxd); cx_oxd(ind,:) = [];
 c_cmp  = squeeze(c_cmp); c_cmp(ind,:) = [];
 cm_cmp = squeeze(cm_cmp); cm_cmp(ind,:) = [];
 cx_cmp = squeeze(cx_cmp); cx_cmp(ind,:) = [];
+c_mem  = squeeze(c_mem); c_mem(ind,:) = [];
+cm_mem = squeeze(cm_mem); cm_mem(ind,:) = [];
+cx_mem = squeeze(cx_mem); cx_mem(ind,:) = [];
 cx (ind) = [];
 cm (ind) = [];
 vf (ind) = [];
@@ -175,15 +178,15 @@ ylabel('Segregation flux [m/hr]','Interpreter','latex','FontSize',15)
 figure(8); if ~holdfig; clf; end
 subplot(2,1,1)
 sgtitle('Phase Oxide Fractions','Interpreter','latex','FontSize',18)
-for i=1:cal.nc
-    plot(T,cm_oxd(:,i),'LineStyle',linestyle,'LineWidth',2,'color',ocean(round((i-1)*213/cal.nc)+1,:)); hold on; box on; axis tight;
+for i=1:cal.noxd
+    plot(T,cm_oxd(:,i).*100,'LineStyle',linestyle,'LineWidth',2,'color',ocean(round((i-1)*213/cal.noxd)+1,:)); hold on; box on; axis tight;
 end
 legend(cal.oxdStr,'Interpreter','latex','FontSize',13,'box','off','location','best')
 set(gca,'TickLabelInterpreter','latex','FontSize',13)
 ylabel('Melt composition [wt\%]','Interpreter','latex','FontSize',15)
 subplot(2,1,2)
-for i=1:cal.nc
-    plot(T,cx_oxd(:,i),'LineStyle',linestyle,'LineWidth',2,'color',ocean(round((i-1)*213/cal.nc)+1,:)); hold on; box on; axis tight;
+for i=1:cal.noxd
+    plot(T,cx_oxd(:,i).*100,'LineStyle',linestyle,'LineWidth',2,'color',ocean(round((i-1)*213/cal.noxd)+1,:)); hold on; box on; axis tight;
 end
 set(gca,'TickLabelInterpreter','latex','FontSize',13)
 xlabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',15)
@@ -193,15 +196,15 @@ ylabel('Solid composition [wt\%]','Interpreter','latex','FontSize',15)
 figure(9); if ~holdfig; clf; end
 subplot(2,1,1)
 sgtitle('Phase Component Fractions','Interpreter','latex','FontSize',18)
-for i=1:cal.nc
-    plot(T,cm_cmp(:,i),'LineStyle',linestyle,'LineWidth',2,'color',ocean(round((i-1)*213/cal.nc)+1,:)); hold on; box on; axis tight;
+for i=1:cal.ncmp
+    plot(T,cm_cmp(:,i).*100,'LineStyle',linestyle,'LineWidth',2,'color',ocean(round((i-1)*213/cal.ncmp)+1,:)); hold on; box on; axis tight;
 end
 legend(cal.cmpStr,'Interpreter','latex','FontSize',13,'box','off','location','best')
 set(gca,'TickLabelInterpreter','latex','FontSize',13)
 ylabel('Melt composition [wt\%]','Interpreter','latex','FontSize',15)
 subplot(2,1,2)
-for i=1:cal.nc
-    plot(T,cx_cmp(:,i),'LineStyle',linestyle,'LineWidth',2,'color',ocean(round((i-1)*213/cal.nc)+1,:)); hold on; box on; axis tight;
+for i=1:cal.ncmp
+    plot(T,cx_cmp(:,i).*100,'LineStyle',linestyle,'LineWidth',2,'color',ocean(round((i-1)*213/cal.ncmp)+1,:)); hold on; box on; axis tight;
 end
 set(gca,'TickLabelInterpreter','latex','FontSize',13)
 xlabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',15)
@@ -209,15 +212,15 @@ ylabel('Solid composition [wt\%]','Interpreter','latex','FontSize',15)
 
 % plot simplified mineral assemblage
 figure(10); clf;
-patch([T;flipud(T)],[zeros(size(T));flipud(c_cmp(:,1))],0.9.*[0.6,0.8,0.5],'LineWidth',2); hold on; box on; axis tight;
-patch([T;flipud(T)],[c_cmp(:,1);flipud(c_cmp(:,1)+c_cmp(:,2))],1.1.*[0.6,0.8,0.5],'LineWidth',2);
-patch([T;flipud(T)],[c_cmp(:,1)+c_cmp(:,2);flipud(c_cmp(:,1)+c_cmp(:,2)+c_cmp(:,3))],0.9.*[0.6,0.6,0.6],'LineWidth',2);
-patch([T;flipud(T)],[c_cmp(:,1)+c_cmp(:,2)+c_cmp(:,3);flipud(c_cmp(:,1)+c_cmp(:,2)+c_cmp(:,3)+c_cmp(:,4))],1.1.*[0.6,0.6,0.6],'LineWidth',2);
-patch([T;flipud(T)],[c_cmp(:,1)+c_cmp(:,2)+c_cmp(:,3)+c_cmp(:,4);flipud(c_cmp(:,1)+c_cmp(:,2)+c_cmp(:,3)+c_cmp(:,4)+c_cmp(:,5))],0.9.*[0.9,0.9,0.9],'LineWidth',2);
-patch([T;flipud(T)],[c_cmp(:,1)+c_cmp(:,2)+c_cmp(:,3)+c_cmp(:,4)+c_cmp(:,5);flipud(c_cmp(:,1)+c_cmp(:,2)+c_cmp(:,3)+c_cmp(:,4)+c_cmp(:,5)+c_cmp(:,6))],1.1.*[0.9,0.9,0.9],'LineWidth',2);
-patch([T;flipud(T)],[c_cmp(:,1)+c_cmp(:,2)+c_cmp(:,3)+c_cmp(:,4)+c_cmp(:,5)+c_cmp(:,6);flipud(c_cmp(:,1)+c_cmp(:,2)+c_cmp(:,3)+c_cmp(:,4)+c_cmp(:,5)+c_cmp(:,6)+c_cmp(:,7))],[1.0,0.8,0.7],'LineWidth',2);
-patch([T;flipud(T)],[c_cmp(:,1)+c_cmp(:,2)+c_cmp(:,3)+c_cmp(:,4)+c_cmp(:,5)+c_cmp(:,6)+c_cmp(:,7);flipud(c_cmp(:,1)+c_cmp(:,2)+c_cmp(:,3)+c_cmp(:,4)+c_cmp(:,5)+c_cmp(:,6)+c_cmp(:,7)+c_cmp(:,8))],[0.9,0.7,1.0],'LineWidth',2);
-legend('~forsterite','~fayalite','~orthopyroxene','~clinopyroxene','~anorthite','~albite','~k-feldspar','~quartz','Interpreter','latex','FontSize',15,'box','off','location','best')
+patch([T;flipud(T)],[zeros(size(T));flipud(cx_mem(:,1))],0.9.*[0.6,0.8,0.5],'LineWidth',2); hold on; box on; axis tight;
+patch([T;flipud(T)],[sum(cx_mem(:,1  ),2);flipud(sum(cx_mem(:,1:2),2))],1.1.*[0.6,0.8,0.5],'LineWidth',2);
+patch([T;flipud(T)],[sum(cx_mem(:,1:2),2);flipud(sum(cx_mem(:,1:4),2))],0.9.*[0.6,0.6,0.6],'LineWidth',2);
+patch([T;flipud(T)],[sum(cx_mem(:,1:4),2);flipud(sum(cx_mem(:,1:6),2))],1.1.*[0.6,0.6,0.6],'LineWidth',2);
+patch([T;flipud(T)],[sum(cx_mem(:,1:6),2);flipud(sum(cx_mem(:,1:8),2))],[0.9,0.9,0.9],'LineWidth',2);
+patch([T;flipud(T)],[sum(cx_mem(:,1:8),2);flipud(sum(cx_mem(:,1:9),2))],[0.4,0.4,0.4],'LineWidth',2);
+patch([T;flipud(T)],[sum(cx_mem(:,1:9),2);flipud(sum(cx_mem(:,1:10),2))],[1.0,0.8,0.7],'LineWidth',2);
+patch([T;flipud(T)],[sum(cx_mem(:,1:10),2);flipud(sum(cx_mem(:,1:11),2))],[0.9,0.7,1.0],'LineWidth',2);
+legend('~forsterite','~fayalite','~orthopyroxene','~clinopyroxene','~plagioclase','~spinel','~k-feldspar','~quartz','Interpreter','latex','FontSize',15,'box','off','location','best')
 set(gca,'TickLabelInterpreter','latex','FontSize',13)
 title('Mineral assemblage','Interpreter','latex','FontSize',18)
 xlabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',15)
@@ -249,6 +252,6 @@ if save_plot
     print(figure(8),name,'-dpng','-r300','-opengl');
     name = ['../out/',runID,'/',runID,'_components'];
     print(figure(9),name,'-dpng','-r300','-opengl');
-    name = ['../out/',runID,'/',runID,'_modalcmp'];
+    name = ['../out/',runID,'/',runID,'_modal'];
     print(figure(10),name,'-dpng','-r300','-opengl');
 end

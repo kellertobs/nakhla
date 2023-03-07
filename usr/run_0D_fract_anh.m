@@ -25,7 +25,7 @@ dt       =  36;                  % initial time step [s]
 dtmax    =  36;                  % maximum time step [s]
 
 % set initial thermo-chemical state
-T0       =  1325;                % temperature top layer [deg C]
+T0       =  1330;                % temperature top layer [deg C]
 c0       =  0.51;                % major component top layer [wt SiO2]
 v0       =  0.00;                % volatile component top layer [wt H2O]
 

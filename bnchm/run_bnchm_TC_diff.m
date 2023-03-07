@@ -31,7 +31,7 @@ dteg     =  [1,1,1,1];           % trace elements centred gaussian [wt ppm]
 ir0      =  [1,1];               % isotope ratios top layer [delta]
 dirg     =  [1,1];               % isotope ratios centred gaussian [delta]
 
-fin = 0; fout = 0; Twall = [nan,nan,nan];
+fin = 0; fout = 0; Twall = nan;
 
 % set numerical model parameters
 CFL      =  1.00;                % (physical) time stepping courant number (multiplies stable step) [0,1]
@@ -48,13 +48,13 @@ end
 
 cd ../src
 
-N     =  100 + 2;           % number of grid points in z-direction (incl. 2 ghosts)
-h     =  D/(N-2);           % grid spacing (equal in both dimensions, do not set) [m]
+N     =  100 ;           % number of grid points in z-direction (incl. 2 ghosts)
+h     =  D/N;            % grid spacing (equal in both dimensions, do not set) [m]
 
 dt    =  1e+2;
 dtmax =  1e+5;
 
-Nt    =  100;              % number of time steps to take
+Nt    =  100;            % number of time steps to take
 
 % run advection-diffusion benchmark
 g0 = 0.;  init;
