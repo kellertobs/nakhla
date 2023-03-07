@@ -19,11 +19,12 @@ load ocean;                  % load custom colormap
 run(['../cal/cal_',calID]);  % load melt model calibration
 
 % calculate dimensionless numbers characterising the system dynamics
-res = 1; x0 = 0; f0 = 0;
+res = 1; x0 = 0; f0 = 0; T = T0+273.15;
 while res>1e-16
     ci = c0*(1-f0);
-    [x0,cx0,cm0,f0,vf0,vm0] = equilibrium(x0,f0,T0,c0*(1-f0),v0,Ptop,cal,TINY);
+    [x0,cx0,cm0,f0,vf0,vm0] = equilibrium(x0,f0,T-273.15,c0*(1-f0),v0,Ptop,cal,TINY);
     m0 = 1-x0-f0;
+    T  = (T0+273.15).*exp(cal.aT/mean(cal.rhom0)/cP.*Ptop);
     res = abs(c0*(1-f0)-ci)/ci;
 end
 

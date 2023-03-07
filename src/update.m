@@ -97,9 +97,9 @@ hh     = (1-cal.xi).*erf(sqrt(pi)./(2.*(1-cal.xi)).*(max(TINY^0.5,chi)./cal.chi_
 eta    = etam .* (1+(max(TINY^0.5,chi)./cal.chi_pck).^cal.delta) .* (1-hh).^-cal.Bchi .* max(TINY^0.5,1-phi).^-cal.Bphi;
 
 % phase segregation coefficients
-Ksgr_x = 2/9*cal.dx^2./eta/sgrreg                                                                      ;
-Ksgr_f = 2/9*cal.df^2./eta/sgrreg + cal.dx^2/cal.bf./cal.etaf0/sgrreg.*max(TINY^0.5,phi-cal.cf).^(cal.nf-1).*max(TINY^0.5,1-phi).^cal.mf;
-Ksgr_m =                            cal.dx^2/cal.bm./    etam /sgrreg.*max(TINY^0.5,mu -cal.cm).^(cal.nm-1).*max(TINY^0.5,1-mu ).^cal.mm;
+Ksgr_x = 2/9*dx^2./eta/sgrreg                                                                      ;
+Ksgr_f = 2/9*df^2./eta/sgrreg + dx^2/cal.bf./cal.etaf0/sgrreg.*max(TINY^0.5,phi-cal.cf).^(cal.nf-1).*max(TINY^0.5,1-phi).^cal.mf;
+Ksgr_m =                            dx^2/cal.bm./    etam /sgrreg.*max(TINY^0.5,mu -cal.cm).^(cal.nm-1).*max(TINY^0.5,1-mu ).^cal.mm;
 
 % bound and regularise viscosity
 if ~calibrt; etamax = etacntr.*min(eta(:)); else; etamax = 1e+32.*min(eta(:)); end

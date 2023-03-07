@@ -59,8 +59,6 @@ cal.xi      = 4.5e-4;           % solid viscosity level
 cal.etaf0   = 0.1;              % fluid viscosity constant
 
 % specify segregation coefficient parameters
-cal.dx      = 1e-3;             % crystal size [m]
-cal.df      = 1e-3;             % bubble size [m]
 cal.bm      = 100;              % melt permeability geometric factor (k0 = dx^2/bm)
 cal.cm      = 0.001;            % melt percolation threshold
 cal.nm      = 3;                % melt permeability powerlaw (k0*(mu-cm)^nm*(1-mu)^mm)
