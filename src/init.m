@@ -187,20 +187,20 @@ if ~any(bnd_h)
     switch bndmode
         case 0  % none
         case 1  % top only
-            topshape = exp( ( -ZZ)/bnd_w);
+            topshape = exp( ( -ZZ+h/2)/bnd_w);
         case 2  % bot only
-            botshape = exp(-(D-ZZ)/bnd_w);
+            botshape = exp(-(D-ZZ-h/2)/bnd_w);
         case 3  % top/bot only
-            topshape = exp( ( -ZZ)/bnd_w);
-            botshape = exp(-(D-ZZ)/bnd_w);
+            topshape = exp( ( -ZZ+h/2)/bnd_w);
+            botshape = exp(-(D-ZZ-h/2)/bnd_w);
         case 4 % all walls
-            topshape = exp( ( -ZZ)/bnd_w);
-            botshape = exp(-(D-ZZ)/bnd_w);
-            sdsshape = exp( ( -XX)/bnd_w) ...
-                + exp(-(L-XX)/bnd_w);
+            topshape = exp( ( -ZZ+h/2)/bnd_w);
+            botshape = exp(-(D-ZZ-h/2)/bnd_w);
+            sdsshape = exp( ( -XX+h/2)/bnd_w) ...
+                     + exp(-(L-XX-h/2)/bnd_w);
         case 5 % only walls
-            sdsshape = exp( ( -XX)/bnd_w) ...
-                + exp(-(L-XX)/bnd_w);
+            sdsshape = exp( ( -XX+h/2)/bnd_w) ...
+                     + exp(-(L-XX-h/2)/bnd_w);
     end
     sdsshape = max(0,sdsshape - topshape - botshape);
 end

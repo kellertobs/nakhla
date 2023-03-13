@@ -19,8 +19,8 @@ N        =  1;                   % number of grid points in z-direction
 h        =  D/N;                 % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
-Nt       =  1400;                % number of time steps to take
-tend     =  14*hr;               % end time for simulation [s]
+Nt       =  500;                 % number of time steps to take
+tend     =  5*hr;                % end time for simulation [s]
 dt       =  36;                  % initial time step [s]
 dtmax    =  36;                  % maximum time step [s]
 
@@ -32,7 +32,7 @@ v0       =  0.02;                % volatile component top layer [wt H2O]
 % set thermo-chemical boundary parameters
 bndmode  =  1;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
 bnd_w    =  1e16;                % boundary layer width [m]
-tau_T    =  12*hr;               % wall cooling/assimilation time [s]
+tau_T    =  4*hr;                % wall cooling/assimilation time [s]
 Twall    =  [300,300,nan];       % [top,bot,sds] wall rock temperature [degC] (nan = insulating)
 Ptop     =  1.25e8;              % top pressure [Pa]
 

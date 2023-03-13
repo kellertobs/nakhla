@@ -4,44 +4,52 @@
 
 % number of oxides, mineral end-members, mineral systems, model components
 cal.noxd   = 8;
-cal.nmem   = 11;
-cal.nmsy   = 7;
+cal.nmem   = 12;
+cal.nmsy   = 6;
 cal.ncmp   = 4;
 
 % label strings for all compositional representations
 cal.oxdStr = {'SiO$_2$','TiO$_2$','Al$_2$O$_3$','FeO','MgO','CaO','Na$_2$O','K$_2$O'};
-cal.memStr = {'for','fay','ens','hyp','aug','pig','ant','alb','spn','kfs','qtz'};
-cal.msyStr = {'olv','opx','cpx','plg','spn','kfs','qtz'};
+     elStr = {'Si','Ti','Al','Fe','Mg','Ca','Na','K'};
+cal.memStr = {'for','fay','mgt','ulv','ens','hyp','aug','pig','ant','alb','kfs','qtz'};
+cal.msyStr = {'olv','spn','opx','cpx','fsp','qtz'};
 cal.cmpStr = {'dun','pxn','bas','rhy'};
+
+for i = 1:cal.ncmp; cal.(cal.cmpStr{i}) = i; end
+for i = 1:cal.nmsy; cal.(cal.msyStr{i}) = i; end
+for i = 1:cal.nmem; cal.(cal.memStr{i}) = i; end
+for i = 1:cal.noxd; cal.(elStr{i}) = i; end
+
 
 % oxide composition of mineral end-members
 cal.mem_oxd    = [  42.7    0.0    0.0    0.0   57.3    0.0    0.0    0.0      % forsterite (for)
-                    30.0    0.6    0.0   69.4    0.0    0.0    0.0    0.0      % fayalite (fay)
-                    56.0    0.08   4.49   4.33  33.92   1.11   0.07   0.0      % enstatite (ens)
-                    50.0    0.15   8.85  22.17  16.08   2.70   0.05   0.0      % hypersthene (hyp)
-                    52.0    0.08   7.16   4.88  18.05  16.03   0.20   0.6      % augite (aug)
-                    48.0    1.68   2.05  33.27   4.19  10.08   0.13   0.6      % pigeonite (pig)
+                    29.5    0.0    0.0   70.5    0.0    0.0    0.0    0.0      % fayalite (fay)
+                    0.0    10.0    2.0   87.5    0.5    0.0    0.0    0.0      % magnetite (mgt)
+                    0.0    37.5    3.0   32.0   27.5    0.0    0.0    0.0      % ulvospinel (ulv)
+                    54.0    0.0    4.5    7.0   31.5    3.0    0.0    0.0      % enstatite (ens)
+                    47.0    0.0    1.7   42.0    7.5    1.8    0.0    0.0      % hypersthene (hyp)
+                    53.5    0.0    2.0    8.5   16.5   19.0    0.5    0.0      % augite (aug)
+                    49.5    0.0    1.0   29.3    3.5   14.6    1.4    0.7      % pigeonite (pig)
                     44.4    0.0   35.8    0.0    0.0   19.2    0.6    0.0      % anorthite (ant)
                     67.3    0.0   20.2    0.0    0.0    0.8   11.0    0.7      % albite (alb)
-                    0.0    23.0    1.0   67.0    9.0    0.0    0.0    0.0      % spinel (spn)
                     64.8    0.0   18.3    0.0    0.0    0.0    0.9   16.0      % k-feldspar (kfs)
                     99.99   0.01   0.0    0.0    0.0    0.0    0.0    0.0];    % quartz (qtz)
 cal.mem_oxd = cal.mem_oxd./sum(cal.mem_oxd,2)*100;
 
 % mineral end-members in mineral systems
-cal.msy_mem = [1  1  0  0  0  0  0  0  0  0  0    % olivine (olv)
-               0  0  1  1  0  0  0  0  0  0  0    % orthopyroxene (opx)
-               0  0  0  0  1  1  0  0  0  0  0    % clinopyroxene (cpx)
-               0  0  0  0  0  0  1  1  0  0  0    % plagioclase (plg)
-               0  0  0  0  0  0  0  0  1  0  0    % spinel (spn)
-               0  0  0  0  0  0  0  0  0  1  0    % k-feldspar (kfs)
-               0  0  0  0  0  0  0  0  0  0  1];  % quartz (qtz)
+cal.msy_mem = [1  1  0  0  0  0  0  0  0  0  0  0    % olivine (olv)
+               0  0  1  1  0  0  0  0  0  0  0  0    % spinel (spn)
+               0  0  0  0  1  1  0  0  0  0  0  0    % orthopyroxene (opx)
+               0  0  0  0  0  0  1  1  0  0  0  0    % clinopyroxene (cpx)
+               0  0  0  0  0  0  0  0  1  1  1  0    % feldspar (fsp)
+               0  0  0  0  0  0  0  0  0  0  0  1];  % quartz (qtz)
 
 % mineral end-member composition of melting model components
-cal.cmp_mem =[  97.5    2.5    0.0    0.0   0.0    0.0    0.0    0.0    0.0    0.0   0.0      % cphs0 => dunite (dun)
-                14.0   16.0   43.0    0.0  19.0    0.0    7.0    0.0    1.0    0.0   0.0      % perCx => pyroxenite (pxn)
-                 0.1    2.0    1.0   11.0  21.0   13.0   25.0   23.0    2.0    1.0   0.9      % perCm => basalt (bas)
-                 0.0    0.0    0.0    1.0   0.0   11.0    6.0   12.0    0.5   31.0  38.5];    % cphs1 => rhyolite (rhy)
+%               for     fay  Fe-spn Ti-spn  ens    hyp    aug    pig    ant    alb    kfs    qtz
+cal.cmp_mem =[  97.5    2.5    0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0      % cphs0 => dunite (dun)
+                16.0   14.0    0.0    0.0   48.0    4.0   13.0    0.0    3.0    0.0    0.0    0.0      % perCx => pyroxenite (pxn)
+                 0.1    2.0    0.1    2.4    1.0   11.0   21.0   11.0   25.4   23.0    1.0    0.5      % perCm => basalt (bas)
+                 0.0    0.0    0.9    0.1    0.0    0.0    1.5   16.5    4.0   11.5   22.5   43.0];    % cphs1 => rhyolite (rhy)
 cal.cmp_mem = cal.cmp_mem./sum(cal.cmp_mem,2)*100;
 
 % mineral systems composition of melting model components
@@ -60,12 +68,12 @@ end
 % specify melting model phase diagram parameters
 cal.cphs0    =  cal.cmp_oxd(1,1)/100; % phase diagram lower bound composition [wt SiO2]
 cal.cphs1    =  cal.cmp_oxd(4,1)/100; % phase diagram upper bound composition [wt SiO2]
-cal.Tphs0    =  850;                  % phase diagram lower bound temperature [degC]
+cal.Tphs0    =  870;                  % phase diagram lower bound temperature [degC]
 cal.Tphs1    =  1850;                 % phase diagram upper bound temperature [degC]
-cal.PhDg     =  [8.0,3.5,1.3,1.3];    % phase diagram curvature factor (> 1)
+cal.PhDg     =  [8.5,3.5,2.0,1.5];    % phase diagram curvature factor (> 1)
 cal.perCm    =  cal.cmp_oxd(3,1)/100; % peritectic liquidus composition [wt SiO2]
 cal.perCx    =  cal.cmp_oxd(2,1)/100; % peritectic solidus  composition [wt SiO2]
-cal.perT     =  1125;                 % peritectic temperature [degC]
+cal.perT     =  1130;                 % peritectic temperature [degC]
 cal.clap     =  1e-7;                 % Clapeyron slope for P-dependence of melting T [degC/Pa]
 cal.dTH2O    =  [1400,1300,1200];     % solidus shift from water content [degC/wt^0.75]
 
@@ -75,8 +83,8 @@ cal.nir      =  2;           % number of isotope ratios
 cal.Kte_mem  =  [0.01;0.10;3.00;10.0].*ones(cal.nte,cal.nmem);
 
 % specify density parameters
-cal.rhox0 = [3270,4390,3000,3150,3250,2730,2630,2620,2580,4300,2650];      % solid  component reference densities [kg/m3]
-cal.rhom0 = [2710,3580,2580,2750,2850,2530,2430,2310,2290,3700,2360];      % liquid component reference densities [kg/m3]
+cal.rhox0 = [3270,4390,4300,3800,3000,3150,3250,2730,2630,2620,2580,2650]; % solid  component reference densities [kg/m3]
+cal.rhom0 = [2710,3580,3700,3200,2580,2750,2850,2530,2430,2310,2290,2360]; % liquid component reference densities [kg/m3]
 cal.rhof0 =  1000;                                                         % fluid reference density [kg/m3]
 cal.aT    =  4e-5;                                                         % thermal expansivity [1/K]
 cal.gH    =  0.75;                                                         % hydrous melt expansivity [1/(wt H2O)]

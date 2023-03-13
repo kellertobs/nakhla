@@ -19,7 +19,7 @@ perCx = (perCx-cphs0)./(cphs1-cphs0);
 iter    = 1;
 maxit   = 75;
 resnorm = 1;
-tol     = 1e-12;
+tol     = 1e-10;
 alpha   = 0.50;
 
 vmq_c0 = (4.7773e-7.*P.^0.6 + 1e-11.*P) .* exp(2565*(1./(T0+273.15)-1./(perTd+273.15))); % Katz et al., 2003; Moore et al., 1998
@@ -45,7 +45,7 @@ while resnorm > tol && iter < maxit
     fq = fq - alpha.*resf./dresf_df;
 
     resnorm = norm(resx./dresx_dx)./sqrt(length(xq(:))) ...
-            + norm(resf./dresf_df)./sqrt(length(xq(:)));
+            + norm(resf./dresf_df)./sqrt(length(fq(:)));
 
     iter    = iter+1;
 end

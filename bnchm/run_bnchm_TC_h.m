@@ -5,17 +5,17 @@ clear; close all;
 run('../usr/par_default')
 
 % set run parameters
-runID    =  'bnchm_TC_h';       % run identifier
+runID    =  'bnchm_TC_h';        % run identifier
 opdir    =  '../out/';           % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
-nop      =  10;                  % output frame plotted/saved every 'nop' time steps
+nop      =  100;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot of results
 save_op  =  0;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
 
 % set model domain parameters
-D        =  10;                  % chamber depth [m]
-L        =  10;                  % chamber width [m]
+D        =  8;                   % chamber depth [m]
+L        =  8;                   % chamber width [m]
 
 % set initial thermo-chemical state
 T0       =  1140;                % temperature top layer [deg C]
@@ -34,8 +34,8 @@ dirg     =  [1, 1];              % isotope ratios centred gaussian [delta]
 fin = 0; fout = 0; Twall = [nan,nan,nan];
 
 % set numerical model parameters
-CFL      =  1.00;                % (physical) time stepping courant number (multiplies stable step) [0,1]
-TINT     =  'bd2si';             % time integration scheme ('be1im','bd2im','cn2si','bd2si')
+CFL      =  10.00;               % (physical) time stepping courant number (multiplies stable step) [0,1]
+TINT     =  'bd2im';             % time integration scheme ('be1im','bd2im','cn2si','bd2si')
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
 rtol     =  1e-6;                % outer its relative tolerance
 atol     =  1e-9;                % outer its absolute tolerance
@@ -48,12 +48,12 @@ end
 
 cd ../src
 
-NN = [50,100,200];
+NN = [20,40,80];
 
-dt    =  D/NN(2)/4;
-dtmax =  D/NN(2)/4;
+dt     =  D/NN(3)/12.5;
+dtmax  =  D/NN(3)/12.5;
 
-Nt    =  L/dt;              % number of time steps to take
+Nt     =  L/dt;                 % number of time steps to take
 
 for Ni = NN
     
@@ -69,7 +69,7 @@ for Ni = NN
     P(:) = 0;
 
     % set periodic boundary conditions for advection
-    BCA = {'closed','periodic'};
+    BCA = {'periodic','periodic'};
 
     % set diffusion parameters to zero to isolate advection
     ks(:) = 0; kc(:) = 0; kv(:) = 0;
@@ -90,8 +90,6 @@ for Ni = NN
     plot(XX(N/2,:),Xin(N/2,:)./rhoin(N/2,:),'k',XX(N/2,:),X(N/2,:)./rho(N/2,:),'r','LineWidth',1.5); axis tight; box on;
     drawnow;
 
-    dt    =  h/4;
-    dtmax =  h/4;
     time  =  0;
 
     % physical time stepping loop
@@ -202,9 +200,10 @@ for Ni = NN
 
     if Ni == NN(1)
         p7 = loglog(D./NN,geomean([EC,EV,ES,EX,EF]).*(NN./NN(1)).^-2,'k-','LineWidth',2);  % plot trend for comparison
+        p8 = loglog(D./NN,geomean([EC,EV,ES,EX,EF]).*(NN./NN(1)).^-3,'k--','LineWidth',2);  % plot trend for comparison
     end
     if Ni == NN(end)
-        legend([p1,p2,p3,p4,p5,p6,p7],{'error $M$','error $S$','error $C$','error $V$','error $X$','error $F$','quadratic'},'Interpreter','latex','box','on','location','southeast')
+        legend([p1,p2,p3,p4,p5,p6,p7,p8],{'error $M$','error $S$','error $C$','error $V$','error $X$','error $F$','quadratic','cubic'},'Interpreter','latex','box','on','location','southeast')
     end
     drawnow;
 

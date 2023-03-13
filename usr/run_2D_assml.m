@@ -25,9 +25,9 @@ tend     =  1*yr;                % end time for simulation [s]
 % set initial thermo-chemical state
 T0       =  1175;                % temperature top layer [deg C]
 c0       =  0.51;                % major component top layer [wt SiO2]
-dcr      =  1e-4;                % amplitude of random noise [wt SiO2]
+dcr      =  1e-5;                % amplitude of random noise [wt SiO2]
 v0       =  0.02;                % volatile component top layer [wt H2O]
-dvr      =  1e-4;                % amplitude of random noise [wt H2O]
+dvr      =  1e-5;                % amplitude of random noise [wt H2O]
 
 % set model trace and isotope geochemistry parameters (must match # trace elements and isotope ratios in calibration!)
 te0      =  [1,1,1,1];           % trace elements top layer [wt ppm]
@@ -37,8 +37,8 @@ ir0      =  [-1,5];              % isotope ratios top layer [delta]
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
 bnd_h    =  [0,0,0];             % boundary layer width [m]
 bnd_w    =  h;                   % boundary layer width [m]
-tau_T    =  12*hr;               % wall cooling/assimilation time [s]
-tau_a    =  12*hr;               % wall cooling/assimilation time [s]
+tau_T    =  4*hr;                % wall cooling/assimilation time [s]
+tau_a    =  4*hr;                % wall cooling/assimilation time [s]
 Twall    =  [500,500,nan];       % [top,bot,sds] wall rock temperature [degC] (nan = insulating)
 cwall    =  [0.70,0.70,nan];     % [top,bot,sds] wall rock major component [wt SiO2] (nan = no assimilation)
 vwall    =  [0.05,0.05,nan];     % [top,bot,sds] wall rock volatile component [wt H2O] (nan = no assimilation)
@@ -66,7 +66,7 @@ rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-8;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its
 cnvreg   =  10;                  % convection regularisation parameter
-dtmax    =  10;                  % maximum time step [s]
+dtmax    =  2;                   % maximum time step [s]
 
 
 %*****  RUN NAKHLA MODEL  *************************************************

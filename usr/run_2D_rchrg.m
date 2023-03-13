@@ -13,7 +13,7 @@ save_op  =  1;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
 
 % set model domain parameters
-D        =  20;                  % chamber depth [m]
+D        =  10;                  % chamber depth [m]
 N        =  120;                 % number of grid points in z-direction
 h        =  D/N;                 % grid spacing (equal in both dimensions, do not set) [m]
 L        =  D;                   % chamber width (equal to h for 1-D mode) [m]
@@ -31,7 +31,7 @@ dcr      =  1e-4;                % amplitude of random noise [wt SiO2]
 v0       =  0.03;                % volatile component top layer [wt H2O]
 v1       =  0.02;                % volatile component base layer [wt H2O]
 dvr      =  1e-4;                % amplitude of random noise [wt H2O]
-zlay     =  0.8;                 % layer thickness (relative to domain depth D)
+zlay     =  0.9;                 % layer thickness (relative to domain depth D)
 dlay     =  0.0;                 % random perturbation to layer thickness (relative to grid spacing h)
 wlay_T   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
 wlay_c   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
@@ -45,7 +45,7 @@ ir1      =  [5,-1];              % isotope ratios base layer [delta]
 % set thermo-chemical boundary parameters
 bndmode  =  0;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
 bnd_w    =  h;                   % boundary layer width [m]
-tau_T    =  12*hr;               % wall cooling/assimilation time [s]
+tau_T    =  6*hr;                % wall cooling/assimilation time [s]
 Ptop     =  1.25e8;              % top pressure [Pa]
 
 % set thermo-chemical material parameters
@@ -63,7 +63,7 @@ CFL      =  0.50;                % (physical) time stepping courant number (mult
 rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-8;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its
-cnvreg   =  10;                  % convection regularisation parameter
+cnvreg   =  1;                   % convection regularisation parameter
 dtmax    =  5;                   % maximum time step [s]
 
 
