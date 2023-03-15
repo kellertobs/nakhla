@@ -24,7 +24,7 @@ while res>1e-16
     ci = c0*(1-f0);
     [x0,cx0,cm0,f0,vf0,vm0] = equilibrium(x0,f0,T-273.15,c0*(1-f0),v0,Ptop,cal,TINY);
     m0 = 1-x0-f0;
-    T  = (T0+273.15).*exp(cal.aT/mean(cal.rhom0)/cP.*Ptop);
+    T  = (T0+273.15).*exp(cal.aT/mean(cal.rhox0-500)/cP.*Ptop);
     res = abs(c0*(1-f0)-ci)/ci;
 end
 
@@ -56,19 +56,30 @@ cx0_oxd = cx0_mem*cal.mem_oxd/100;
  c0_oxd =  c0_mem*cal.mem_oxd/100;
 
 rhof0 = cal.rhof0;
-rhom0 = sum(cm0_mem./cal.rhom0).^-1;
 rhox0 = sum(cx0_mem./cal.rhox0).^-1;
 
-cm1_mem = (0.99.*cm0_mem + 0.01.*cal.cmp_mem(1,:)/100);
-cm2_mem = (0.99.*cm0_mem + 0.01.*cal.cmp_mem(4,:)/100);
+cm1_oxd = (0.9.*cm0_mem + 0.1.*cal.cmp_mem(1,:)/100)*cal.mem_oxd/100;
+cm2_oxd = (0.9.*cm0_mem + 0.1.*cal.cmp_mem(4,:)/100)*cal.mem_oxd/100;
 
 wtm = [];
-wtm([1 2 3 4 6 7 8 9 11 12]) = [cm0_oxd,100.*vm0,0];
-etam0 = grdmodel08(wtm,T0);
+wtm([1 2 3 5 6 7 8 9 10]) = [cm0_oxd.*100,100.*vm0];
+rhom0 = DensityX(wtm,T0,Ptop/1e8);
 
-DrhoT = cal.aT*max([abs(T0-Twall),abs(T0-T1),T0/100]);
-Drhoc = abs(sum(cm1_mem./cal.rhom0).^-1-sum(cm2_mem./cal.rhom0).^-1);
-Drhox = 0.01*abs(rhox0-rhom0);
+wtm = [];
+wtm([1 2 3 5 6 7 8 9 10]) = [cm1_oxd.*100,100.*vm0];
+rhom1 = DensityX(wtm,T0,Ptop/1e8);
+
+wtm = [];
+wtm([1 2 3 5 6 7 8 9 10]) = [cm2_oxd.*100,100.*vm0];
+rhom2 = DensityX(wtm,T0,Ptop/1e8);
+
+wtm = [];
+wtm([1 2 3 4 6 7 8 9 11 12]) = [cm0_oxd.*100,100.*vm0,0];
+etam0 = giordano08(wtm,T0);
+
+DrhoT = rhom0.*cal.aT*max([abs(T0-Twall)/10,abs(T0-T1),T0/100]);
+Drhoc = abs(rhom1-rhom2);
+Drhox = 0.1*abs(rhox0-rhom0);
 Drhof = 0.01*abs(cal.rhof0-rhom0) * (max([v0,v1,vwall])>TINY);
 Drho0 = DrhoT + Drhoc + Drhox + Drhof;
 

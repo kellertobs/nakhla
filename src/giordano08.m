@@ -6,8 +6,7 @@
 %
 % ________________________________________________________________
 % INPUT: Chemical compositions of silicate melts (wt% oxides) as:
-% SiO2 TiO2 Al2O3 FeO(T) MnO MgO CaO Na2O K2O P2O5 H2O F2O-1
-% One line for each melt composition
+% [SiO2 TiO2 Al2O3 FeO(T) MnO MgO CaO Na2O K2O P2O5 H2O F2O-1]
 % _________________________________________________________________
 
 % ________________________________________________________________
@@ -17,19 +16,24 @@
 % VFT Multicomponent-Model Coedfficients
 % -----------------------------------------------------------------
 
-% modified and optimised by Tobias Keller, 10. June, 2022
+% Modified and optimised by Tobias Keller (github.com/kellertobs), 06/2022
 
-function   [eta] = grdmodel08(wt,TC)
+function   [eta] = giordano08(wt,TC)
 
 AT  =  -4.55;
 bb  =  [159.56  -173.34 72.13 75.69 -38.98 -84.08 141.54 -2.43 -0.91 17.62];
 cc  =  [2.75 15.72 8.32 10.2 -12.29 -99.54 0.3 ];
 
-% Function molefrac_grd: converts wt % oxide basis to mole % oxide basis
-[~,mol]  =  molefrac(wt);
+% molar weights
+mw  = [ 60.0843, 79.8658, 101.961276, 71.8444, 70.937449,40.3044,56.0774, 61.97894, 94.1960, 141.9446,18.01528, 18.9984];
+
+% convert from wt % to mol%
+% note all data are normalized on anhydrous components first
+wtn = [wt(:,1:10).*(100-wt(:,11))./(sum(wt(:,1:10),2)+wt(:,12)) wt(:,11) 0.5.*wt(:,12).*(100-wt(:,11))./(sum(wt(:,1:10),2)+wt(:,12))];
+mp  = wtn./mw;
+mol = 100.*(mp./sum(mp,2));
 
 % Load composition-basis matrix for multiplication against model-coefficients
-% Result is two matrices bcf[nx by 10] and ccf[nx by 7]
 siti  =  mol(:,1) + mol(:,2);
 tial  =  mol(:,2)+mol(:,3);
 fmm   =  mol(:,4) + mol(:,5) + mol(:,6);
@@ -59,6 +63,9 @@ ccf   =  [c1 c2 c3 c4 c5 c6 c11];
 BT    =  sum(bb.*bcf,2);
 CT    =  sum(cc.*ccf,2);
 
+% Convert temperature to [K]
 TK    =  TC + 273.15;
+
+% Calculate melt viscosity in [Pas]
 eta   =  10.^(min(18,max(-6,AT + BT./(TK(:)-CT))));
 

@@ -1,59 +1,6 @@
 %%*****  UPDATE PARAMETERS & AUXILIARY FIELDS  ****************************
 tic;
 
-% wt0 = (cal.perCm-[cal.cphs0,cal.cphs1])./(cal.perCm-cal.cphs0);
-% wt1 = (cal.cphs1-[cal.cphs0,cal.cphs1])./(cal.cphs1-cal.perCm);
-% minmem = zeros(1,1,cal.nmem);
-% maxmem = zeros(1,1,cal.nmem);
-% minmem(1,:,:) = min(min((wt0(:) .* cal.cmp_mem(1,:) + (1-wt0(:)) .* cal.cmp_mem(3,:)),(wt1(:) .* cal.cmp_mem(3,:) + (1-wt1(:)) .* cal.cmp_mem(4,:))));
-% maxmem(1,:,:) = max(max((wt0(:) .* cal.cmp_mem(1,:) + (1-wt0(:)) .* cal.cmp_mem(3,:)),(wt1(:) .* cal.cmp_mem(3,:) + (1-wt1(:)) .* cal.cmp_mem(4,:))));
-% cm_mem1 = (cm_mem1-minmem)./(maxmem-minmem);
-% cm_mem2 = (cm_mem2-minmem)./(maxmem-minmem);
-% 
-% a = 200;
-% b = 0.02;
-% ind1 = repmat(cm,1,1,cal.nmem)<=cal.perCm-b;
-% ind2 = repmat(cm,1,1,cal.nmem)> cal.perCm+b;
-% ind3 = repmat(cm,1,1,cal.nmem)< cal.perCm+b & cm>=cal.perCm-b;
-% 
-% cm_mem = zeros(size(cm_mem1));
-% cm_mem(ind1)  =  cm_mem1(ind1);
-% cm_mem(ind2)  =  cm_mem2(ind2);
-% scl = ((cal.cmp_mem(4,:)-cal.cmp_mem(3,:))./(cal.cphs1-cal.perCm)./100 - (cal.cmp_mem(3,:)-cal.cmp_mem(1,:))./(cal.perCm-cal.cphs0)./100);
-% scl = reshape(sign(scl).*(cal.cmp_mem(3,:)-squeeze(minmem).')./(squeeze(maxmem).'-squeeze(minmem).').*ones(Nz*Nx,cal.nmem),Nz,Nx,cal.nmem);
-% cm_mem(ind3)  = (cm_mem1(ind3).^(scl(ind3)*a)+cm_mem2(ind3).^(scl(ind3)*a)).^(1./(scl(ind3)*a));
-% cm_mem = minmem + cm_mem.*(maxmem-minmem);
-% 
-% wt0 = (cal.perCx-cx)./(cal.perCx-cal.cphs0);
-% wt1 = (cal.cphs1-cx)./(cal.cphs1-cal.perCx);
-% cx_mem1 = reshape((wt0(:) .* cal.cmp_mem(1,:) + (1-wt0(:)) .* cal.cmp_mem(2,:)),Nz,Nx,cal.nmem);
-% cx_mem2 = reshape((wt1(:) .* cal.cmp_mem(2,:) + (1-wt1(:)) .* cal.cmp_mem(4,:)),Nz,Nx,cal.nmem);
-% 
-% wt0 = (cal.perCx-[cal.cphs0,cal.cphs1])./(cal.perCx-cal.cphs0);
-% wt1 = (cal.cphs1-[cal.cphs0,cal.cphs1])./(cal.cphs1-cal.perCx);
-% minmem = zeros(1,1,cal.nmem);
-% maxmem = zeros(1,1,cal.nmem);
-% minmem(1,:,:) = min(min((wt0(:) .* cal.cmp_mem(1,:) + (1-wt0(:)) .* cal.cmp_mem(2,:)),(wt1(:) .* cal.cmp_mem(2,:) + (1-wt1(:)) .* cal.cmp_mem(4,:))));
-% maxmem(1,:,:) = max(max((wt0(:) .* cal.cmp_mem(1,:) + (1-wt0(:)) .* cal.cmp_mem(2,:)),(wt1(:) .* cal.cmp_mem(2,:) + (1-wt1(:)) .* cal.cmp_mem(4,:))));
-% cx_mem1 = (cx_mem1-minmem)./(maxmem-minmem);
-% cx_mem2 = (cx_mem2-minmem)./(maxmem-minmem);
-% 
-% a = 200;
-% b = 0.02;
-% ind1 = repmat(cx,1,1,cal.nmem)<=cal.perCx-b;
-% ind2 = repmat(cx,1,1,cal.nmem)> cal.perCx+b;
-% ind3 = repmat(cx,1,1,cal.nmem)< cal.perCx+b & cx>=cal.perCx-b;
-% 
-% cx_mem = zeros(size(cx_mem1));
-% cx_mem(ind1)  =  cx_mem1(ind1);
-% cx_mem(ind2)  =  cx_mem2(ind2);
-% scl = ((cal.cmp_mem(4,:)-cal.cmp_mem(2,:))./(cal.cphs1-cal.perCx)./100 - (cal.cmp_mem(2,:)-cal.cmp_mem(1,:))./(cal.perCx-cal.cphs0)./100);
-% scl = reshape(sign(scl).*(cal.cmp_mem(2,:)-squeeze(minmem).')./(squeeze(maxmem).'-squeeze(minmem).').*ones(Nz*Nx,cal.nmem),Nz,Nx,cal.nmem);
-% cx_mem(ind3)  = (cx_mem1(ind3).^(scl(ind3)*a)+cx_mem2(ind3).^(scl(ind3)*a)).^(1./(scl(ind3)*a));
-% cx_mem = minmem + cx_mem.*(maxmem-minmem);
-% 
-% c_mem = (m.*cm_mem + x.*cx_mem)./(1-f);
-
 % update melting model component compositions
 wt0 = (cal.perCm-cm(:))./(cal.perCm-cal.cphs0);
 wt1 = (cal.cphs1-cm(:))./(cal.cphs1-cal.perCm);
@@ -87,7 +34,17 @@ for j = 1:cal.nmsy
 end
 
 % update phase densities
-rhom = reshape(sum(reshape(cm_mem,Nz*Nx,cal.nmem)./cal.rhom0,2).^-1,Nz,Nx) .* (1 - cal.aT.*(T-cal.perT-273.15) - cal.gH.*vm);
+wtm       = zeros(Nz*Nx,10);
+wtm(:, 1) = reshape(cm_oxd(:,:,1),Nz*Nx,1).*100; % SiO2
+wtm(:, 2) = reshape(cm_oxd(:,:,2),Nz*Nx,1).*100; % TiO2
+wtm(:, 3) = reshape(cm_oxd(:,:,3),Nz*Nx,1).*100; % Al2O3
+wtm(:, 5) = reshape(cm_oxd(:,:,4),Nz*Nx,1).*100; % FeO
+wtm(:, 6) = reshape(cm_oxd(:,:,5),Nz*Nx,1).*100; % MgO
+wtm(:, 7) = reshape(cm_oxd(:,:,6),Nz*Nx,1).*100; % CaO
+wtm(:, 8) = reshape(cm_oxd(:,:,7),Nz*Nx,1).*100; % Na2O
+wtm(:,10) = reshape(cm_oxd(:,:,8),Nz*Nx,1).*100; % K2O
+wtm(:, 9) = reshape(vm     (:,: ),Nz*Nx,1).*100; % H2O
+rhom = reshape(DensityX(wtm,T(:)-273.15,Pt(:)./1e8),Nz,Nx);
 rhox = reshape(sum(reshape(cx_mem,Nz*Nx,cal.nmem)./cal.rhox0,2).^-1,Nz,Nx) .* (1 - cal.aT.*(T-cal.perT-273.15));
 rhof = cal.rhof0 .* (1 - cal.aT.*(T-cal.perT-273.15) + cal.bP.*(Pt-Ptop ));
 
@@ -100,18 +57,18 @@ chi   = max(0,min(1, x.*rho./rhox ));
 phi   = max(0,min(1, f.*rho./rhof ));
 mu    = max(0,min(1, m.*rho./rhom ));
 
-% update effective viscosity
-wtm      = zeros(Nz*Nx,12);
-wtm(:, 1) = reshape(cm_oxd(:,:,1),Nz*Nx,1); % SiO2
-wtm(:, 2) = reshape(cm_oxd(:,:,2),Nz*Nx,1); % TiO2
-wtm(:, 3) = reshape(cm_oxd(:,:,3),Nz*Nx,1); % Al2O3
-wtm(:, 4) = reshape(cm_oxd(:,:,4),Nz*Nx,1); % FeO
-wtm(:, 6) = reshape(cm_oxd(:,:,5),Nz*Nx,1); % MgO
-wtm(:, 7) = reshape(cm_oxd(:,:,6),Nz*Nx,1); % CaO
-wtm(:, 8) = reshape(cm_oxd(:,:,7),Nz*Nx,1); % Na2O
-wtm(:, 9) = reshape(cm_oxd(:,:,8),Nz*Nx,1); % K2O
-wtm(:,11) = reshape(100.*vm(:,: ),Nz*Nx,1); % H2O
-etam      = reshape(grdmodel08(wtm,T(:)-273.15),Nz,Nx);
+% update melt viscosity
+wtm       = zeros(Nz*Nx,12);
+wtm(:, 1) = reshape(cm_oxd(:,:,1),Nz*Nx,1).*100; % SiO2
+wtm(:, 2) = reshape(cm_oxd(:,:,2),Nz*Nx,1).*100; % TiO2
+wtm(:, 3) = reshape(cm_oxd(:,:,3),Nz*Nx,1).*100; % Al2O3
+wtm(:, 4) = reshape(cm_oxd(:,:,4),Nz*Nx,1).*100; % FeO
+wtm(:, 6) = reshape(cm_oxd(:,:,5),Nz*Nx,1).*100; % MgO
+wtm(:, 7) = reshape(cm_oxd(:,:,6),Nz*Nx,1).*100; % CaO
+wtm(:, 8) = reshape(cm_oxd(:,:,7),Nz*Nx,1).*100; % Na2O
+wtm(:, 9) = reshape(cm_oxd(:,:,8),Nz*Nx,1).*100; % K2O
+wtm(:,11) = reshape(100.*vm(:,: ),Nz*Nx,1).*100; % H2O
+etam      = reshape(giordano08(wtm,T(:)-273.15),Nz,Nx);
 
 % effective mixture shear viscosity (Costa et al., 2009)
 hh     = (1-cal.xi).*erf(sqrt(pi)./(2.*(1-cal.xi)).*(max(TINY^0.5,chi)./cal.chi_pck).*(1+(max(TINY^0.5,chi)./cal.chi_pck).^cal.gamma));

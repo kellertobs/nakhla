@@ -363,7 +363,7 @@ if ~bnchm
 
     
     %% update time step
-    dtk = (h/2)^2./max(kT(:)./rho(:)./cP)/4;                                      % diffusive time step size
+    dtk = (h/2)^2./max(kT(:)./rho(:)./cP)/3;                                      % diffusive time step size
     dta = CFL*h/2/max(abs([Um(:).*any(m(:)>10*TINY);Wm(:).*any(m(:)>10*TINY); ... % advective time step size
                            Ux(:).*any(x(:)>10*TINY);Wx(:).*any(x(:)>10*TINY); ...
                            Uf(:).*any(f(:)>10*TINY);Wf(:).*any(f(:)>10*TINY)]+1e-16));   
