@@ -8,7 +8,8 @@
 %     oxd_wt Melt composition as Nx10 matrix containing N sample compositions  
 %            given as concentrations in [wt%] of the following oxides
 %            ordered in the exact sequence 
-%            [SiO2, TiO2, Al2O3, Fe2O3, FeO, MgO, CaO, Na2O, K2O, H2O]
+%            [SiO2 TiO2 Al2O3 FeO(T) MgO CaO Na2O K2O H2O]
+%             1    2    3     4      5   6   7    8   9 
 %     T      Melt emperature in [degC] as Nx1 vector
 %     P      Pressure in [kbar] as Nx1 vector
 
@@ -33,31 +34,29 @@ function [rho] = DensityX(oxd_wt,T,P)
 % Set parameter values
 
 % Molecular Weights [g/mol]
-MW  = [60.0855, 79.88, 101.96, 159.69, 71.85, 40.3, 56.08, 61.98, 94.2, 18.02];
+MW  = [60.0855, 79.88, 101.96, 71.85, 40.3, 56.08, 61.98, 94.2, 18.02];
 
 % Partial Molar Volumes
 % Volumes for SiO2, Al2O3, MgO, CaO, Na2O, K2O at Tref = 1773 K (Lange, 1997; CMP)
 % Volume for H2O at Tref = 1273 K (Ochs and Lange, 1999)
 % Volume for FeO at Tref = 1723 K (Guo et al., 2014)
-% Volume for Fe2O3 at Tref = 1723 K (Liu and Lange, 2006)
 % Volume for TiO2 at Tref = 1773 K (Lange and Carmichael, 1987)
-MV  = [26.86, 28.32, 37.42, 41.50, 12.68, 12.02, 16.90, 29.65, 47.28, 22.9];
+MV  = [26.86, 28.32, 37.42, 12.68, 12.02, 16.90, 29.65, 47.28, 22.9];
 
 % dV/dT values
 % MgO, CaO, Na2O, K2O Table 4 (Lange, 1997)
 % SiO2, TiO2, Al2O3 Table 9 (Lange and Carmichael, 1987)
 % H2O from Ochs & Lange (1999)
-% Fe2O3 from Liu & Lange (2006)
 % FeO from Guo et al (2014)
-dVdT  = [0.0, 0.00724, 0.00262, 0.0, 0.00369, 0.00327, 0.00374, 0.00768, 0.01208, 0.0095];
+dVdT  = [0.0, 0.00724, 0.00262, 0.00369, 0.00327, 0.00374, 0.00768, 0.01208, 0.0095];
 
 % dV/dP values
 % Anhydrous component data from Kess and Carmichael (1991)
 % H2O data from Ochs & Lange (1999)
-dVdP  = [-0.000189, -0.000231, -0.000226, -0.000253, -0.000045, 0.000027, 0.000034, -0.00024, -0.000675, -0.00032];
+dVdP  = [-0.000189, -0.000231, -0.000226, -0.000045, 0.000027, 0.000034, -0.00024, -0.000675, -0.00032];
 
 % Tref values
-Tref  = [1773.15, 1773.15, 1773.15, 1723.15, 1723.15, 1773.15, 1773.15, 1773.15, 1773.15, 1273.15];
+Tref  = [1773.15, 1773.15, 1773.15, 1723.15, 1773.15, 1773.15, 1773.15, 1773.15, 1273.15];
 
 
 % Prepare composition, temperature, and pressure variables

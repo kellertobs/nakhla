@@ -61,21 +61,15 @@ rhox0 = sum(cx0_mem./cal.rhox0).^-1;
 cm1_oxd = (0.9.*cm0_mem + 0.1.*cal.cmp_mem(1,:)/100)*cal.mem_oxd/100;
 cm2_oxd = (0.9.*cm0_mem + 0.1.*cal.cmp_mem(4,:)/100)*cal.mem_oxd/100;
 
-wtm = [];
-wtm([1 2 3 5 6 7 8 9 10]) = [cm0_oxd.*100,100.*vm0];
+wtm   = [cm0_oxd.*100,100.*vm0];
+etam0 = giordano08(wtm,T0);
 rhom0 = DensityX(wtm,T0,Ptop/1e8);
 
-wtm = [];
-wtm([1 2 3 5 6 7 8 9 10]) = [cm1_oxd.*100,100.*vm0];
+wtm   = [cm1_oxd.*100,100.*vm0];
 rhom1 = DensityX(wtm,T0,Ptop/1e8);
 
-wtm = [];
-wtm([1 2 3 5 6 7 8 9 10]) = [cm2_oxd.*100,100.*vm0];
+wtm   = [cm2_oxd.*100,100.*vm0];
 rhom2 = DensityX(wtm,T0,Ptop/1e8);
-
-wtm = [];
-wtm([1 2 3 4 6 7 8 9 11 12]) = [cm0_oxd.*100,100.*vm0,0];
-etam0 = giordano08(wtm,T0);
 
 DrhoT = rhom0.*cal.aT*max([abs(T0-Twall)/10,abs(T0-T1),T0/100]);
 Drhoc = abs(rhom1-rhom2);
