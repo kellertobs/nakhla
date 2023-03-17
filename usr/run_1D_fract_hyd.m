@@ -5,7 +5,7 @@ clear; close all;
 run('./par_default')
 
 % set run parameters
-runID    =  '1D_fract_hyd';      % run identifier
+runID    =  '1D_fract_andhyd';   % run identifier
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  500;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot results
@@ -23,8 +23,8 @@ Nt       =  5e5;                 % number of time steps to take
 tend     =  1*yr;                % end time for simulation [s]
 
 % set initial thermo-chemical state
-T0       =  1175;                % temperature top layer [deg C]
-c0       =  0.51;                % major component top layer [wt SiO2]
+T0       =  1160;                % temperature top layer [deg C]
+c0       =  0.515;               % major component top layer [wt SiO2]
 v0       =  0.02;                % volatile component top layer [wt H2O]
 
 % set model trace and isotope geochemistry parameters (must match # trace elements and isotope ratios in calibration!)
@@ -34,11 +34,12 @@ ir0      =  [1,1];               % isotope ratios top layer [delta]
 % set thermo-chemical boundary parameters
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
 bnd_w    =  h;                   % boundary layer width [m]
-tau_T    =  4*hr;                % wall cooling/assimilation time [s]
+tau_T    =  6*hr;                % wall cooling/assimilation time [s]
 Twall    =  [300,300,nan];       % [top,bot,sds] wall rock temperature [degC] (nan = insulating)
 Ptop     =  1.25e8;              % top pressure [Pa]
 
 % set thermo-chemical material parameters
+calID    =  'andes';             % phase diagram calibration
 Dsx      = -300;                 % entropy change of crystallisation [J/kg]
 Dsf      =  400;                 % entropy change of exsolution [J/kg]
 

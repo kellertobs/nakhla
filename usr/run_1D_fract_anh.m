@@ -5,7 +5,7 @@ clear; close all;
 run('./par_default')
 
 % set run parameters
-runID    =  '1D_fract_anh';      % run identifier
+runID    =  '1D_fract_andes';    % run identifier
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  500;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot results
@@ -23,8 +23,8 @@ Nt       =  5e5;                 % number of time steps to take
 tend     =  1*yr;                % end time for simulation [s]
 
 % set initial thermo-chemical state
-T0       =  1250;                % temperature top layer [deg C]
-c0       =  0.51;                % major component top layer [wt SiO2]
+T0       =  1240;                % temperature top layer [deg C]
+c0       =  0.515;               % major component top layer [wt SiO2]
 v0       =  0.00;                % volatile component top layer [wt H2O]
 
 % set model trace and isotope geochemistry parameters (must match # trace elements and isotope ratios in calibration!)
@@ -43,7 +43,7 @@ Dsx      = -300;                 % entropy change of crystallisation [J/kg]
 Dsf      =  400;                 % entropy change of exsolution [J/kg]
 
 % set model buoyancy parameters
-calID    =  'default';           % phase diagram calibration
+calID    =  'andes';             % phase diagram calibration
 dx       =  1e-3;                % crystal size [m]
 df       =  1e-3;                % bubble size [m]
 

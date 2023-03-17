@@ -46,10 +46,10 @@ cal.msy_mem = [1  1  0  0  0  0  0  0  0  0  0  0    % olivine (olv)
 
 % mineral end-member composition of melting model components
 %               for     fay  Fe-spn Ti-spn  ens    hyp    aug    pig    ant    alb    kfs    qtz
-cal.cmp_mem =[  99.96   0.01   0.0    0.01   0.01   0.0    0.01   0.0    0.0    0.0    0.0    0.0      % cphs0 => dunite (dun)
-                 5.5    3.7    0.2    3.6   39.0    6.0   15.0    1.0   23.0    3.0    0.0    0.0      % perCx => gabbro (gbr)
-                 0.2    2.2    2.4    0.5    1.5    9.0   12.4   16.0   26.0   27.7    2.0    0.1      % perCm => basalt (bas)
-                 0.0    0.0    0.84   0.01   0.0    0.0    0.5   13.8    3.0   12.0   23.65  46.2];    % cphs1 => rhyolite (rhy)
+cal.cmp_mem =[  99.95   0.01   0.0    0.01   0.01   0.0    0.01   0.0    0.009  0.001  0.0    0.0      % cphs0 => dunite (dun)
+                 4.2    2.8    0.3    4.1   33.0    5.0   21.0    2.0   24.4    3.2    0.0    0.0      % perCx => gabbro (gbr)
+                 0.1    1.1    2.4    0.4    1.3    8.3   12.0   16.0   27.0   29.1    2.3    0.0      % perCm => basalt (bas)
+                 0.0    0.0    0.84   0.01   0.0    0.0    0.8   13.5    3.0   12.0   23.65  46.2];    % cphs1 => rhyolite (rhy)
 cal.cmp_mem = cal.cmp_mem./sum(cal.cmp_mem,2)*100;
 
 % mineral systems composition of melting model components
@@ -68,14 +68,14 @@ end
 % specify melting model phase diagram parameters
 cal.cphs0    =  cal.cmp_oxd(1,1)/100; % phase diagram lower bound composition [wt SiO2]
 cal.cphs1    =  cal.cmp_oxd(4,1)/100; % phase diagram upper bound composition [wt SiO2]
-cal.Tphs0    =  870;                  % phase diagram lower bound temperature [degC]
+cal.Tphs0    =  865;                  % phase diagram lower bound temperature [degC]
 cal.Tphs1    =  1890;                 % phase diagram upper bound temperature [degC]
-cal.PhDg     =  [8.5,2.5,1.3,1.5];    % phase diagram curvature factor (> 1)
+cal.PhDg     =  [9.0,2.2,1.3,1.5];    % phase diagram curvature factor (> 1)
 cal.perCm    =  cal.cmp_oxd(3,1)/100; % peritectic liquidus composition [wt SiO2]
 cal.perCx    =  cal.cmp_oxd(2,1)/100; % peritectic solidus  composition [wt SiO2]
 cal.perT     =  1130;                 % peritectic temperature [degC]
 cal.clap     =  1e-7;                 % Clapeyron slope for P-dependence of melting T [degC/Pa]
-cal.dTH2O    =  [1400,1300,1200];     % solidus shift from water content [degC/wt^0.75]
+cal.dTH2O    =  [1400,1400,1400];     % solidus shift from water content [degC/wt^0.75]
 
 % specify geochemical model parameters
 cal.nte      =  4;           % number of trace elements

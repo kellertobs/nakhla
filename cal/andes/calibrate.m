@@ -464,8 +464,8 @@ sgtitle('melt, solid, mixture',FS{:},TX{:})
 
 
 %% set ranges for control variables T, c, v, P
-T = linspace(1400,700,400).';    % temperature range [degC]
-c = linspace(0.51,0.51,400).';   % major component range [wt SiO2]
+T = linspace(1275,925,400).';    % temperature range [degC]
+c = linspace(0.43,0.67,400).';   % major component range [wt SiO2]
 v = linspace(0.00,0.00,400).';   % volatile component range [wt H2O]
 P = linspace(125,125,400).'*1e6; % pressure range [Pa]
 
@@ -500,6 +500,7 @@ cx_cmp = squeeze(cx_cmp); cx_cmp(ind,:) = [];
 c_mem  = squeeze(c_mem); c_mem(ind,:) = [];
 cm_mem = squeeze(cm_mem); cm_mem(ind,:) = [];
 cx_mem = squeeze(cx_mem); cx_mem(ind,:) = [];
+cx_msy = squeeze(cx_msy); cx_msy(ind,:) = [];
 cx (ind) = [];
 cm (ind) = [];
 vf (ind) = [];
@@ -526,7 +527,7 @@ mu (ind) = [];
 Ptop = min(P); Pt = P;
 
 % plot phase diagram
-figure(7); if ~holdfig; clf; end
+figure(7); clf;
 for ic = nc
     ind = MAG(ic).OUT.PhaseFractions.liq_wt>=0.001 & MAG(ic).OUT.PhaseFractions.sol_wt>=0.001;
     plot(MAG(ic).OUT.OxideFract.liq(ind,1),MAG(ic).OUT.T(ind),'o','Color',[0.6,0.2,0.2]); axis tight; hold on; box on;
@@ -573,7 +574,7 @@ xlabel('Major component [wt\% SiO$_2$]','Interpreter','latex','FontSize',15)
 ylabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',15)
 
 %% plot phase fractions
-figure(2); if ~holdfig; clf; end
+figure(8); clf;
 plot(T,x.*100,'k',T,m.*100,'r',T,f.*1000,'b','LineStyle',linestyle,'LineWidth',2); hold on; box on; axis tight;
 legend('crystals','melt','fluid $\times10$','Interpreter','latex','FontSize',15,'box','off','location','east')
 set(gca,'TickLabelInterpreter','latex','FontSize',13)
@@ -582,7 +583,7 @@ xlabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',15)
 ylabel('Phase fractions [wt\%]','Interpreter','latex','FontSize',15)
 
 % plot major phase compositions
-figure(3); if ~holdfig; clf; end
+figure(9); clf;
 plot(T,cx.*100,'b',T,cm.*100,'r','LineStyle',linestyle,'LineWidth',2); hold on; box on; axis tight;
 legend('crystals','melt','Interpreter','latex','FontSize',15,'box','off','location','northeast')
 set(gca,'TickLabelInterpreter','latex','FontSize',13)
@@ -591,7 +592,7 @@ xlabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',15)
 ylabel('Major component [wt\% SiO$_2$]','Interpreter','latex','FontSize',15)
 
 % plot volatile phase compositions
-figure(4); if ~holdfig; clf; end
+figure(10); clf;
 plot(T,vf/10.*100,'b',T,vm.*100,'r','LineStyle',linestyle,'LineWidth',2); hold on; box on; axis tight;
 legend('fluid $/10$','melt','Interpreter','latex','FontSize',15,'box','off','location','northeast')
 set(gca,'TickLabelInterpreter','latex','FontSize',13)
@@ -600,7 +601,7 @@ xlabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',15)
 ylabel('Volatile component [wt\% H$_2$O]','Interpreter','latex','FontSize',15)
 
 % plot phase densities
-figure(5); if ~holdfig; clf; end
+figure(11); clf;
 plot(T,rhox,'k',T,rhom,'r',T,rhof,'b','LineStyle',linestyle,'LineWidth',2); hold on; box on; axis tight;
 plot(T,rho ,'Color',[0.5 0.5 0.5],'LineStyle',linestyle,'LineWidth',2); hold on; box on; axis tight;
 legend('crystals','melt','fluid','mixture','Interpreter','latex','FontSize',15,'box','off','location','best')
@@ -610,7 +611,7 @@ xlabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',15)
 ylabel('Density [kg/m$^3$]','Interpreter','latex','FontSize',15)
 
 % plot mixture rheology
-figure(6); if ~holdfig; clf; end
+figure(12); clf;
 semilogy(T,eta,'k',T,etam,'r','LineStyle',linestyle,'LineWidth',2); hold on; box on; axis tight;
 legend('mixture','melt','Interpreter','latex','FontSize',15,'box','off','location','best')
 set(gca,'TickLabelInterpreter','latex','FontSize',13)
@@ -619,7 +620,7 @@ xlabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',15)
 ylabel('Viscosity [log$_{10}$ Pas]','Interpreter','latex','FontSize',15)
 
 % plot phase segregation speeds
-figure(7); if ~holdfig; clf; end
+figure(13); clf;
 semilogy(T,max(1e-18,abs(chi.*wx)).*3600,'k',T,max(1e-18,abs(mu.*wm)).*3600,'r',T,max(1e-18,abs(phi.*wf)).*3600,'b','LineStyle',linestyle,'LineWidth',2); hold on; box on; axis tight;
 legend('crystals','melt','fluid','Interpreter','latex','FontSize',15,'box','off','location','best')
 set(gca,'TickLabelInterpreter','latex','FontSize',13)
@@ -628,7 +629,7 @@ xlabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',15)
 ylabel('Segregation flux [m/hr]','Interpreter','latex','FontSize',15)
 
 % plot oxide compositions
-figure(8); if ~holdfig; clf; end
+figure(14); clf;
 subplot(2,1,1)
 sgtitle('Phase Oxide Fractions','Interpreter','latex','FontSize',18)
 for i=1:cal.noxd
@@ -646,7 +647,7 @@ xlabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',15)
 ylabel('Solid composition [wt\%]','Interpreter','latex','FontSize',15)
 
 % plot end-member component compositions
-figure(9); if ~holdfig; clf; end
+figure(15); clf;
 subplot(2,1,1)
 sgtitle('Phase Component Fractions','Interpreter','latex','FontSize',18)
 for i=1:cal.ncmp
@@ -664,16 +665,14 @@ xlabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',15)
 ylabel('Solid composition [wt\%]','Interpreter','latex','FontSize',15)
 
 % plot simplified mineral assemblage
-figure(10); clf;
-patch([T;flipud(T)],[zeros(size(T));flipud(cx_mem(:,1))],0.9.*[0.6,0.8,0.5],'LineWidth',2); hold on; box on; axis tight;
-patch([T;flipud(T)],[sum(cx_mem(:,1  ),2);flipud(sum(cx_mem(:,1:2),2))],1.1.*[0.6,0.8,0.5],'LineWidth',2);
-patch([T;flipud(T)],[sum(cx_mem(:,1:2),2);flipud(sum(cx_mem(:,1:4),2))],0.9.*[0.6,0.6,0.6],'LineWidth',2);
-patch([T;flipud(T)],[sum(cx_mem(:,1:4),2);flipud(sum(cx_mem(:,1:6),2))],1.1.*[0.6,0.6,0.6],'LineWidth',2);
-patch([T;flipud(T)],[sum(cx_mem(:,1:6),2);flipud(sum(cx_mem(:,1:8),2))],[0.9,0.9,0.9],'LineWidth',2);
-patch([T;flipud(T)],[sum(cx_mem(:,1:8),2);flipud(sum(cx_mem(:,1:9),2))],[0.4,0.4,0.4],'LineWidth',2);
-patch([T;flipud(T)],[sum(cx_mem(:,1:9),2);flipud(sum(cx_mem(:,1:10),2))],[1.0,0.8,0.7],'LineWidth',2);
-patch([T;flipud(T)],[sum(cx_mem(:,1:10),2);flipud(sum(cx_mem(:,1:11),2))],[0.9,0.7,1.0],'LineWidth',2);
-legend('~forsterite','~fayalite','~orthopyroxene','~clinopyroxene','~plagioclase','~spinel','~k-feldspar','~quartz','Interpreter','latex','FontSize',15,'box','off','location','best')
+figure(16); clf;
+patch([T;flipud(T)],[zeros(size(T));flipud(cx_msy(:,1))],[0.6,0.8,0.5],'LineWidth',2); hold on; box on; axis tight;
+patch([T;flipud(T)],[sum(cx_msy(:,1  ),2);flipud(sum(cx_msy(:,1:2),2))],0.7.*[0.6,0.6,0.6],'LineWidth',2);
+patch([T;flipud(T)],[sum(cx_msy(:,1:2),2);flipud(sum(cx_msy(:,1:3),2))],0.9.*[0.6,0.6,0.6],'LineWidth',2);
+patch([T;flipud(T)],[sum(cx_msy(:,1:3),2);flipud(sum(cx_msy(:,1:4),2))],1.1.*[0.6,0.6,0.6],'LineWidth',2);
+patch([T;flipud(T)],[sum(cx_msy(:,1:4),2);flipud(sum(cx_msy(:,1:5),2))],[0.9,0.9,0.9],'LineWidth',2);
+patch([T;flipud(T)],[sum(cx_msy(:,1:5),2);flipud(sum(cx_msy(:,1:6),2))],[0.9,0.7,0.9],'LineWidth',2);
+legend('~olivine','~spinel','~orthopyroxene','~clinopyroxene','~feldspar','~quartz','Interpreter','latex','FontSize',15,'box','off','location','southeast')
 set(gca,'TickLabelInterpreter','latex','FontSize',13)
 title('Mineral assemblage','Interpreter','latex','FontSize',18)
 xlabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',15)
