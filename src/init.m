@@ -62,7 +62,7 @@ cm1_oxd = (0.9.*cm0_mem + 0.1.*cal.cmp_mem(1,:)/100)*cal.mem_oxd/100;
 cm2_oxd = (0.9.*cm0_mem + 0.1.*cal.cmp_mem(4,:)/100)*cal.mem_oxd/100;
 
 wtm   = [cm0_oxd.*100,100.*vm0];
-etam0 = giordano08(wtm,T0);
+etam0 = Giordano08(wtm,T0);
 rhom0 = DensityX(wtm,T0,Ptop/1e8);
 
 wtm   = [cm1_oxd.*100,100.*vm0];
@@ -74,7 +74,7 @@ rhom2 = DensityX(wtm,T0,Ptop/1e8);
 DrhoT = rhom0.*cal.aT*max([abs(T0-Twall)/10,abs(T0-T1),T0/100]);
 Drhoc = abs(rhom1-rhom2);
 Drhox = 0.1*abs(rhox0-rhom0);
-Drhof = 0.01*abs(cal.rhof0-rhom0) * (max([v0,v1,vwall])>TINY);
+Drhof = 0.1*abs(cal.rhof0-rhom0) * (max([v0,v1,vwall])>TINY);
 Drho0 = DrhoT + Drhoc + Drhox + Drhof;
 
 uT    = DrhoT*g0*(D/10)^2/etam0/cnvreg;
@@ -340,13 +340,14 @@ dto  = dt;
 ho   = h;
 
 % get bulk enthalpy, silica, volatile content densities
-S  = rho.*(cP.*log(T/(cal.Tphs1+273.15)) + x.*Dsx + f.*Dsf - Adbt.*(Pt-Ptop));  So = S;  res_S = 0.*S;
-S0 = rho.*(cP.*log(cal.Tphs1+273.15) + x.*Dsx + f.*Dsf - Adbt.*Ptop);  
-C  = rho.*(m.*cm + x.*cx); Co = C;  res_C = 0.*C;
-V  = rho.*(m.*vm + f.*vf); Vo = V;  res_V = 0.*V;
-X  = rho.*x; Xo = X;  res_X = 0.*X;
-F  = rho.*f; Fo = F;  res_F = 0.*F;
-M  = rho.*m; Mo = M;  res_M = 0.*M;
+S   = rho.*(cP.*log(T/(cal.Tphs1+273.15)) + x.*Dsx + f.*Dsf - Adbt.*(Pt-Ptop));  So = S;  res_S = 0.*S;
+S0  = rho.*(cP.*log(cal.Tphs1+273.15) + x.*Dsx + f.*Dsf - Adbt.*Ptop);  
+C   = rho.*(m.*cm + x.*cx); Co = C;  res_C = 0.*C;
+V   = rho.*(m.*vm + f.*vf); Vo = V;  res_V = 0.*V;
+X   = rho.*x; Xo = X;  res_X = 0.*X;
+F   = rho.*f; Fo = F;  res_F = 0.*F;
+M   = rho.*m; Mo = M;  res_M = 0.*M;
+RHO = X+M+F;
 
 % get phase entropies
 sm = S./rho - x.*Dsx - f.*Dsf;

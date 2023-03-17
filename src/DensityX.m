@@ -5,27 +5,26 @@
 %
 % Input: 
 %
-%     oxd_wt Melt composition as Nx10 matrix containing N sample compositions  
-%            given as concentrations in [wt%] of the following oxides
-%            ordered in the exact sequence 
-%            [SiO2 TiO2 Al2O3 FeO(T) MgO CaO Na2O K2O H2O]
-%             1    2    3     4      5   6   7    8   9 
-%     T      Melt emperature in [degC] as Nx1 vector
-%     P      Pressure in [kbar] as Nx1 vector
-
+%     oxd_wt Melt composition as 9-element vector containing concentrations 
+%            in [wt%] of the following oxides ordered in the exact sequence 
+%            [SiO2 TiO2 Al2O3 FeO MgO CaO Na2O K2O H2O]
+%             1    2    3     4   5   6   7    8   9  
+%     T      Melt emperature in [degC]
+%     P      Pressure in [kbar]
+%
 % Output:
 %
-%     rho    Melt density in [kg/m3] as Nx1 vector
+%     rho    Melt density in [kg/m3]
 %
 % Reference:
-% Iacovino & Till (2019) DensityX: A program for calculating the densities 
-% of magmatic liquids up to 1,627 °C and 30 kbar. Volcanica 2(1), p 1-10.
+% Iacovino K & Till C (2019) 
+% DensityX: A program for calculating the densities of magmatic liquids up 
+% to 1,627 °C and 30 kbar. Volcanica 2(1), p 1-10.
 % doi: 10.30909/vol.02.01.0110
 %
 % Translated to Matlab by Tobias Keller (github.com/kellertobs), 03/2023
 %
-% Original python code: github.com/kaylai/DensityX
-
+% Original Python code by K Iacovino: github.com/kaylai/DensityX
 
 
 function [rho] = DensityX(oxd_wt,T,P)

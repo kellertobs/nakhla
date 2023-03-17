@@ -68,5 +68,5 @@ IR = (a2*IRo+a3*IRoo + (b1*dIRdt + b2*dIRdto + b3*dIRdtoo)*dt)/a1;
 
 
 % convert from densites to concentrations
-for i = 1:cal.nte; te(:,:,i) = TE(:,:,i)./rho; end
-for i = 1:cal.nir; ir(:,:,i) = IR(:,:,i)./rho; end
+for i = 1:cal.nte; te(:,:,i) = TE(:,:,i)./RHO; end
+for i = 1:cal.nir; ir(:,:,i) = IR(:,:,i)./RHO; end

@@ -12,17 +12,17 @@ wt1 = (cal.cphs1-cx(:))./(cal.cphs1-cal.perCx);
 cx_cmp = reshape((wt0 .* [1 0 0 0] + (1-wt0) .* [0 1 0 0]) .* (cx(:)< cal.perCx) ...
        +         (wt1 .* [0 1 0 0] + (1-wt1) .* [0 0 0 1]) .* (cx(:)>=cal.perCx),Nz,Nx,cal.ncmp);
 
-c_cmp = (m.*cm_cmp + x.*cx_cmp)./(1-f);
+c_cmp = (m.*cm_cmp + x.*cx_cmp);
 
 % update mineral end-member compositions
 cm_mem = reshape(reshape(cm_cmp,Nz*Nx,cal.ncmp)*cal.cmp_mem/100,Nz,Nx,cal.nmem);
 cx_mem = reshape(reshape(cx_cmp,Nz*Nx,cal.ncmp)*cal.cmp_mem/100,Nz,Nx,cal.nmem);
-c_mem  = (m.*cm_mem + x.*cx_mem)./(1-f);
+c_mem  = (m.*cm_mem + x.*cx_mem);
 
 % update phase oxide compositions
 cm_oxd = reshape(reshape(cm_mem,Nz*Nx,cal.nmem)*cal.mem_oxd/100,Nz,Nx,cal.noxd);
 cx_oxd = reshape(reshape(cx_mem,Nz*Nx,cal.nmem)*cal.mem_oxd/100,Nz,Nx,cal.noxd);
-c_oxd = (m.*cm_oxd + x.*cx_oxd)./(1-f);
+c_oxd  = (m.*cm_oxd + x.*cx_oxd);
 
 % update mineral systems composition for solid assemblage
 cx_msy = reshape(reshape(cx_mem,Nz*Nx,cal.nmem)*cal.msy_mem.',Nz,Nx,cal.nmsy);
@@ -58,7 +58,7 @@ phi    = max(0,min(1, f.*rho./rhof ));
 mu     = max(0,min(1, m.*rho./rhom ));
 
 % update melt viscosity
-etam   = reshape(giordano08(wtm,T(:)-273.15),Nz,Nx);
+etam   = reshape(Giordano08(wtm,T(:)-273.15),Nz,Nx);
 
 % effective mixture shear viscosity (Costa et al., 2009)
 hh     = (1-cal.xi).*erf(sqrt(pi)./(2.*(1-cal.xi)).*(max(TINY^0.5,chi)./cal.chi_pck).*(1+(max(TINY^0.5,chi)./cal.chi_pck).^cal.gamma));
