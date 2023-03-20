@@ -89,7 +89,7 @@ elseif Nx <= 10  % create 1D plots
     subplot(1,5,2)
     plot(cx*100,Zc.',CL{[1,4]},LW{:}); axis ij tight; box on; hold on;
     plot(cm*100,Zc.',CL{[1,3]},LW{:});
-    plot(c./(1-f)*100,Zc.',CL{[1,2]},LW{:});
+    plot(c*100,Zc.',CL{[1,2]},LW{:});
     title('$\bar{c}/(1-f)$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,5,3)
     semilogx(max(1e-6,vf*100).*any(v(:)>10*TINY),Zc.',CL{[1,5]},LW{:}); axis ij tight; box on; hold on;
@@ -138,7 +138,7 @@ elseif Nx <= 10  % create 1D plots
     sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
     subplot(1,4,1)
     for i=1:cal.noxd
-        plot(squeeze( c_oxd(:,:,i))./(1-f).*100,Zc.',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis ij tight; box on; hold on;
+        plot(squeeze( c_oxd(:,:,i)).*100,Zc.',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis ij tight; box on; hold on;
     end
     title('Bulk oxds [wt\%]',TX{:},FS{:});ylabel('Depth [m]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,4,2)
@@ -259,7 +259,7 @@ else % create 2D plots
     imagesc(Xc,Zc,T-273.15); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$T [^\circ$C]'],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel('Depth [m]',TX{:},FS{:}); 
     set(fh2,'CurrentAxes',ax(22));
-    imagesc(Xc,Zc,c./(1-f).*100); axis ij equal tight; box on; cb = colorbar;
+    imagesc(Xc,Zc,c.*100); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\bar{c}/(1-f)$ [wt\% SiO$_2$]'],TX{:},FS{:}); set(gca,'YTickLabel',[]); xlabel('Width [m]',TX{:},FS{:});
     set(fh2,'CurrentAxes',ax(23));
     imagesc(Xc,Zc,v.*100.*(v>1e-9)); axis ij equal tight; box on; cb = colorbar;
@@ -301,22 +301,22 @@ else % create 2D plots
     % plot geochemical variables in Fig. 5
     set(0,'CurrentFigure',fh5)
     set(fh5,'CurrentAxes',ax(51));
-    imagesc(Xc,Zc,te(:,:,1)./(1-f)); axis ij equal tight; box on; cb = colorbar;
+    imagesc(Xc,Zc,te(:,:,1)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['trace element 1'],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel('Depth [m]',TX{:},FS{:}); 
     set(fh5,'CurrentAxes',ax(52));
-    imagesc(Xc,Zc,te(:,:,2)./(1-f)); axis ij equal tight; box on; cb = colorbar;
+    imagesc(Xc,Zc,te(:,:,2)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['trace element 2'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
     set(fh5,'CurrentAxes',ax(53));
-    imagesc(Xc,Zc,ir(:,:,1)./(1-f)); axis ij equal tight; box on; cb = colorbar;
+    imagesc(Xc,Zc,ir(:,:,1)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['isotope ratio 1'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
     set(fh5,'CurrentAxes',ax(54));
-    imagesc(Xc,Zc,te(:,:,3)./(1-f)); axis ij equal tight; box on; cb = colorbar;
+    imagesc(Xc,Zc,te(:,:,3)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['trace element 3'],TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:});
     set(fh5,'CurrentAxes',ax(55));
-    imagesc(Xc,Zc,te(:,:,4)./(1-f)); axis ij equal tight; box on; cb = colorbar;
+    imagesc(Xc,Zc,te(:,:,4)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['trace element 4'],TX{:},FS{:}); set(gca,'YTickLabel',[]); xlabel('Width [m]',TX{:},FS{:});
     set(fh5,'CurrentAxes',ax(56));
-    imagesc(Xc,Zc,ir(:,:,2)./(1-f)); axis ij equal tight; box on; cb = colorbar;
+    imagesc(Xc,Zc,ir(:,:,2)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['isotope ratio 2'],TX{:},FS{:}); set(gca,'YTickLabel',[]);
     sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
 

@@ -56,7 +56,7 @@ Ptop     =  125e6;               % top pressure [Pa]
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
 bnd_w    =  h;                   % boundary layer width [m]
 bnd_h    =  [0,0,0];             % internal wall rock layer thickness [m]
-fin      =  1;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
+fin      =  0;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
 fout     =  1;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
 tau_T    =  12*hr;               % wall cooling/assimilation time [s]
 tau_a    =  24*hr;               % wall cooling/assimilation tie [s]
