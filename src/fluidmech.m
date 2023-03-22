@@ -17,10 +17,10 @@ WBG     = - mean(VolSrc,'all')./2 .* (D/2-ZZw);
 end
 
 %% 0-D run does not require fluidmech solve
-if Nz==3 && Nx==3  
+if Nz==1 && Nx==1  
     W  = WBG; Wm = W;  Wx = W;  Wf = W;
     U  = UBG; Um = U;  Ux = U;  Uf = U;
-    P  = zeros(Nz,Nx);
+    P  = zeros(Nz+2,Nx+2);
     Pt = Ptop.*ones(Nz,Nx);
     resnorm_VP = 0;
 else

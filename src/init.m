@@ -18,21 +18,12 @@ fprintf('\n   run ID: %s \n\n',runID);
 load ocean;                  % load custom colormap
 run(['../cal/cal_',calID]);  % load melt model calibration
 
-% calculate dimensionless numbers characterising the system dynamics
-res = 1; x0 = 0; f0 = 0; T = T0+273.15;
-while res>1e-16
-    ci = c0*(1-f0);
-    [x0,cx0,cm0,f0,vf0,vm0] = equilibrium(x0,f0,T-273.15,c0*(1-f0),v0,Ptop,cal,TINY);
-    m0 = 1-x0-f0;
-    T  = (T0+273.15).*exp(cal.aT/mean(cal.rhox0-500)/cP.*Ptop);
-    res = abs(c0*(1-f0)-ci)/ci;
-end
+T = T0+273.15;
+for i=1:5
 
-fprintf('    initial T: %4.3f \n'  ,T0);
-fprintf('    initial c: %4.3f \n'  ,c0);
-fprintf('    initial v: %4.3f \n'  ,v0);
-fprintf('    initial x: %4.3f \n'  ,x0);
-fprintf('    initial f: %4.3f \n\n',f0);
+% calculate dimensionless numbers characterising the system dynamics
+[x0,cx0,cm0,f0,vf0,vm0] = equilibrium(0.01,v0/10,T-273.15,c0,v0,Ptop,cal,TINY);
+m0 = 1-x0-f0;
 
 % update oxide compositions
 wt0 = (cal.perCm-cm0)./(cal.perCm-cal.cphs0);
@@ -64,6 +55,17 @@ cm2_oxd = (0.9.*cm0_mem + 0.1.*cal.cmp_mem(4,:)/100)*cal.mem_oxd/100;
 wtm   = [cm0_oxd.*100,100.*vm0];
 etam0 = Giordano08(wtm,T0);
 rhom0 = DensityX(wtm,T0,Ptop/1e8);
+
+rho0  = (x0./rhox0 + m0./rhom0).^-1;
+T     = (T0+273.15).*exp(cal.aT./rho0./cP.*Ptop);
+
+end
+
+fprintf('    initial T: %4.3f \n'  ,T0);
+fprintf('    initial c: %4.3f \n'  ,c0);
+fprintf('    initial v: %4.3f \n'  ,v0);
+fprintf('    initial x: %4.3f \n'  ,x0);
+fprintf('    initial f: %4.3f \n\n',f0);
 
 wtm   = [cm1_oxd.*100,100.*vm0];
 rhom1 = DensityX(wtm,T0,Ptop/1e8);
@@ -326,10 +328,6 @@ while res > tol
     EQtime = EQtime + eqtime;
 
     update;
-
-    c  = cin .*(1-f);
-    te = tein.*(1-f);
-    ir = irin.*(1-f);
 
     res  = norm(Pt(:)-Pti(:),2)./norm(Pt(:),2) ...
          + norm((x(:)-xi(:)).*(x(:)>TINY^0.5),2)./(norm(x(:),2)+TINY) ...
