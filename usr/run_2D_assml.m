@@ -35,7 +35,6 @@ ir0      =  [-1,5];              % isotope ratios top layer [delta]
 
 % set thermo-chemical boundary parameters
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
-bnd_h    =  [0,0,0];             % boundary layer width [m]
 bnd_w    =  h;                   % boundary layer width [m]
 tau_T    =  6*hr;                % wall cooling/assimilation time [s]
 tau_a    =  6*hr;                % wall cooling/assimilation time [s]
