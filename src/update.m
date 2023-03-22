@@ -57,6 +57,13 @@ chi    = max(0,min(1, x.*rho./rhox ));
 phi    = max(0,min(1, f.*rho./rhof ));
 mu     = max(0,min(1, m.*rho./rhom ));
 
+% update lithostatic pressure
+if Nz==1; Pt = Ptop.*ones(size(Tp)); else
+    rhofz       = (rho(1:end-1,:)+rho(2:end,:))/2;
+    Pt(1,:)     = repmat(mean(rhofz(1,:),2).*g0.*h/2,1,Nx) + Ptop;
+    Pt(2:end,:) = Pt(1,:) + repmat(cumsum(mean(rhofz,2).*g0.*h),1,Nx);
+end
+
 % update melt viscosity
 etam   = reshape(Giordano08(wtm,T(:)-273.15),Nz,Nx);
 
@@ -89,7 +96,6 @@ ks  = kT./T;                                                               % ent
 % update velocity divergence
 Div_V = ddz(W(:,2:end-1),h) + ddx(U(2:end-1,:),h);                         % get velocity divergence
       
-
 % update strain rates
 exx = diff(U(2:end-1,:),1,2)./h - Div_V./2;                                % x-normal strain rate
 ezz = diff(W(:,2:end-1),1,1)./h - Div_V./2;                                % z-normal strain rate
@@ -115,12 +121,12 @@ if Nz==1 && Nx==1
 else
     [grdTx,grdTz] = gradient(T([1,1:end,end],[1,1:end,end]),h);
     diss = ks.*(grdTz(2:end-1,2:end-1).^2 + grdTx(2:end-1,2:end-1).^2) ...
-        + exx.*txx + ezz.*tzz ...
-        + 2.*(exz(1:end-1,1:end-1)+exz(2:end,1:end-1)+exz(1:end-1,2:end)+exz(2:end,2:end))./4 ...
-           .*(txz(1:end-1,1:end-1)+txz(2:end,1:end-1)+txz(1:end-1,2:end)+txz(2:end,2:end))./4 ...
-        +  mu./Ksgr_m .* ((wm(1:end-1,2:end-1)+wm(2:end,2:end-1))./2).^2 ...
-        + chi./Ksgr_x .* ((wx(1:end-1,2:end-1)+wx(2:end,2:end-1))./2).^2 ...
-        + phi./Ksgr_f .* ((wf(1:end-1,2:end-1)+wf(2:end,2:end-1))./2).^2;
+         + exx.*txx + ezz.*tzz ...
+         + 2.*(exz(1:end-1,1:end-1)+exz(2:end,1:end-1)+exz(1:end-1,2:end)+exz(2:end,2:end))./4 ...
+            .*(txz(1:end-1,1:end-1)+txz(2:end,1:end-1)+txz(1:end-1,2:end)+txz(2:end,2:end))./4 ...
+         +  mu./Ksgr_m .* ((wm(1:end-1,2:end-1)+wm(2:end,2:end-1))./2).^2 ...
+         + chi./Ksgr_x .* ((wx(1:end-1,2:end-1)+wx(2:end,2:end-1))./2).^2 ...
+         + phi./Ksgr_f .* ((wf(1:end-1,2:end-1)+wf(2:end,2:end-1))./2).^2;
 end
 
 UDtime = UDtime + toc;

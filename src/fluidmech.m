@@ -320,11 +320,6 @@ Vel = sqrt(((W(1:end-1,2:end-1)+W(2:end,2:end-1))/2).^2 ...
          + ((U(2:end-1,1:end-1)+U(2:end-1,2:end))/2).^2);
 
 if ~bnchm
-    if Nz==1; Pt = Ptop.*ones(size(Tp)); else
-        rhofz  = (rho(1:end-1,:)+rho(2:end,:))/2;
-        Pt(1,:)     = repmat(mean(rhofz(1,:),2).*g0.*h/2,1,Nx) + Ptop;
-        Pt(2:end,:) = Pt(1,:) + repmat(cumsum(mean(rhofz,2).*g0.*h),1,Nx);
-    end
 
     % phase segregation speeds
     wm(2:end-1,2:end-1) = ((rhom(1:end-1,:)+rhom(2:end,:))/2-mean(rhofz,2)).*g0.*(Ksgr_m(1:end-1,:).*Ksgr_m(2:end,:)).^0.5; % melt segregation speed
