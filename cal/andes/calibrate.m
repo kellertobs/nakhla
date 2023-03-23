@@ -17,7 +17,7 @@ linestyle = '-';                 % set line style for plots
 save_plot = 0;                   % turn on (1) to save output file in /out directory
 
 % set phase diagram parameters
-cal_andes;  % load melt model calibration
+cal_andesSVZ;  % load melt model calibration
 
 % set model buoyancy parameters
 dx       =  1e-3;                % crystal size [m]
@@ -31,7 +31,7 @@ nc  = [1 2 3]; % number of cluster compositions modelled
 MAG = [];
 ioxd = [1 8 2 5 4 3 7 6]; % oxide indices from MAGEMin to standard
 for ic = nc
-    filename = ['andes_Fc',int2str(ic),'_fract_anh_out.mat'];
+    filename = ['SVZ_Fc',int2str(ic),'_fract_out.mat'];
     load(filename);
 
     % lump in free O to FeO, Cr2O3 to Al2O3, normalise to anhydrous unit sum
@@ -53,6 +53,14 @@ for ic = nc
         OUT.OxideFract = rmfield(OUT.OxideFract,'pl4T2');
         OUT.EMFractions = rmfield(OUT.EMFractions,'pl4T2');
         OUT.PhaseProps = rmfield(OUT.PhaseProps,'pl4T2');
+    end
+    if isfield(OUT.PhaseProps,'pl4T3')
+        OUT.OxideFract.pl4T = (OUT.OxideFract.pl4T.*OUT.PhaseProps.pl4T(:,1) + OUT.OxideFract.pl4T3.*OUT.PhaseProps.pl4T3(:,1)) ./ (OUT.PhaseProps.pl4T(:,1)+OUT.PhaseProps.pl4T3(:,1)+1e-16);
+        OUT.EMFractions.pl4T = (OUT.EMFractions.pl4T.*OUT.PhaseProps.pl4T(:,1) + OUT.EMFractions.pl4T3.*OUT.PhaseProps.pl4T3(:,1)) ./ (OUT.PhaseProps.pl4T(:,1)+OUT.PhaseProps.pl4T3(:,1)+1e-16);
+        OUT.PhaseProps.pl4T = OUT.PhaseProps.pl4T(:,1)+OUT.PhaseProps.pl4T3(:,1);
+        OUT.OxideFract = rmfield(OUT.OxideFract,'pl4T3');
+        OUT.EMFractions = rmfield(OUT.EMFractions,'pl4T3');
+        OUT.PhaseProps = rmfield(OUT.PhaseProps,'pl4T3');
     end
 
     % combine all orthopyroxene instances
@@ -123,7 +131,7 @@ end
 % calibrate mineral end-members
 
 %% olivine system
-cal_andes;  % load melt model calibration
+cal_andesSVZ;  % load melt model calibration
 figure(1); clf;
 for ic = nc
     if isfield(MAG(ic).OUT.PhaseProps,'ol')
@@ -152,9 +160,9 @@ end
 sgtitle('olivine system',FS{:},TX{:})
 
 %% spinel system
-cal_andes;  % load melt model calibration
+cal_andesSVZ;  % load melt model calibration
 figure(2); clf;
-for ic = nc(2:end)
+for ic = nc
     if isfield(MAG(ic).OUT.PhaseProps,'spn')
     hasspn = MAG(ic).OUT.PhaseProps.spn(:,1)>0.001 & MAG(ic).OUT.PhaseFractions.liq_wt>=0.001;
     subplot(1,3,1);
@@ -191,9 +199,9 @@ sgtitle('spinel system',FS{:},TX{:})
 
 
 %% orthopyroxene system
-cal_andes;  % load melt model calibration
+cal_andesSVZ;  % load melt model calibration
 figure(3); clf;
-for ic = nc(2:end)
+for ic = nc
     if isfield(MAG(ic).OUT.PhaseProps,'opx')
     hasopx = MAG(ic).OUT.PhaseProps.opx(:,1)>0.001 & MAG(ic).OUT.PhaseFractions.liq_wt>=0.001;
     subplot(2,2,1);
@@ -235,9 +243,9 @@ sgtitle('orthopyroxene system',FS{:},TX{:})
 
 
 %% clinopyroxene system
-cal_andes;  % load melt model calibration
+cal_andesSVZ;  % load melt model calibration
 figure(4); clf;
-for ic = nc(2:end)
+for ic = nc
     if isfield(MAG(ic).OUT.PhaseProps,'cpx')
     hascpx = MAG(ic).OUT.PhaseProps.cpx(:,1)>0.001 & MAG(ic).OUT.PhaseFractions.liq_wt>=0.001;
     subplot(2,3,1);
@@ -301,9 +309,9 @@ sgtitle('clinopyroxene system',FS{:},TX{:})
 
 
 %% feldspar system
-cal_andes;  % load melt model calibration
+cal_andesSVZ;  % load melt model calibration
 figure(5); clf;
-for ic = nc(2:end)
+for ic = nc
     if isfield(MAG(ic).OUT.PhaseProps,'pl4T')
     hasfsp = MAG(ic).OUT.PhaseProps.pl4T(:,1)>0.001 & MAG(ic).OUT.PhaseFractions.liq_wt>=0.001;
     subplot(2,2,1);
@@ -353,7 +361,7 @@ sgtitle('felspar system',FS{:},TX{:})
 
 
 %% liquid, solid, mixture compositions
-cal_andes;  % load melt model calibration
+cal_andesSVZ;  % load melt model calibration
 figure(6); clf;
 for ic = nc
     if isfield(MAG(ic).OUT.PhaseProps,'cpx')
@@ -366,7 +374,7 @@ for ic = nc
     scatter(cal.cmp_oxd(cal.bas,cal.Si),cal.cmp_oxd(cal.bas,cal.Ti),140,cal.perT ,'filled','o');
     scatter(cal.cmp_oxd(cal.rhy,cal.Si),cal.cmp_oxd(cal.rhy,cal.Ti),140,cal.Tphs0,'filled','o');
     xlabel(cal.oxdStr(cal.Si),FS{:},TX{:})
-    ylabel(cal.oxdStr(cal.Al),FS{:},TX{:})
+    ylabel(cal.oxdStr(cal.Ti),FS{:},TX{:})
     subplot(2,4,2);
     scatter(MAG(ic).OUT.OxideFract.liq(hasmlt,cal.Si).*100,MAG(ic).OUT.OxideFract.liq(hasmlt,cal.Al).*100,25,MAG(ic).OUT.T(hasmlt),'o'); colormap('copper'); axis tight; hold on
     scatter(MAG(ic).OUT.OxideFract.sol(hasmlt,cal.Si).*100,MAG(ic).OUT.OxideFract.sol(hasmlt,cal.Al).*100,25,MAG(ic).OUT.T(hasmlt),'s'); colormap('copper');
@@ -470,7 +478,7 @@ v = linspace(0.00,0.00,400).';   % volatile component range [wt H2O]
 P = linspace(125,125,400).'*1e6; % pressure range [Pa]
 
 % equilibrium phase fractions and compositions
-cal_andes;  % load melt model calibration
+cal_andesSVZ;  % load melt model calibration
 c0 = c; res = 1; x = zeros(size(T)); f = zeros(size(T));
 while res>1e-13
     ci = c;
