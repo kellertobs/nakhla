@@ -23,10 +23,10 @@ Nt       =  5e5;                 % number of time steps to take
 tend     =  1*yr;                % end time for simulation [s]
 
 % set initial thermo-chemical state
-T0       =  730;                 % temperature top layer [deg C]
-c0       =  0.75;                % major component base layer [wt SiO2]
+T0       =  775;                 % temperature top layer [deg C]
+c0       =  0.70;                % major component base layer [wt SiO2]
 dcr      =  1e-4;                % amplitude of random noise [wt SiO2]
-v0       =  0.05;                % volatile component top layer [wt H2O]
+v0       =  0.04;                % volatile component top layer [wt H2O]
 dvr      =  1e-4;                % amplitude of random noise [wt H2O]
 
 % set model trace and isotope geochemistry parameters (must match # trace elements and isotope ratios in calibration!)
@@ -45,7 +45,7 @@ tewall   =  [nan,nan,nan,nan; ...
              10,3,0.1,0.01;   ...
              nan,nan,nan,nan];   % [top,bot,sds] wall rock trace elements [wt ppm] (nan = no assimilation)
 irwall   =  [nan,nan; ...
-             -1,5;    ...
+             1,1;     ...
              nan,nan];           % [top,bot,sds] wall rock isotope ratios [delta] (nan = no assimilation)
 Ptop     =  1.25e8;              % top pressure [Pa]
 
@@ -66,7 +66,7 @@ rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-8;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its
 cnvreg   =  1;                   % convection regularisation parameter
-dtmax    =  100;                 % maximum time step [s]
+dtmax    =  200;                 % maximum time step [s]
 
 
 %*****  RUN NAKHLA MODEL  *************************************************
