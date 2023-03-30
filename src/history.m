@@ -93,14 +93,10 @@ hist.T(stp,1) = min(min(T));
 hist.T(stp,2) = mean(mean(T));
 hist.T(stp,3) = max(max(T));
 
-hist.c(stp,1) = min(min(c));
-hist.c(stp,2) = mean(mean(c));
-hist.c(stp,3) = max(max(c));
-
 for i=1:cal.ncmp
-    hist.c_cmp(stp,1,i) = min(min(c_cmp(:,:,i)));
-    hist.c_cmp(stp,2,i) = mean(mean(c_cmp(:,:,i)));
-    hist.c_cmp(stp,3,i) = max(max(c_cmp(:,:,i)));
+    hist.c(stp,1,i) = min(min(c(:,:,i)));
+    hist.c(stp,2,i) = mean(mean(c(:,:,i)));
+    hist.c(stp,3,i) = max(max(c(:,:,i)));
 end
 for i=1:cal.noxd
     hist.c_oxd(stp,1,i) = min(min(c_oxd(:,:,i)));
@@ -120,14 +116,11 @@ indx_cmp = repmat(x>1e-6,1,1,cal.ncmp);
 indx_oxd = repmat(x>1e-6,1,1,cal.noxd);
 indx_msy = repmat(x>1e-6,1,1,cal.nmsy);
 if any(indx(:)>0)
-    hist.cx(stp,1) = min(min(cx(indx)));
-    hist.cx(stp,2) = sum(sum(cx.*x.*rho))./sum(sum(x.*rho));
-    hist.cx(stp,3) = max(max(cx(indx)));
 
     for i=1:cal.ncmp
-        hist.cx_cmp(stp,1,i) = min(min(cx_cmp(indx_cmp(:,:,i))));
-        hist.cx_cmp(stp,2,i) = sum(sum(cx_cmp(:,:,i).*x.*rho))./sum(sum(x.*rho));
-        hist.cx_cmp(stp,3,i) = max(max(cx_cmp(indx_cmp(:,:,i))));
+        hist.cx(stp,1,i) = min(min(cx(indx_cmp(:,:,i))));
+        hist.cx(stp,2,i) = sum(sum(cx(:,:,i).*x.*rho))./sum(sum(x.*rho));
+        hist.cx(stp,3,i) = max(max(cx(indx_cmp(:,:,i))));
     end
     for i=1:cal.noxd
         hist.cx_oxd(stp,1,i) = min(min(cx_oxd(indx_oxd(:,:,i))));
@@ -144,8 +137,7 @@ if any(indx(:)>0)
     hist.rhox(stp,2) = sum(sum(rhox.*x.*rho))./sum(sum(x.*rho));
     hist.rhox(stp,3) = max(max(rhox(indx)));
 else
-    hist.cx(stp,1:3) = NaN;
-    hist.cx_cmp(stp,1:3,1:cal.ncmp) = NaN;
+    hist.cx(stp,1:3,1:cal.ncmp) = NaN;
     hist.cx_oxd(stp,1:3,1:cal.noxd) = NaN;
     hist.cx_msy(stp,1:3,1:cal.nmsy) = NaN;
     hist.rhox(stp,1:3) = NaN;
@@ -155,14 +147,10 @@ indm     = m>1e-6;
 indm_cmp = repmat(m>1e-6,1,1,cal.ncmp);
 indm_oxd = repmat(m>1e-6,1,1,cal.noxd);
 if any(indm(:)>0)
-    hist.cm(stp,1) = min(min(cm(indm)));
-    hist.cm(stp,2) = sum(sum(cm.*m.*rho))./sum(sum(m.*rho));
-    hist.cm(stp,3) = max(max(cm(indm)));
-    
     for i=1:cal.ncmp
-        hist.cm_cmp(stp,1,i) = min(min(cm_cmp(indm_cmp(:,:,i))));
-        hist.cm_cmp(stp,2,i) = sum(sum(cm_cmp(:,:,i).*m.*rho))./sum(sum(m.*rho));
-        hist.cm_cmp(stp,3,i) = max(max(cm_cmp(indm_cmp(:,:,i))));
+        hist.cm(stp,1,i) = min(min(cm(indm_cmp(:,:,i))));
+        hist.cm(stp,2,i) = sum(sum(cm(:,:,i).*m.*rho))./sum(sum(m.*rho));
+        hist.cm(stp,3,i) = max(max(cm(indm_cmp(:,:,i))));
     end
     for i=1:cal.noxd
         hist.cm_oxd(stp,1,i) = min(min(cm_oxd(indm_oxd(:,:,i))));
@@ -186,8 +174,7 @@ if any(indm(:)>0)
     hist.etam(stp,2) = sum(sum(etam.*m))./sum(sum(m));
     hist.etam(stp,3) = max(max(etam(indm)));
 else
-    hist.cm(stp,1:3) = NaN;
-    hist.cm_cmp(stp,1:3,1:cal.ncmp) = NaN;
+    hist.cm(stp,1:3,1:cal.ncmp) = NaN;
     hist.cm_oxd(stp,1:3,1:cal.noxd) = NaN;
     hist.vm(stp,1:3) = NaN;
     hist.rhom(stp,1:3) = NaN;

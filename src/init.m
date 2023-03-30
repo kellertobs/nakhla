@@ -19,40 +19,69 @@ load ocean;                  % load custom colormap
 run(['../cal/cal_',calID]);  % load melt model calibration
 
 T = T0+273.15;
-for i=1:5
+for i=1:2
 
 % calculate dimensionless numbers characterising the system dynamics
-[x0,cx0,cm0,f0,vf0,vm0] = equilibrium(0.01,v0/10,T-273.15,c0,v0,Ptop,cal,TINY);
-m0 = 1-x0-f0;
+wtm        = [c0*cal.cmp_oxd,v0.*100]; % 8 major elements + H2O
+rhom0      = DensityX(wtm,T0,Ptop/1e8);
+var0.c     = c0;          % in wt
+var0.H2O   = v0;
+var0.SiO2m = c0*cal.cmp_oxd(:,1)./100;
+var0.T     = T0.*exp(cal.aT./rhom0./cP.*Ptop);  % in C
+var0.P     = Ptop/1e9;    % convert to GPa
+var0.m     = 1;           % in wt
+var0.f     = 0;           % in wt
 
-% update oxide compositions
-wt0 = (cal.perCm-cm0)./(cal.perCm-cal.cphs0);
-wt1 = (cal.cphs1-cm0)./(cal.cphs1-cal.perCm);
-cm0_cmp = (wt0(:) .* [1 0 0 0] + (1-wt0(:)) .* [0 0 1 0]) .* (cm0< cal.perCm) ...
-        + (wt1(:) .* [0 0 1 0] + (1-wt1(:)) .* [0 0 0 1]) .* (cm0>=cal.perCm);
+[var0,cal0]  =  meltmodel(var0,cal,'E');
 
-wt0 = (cal.perCx-cx0)./(cal.perCx-cal.cphs0);
-wt1 = (cal.cphs1-cx0)./(cal.cphs1-cal.perCx);
-cx0_cmp = (wt0(:) .* [1 0 0 0] + (1-wt0(:)) .* [0 1 0 0]) .* (cx0< cal.perCx) ...
-        + (wt1(:) .* [0 1 0 0] + (1-wt1(:)) .* [0 0 0 1]) .* (cx0>=cal.perCx);
+m0  = var0.m; 
+x0  = var0.x;
+f0  = var0.f;
+cm0 = var0.cm;  cm0 = cm0./sum(cm0)./(1-f0);
+cx0 = var0.cx;  cx0 = cx0./sum(cx0)./(1-f0);
+vm0 = var0.H2Om;
+vf0 = 1;
 
-c0_cmp = (m0.*cm0_cmp + x0.*cx0_cmp)./(1-f0);
+cm0_mem = cm0*cal.cmp_mem;
+cx0_mem = cx0*cal.cmp_mem;
+ c0_mem =  c0*cal.cmp_mem;
 
-cm0_mem = cm0_cmp*cal.cmp_mem/100;
-cx0_mem = cx0_cmp*cal.cmp_mem/100;
- c0_mem =  c0_cmp*cal.cmp_mem/100;
+cm0_oxd = cm0*cal.cmp_oxd;
+cx0_oxd = cx0*cal.cmp_oxd;
+ c0_oxd =  c0*cal.cmp_oxd;
 
-cm0_oxd = cm0_mem*cal.mem_oxd/100;
-cx0_oxd = cx0_mem*cal.mem_oxd/100;
- c0_oxd =  c0_mem*cal.mem_oxd/100;
+% % calculate dimensionless numbers characterising the system dynamics
+% [x0,cx0,cm0,f0,vf0,vm0] = equilibrium(0.01,v0/10,T-273.15,c0,v0,Ptop,cal,TINY);
+% m0 = 1-x0-f0;
+% 
+% % update oxide compositions
+% wt0 = (cal.perCm-cm0)./(cal.perCm-cal.cphs0);
+% wt1 = (cal.cphs1-cm0)./(cal.cphs1-cal.perCm);
+% cm0_cmp = (wt0(:) .* [1 0 0 0] + (1-wt0(:)) .* [0 0 1 0]) .* (cm0< cal.perCm) ...
+%         + (wt1(:) .* [0 0 1 0] + (1-wt1(:)) .* [0 0 0 1]) .* (cm0>=cal.perCm);
+% 
+% wt0 = (cal.perCx-cx0)./(cal.perCx-cal.cphs0);
+% wt1 = (cal.cphs1-cx0)./(cal.cphs1-cal.perCx);
+% cx0_cmp = (wt0(:) .* [1 0 0 0] + (1-wt0(:)) .* [0 1 0 0]) .* (cx0< cal.perCx) ...
+%         + (wt1(:) .* [0 1 0 0] + (1-wt1(:)) .* [0 0 0 1]) .* (cx0>=cal.perCx);
+% 
+% c0_cmp = (m0.*cm0_cmp + x0.*cx0_cmp)./(1-f0);
+% 
+% cm0_mem = cm0_cmp*cal.cmp_mem/100;
+% cx0_mem = cx0_cmp*cal.cmp_mem/100;
+%  c0_mem =  c0_cmp*cal.cmp_mem/100;
+% 
+% cm0_oxd = cm0_mem*cal.mem_oxd/100;
+% cx0_oxd = cx0_mem*cal.mem_oxd/100;
+%  c0_oxd =  c0_mem*cal.mem_oxd/100;
 
 rhof0 = cal.rhof0;
-rhox0 = sum(cx0_mem./cal.rhox0).^-1;
+rhox0 = sum(cx0_mem/100./cal.rhox0).^-1;
 
-cm1_oxd = (0.9.*cm0_mem + 0.1.*cal.cmp_mem(1,:)/100)*cal.mem_oxd/100;
-cm2_oxd = (0.9.*cm0_mem + 0.1.*cal.cmp_mem(4,:)/100)*cal.mem_oxd/100;
+cm1_oxd = (0.9.*cm0_mem + 0.1.*cal.cmp_mem(4,:))*cal.mem_oxd/100;
+cm2_oxd = (0.9.*cm0_mem - 0.1.*cal.cmp_mem(4,:))*cal.mem_oxd/100;
 
-wtm   = [cm0_oxd.*100,100.*vm0];
+wtm   = [cm0_oxd,vm0*100];
 etam0 = Giordano08(wtm,T0);
 rhom0 = DensityX(wtm,T0,Ptop/1e8);
 
@@ -212,9 +241,9 @@ if ~any(bnd_h)
     sdsshape = max(0,sdsshape - topshape - botshape);
 end
 
-bnd_S = zeros(size(topshape));
-bnd_C = zeros(size(topshape));
-bnd_V = zeros(size(topshape));
+bnd_S = zeros(Nz,Nx);
+bnd_C = zeros(Nz,Nx,cal.ncmp);
+bnd_V = zeros(Nz,Nx);
 
 % set specified boundaries to no slip, else to free slip
 if bndmode>=4;               sds = +1;      % no slip sides for 'all sides(4)'
@@ -227,7 +256,12 @@ if bndmode==5;               top = -1; bot = -1; end % free slip top/bot for 'on
 
 % initialise solution fields
 Tp  =  T0 + (T1-T0) .* (1+erf((ZZ/D-zlay+rp*h*dlay)/wlay_T))/2 + dTr.*rp + dTg.*gp;  % potential temperature [C]
-c   =  c0 + (c1-c0) .* (1+erf((ZZ/D-zlay+rp*h*dlay)/wlay_c))/2 + dcr.*rp + dcg.*gp;  % major component
+
+c = zeros(Nz,Nx,cal.ncmp);
+for i = 1:cal.ncmp
+    c(:,:,i)  =  c0(i) + (c1(i)-c0(i)) .* (1+erf((ZZ/D-zlay+rp*h*dlay)/wlay_c))/2 + dcr(i).*rp + dcg(i).*gp;  % trace elements
+end
+% c   =  c0 + (c1-c0) .* (1+erf((ZZ/D-zlay+rp*h*dlay)/wlay_c))/2 + dcr.*rp + dcg.*gp;  % major component
 v   =  v0 + (v1-v0) .* (1+erf((ZZ/D-zlay+rp*h*dlay)/wlay_c))/2 + dvr.*rp + dvg.*gp;  % volatile component
 
 te = zeros(Nz,Nx,cal.nte);
@@ -280,17 +314,17 @@ Wx  = W;  Ux  = U;
 Wm  = W;  Um  = U;
 
 eIIref = 1e-6;  
-Div_V  = 0.*c;  advn_rho = 0.*c;  drhodt = 0.*c;  drhodto = drhodt;
-exx    = 0.*c;  ezz = 0.*c;  exz = zeros(Nz-1,Nx-1);  eII = 0.*c;  
-txx    = 0.*c;  tzz = 0.*c;  txz = zeros(Nz-1,Nx-1);  tII = 0.*c; 
-VolSrc = 0.*c; 
-rhom   = rhom0.*ones(size(c)); 
-rhox   = rhox0.*ones(size(c));
-rhof   = rhof0.*ones(size(c));
-rho    = rhom0.*ones(size(c));
+Div_V  = 0.*Tp;  advn_rho = 0.*Tp;  drhodt = 0.*Tp;  drhodto = drhodt;
+exx    = 0.*Tp;  ezz = 0.*Tp;  exz = zeros(Nz-1,Nx-1);  eII = 0.*Tp;  
+txx    = 0.*Tp;  tzz = 0.*Tp;  txz = zeros(Nz-1,Nx-1);  tII = 0.*Tp; 
+VolSrc = 0.*Tp; 
+rhom   = rhom0.*ones(size(Tp)); 
+rhox   = rhox0.*ones(size(Tp));
+rhof   = rhof0.*ones(size(Tp));
+rho    = rhom0.*ones(size(Tp));
 rhoref = mean(rho,'all');
 Pt     = Ptop + rhoref.*g0.*ZZ;
-xq     = ones(size(c))/10;  fq = v/2;
+xq     = ones(size(Tp))/10;  fq = zeros(size(Tp));  mq = ones(size(Tp));
 cmq    = c; cxq = c; 
 vmq    = v; vfq = ones(size(v)); 
 
@@ -316,13 +350,28 @@ while res > tol
 
     eqtime = tic;
 
-    [xq,cxq,cmq,fq,vfq,vmq] = equilibrium(xq,fq,T-273.15,c,v,Pt,cal,TINY);
+    var.c     = reshape(c,Nx*Nz,cal.ncmp);   % component fractions [wt]
+    var.T     = reshape(T,Nx*Nz,1)-273.15;   % temperature [C]
+    var.P     = reshape(Pt,Nx*Nz,1)/1e9;     % pressure [GPa]
+    var.m     = reshape(mq,Nx*Nz,1);         % melt fraction [wt]
+    var.f     = reshape(fq,Nx*Nz,1);         % bubble fraction [wt]
+    var.H2O   = reshape(v,Nx*Nz,1);          % water concentration [wt]
+    var.SiO2m = var.c*cal.cmp_oxd(:,1)./100; % melt silica concentration [wt]
 
-    mq = 1-xq-fq;
+    [var,cal] =  meltmodel(var,cal,'E');
 
-    x  = xq;  f = fq;  m = mq;
-    cm = cmq; cx = cxq;
-    vm = vmq; vf = vfq;
+    mq = reshape(var.m,Nz,Nx);
+    fq = reshape(var.f,Nz,Nx);
+    xq = reshape(var.x,Nz,Nx);
+    x  = xq;  m = mq;  f = fq;
+
+    cxq = reshape(var.cx,Nz,Nx,cal.ncmp);
+    cmq = reshape(var.cm,Nz,Nx,cal.ncmp);
+    cm  = cmq; cx = cxq;
+    
+    vmq = reshape(var.H2Om,Nz,Nx,1);
+    vfq = ones(size(vmq));
+    vm  = vmq; vf = vfq;
 
     eqtime = toc(eqtime);
     EQtime = EQtime + eqtime;
@@ -335,7 +384,6 @@ while res > tol
 end
 rhoo = rho;
 dto  = dt; 
-ho   = h;
 
 % get bulk enthalpy, silica, volatile content densities
 S   = rho.*(cP.*log(T/(cal.Tphs1+273.15)) + x.*Dsx + f.*Dsf - Adbt.*(Pt-Ptop));  So = S;  res_S = 0.*S;

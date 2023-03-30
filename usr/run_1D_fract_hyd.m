@@ -5,7 +5,7 @@ clear; close all;
 run('./par_default')
 
 % set run parameters
-runID    =  '1D_fract_andhyd';   % run identifier
+runID    =  '1D_fract_andesSVZ_hyd';   % run identifier
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  500;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot results
@@ -23,7 +23,7 @@ Nt       =  5e5;                 % number of time steps to take
 tend     =  1*yr;                % end time for simulation [s]
 
 % set initial thermo-chemical state
-T0       =  1160;                % temperature top layer [deg C]
+T0       =  1150;                % temperature top layer [deg C]
 c0       =  0.515;               % major component top layer [wt SiO2]
 v0       =  0.02;                % volatile component top layer [wt H2O]
 
@@ -39,7 +39,7 @@ Twall    =  [300,300,nan];       % [top,bot,sds] wall rock temperature [degC] (n
 Ptop     =  1.25e8;              % top pressure [Pa]
 
 % set thermo-chemical material parameters
-calID    =  'andes';             % phase diagram calibration
+calID    =  'andesSVZ';             % phase diagram calibration
 Dsx      = -300;                 % entropy change of crystallisation [J/kg]
 Dsf      =  400;                 % entropy change of exsolution [J/kg]
 

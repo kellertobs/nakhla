@@ -72,7 +72,7 @@ while time <= tend && step <= Nt && any(m(:)>TINY^0.5)
 
         iter = iter+1;
     end
-    
+
     % record model history
     history;
 

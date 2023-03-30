@@ -20,9 +20,9 @@ if Nx <= 10 && Nz <= 10  % create 0D plots
     plot(hist.time/hr,hist.T(:,2)-273.15,CL{[1,2]},LW{:}); axis xy tight; box on;
     title('$T [^\circ$C]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(4,1,2)
-    plot(hist.time/hr,hist.cx(:,2)*100,CL{[1,4]},LW{:}); axis xy tight; box on; hold on;
-    plot(hist.time/hr,hist.cm(:,2)*100,CL{[1,3]},LW{:});
-    plot(hist.time/hr,hist.c(:,2)./(1-hist.f(:,2))*100,CL{[1,2]},LW{:});
+    plot(hist.time/hr,hist.cx_oxd(:,2,cal.Si),CL{[1,4]},LW{:}); axis xy tight; box on; hold on;
+    plot(hist.time/hr,hist.cm_oxd(:,2,cal.Si),CL{[1,3]},LW{:});
+    plot(hist.time/hr,hist.c_oxd(:,2,cal.Si)./(1-hist.f(:,2)),CL{[1,2]},LW{:});
     title('$\bar{c}$ [wt\% SiO$_2$]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(4,1,3)
     semilogy(hist.time/hr,hist.vf(:,2)*100,CL{[1,4]},LW{:}); axis xy tight; box on; hold on;
@@ -62,17 +62,17 @@ if Nx <= 10 && Nz <= 10  % create 0D plots
     end
     subplot(3,1,1)
     for i=1:cal.noxd
-        plot(hist.time/hr,squeeze(hist.cm_oxd(:,2,i)).*100,'-',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis xy tight; box on; hold on
+        plot(hist.time/hr,squeeze(hist.cm_oxd(:,2,i)),'-',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis xy tight; box on; hold on
     end
     title('Melt oxds [wt\%]',TX{:},FS{:}); legend(cal.oxdStr,TX{:},FS{1},8,'Location','northeast'); set(gca,TL{:},TS{:});
     subplot(3,1,2)
     for i=1:cal.noxd
-        plot(hist.time/hr,squeeze(hist.cx_oxd(:,2,i)).*100,'-',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis xy tight; box on; hold on
+        plot(hist.time/hr,squeeze(hist.cx_oxd(:,2,i)),'-',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis xy tight; box on; hold on
     end
     title('Xtal oxds [wt\%]',TX{:},FS{:});
     subplot(3,1,3)
     for i=1:cal.nmsy
-        plot(hist.time/hr,squeeze(hist.x(:,2).*hist.cx_msy(:,2,i)).*100,'-',LW{:},'color',ocean(round((i-1)*213/cal.nmsy)+1,:)); axis xy tight; box on; hold on
+        plot(hist.time/hr,squeeze(hist.x(:,2).*hist.cx_msy(:,2,i)),'-',LW{:},'color',ocean(round((i-1)*213/cal.nmsy)+1,:)); axis xy tight; box on; hold on
     end
     title('Xtal msys [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:}); legend(cal.msyStr,TX{:},FS{1},8,'Location','northeast'); set(gca,TL{:},TS{:});
     xlabel('Time [hr]',TX{:},FS{:});
@@ -143,17 +143,17 @@ elseif Nx <= 10  % create 1D plots
     title('Bulk oxds [wt\%]',TX{:},FS{:});ylabel('Depth [m]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,4,2)
     for i=1:cal.noxd
-        plot(squeeze(cm_oxd(:,:,i)).*100,Zc.',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis ij tight; box on; hold on;
+        plot(squeeze(cm_oxd(:,:,i)),Zc.',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis ij tight; box on; hold on;
     end
     title('Melt oxds [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,4,3)
     for i=1:cal.noxd
-        plot(squeeze(cx_oxd(:,:,i)).*100,Zc.',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis ij tight; box on; hold on;
+        plot(squeeze(cx_oxd(:,:,i)),Zc.',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis ij tight; box on; hold on;
     end
     title('Xtal oxds [wt\%]',TX{:},FS{:}); legend(cal.oxdStr,TX{:},FS{:},'Location','west'); set(gca,TL{:},TS{:});
     subplot(1,4,4)
     for i=1:cal.nmsy
-        plot(squeeze(x.*cx_msy(:,:,i)).*100,Zc.',LW{:},'color',ocean(round((i-1)*213/cal.nmsy)+1,:)); axis ij tight; box on; hold on;
+        plot(squeeze(x.*cx_msy(:,:,i)),Zc.',LW{:},'color',ocean(round((i-1)*213/cal.nmsy)+1,:)); axis ij tight; box on; hold on;
     end
     title('Xtal msys [wt\%]',TX{:},FS{:}); legend(cal.msyStr,TX{:},FS{:},'Location','west'); set(gca,TL{:},TS{:});
 
@@ -324,48 +324,81 @@ end
 
 % plot phase diagram
 if ~exist('fh7','var'); fh7 = figure(VIS{:});
-else; set(0, 'CurrentFigure', fh7); clf;
+else; set(0, 'CurrentFigure', fh7);
 end
-TT = [linspace(cal.Tphs0+Ptop*cal.clap,cal.perT+Ptop*cal.clap,200),linspace(cal.perT+Ptop*cal.clap,cal.Tphs1+Ptop*cal.clap,200)];
-cc = [linspace(cal.cphs1,(cal.perCx+cal.perCm)/2,200),linspace((cal.perCx+cal.perCm)/2,cal.cphs0,200)];
-[~,CCx,CCm,~,~,~] = equilibrium(0*TT,0*TT,TT,cc,0*TT,Ptop*ones(size(TT)),cal,TINY);
-plot(CCx.*100,TT,'k-','LineWidth',2); axis tight; hold on; box on;
-plot(CCm.*100,TT,'k-','LineWidth',2);
-perTs  = cal.perT;
-Tphs0s = cal.Tphs0;
-Tphs1s = cal.Tphs1;
-vv = 0.10*ones(size(TT));
-xx = 0.50*ones(size(TT));
-ff = 0.05*ones(size(TT));
-for i = 1:5
-    TT = [linspace(Tphs0s+Ptop*cal.clap,perTs+Ptop*cal.clap,200),linspace(perTs+Ptop*cal.clap,Tphs1s+Ptop*cal.clap,200)];
-    cc = [linspace(cal.cphs1,(cal.perCx+cal.perCm)/2,200),linspace((cal.perCx+cal.perCm)/2,cal.cphs0,200)];
-    vmq_c0 = (4.7773e-7.*Ptop.^0.6 + 1e-11.*Ptop) .* exp(2565*(1./(TT+273.15)-1./(cal.perT+273.15))); % Katz et al., 2003; Moore et al., 1998
-    vmq_c1 = (3.5494e-3.*Ptop.^0.5 + 9.623e-8.*Ptop - 1.5223e-11.*Ptop.^1.5)./(TT+273.15) + 1.2436e-14.*Ptop.^1.5; % Liu et al., 2015
-    vmq0   = (1-cc).*vmq_c0 + cc.*vmq_c1;
-    perTs  = cal.perT -cal.dTH2O(2).*vmq0(round((perTs-Tphs1s)./(Tphs0s-Tphs1s)*200)).^0.75;
-    Tphs0s = cal.Tphs0-cal.dTH2O(1).*vmq0(1  ).^0.75;
-    Tphs1s = cal.Tphs1-cal.dTH2O(3).*vmq0(end).^0.75;
-end
-[~,CCx,CCm,~,~,~] = equilibrium(0*TT,0*TT,TT,cc,vmq0,Ptop*ones(size(TT)),cal,TINY);
-plot(CCx.*100,TT,'k-','LineWidth',2); axis tight; hold on; box on;
-plot(CCm.*100,TT,'k-','LineWidth',2);
+% if Nz>1 || step==0; clf;
+% TT = [linspace(cal.Tphs0+Ptop*cal.clap,cal.perTm+Ptop*cal.clap,200),linspace(cal.perTm+Ptop*cal.clap,cal.Tphs1+Ptop*cal.clap,200)];
+% cc = [linspace(cal.cphs1,(cal.perCx+cal.perCm)/2,200),linspace((cal.perCx+cal.perCm)/2,cal.cphs0,200)];
+% [~,CCx,CCm,~,~,~] = equilibrium(0*TT,0*TT,TT,cc,0*TT,Ptop*ones(size(TT)),cal,TINY);
+% plot(CCx.*100,TT,'k-','LineWidth',2); axis tight; hold on; box on;
+% plot(CCm.*100,TT,'k-','LineWidth',2);
+% perTms  = cal.perTm;
+% Tphs0s = cal.Tphs0;
+% Tphs1s = cal.Tphs1;
+% vv = 0.10*ones(size(TT));
+% xx = 0.50*ones(size(TT));
+% ff = 0.05*ones(size(TT));
+% for i = 1:5
+%     TT = [linspace(Tphs0s+Ptop*cal.clap,perTms+Ptop*cal.clap,200),linspace(perTms+Ptop*cal.clap,Tphs1s+Ptop*cal.clap,200)];
+%     cc = [linspace(cal.cphs1,(cal.perCx+cal.perCm)/2,200),linspace((cal.perCx+cal.perCm)/2,cal.cphs0,200)];
+%     vmq_c0 = (4.7773e-7.*Ptop.^0.6 + 1e-11.*Ptop) .* exp(2565*(1./(TT+273.15)-1./(1200+273.15))); % Katz et al., 2003; Moore et al., 1998
+%     vmq_c1 = (3.5494e-3.*Ptop.^0.5 + 9.623e-8.*Ptop - 1.5223e-11.*Ptop.^1.5)./(TT+273.15) + 1.2436e-14.*Ptop.^1.5; % Liu et al., 2015
+%     vmq0   = (1-cc).*vmq_c0 + cc.*vmq_c1;
+%     perTms  = cal.perTm -cal.dTH2O(2).*vmq0(round((perTms-Tphs1s)./(Tphs0s-Tphs1s)*200)).^0.75;
+%     Tphs0s = cal.Tphs0-cal.dTH2O(1).*vmq0(1  ).^0.75;
+%     Tphs1s = cal.Tphs1-cal.dTH2O(3).*vmq0(end).^0.75;
+% end
+% [~,CCx,CCm,~,~,~] = equilibrium(0*TT,0*TT,TT,cc,vmq0,Ptop*ones(size(TT)),cal,TINY);
+% plot(CCx.*100,TT,'k-','LineWidth',2); axis tight; hold on; box on;
+% plot(CCm.*100,TT,'k-','LineWidth',2);
+% end
 
 Tplt = T-273.15 - (Pt-Ptop)*cal.clap;
-cplt = c./(1-f);
-plot(cplt.*100,Tplt,'.',CL{[1,2]},LW{:},'MarkerSize',15);
-plot(cx  .*100,Tplt,'.',CL{[1,4]},LW{:},'MarkerSize',15);
-plot(cm  .*100,Tplt,'.',CL{[1,3]},LW{:},'MarkerSize',15);
+plot(c_oxd(:,:,cal.Si)./(1-f),Tplt,'.',CL{[1,2]},LW{:},'MarkerSize',15); axis tight; hold on
+plot(cx_oxd(:,:,cal.Si)      ,Tplt,'.',CL{[1,4]},LW{:},'MarkerSize',15);
+plot(cm_oxd(:,:,cal.Si)      ,Tplt,'.',CL{[1,3]},LW{:},'MarkerSize',15);
 
 set(gca,'TickLabelInterpreter','latex','FontSize',15)
 title('Phase Diagram','Interpreter','latex','FontSize',18)
 xlabel('Major component [wt\% SiO$_2$]','Interpreter','latex','FontSize',15)
 ylabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',15)
 
+% plot composition on TAS, AFM diagrams
+if ~exist('fh8','var'); fh8 = figure(VIS{:});
+else; set(0, 'CurrentFigure', fh8);
+end
+if Nz>1 || step==0; clf;
+TAS; axis tight; box on; hold on;
+end
+scatter(cx_oxd(:,:,cal.Si)       ,(cx_oxd(:,:,cal.Na)+cx_oxd(:,:,cal.K))       ,50,T,'filled','^','MarkerEdgeColor','k'); colormap(ocean); cb = colorbar;
+scatter(cm_oxd(:,:,cal.Si)       ,(cm_oxd(:,:,cal.Na)+cm_oxd(:,:,cal.K))       ,50,T,'filled','o','MarkerEdgeColor','k');
+scatter( c_oxd(:,:,cal.Si)./(1-f),( c_oxd(:,:,cal.Na)+ c_oxd(:,:,cal.K))./(1-f),80,T,'filled','s','MarkerEdgeColor','k');
+set(cb,TL{:},'FontSize',12); set(gca,TL{:},'FontSize',15); xlabel('SiO$_2$ [wt \%]',TX{:},'FontSize',15); ylabel('Na$_2$O + K$_2$O [wt \%]',TX{:},'FontSize',15);
+
+if ~exist('fh9','var'); fh9 = figure(VIS{:});
+else; set(0, 'CurrentFigure', fh9);
+end
+if Nz>1 || step==0; clf;
+AFM; axis tight; box on; hold on;
+end
+[A,B] = terncoords(cx_oxd(:,:, cal.Mg          )./sum(cx_oxd(:,:,[cal.Fe,cal.Mg,cal.Na,cal.K]),3), ...
+                   cx_oxd(:,:, cal.Fe          )./sum(cx_oxd(:,:,[cal.Fe,cal.Mg,cal.Na,cal.K]),3), ...
+               sum(cx_oxd(:,:,[cal.Na,cal.K]),3)./sum(cx_oxd(:,:,[cal.Fe,cal.Mg,cal.Na,cal.K]),3));
+scatter(A,B,50,T-273.15,'filled','^','MarkerEdgeColor','k'); colormap(ocean); cb = colorbar;
+[A,B] = terncoords(cm_oxd(:,:, cal.Mg          )./sum(cm_oxd(:,:,[cal.Fe,cal.Mg,cal.Na,cal.K]),3), ...
+                   cm_oxd(:,:, cal.Fe          )./sum(cm_oxd(:,:,[cal.Fe,cal.Mg,cal.Na,cal.K]),3), ...
+               sum(cm_oxd(:,:,[cal.Na,cal.K]),3)./sum(cm_oxd(:,:,[cal.Fe,cal.Mg,cal.Na,cal.K]),3));
+scatter(A,B,50,T-273.15,'filled','o','MarkerEdgeColor','k'); colormap(ocean);
+[A,B] = terncoords(c_oxd(:,:, cal.Mg          )./(1-f)./sum(c_oxd(:,:,[cal.Fe,cal.Mg,cal.Na,cal.K]),3)./(1-f), ...
+                   c_oxd(:,:, cal.Fe          )./(1-f)./sum(c_oxd(:,:,[cal.Fe,cal.Mg,cal.Na,cal.K]),3)./(1-f), ...
+               sum(c_oxd(:,:,[cal.Na,cal.K]),3)./(1-f)./sum(c_oxd(:,:,[cal.Fe,cal.Mg,cal.Na,cal.K]),3)./(1-f));
+scatter(A,B,80,T-273.15,'filled','s','MarkerEdgeColor','k'); colormap(ocean);
+set(cb,TL{:},'FontSize',12); set(gca,TL{:},'FontSize',15); xlabel('SiO$_2$ [wt \%]',TX{:},'FontSize',15); ylabel('Na$_2$O + K$_2$O [wt \%]',TX{:},'FontSize',15);
+
 % plot model history
 if plot_cv
-    if ~exist('fh8','var'); fh8 = figure(VIS{:});
-    else; set(0, 'CurrentFigure', fh8); clf;
+    if ~exist('fh10','var'); fh10 = figure(VIS{:});
+    else; set(0, 'CurrentFigure', fh10); clf;
     end 
     subplot(4,1,1);
     plot(hist.time/hr,hist.DM./hist.sumM,'k-',LW{:}); hold on; axis tight; box on;
@@ -381,8 +414,8 @@ if plot_cv
     ylabel('consv. $V$',TX{:},FS{:}); set(gca,TL{:},TS{:});
     xlabel('Time [hr]',TX{:},FS{:});
 
-    if ~exist('fh9','var'); fh9 = figure(VIS{:});
-    else; set(0, 'CurrentFigure', fh9); clf;
+    if ~exist('fh11','var'); fh11 = figure(VIS{:});
+    else; set(0, 'CurrentFigure', fh11); clf;
     end 
     subplot(4,1,1);
     plot(hist.time/hr,hist.EM,'k-',LW{:}); hold on; axis tight; box on;
