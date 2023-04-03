@@ -13,7 +13,7 @@ cal.oxdStr = {'SiO$_2$','TiO$_2$','Al$_2$O$_3$','FeO','MgO','CaO','Na$_2$O','K$_
      elStr = {'Si','Ti','Al','Fe','Mg','Ca','Na','K'};
 cal.memStr = {'for','fay','mgt','ulv','ens','hyp','aug','pig','ant','alb','san','qtz'};
 cal.msyStr = {'olv','spn','opx','cpx','fsp','qtz'};
-cal.cmpStr = {'dun','gbr','bas','rhy'};
+cal.cmpStr = {'ano','gbr','bas','rhy'};
 
 for i = 1:cal.ncmp; cal.(cal.cmpStr{i}) = i; end
 for i = 1:cal.nmsy; cal.(cal.msyStr{i}) = i; end
@@ -46,10 +46,10 @@ cal.msy_mem = [1  1  0  0  0  0  0  0  0  0  0  0    % olivine (olv)
 
 % mineral end-member composition of melting model components
 %               for     fay  Fe-spn Ti-spn  ens    hyp    aug    pig    ant    alb    kfs    qtz
-cal.cmp_mem =[  99.95   0.01   0.0    0.01   0.01   0.0    0.01   0.0    0.009  0.001  0.0    0.0      % cphs0 => dunite (dun)
-                 3.5    1.5    0.1    3.6   11.8    1.0   25.5    2.0   45.5    5.5    0.0    0.0      % perCx => gabbro (gbr)
-                 0.1    1.1    1.8    2.2    5.5   10.2   16.5   15.0   19.0   27.5    1.6    0.0      % perCm => basalt (bas)
-                 0.0    0.0    0.8    0.05   0.0    1.0    1.0   11.25   2.0   15.1   23.0   45.8];    % cphs1 => rhyolite (rhy)
+cal.cmp_mem =[   0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0  100.0    0.0    0.0    0.0      % cphs0 => anorthosite (ano)
+                 3.5    1.5    0.1    3.7   12.7    1.5   17.0    1.5   50.0    8.5    0.0    0.0      % perCx => gabbro (gbr)
+                 0.05   0.95   1.8    2.5    6.0   12.5    7.2   10.5   16.5   38.0    4.0    0.0      % perCm => basalt (bas)
+                 0.0    0.0    0.8    0.05   0.0    1.0    0.5    9.0    1.5   16.6   25.25  45.3];    % cphs1 => rhyolite (rhy)
 cal.cmp_mem = cal.cmp_mem./sum(cal.cmp_mem,2)*100;
 
 % mineral systems composition of melting model components
@@ -66,9 +66,9 @@ for i=1:cal.ncmp
 end
 
 % set pure component melting points T_m^i at P=0
-cal.T0(cal.for) =  1890;
+cal.T0(cal.for) =  1550;
 cal.T0(cal.gbr) =  1200;
-cal.T0(cal.bas) =  1120;
+cal.T0(cal.bas) =  1100;
 cal.T0(cal.rhy) =  850;
 
 % set first coeff. for P-dependence of T_m^i [GPa]

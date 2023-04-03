@@ -59,14 +59,14 @@ C = (a2*Co+a3*Coo + (b1*dCdt + b2*dCdto + b3*dCdtoo)*dt)/a1;
 C = max(0, C );
 
 % convert major component density to concentration
-c = C./RHO;
+c = C./RHO; c = c./sum(c,3);
 
 
 %***  update volatile component (H2O) density
 
 % volatile component advection
 advn_V = - advect(M.*vm,Um(2:end-1,:),Wm(:,2:end-1),h,{ADVN,''},[1,2],BCA) ...  % melt  advection
-    - advect(F.*vf,Uf(2:end-1,:),Wf(:,2:end-1),h,{ADVN,''},[1,2],BCA);     % fluid advection
+         - advect(F.*vf,Uf(2:end-1,:),Wf(:,2:end-1),h,{ADVN,''},[1,2],BCA);     % fluid advection
 
 % boundary layers
 bnd_V = zeros(size(V));
@@ -107,8 +107,8 @@ mq = reshape(var.m,Nz,Nx);
 fq = reshape(var.f,Nz,Nx);
 xq = reshape(var.x,Nz,Nx);
 
-cxq = reshape(var.cx,Nz,Nx,cal.ncmp);
-cmq = reshape(var.cm,Nz,Nx,cal.ncmp);
+cxq = reshape(var.cx,Nz,Nx,cal.ncmp); cxq = cxq./sum(cxq,3)./(1-fq);
+cmq = reshape(var.cm,Nz,Nx,cal.ncmp); cmq = cmq./sum(cmq,3)./(1-fq);
 
 vmq = reshape(var.H2Om,Nz,Nx,1);
 vfq = ones(size(vmq));
@@ -126,9 +126,9 @@ advn_M   = - advect(M,Um(2:end-1,:),Wm(:,2:end-1),h,{ADVN,''},[1,2],BCA);
 advn_rho = advn_X+advn_F+advn_M;
 
 % phase mass transfer rates
-Gx = 2/3*Gx + 1/3*(xq.*RHO-X)./max(tau_r,4*dt);
-Gf = 2/3*Gf + 1/3*(fq.*RHO-F)./max(tau_r,4*dt);
-Gm = 2/3*Gm + 1/3*(mq.*RHO-M)./max(tau_r,4*dt);
+Gx = 2/3*Gx + 1/3*(xq.*RHO-X)./max(tau_r,5*dt);
+Gf = 2/3*Gf + 1/3*(fq.*RHO-F)./max(tau_r,5*dt);
+Gm = 2/3*Gm + 1/3*(mq.*RHO-M)./max(tau_r,5*dt);
 
 % total rates of change
 dXdt   = advn_X + Gx;
@@ -166,31 +166,21 @@ sx = sm + Dsx;
 sf = sm + Dsf;
 
 % update major component phase composition
-% Kc = cxq./cmq;
-% cm = c./(m + x.*Kc + TINY);
-% cx = c./(m./Kc + x + TINY);
 Kc  = (cxq+TINY)./(cmq+TINY);
-res = 1; tol = 1e-9;
-while res>tol
+res = 1; tol  = 1e-9;
+it  = 1; mxit = 25;
+while res>tol && it<maxit
     Kci = Kc;
-    cm  = c./(m + x.*Kc); cm = cm./sum(cm,3)./(1-f);
-    cx  = c./(m./Kc + x); cx = cx./sum(cx,3)./(1-f);
-    Kc  = (cx+TINY)./(cm+TINY);
+    Kc  = Kc .* sum(c./(m + x.*Kc),3)./sum(c./(m./Kc + x),3);
     res = norm(Kci-Kc,'fro')./norm(Kc,'fro');
+    it = it+1;
 end
+cm  = c./(m + x.*Kc);
+cx  = c./(m./Kc + x);
 
 % update volatile component phase composition
-Kf = vfq./max(TINY,vmq);
+Kf = (vfq+TINY)./(vmq+TINY);
 vm = v./(m + f.*Kf + TINY);
 vf = v./(m./Kf + f + TINY);
-% % Kv  = (vfq+TINY)./(vmq+TINY);
-% % res = 1; tol = 1e-9;
-% % while res>tol
-% %     Kvi = Kv;
-% %     vm  = v./(m + f.*Kv + TINY);
-% %     vf  = v./(m./Kv + f + TINY);
-% %     Kv  = (vf+TINY)./(vm+TINY);
-% %     res = norm(Kvi-Kv,'fro')./norm(Kv,'fro');
-% % end
 
 TCtime = TCtime + toc - eqtime;

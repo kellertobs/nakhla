@@ -11,13 +11,15 @@ else
     VIS = {'Visible','off'};
 end
 
-if Nx <= 10 && Nz <= 10  % create 0D plots
+if Nx <= 1 && Nz <= 1  % create 0D plots
 
     if ~exist('fh1','var'); fh1 = figure(VIS{:});
     else; set(0, 'CurrentFigure', fh1); clf;
     end
     subplot(4,1,1)
-    plot(hist.time/hr,hist.T(:,2)-273.15,CL{[1,2]},LW{:}); axis xy tight; box on;
+    plot(hist.time/hr,hist.T(:,2)-273.15,CL{[1,2]},LW{:}); axis xy tight; box on; hold on;
+    plot(hist.time/hr,hist.Tliq(:,2),CL{[1,3]},LW{:});
+    plot(hist.time/hr,hist.Tsol(:,2),CL{[1,4]},LW{:});
     title('$T [^\circ$C]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(4,1,2)
     plot(hist.time/hr,hist.cx_oxd(:,2,cal.Si),CL{[1,4]},LW{:}); axis xy tight; box on; hold on;
@@ -77,19 +79,21 @@ if Nx <= 10 && Nz <= 10  % create 0D plots
     title('Xtal msys [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:}); legend(cal.msyStr,TX{:},FS{1},8,'Location','northeast'); set(gca,TL{:},TS{:});
     xlabel('Time [hr]',TX{:},FS{:});
 
-elseif Nx <= 10  % create 1D plots
+elseif Nx <= 1  % create 1D plots
 
     if ~exist('fh1','var'); fh1 = figure(VIS{:});
     else; set(0, 'CurrentFigure', fh1); clf;
     end
     sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
     subplot(1,5,1)
-    plot(T-273.15,Zc.',CL{[1,2]},LW{:}); axis ij tight; box on;
+    plot(T-273.15,Zc.',CL{[1,2]},LW{:}); axis ij tight; box on; hold on;
+    plot(cal.Tliq,Zc.',CL{[1,3]},LW{:});
+    plot(cal.Tsol,Zc.',CL{[1,4]},LW{:});
     title('$T [^\circ$C]',TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,5,2)
-    plot(cx*100,Zc.',CL{[1,4]},LW{:}); axis ij tight; box on; hold on;
-    plot(cm*100,Zc.',CL{[1,3]},LW{:});
-    plot(c*100,Zc.',CL{[1,2]},LW{:});
+    plot(cx_oxd(:,:,cal.Si),Zc.',CL{[1,4]},LW{:}); axis ij tight; box on; hold on;
+    plot(cm_oxd(:,:,cal.Si),Zc.',CL{[1,3]},LW{:});
+    plot( c_oxd(:,:,cal.Si)./(1-f),Zc.',CL{[1,2]},LW{:});
     title('$\bar{c}$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,5,3)
     semilogx(max(1e-6,vf*100).*any(v(:)>10*TINY),Zc.',CL{[1,5]},LW{:}); axis ij tight; box on; hold on;
@@ -138,7 +142,7 @@ elseif Nx <= 10  % create 1D plots
     sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
     subplot(1,4,1)
     for i=1:cal.noxd
-        plot(squeeze( c_oxd(:,:,i)).*100,Zc.',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis ij tight; box on; hold on;
+        plot(squeeze( c_oxd(:,:,i)),Zc.',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis ij tight; box on; hold on;
     end
     title('Bulk oxds [wt\%]',TX{:},FS{:});ylabel('Depth [m]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,4,2)
@@ -259,7 +263,7 @@ else % create 2D plots
     imagesc(Xc,Zc,T-273.15); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$T [^\circ$C]'],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel('Depth [m]',TX{:},FS{:}); 
     set(fh2,'CurrentAxes',ax(22));
-    imagesc(Xc,Zc,c.*100); axis ij equal tight; box on; cb = colorbar;
+    imagesc(Xc,Zc,c_oxd(:,:,cal.Si)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\bar{c}$ [wt\% SiO$_2$]'],TX{:},FS{:}); set(gca,'YTickLabel',[]); xlabel('Width [m]',TX{:},FS{:});
     set(fh2,'CurrentAxes',ax(23));
     imagesc(Xc,Zc,v.*100.*(v>1e-9)); axis ij equal tight; box on; cb = colorbar;
@@ -326,7 +330,7 @@ end
 if ~exist('fh7','var'); fh7 = figure(VIS{:});
 else; set(0, 'CurrentFigure', fh7);
 end
-% if Nz>1 || step==0; clf;
+if Nz>1 || step==0; clf; end
 % TT = [linspace(cal.Tphs0+Ptop*cal.clap,cal.perTm+Ptop*cal.clap,200),linspace(cal.perTm+Ptop*cal.clap,cal.Tphs1+Ptop*cal.clap,200)];
 % cc = [linspace(cal.cphs1,(cal.perCx+cal.perCm)/2,200),linspace((cal.perCx+cal.perCm)/2,cal.cphs0,200)];
 % [~,CCx,CCm,~,~,~] = equilibrium(0*TT,0*TT,TT,cc,0*TT,Ptop*ones(size(TT)),cal,TINY);
@@ -370,9 +374,9 @@ end
 if Nz>1 || step==0; clf;
 TAS; axis tight; box on; hold on;
 end
-scatter(cx_oxd(:,:,cal.Si)       ,(cx_oxd(:,:,cal.Na)+cx_oxd(:,:,cal.K))       ,50,T,'filled','^','MarkerEdgeColor','k'); colormap(ocean); cb = colorbar;
-scatter(cm_oxd(:,:,cal.Si)       ,(cm_oxd(:,:,cal.Na)+cm_oxd(:,:,cal.K))       ,50,T,'filled','o','MarkerEdgeColor','k');
-scatter( c_oxd(:,:,cal.Si)./(1-f),( c_oxd(:,:,cal.Na)+ c_oxd(:,:,cal.K))./(1-f),80,T,'filled','s','MarkerEdgeColor','k');
+scatter(cx_oxd(:,:,cal.Si)       ,sum(cx_oxd(:,:,[cal.Na,cal.K]),3)       ,50,T-273.15,'filled','^','MarkerEdgeColor','k'); colormap(ocean); cb = colorbar;
+scatter(cm_oxd(:,:,cal.Si)       ,sum(cm_oxd(:,:,[cal.Na,cal.K]),3)       ,50,T-273.15,'filled','o','MarkerEdgeColor','k');
+scatter( c_oxd(:,:,cal.Si)./(1-f),sum( c_oxd(:,:,[cal.Na,cal.K]),3)./(1-f),80,T-273.15,'filled','s','MarkerEdgeColor','k');
 set(cb,TL{:},'FontSize',12); set(gca,TL{:},'FontSize',15); xlabel('SiO$_2$ [wt \%]',TX{:},'FontSize',15); ylabel('Na$_2$O + K$_2$O [wt \%]',TX{:},'FontSize',15);
 
 if ~exist('fh9','var'); fh9 = figure(VIS{:});
@@ -389,9 +393,9 @@ scatter(A,B,50,T-273.15,'filled','^','MarkerEdgeColor','k'); colormap(ocean); cb
                    cm_oxd(:,:, cal.Fe          )./sum(cm_oxd(:,:,[cal.Fe,cal.Mg,cal.Na,cal.K]),3), ...
                sum(cm_oxd(:,:,[cal.Na,cal.K]),3)./sum(cm_oxd(:,:,[cal.Fe,cal.Mg,cal.Na,cal.K]),3));
 scatter(A,B,50,T-273.15,'filled','o','MarkerEdgeColor','k'); colormap(ocean);
-[A,B] = terncoords(c_oxd(:,:, cal.Mg          )./(1-f)./sum(c_oxd(:,:,[cal.Fe,cal.Mg,cal.Na,cal.K]),3)./(1-f), ...
-                   c_oxd(:,:, cal.Fe          )./(1-f)./sum(c_oxd(:,:,[cal.Fe,cal.Mg,cal.Na,cal.K]),3)./(1-f), ...
-               sum(c_oxd(:,:,[cal.Na,cal.K]),3)./(1-f)./sum(c_oxd(:,:,[cal.Fe,cal.Mg,cal.Na,cal.K]),3)./(1-f));
+[A,B] = terncoords(c_oxd(:,:, cal.Mg          )./(1-f)./(sum(c_oxd(:,:,[cal.Fe,cal.Mg,cal.Na,cal.K]),3)./(1-f)), ...
+                   c_oxd(:,:, cal.Fe          )./(1-f)./(sum(c_oxd(:,:,[cal.Fe,cal.Mg,cal.Na,cal.K]),3)./(1-f)), ...
+               sum(c_oxd(:,:,[cal.Na,cal.K]),3)./(1-f)./(sum(c_oxd(:,:,[cal.Fe,cal.Mg,cal.Na,cal.K]),3)./(1-f)));
 scatter(A,B,80,T-273.15,'filled','s','MarkerEdgeColor','k'); colormap(ocean);
 set(cb,TL{:},'FontSize',12); set(gca,TL{:},'FontSize',15); xlabel('SiO$_2$ [wt \%]',TX{:},'FontSize',15); ylabel('Na$_2$O + K$_2$O [wt \%]',TX{:},'FontSize',15);
 
@@ -445,6 +449,10 @@ if save_op && ~restart
         print(fh3,name,'-dpng','-r300','-image');
         name = [opdir,'/',runID,'/',runID,'_eql',num2str(floor(step/nop))];
         print(fh7,name,'-dpng','-r300','-image');
+        name = [opdir,'/',runID,'/',runID,'_TAS',num2str(floor(step/nop))];
+        print(fh8,name,'-dpng','-r300','-image');
+        name = [opdir,'/',runID,'/',runID,'_AFM',num2str(floor(step/nop))];
+        print(fh9,name,'-dpng','-r300','-image');
     elseif Nx <= 10  % create 1D plots
         name = [opdir,'/',runID,'/',runID,'_sol_',num2str(floor(step/nop))];
         print(fh1,name,'-dpng','-r300','-image');
@@ -454,6 +462,10 @@ if save_op && ~restart
         print(fh3,name,'-dpng','-r300','-image');
         name = [opdir,'/',runID,'/',runID,'_eql',num2str(floor(step/nop))];
         print(fh7,name,'-dpng','-r300','-image');
+        name = [opdir,'/',runID,'/',runID,'_TAS',num2str(floor(step/nop))];
+        print(fh8,name,'-dpng','-r300','-image');
+        name = [opdir,'/',runID,'/',runID,'_AFM',num2str(floor(step/nop))];
+        print(fh9,name,'-dpng','-r300','-image');
     else
         name = [opdir,'/',runID,'/',runID,'_vep_',num2str(floor(step/nop))];
         print(fh1,name,'-dpng','-r300','-image');
@@ -467,6 +479,10 @@ if save_op && ~restart
         print(fh5,name,'-dpng','-r300','-image');
         name = [opdir,'/',runID,'/',runID,'_eql',num2str(floor(step/nop))];
         print(fh7,name,'-dpng','-r300','-image');
+        name = [opdir,'/',runID,'/',runID,'_TAS',num2str(floor(step/nop))];
+        print(fh8,name,'-dpng','-r300','-image');
+        name = [opdir,'/',runID,'/',runID,'_AFM',num2str(floor(step/nop))];
+        print(fh9,name,'-dpng','-r300','-image');
     end
 
     name = [opdir,'/',runID,'/',runID,'_',num2str(floor(step/nop))];

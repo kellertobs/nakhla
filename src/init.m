@@ -29,7 +29,7 @@ var0.H2O   = v0;
 var0.SiO2m = c0*cal.cmp_oxd(:,1)./100;
 var0.T     = T0.*exp(cal.aT./rhom0./cP.*Ptop);  % in C
 var0.P     = Ptop/1e9;    % convert to GPa
-var0.m     = 1;           % in wt
+var0.m     = 0;           % in wt
 var0.f     = 0;           % in wt
 
 [var0,cal0]  =  meltmodel(var0,cal,'E');
@@ -324,7 +324,7 @@ rhof   = rhof0.*ones(size(Tp));
 rho    = rhom0.*ones(size(Tp));
 rhoref = mean(rho,'all');
 Pt     = Ptop + rhoref.*g0.*ZZ;
-xq     = ones(size(Tp))/10;  fq = zeros(size(Tp));  mq = ones(size(Tp));
+fq     = f0.*ones(size(Tp));  mq = m0.*ones(size(Tp));  xq = 1-mq-fq; 
 cmq    = c; cxq = c; 
 vmq    = v; vfq = ones(size(v)); 
 
