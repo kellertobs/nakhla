@@ -2,7 +2,7 @@
 init;
     
 % physical time stepping loop
-while time <= tend && step <= Nt && any(m(:)>TINY^0.5)
+while time <= tend && step <= Nt && any(m(:)>1e-6)
     
     fprintf(1,'*****  step %d;  dt = %4.4e;  time = %4.4e [hr]\n\n',step,dt./3600,time./3600);
     TTtime  = tic;
@@ -28,7 +28,6 @@ while time <= tend && step <= Nt && any(m(:)>TINY^0.5)
     % store previous solution
     Soo = So; So = S;
     Coo = Co; Co = C;
-    Voo = Vo; Vo = V;
     Xoo = Xo; Xo = X;
     Foo = Fo; Fo = F;
     Moo = Mo; Mo = M;
@@ -37,7 +36,6 @@ while time <= tend && step <= Nt && any(m(:)>TINY^0.5)
     IRoo = IRo; IRo = IR;
     dSdtoo = dSdto; dSdto = dSdt;
     dCdtoo = dCdto; dCdto = dCdt;
-    dVdtoo = dVdto; dVdto = dVdt;
     dXdtoo = dXdto; dXdto = dXdt;
     dFdtoo = dFdto; dFdto = dFdt;
     dMdtoo = dMdto; dMdto = dMdt;

@@ -11,29 +11,6 @@ c_mem  = reshape(reshape(c ,Nz*Nx,cal.ncmp)*cal.cmp_mem,Nz,Nx,cal.nmem);
 cm_mem = reshape(reshape(cm,Nz*Nx,cal.ncmp)*cal.cmp_mem,Nz,Nx,cal.nmem);
 cx_mem = reshape(reshape(cx,Nz*Nx,cal.ncmp)*cal.cmp_mem,Nz,Nx,cal.nmem);
 
-% % update melting model component compositions
-% wt0 = (cal.perCm-cm(:))./(cal.perCm-cal.cphs0);
-% wt1 = (cal.cphs1-cm(:))./(cal.cphs1-cal.perCm);
-% cm_cmp = reshape((wt0 .* [1 0 0 0] + (1-wt0) .* [0 0 1 0]) .* (cm(:)< cal.perCm) ...
-%        +         (wt1 .* [0 0 1 0] + (1-wt1) .* [0 0 0 1]) .* (cm(:)>=cal.perCm),Nz,Nx,cal.ncmp);
-% 
-% wt0 = (cal.perCx-cx(:))./(cal.perCx-cal.cphs0);
-% wt1 = (cal.cphs1-cx(:))./(cal.cphs1-cal.perCx);
-% cx_cmp = reshape((wt0 .* [1 0 0 0] + (1-wt0) .* [0 1 0 0]) .* (cx(:)< cal.perCx) ...
-%        +         (wt1 .* [0 1 0 0] + (1-wt1) .* [0 0 0 1]) .* (cx(:)>=cal.perCx),Nz,Nx,cal.ncmp);
-% 
-% c_cmp = (m.*cm_cmp + x.*cx_cmp);
-% 
-% % update mineral end-member compositions
-% cm_mem = reshape(reshape(cm_cmp,Nz*Nx,cal.ncmp)*cal.cmp_mem/100,Nz,Nx,cal.nmem);
-% cx_mem = reshape(reshape(cx_cmp,Nz*Nx,cal.ncmp)*cal.cmp_mem/100,Nz,Nx,cal.nmem);
-% c_mem  = (m.*cm_mem + x.*cx_mem);
-% 
-% % update phase oxide compositions
-% cm_oxd = reshape(reshape(cm_mem,Nz*Nx,cal.nmem)*cal.mem_oxd/100,Nz,Nx,cal.noxd);
-% cx_oxd = reshape(reshape(cx_mem,Nz*Nx,cal.nmem)*cal.mem_oxd/100,Nz,Nx,cal.noxd);
-% c_oxd  = (m.*cm_oxd + x.*cx_oxd);
-
 % update mineral systems composition for solid assemblage
 cx_msy = reshape(reshape(cx_mem,Nz*Nx,cal.nmem)*cal.msy_mem.',Nz,Nx,cal.nmsy);
 
@@ -44,18 +21,8 @@ for j = 1:cal.nmsy
 end
 
 % update phase densities
-wtm      = zeros(Nz*Nx,9);
-wtm(:,1) = reshape(cm_oxd(:,:,1),Nz*Nx,1); % SiO2
-wtm(:,2) = reshape(cm_oxd(:,:,2),Nz*Nx,1); % TiO2
-wtm(:,3) = reshape(cm_oxd(:,:,3),Nz*Nx,1); % Al2O3
-wtm(:,4) = reshape(cm_oxd(:,:,4),Nz*Nx,1); % FeO
-wtm(:,5) = reshape(cm_oxd(:,:,5),Nz*Nx,1); % MgO
-wtm(:,6) = reshape(cm_oxd(:,:,6),Nz*Nx,1); % CaO
-wtm(:,7) = reshape(cm_oxd(:,:,7),Nz*Nx,1); % Na2O
-wtm(:,8) = reshape(cm_oxd(:,:,8),Nz*Nx,1); % K2O
-wtm(:,9) = reshape(vm    (:,:  )*100,Nz*Nx,1); % H2O
-rhom   = reshape(DensityX(wtm,T(:)-273.15,Pt(:)./1e8),Nz,Nx);
-rhox   = reshape(sum(reshape(cx_mem/100,Nz*Nx,cal.nmem)./cal.rhox0,2).^-1,Nz,Nx) .* (1 - cal.aT.*(T-T0-273.15));
+rhom   = reshape(DensityX(reshape(cm_oxd,Nz*Nx,cal.noxd),T0,Pt(:)./1e8),Nz,Nx) .* (1 - cal.aT.*(T-T0-273.15));
+rhox   = reshape(sum(reshape(cx_mem(:,:,1:end-1)/100,Nz*Nx,cal.nmem-1)./cal.rhox0,2).^-1,Nz,Nx) .* (1 - cal.aT.*(T-T0-273.15));
 rhof   = cal.rhof0 .* (1 - cal.aT.*(T-T0-273.15) + cal.bP.*(Pt-Ptop ));
 
 % convert weight to volume fraction, update bulk density
@@ -75,7 +42,7 @@ if Nz==1; Pt = Ptop.*ones(size(Tp)); else
 end
 
 % update melt viscosity
-etam   = reshape(Giordano08(wtm,T(:)-273.15),Nz,Nx);
+etam   = reshape(Giordano08(reshape(cm_oxd,Nz*Nx,cal.noxd),T(:)-273.15),Nz,Nx);
 
 % effective mixture shear viscosity (Costa et al., 2009)
 hh     = (1-cal.xi).*erf(sqrt(pi)./(2.*(1-cal.xi)).*(max(TINY^0.5,chi)./cal.chi_pck).*(1+(max(TINY^0.5,chi)./cal.chi_pck).^cal.gamma));

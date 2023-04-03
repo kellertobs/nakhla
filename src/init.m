@@ -18,29 +18,38 @@ fprintf('\n   run ID: %s \n\n',runID);
 load ocean;                  % load custom colormap
 run(['../cal/cal_',calID]);  % load melt model calibration
 
-T = T0+273.15;
-for i=1:2
+% normalise input compositions to unit sum
+c0    = c0./sum(c0);
+c1    = c1./sum(c1);
+dcg   = dcg-mean(dcg);
+dcr   = dcr-mean(dcr);
+cwall = cwall./sum(cwall,2);
+
+cm0_oxd = c0*cal.cmp_oxd;
+rho0    = DensityX(cm0_oxd,T0,Ptop/1e8);
+T       = (T0+273.15).*exp(cal.aT./rho0./cP.*Ptop);
+
+m0      = 1;
+f0      = 0;
+
+for i=1:3
 
 % calculate dimensionless numbers characterising the system dynamics
-wtm        = [c0*cal.cmp_oxd,v0.*100]; % 8 major elements + H2O
-rhom0      = DensityX(wtm,T0,Ptop/1e8);
-var0.c     = c0;          % in wt
-var0.H2O   = v0;
-var0.SiO2m = c0*cal.cmp_oxd(:,1)./100;
-var0.T     = T0.*exp(cal.aT./rhom0./cP.*Ptop);  % in C
-var0.P     = Ptop/1e9;    % convert to GPa
-var0.m     = 0;           % in wt
-var0.f     = 0;           % in wt
+var0.c     = c0(1:end-1)./sum(c0(1:end-1)); % [wt]
+var0.H2O   = c0(end);     % [wt]
+var0.SiO2m = cm0_oxd(1)./sum(cm0_oxd(1:end-1));  % [wt]
+var0.T     = T-273.15;    % [C]
+var0.P     = Ptop/1e9;    % [GPa]
+var0.m     = m0;          % [wt]
+var0.f     = f0;          % [wt]
 
 [var0,cal0]  =  meltmodel(var0,cal,'E');
 
 m0  = var0.m; 
 x0  = var0.x;
 f0  = var0.f;
-cm0 = var0.cm;  cm0 = cm0./sum(cm0)./(1-f0);
-cx0 = var0.cx;  cx0 = cx0./sum(cx0)./(1-f0);
-vm0 = var0.H2Om;
-vf0 = 1;
+cx0 = [var0.cx,0                       ];
+cm0 = [var0.cm.*(1-var0.H2Om),var0.H2Om];
 
 cm0_mem = cm0*cal.cmp_mem;
 cx0_mem = cx0*cal.cmp_mem;
@@ -50,40 +59,14 @@ cm0_oxd = cm0*cal.cmp_oxd;
 cx0_oxd = cx0*cal.cmp_oxd;
  c0_oxd =  c0*cal.cmp_oxd;
 
-% % calculate dimensionless numbers characterising the system dynamics
-% [x0,cx0,cm0,f0,vf0,vm0] = equilibrium(0.01,v0/10,T-273.15,c0,v0,Ptop,cal,TINY);
-% m0 = 1-x0-f0;
-% 
-% % update oxide compositions
-% wt0 = (cal.perCm-cm0)./(cal.perCm-cal.cphs0);
-% wt1 = (cal.cphs1-cm0)./(cal.cphs1-cal.perCm);
-% cm0_cmp = (wt0(:) .* [1 0 0 0] + (1-wt0(:)) .* [0 0 1 0]) .* (cm0< cal.perCm) ...
-%         + (wt1(:) .* [0 0 1 0] + (1-wt1(:)) .* [0 0 0 1]) .* (cm0>=cal.perCm);
-% 
-% wt0 = (cal.perCx-cx0)./(cal.perCx-cal.cphs0);
-% wt1 = (cal.cphs1-cx0)./(cal.cphs1-cal.perCx);
-% cx0_cmp = (wt0(:) .* [1 0 0 0] + (1-wt0(:)) .* [0 1 0 0]) .* (cx0< cal.perCx) ...
-%         + (wt1(:) .* [0 1 0 0] + (1-wt1(:)) .* [0 0 0 1]) .* (cx0>=cal.perCx);
-% 
-% c0_cmp = (m0.*cm0_cmp + x0.*cx0_cmp)./(1-f0);
-% 
-% cm0_mem = cm0_cmp*cal.cmp_mem/100;
-% cx0_mem = cx0_cmp*cal.cmp_mem/100;
-%  c0_mem =  c0_cmp*cal.cmp_mem/100;
-% 
-% cm0_oxd = cm0_mem*cal.mem_oxd/100;
-% cx0_oxd = cx0_mem*cal.mem_oxd/100;
-%  c0_oxd =  c0_mem*cal.mem_oxd/100;
-
 rhof0 = cal.rhof0;
-rhox0 = sum(cx0_mem/100./cal.rhox0).^-1;
+rhox0 = sum(cx0_mem(1:end-1)/100./cal.rhox0).^-1;
 
 cm1_oxd = (0.9.*cm0_mem + 0.1.*cal.cmp_mem(4,:))*cal.mem_oxd/100;
 cm2_oxd = (0.9.*cm0_mem - 0.1.*cal.cmp_mem(4,:))*cal.mem_oxd/100;
 
-wtm   = [cm0_oxd,vm0*100];
-etam0 = Giordano08(wtm,T0);
-rhom0 = DensityX(wtm,T0,Ptop/1e8);
+etam0 = Giordano08(cm0_oxd,T0);
+rhom0 = DensityX(cm0_oxd,T0,Ptop/1e8);
 
 rho0  = (x0./rhox0 + m0./rhom0).^-1;
 T     = (T0+273.15).*exp(cal.aT./rho0./cP.*Ptop);
@@ -96,11 +79,8 @@ fprintf('    initial v: %4.3f \n'  ,v0);
 fprintf('    initial x: %4.3f \n'  ,x0);
 fprintf('    initial f: %4.3f \n\n',f0);
 
-wtm   = [cm1_oxd.*100,100.*vm0];
-rhom1 = DensityX(wtm,T0,Ptop/1e8);
-
-wtm   = [cm2_oxd.*100,100.*vm0];
-rhom2 = DensityX(wtm,T0,Ptop/1e8);
+rhom1 = DensityX(cm1_oxd,T0,Ptop/1e8);
+rhom2 = DensityX(cm2_oxd,T0,Ptop/1e8);
 
 DrhoT = rhom0.*cal.aT*max([abs(T0-Twall)/10,abs(T0-T1),T0/100]);
 Drhoc = abs(rhom1-rhom2);
@@ -325,8 +305,10 @@ rho    = rhom0.*ones(size(Tp));
 rhoref = mean(rho,'all');
 Pt     = Ptop + rhoref.*g0.*ZZ;
 fq     = f0.*ones(size(Tp));  mq = m0.*ones(size(Tp));  xq = 1-mq-fq; 
-cmq    = c; cxq = c; 
+cmq    = c; cxq = c;  cfq = 0.*c;  cfq(:,:,end) = 1;  cf = cfq;
 vmq    = v; vfq = ones(size(v)); 
+cm_oxd = reshape(reshape(cmq,Nz*Nx,cal.ncmp)*cal.cmp_oxd,Nz,Nx,cal.noxd);
+
 
 % get volume fractions and bulk density
 step    = 0;
@@ -350,13 +332,13 @@ while res > tol
 
     eqtime = tic;
 
-    var.c     = reshape(c,Nx*Nz,cal.ncmp);   % component fractions [wt]
+    var.c     = reshape(c(:,:,1:end-1)./sum(c(:,:,1:end-1),3),Nx*Nz,cal.ncmp-1);   % component fractions [wt]
     var.T     = reshape(T,Nx*Nz,1)-273.15;   % temperature [C]
     var.P     = reshape(Pt,Nx*Nz,1)/1e9;     % pressure [GPa]
     var.m     = reshape(mq,Nx*Nz,1);         % melt fraction [wt]
     var.f     = reshape(fq,Nx*Nz,1);         % bubble fraction [wt]
-    var.H2O   = reshape(v,Nx*Nz,1);          % water concentration [wt]
-    var.SiO2m = var.c*cal.cmp_oxd(:,1)./100; % melt silica concentration [wt]
+    var.H2O   = reshape(c(:,:,end),Nx*Nz,1); % water concentration [wt]
+    var.SiO2m = reshape(cm_oxd(:,:,1)./sum(cm_oxd(:,:,1:end-1),3),Nx*Nz,1); % melt silica concentration [wt]
 
     [var,cal] =  meltmodel(var,cal,'E');
 
@@ -365,13 +347,11 @@ while res > tol
     xq = reshape(var.x,Nz,Nx);
     x  = xq;  m = mq;  f = fq;
 
-    cxq = reshape(var.cx,Nz,Nx,cal.ncmp);
-    cmq = reshape(var.cm,Nz,Nx,cal.ncmp);
+    cxq = reshape([var.cx,zeros(size(var.T))    ],Nz,Nx,cal.ncmp);
+    cmq = reshape([var.cm.*(1-var.H2Om),var.H2Om],Nz,Nx,cal.ncmp);
     cm  = cmq; cx = cxq;
-    
-    vmq = reshape(var.H2Om,Nz,Nx,1);
-    vfq = ones(size(vmq));
-    vm  = vmq; vf = vfq;
+
+    cm_oxd = reshape(reshape(cm,Nz*Nx,cal.ncmp)*cal.cmp_oxd,Nz,Nx,cal.noxd);
 
     eqtime = toc(eqtime);
     EQtime = EQtime + eqtime;
@@ -386,10 +366,9 @@ rhoo = rho;
 dto  = dt; 
 
 % get bulk enthalpy, silica, volatile content densities
-S   = rho.*(cP.*log(T/(cal.Tphs1+273.15)) + x.*Dsx + f.*Dsf - Adbt.*(Pt-Ptop));  So = S;  res_S = 0.*S;
-S0  = rho.*(cP.*log(cal.Tphs1+273.15) + x.*Dsx + f.*Dsf - Adbt.*Ptop);  
-C   = rho.*(m.*cm + x.*cx); Co = C;  res_C = 0.*C;
-V   = rho.*(m.*vm + f.*vf); Vo = V;  res_V = 0.*V;
+S   = rho.*(cP.*log(T/(min(cal.Tm)+273.15)) + x.*Dsx + f.*Dsf - Adbt.*(Pt-Ptop));  So = S;  res_S = 0.*S;
+S0  = rho.*(cP.*log(min(cal.Tm)+273.15) + x.*Dsx + f.*Dsf - Adbt.*Ptop);  
+C   = rho.*(m.*cm + x.*cx + f.*cf); Co = C;  res_C = 0.*C;
 X   = rho.*x; Xo = X;  res_X = 0.*X;
 F   = rho.*f; Fo = F;  res_F = 0.*F;
 M   = rho.*m; Mo = M;  res_M = 0.*M;

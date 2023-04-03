@@ -3,7 +3,6 @@
 dsumMdtoo = dsumMdto; dsumMdto = dsumMdt;
 dsumSdtoo = dsumSdto; dsumSdto = dsumSdt;
 dsumCdtoo = dsumCdto; dsumCdto = dsumCdt;
-dsumVdtoo = dsumVdto; dsumVdto = dsumVdt;
 
 stp = max(1,step+1);
 
@@ -14,7 +13,6 @@ hist.time(stp) = time;
 hist.sumM(stp) = sum(sum(rho*h*h*1));  % [kg]
 hist.sumS(stp) = sum(sum(  S*h*h*1));  % [J]
 hist.sumC(stp) = sum(sum(  C*h*h*1));  % [kg]
-hist.sumV(stp) = sum(sum(  V*h*h*1));  % [kg]
 
 % record expected rates of change by volume change and imposed boundaries layers
 dsumMdt = sum(  X(1,:).*Wx(1,2:end-1)*h*1) - sum(X(end,:).*Wx(end,2:end-1)*h*1) ...
@@ -31,26 +29,21 @@ dsumSdt = sum(sum(bnd_S*h*h*1)) + sum(sum(diss_h*h*h*1)) ...
         + sum(  M(1,:).*sm(1,:).*Wm(1,2:end-1)*h*1) - sum(M(end,:).*sm(end,:).*Wm(end,2:end-1)*h*1) ...
         + sum(  M(:,1).*sm(:,1).*Um(2:end-1,1)*h*1) - sum(M(:,end).*sm(:,end).*Um(2:end-1,end)*h*1);  % [J /s]
 dsumCdt = sum(sum(bnd_C*h*h*1)) ...
-        + sum(  X(1,:).*cx(1,:).*Wx(1,2:end-1)*h*1) - sum(X(end,:).*cx(end,:).*Wx(end,2:end-1)*h*1) ...
-        + sum(  X(:,1).*cx(:,1).*Ux(2:end-1,1)*h*1) - sum(X(:,end).*cx(:,end).*Ux(2:end-1,end)*h*1) ...
-        + sum(  M(1,:).*cm(1,:).*Wm(1,2:end-1)*h*1) - sum(M(end,:).*cm(end,:).*Wm(end,2:end-1)*h*1) ...
-        + sum(  M(:,1).*cm(:,1).*Um(2:end-1,1)*h*1) - sum(M(:,end).*cm(:,end).*Um(2:end-1,end)*h*1);  % [kg/s]
-dsumVdt = sum(sum(bnd_V*h*h*1)) ...
-        + sum(  F(1,:).*vf(1,:).*Wf(1,2:end-1)*h*1) - sum(F(end,:).*vf(end,:).*Wf(end,2:end-1)*h*1) ...
-        + sum(  F(:,1).*vf(:,1).*Uf(2:end-1,1)*h*1) - sum(F(:,end).*vf(:,end).*Uf(2:end-1,end)*h*1) ...
-        + sum(  M(1,:).*vm(1,:).*Wm(1,2:end-1)*h*1) - sum(M(end,:).*vm(end,:).*Wm(end,2:end-1)*h*1) ...
-        + sum(  M(:,1).*vm(:,1).*Um(2:end-1,1)*h*1) - sum(M(:,end).*vm(:,end).*Um(2:end-1,end)*h*1);  % [kg/s]
+        + sum(  X(1,:).*cx(1,:,:).*Wx(1,2:end-1)*h*1) - sum(X(end,:).*cx(end,:,:).*Wx(end,2:end-1)*h*1) ...
+        + sum(  X(:,1).*cx(:,1,:).*Ux(2:end-1,1)*h*1) - sum(X(:,end).*cx(:,end,:).*Ux(2:end-1,end)*h*1) ...
+        + sum(  F(1,:).*cf(1,:,:).*Wf(1,2:end-1)*h*1) - sum(F(end,:).*cf(end,:,:).*Wf(end,2:end-1)*h*1) ...
+        + sum(  F(:,1).*cf(:,1,:).*Uf(2:end-1,1)*h*1) - sum(F(:,end).*cf(:,end,:).*Uf(2:end-1,end)*h*1) ...
+        + sum(  M(1,:).*cm(1,:,:).*Wm(1,2:end-1)*h*1) - sum(M(end,:).*cm(end,:,:).*Wm(end,2:end-1)*h*1) ...
+        + sum(  M(:,1).*cm(:,1,:).*Um(2:end-1,1)*h*1) - sum(M(:,end).*cm(:,end,:).*Um(2:end-1,end)*h*1);  % [kg/s]
 
 if step>=1; hist.DM(stp) = (a2*hist.DM(stp-1) + a3*hist.DM(max(1,stp-2)) + (b1*dsumMdt + b2*dsumMdto + b3*dsumMdtoo)*dt)/a1; else; hist.DM(stp) = 0; end  % [kg]
 if step>=1; hist.DS(stp) = (a2*hist.DS(stp-1) + a3*hist.DS(max(1,stp-2)) + (b1*dsumSdt + b2*dsumSdto + b3*dsumSdtoo)*dt)/a1; else; hist.DS(stp) = 0; end  % [kg]
 if step>=1; hist.DC(stp) = (a2*hist.DC(stp-1) + a3*hist.DC(max(1,stp-2)) + (b1*dsumCdt + b2*dsumCdto + b3*dsumCdtoo)*dt)/a1; else; hist.DC(stp) = 0; end  % [kg]
-if step>=1; hist.DV(stp) = (a2*hist.DV(stp-1) + a3*hist.DV(max(1,stp-2)) + (b1*dsumVdt + b2*dsumVdto + b3*dsumVdtoo)*dt)/a1 .* any(v(:)>1e-6); else; hist.DV(stp) = 0; end  % [kg]
 
 % record conservation error of mass M, heat H, major component C, volatile component V
 hist.EM(stp) = (hist.sumM(stp) - hist.DM(stp))./hist.sumM(1) - 1;  % [kg/kg]
 hist.ES(stp) = (hist.sumS(stp) - hist.DS(stp))./hist.sumS(1) - 1;  % [J /J ]
 hist.EC(stp) = (hist.sumC(stp) - hist.DC(stp))./hist.sumC(1) - 1;  % [kg/kg]
-hist.EV(stp) =((hist.sumV(stp) - hist.DV(stp))./(hist.sumV(1)+TINY) - 1);  % [kg/kg]
 
 % record variable and coefficient diagnostics
 hist.W(stp,1) = min(min(-W(:,2:end-1)));
@@ -165,14 +158,6 @@ if any(indm(:)>0)
         hist.cm_oxd(stp,2,i) = sum(sum(cm_oxd(:,:,i).*m.*rho))./sum(sum(m.*rho));
         hist.cm_oxd(stp,3,i) = max(max(cm_oxd(indm_oxd(:,:,i))));
     end
-
-    if any(v(:)>1e-6)
-        hist.vm(stp,1) = min(min(vm(indm)));
-        hist.vm(stp,2) = sum(sum(vm.*m.*rho))./sum(sum(m.*rho));
-        hist.vm(stp,3) = max(max(vm(indm)));
-    else
-        hist.vm(stp,1:3) = NaN;
-    end
     
     hist.rhom(stp,1) = min(min(rhom(indm)));
     hist.rhom(stp,2) = sum(sum(rhom.*m))./sum(sum(m));
@@ -189,19 +174,9 @@ else
     hist.etam(stp,1:3) = NaN;
 end
 
-indf = f>1e-6;
-if any(indf(:)>0)
-    hist.vf(stp,1) = min(min(vf(indf)));
-    hist.vf(stp,2) = sum(sum(vf.*f.*rho))./sum(sum(f.*rho));
-    hist.vf(stp,3) = max(max(vf(indf)));
-    
-    hist.rhof(stp,1) = min(min(rhof(indf)));
-    hist.rhof(stp,2) = sum(sum(rhof.*f.*rho))./sum(sum(f.*rho));
-    hist.rhof(stp,3) = max(max(rhof(indf)));
-else
-    hist.vf(stp,1:3) = NaN;
-    hist.rhof(stp,1:3) = NaN;
-end
+hist.Gm(stp,1) = min(min(Gm));
+hist.Gm(stp,2) = mean(mean(Gm));
+hist.Gm(stp,3) = max(max(Gm));
 
 hist.Gx(stp,1) = min(min(Gx));
 hist.Gx(stp,2) = mean(mean(Gx));
@@ -242,57 +217,57 @@ for k = 1:length(ir0)
     hist.ir(stp,k,3) = max(max(ir(:,:,k)));
 end
 
-% fraction, composition, and temperature of eruptible magma suspension (mu>0.55)
-indmagma = max(0,min(1,(1+erf((mu-0.55)./0.05))/2));
-hist.Fmagma(stp) = sum(sum(rho.*indmagma.*h^2))./sum(sum(rho.*h^2));
-hist.Cmagma(stp) = sum(sum(rho.*indmagma.*c.*h^2))./sum(sum(rho.*indmagma.*h^2));
-hist.Tmagma(stp) = sum(sum(rho.*indmagma.*T.*h^2))./sum(sum(rho.*indmagma.*h^2));
+% % fraction, composition, and temperature of eruptible magma suspension (mu>0.55)
+% indmagma = max(0,min(1,(1+erf((mu-0.55)./0.05))/2));
+% hist.Fmagma(stp) = sum(sum(rho.*indmagma.*h^2))./sum(sum(rho.*h^2));
+% hist.Cmagma(stp) = sum(sum(rho.*indmagma.*c.*h^2))./sum(sum(rho.*indmagma.*h^2));
+% hist.Tmagma(stp) = sum(sum(rho.*indmagma.*T.*h^2))./sum(sum(rho.*indmagma.*h^2));
+% 
+% % fraction, composition, and temperature of plutonic rock (mu<0.15)
+% indpluton = max(0,min(1,(1+erf((chi-0.85)./0.05))/2));
+% hist.Fpluton(stp) = sum(sum(rho.*indpluton.*h^2))./sum(sum(rho.*h^2));
+% hist.Cpluton(stp) = sum(sum(rho.*indpluton.*c.*h^2))./sum(sum(rho.*indpluton.*h^2));
+% hist.Tpluton(stp) = sum(sum(rho.*indpluton.*T.*h^2))./sum(sum(rho.*indpluton.*h^2));
+% 
+% % fraction, composition, and temperature of magma mush (0.15<mu<0.55)
+% indmush = max(0,min(1,1-indmagma-indpluton));
+% hist.Fmush(stp) = sum(sum(rho.*indmush.*h^2))./sum(sum(rho.*h^2));
+% hist.Cmush(stp) = sum(sum(rho.*indmush.*c.*h^2))./sum(sum(rho.*indmush.*h^2));
+% hist.Tmush(stp) = sum(sum(rho.*indmush.*T.*h^2))./sum(sum(rho.*indmush.*h^2));
 
-% fraction, composition, and temperature of plutonic rock (mu<0.15)
-indpluton = max(0,min(1,(1+erf((chi-0.85)./0.05))/2));
-hist.Fpluton(stp) = sum(sum(rho.*indpluton.*h^2))./sum(sum(rho.*h^2));
-hist.Cpluton(stp) = sum(sum(rho.*indpluton.*c.*h^2))./sum(sum(rho.*indpluton.*h^2));
-hist.Tpluton(stp) = sum(sum(rho.*indpluton.*T.*h^2))./sum(sum(rho.*indpluton.*h^2));
+% % fraction, crystallinity, and temperature of felsic materials (c > (perCm_cphs1)/2)
+% indfelsic = max(0,min(1,(1+erf((c(:,:,1)-(cal.perCm+cal.cphs1)/2)./0.005))/2));
+% hist.Ffelsic(stp) = sum(sum(rho.*indfelsic.*h^2))./sum(sum(rho.*h^2));
+% hist.Xfelsic(stp) = sum(sum(rho.*indfelsic.*x.*h^2))./sum(sum(rho.*indfelsic.*h^2));
+% hist.Tfelsic(stp) = sum(sum(rho.*indfelsic.*T.*h^2))./sum(sum(rho.*indfelsic.*h^2));
+% 
+% % fraction, crystallinity, and temperature of intermediate materials (perCm < c < (perCm_cphs1)/2)
+% indinterm = max(0,min(1,(1+erf((c-cal.perCm)./0.005))/2 .* (1-indfelsic)));
+% hist.Finterm(stp) = sum(sum(rho.*indinterm.*h^2))./sum(sum(rho.*h^2));
+% hist.Xinterm(stp) = sum(sum(rho.*indinterm.*x.*h^2))./sum(sum(rho.*indinterm.*h^2));
+% hist.Tinterm(stp) = sum(sum(rho.*indinterm.*T.*h^2))./sum(sum(rho.*indinterm.*h^2));
+% 
+% % fraction, crystallinity, and temperature of mafic materials (perCx < c < perCm)
+% indmafic = max(0,min(1,(1+erf((c-cal.perCx)./0.005))/2 .* (1-indinterm-indfelsic)));
+% hist.Fmafic(stp) = sum(sum(rho.*indmafic.*h^2))./sum(sum(rho.*h^2));
+% hist.Xmafic(stp) = sum(sum(rho.*indmafic.*x.*h^2))./sum(sum(rho.*indmafic.*h^2));
+% hist.Tmafic(stp) = sum(sum(rho.*indmafic.*T.*h^2))./sum(sum(rho.*indmafic.*h^2));
+% 
+% % fraction, crystallinity, and temperature of ultramafic materials (c < perCx)
+% indultram = max(0,min(1,1-indmafic-indinterm-indfelsic));
+% hist.Fultram(stp) = sum(sum(rho.*indultram.*h^2))./sum(sum(rho.*h^2));
+% hist.Xultram(stp) = sum(sum(rho.*indultram.*x.*h^2))./sum(sum(rho.*indultram.*h^2));
+% hist.Tultram(stp) = sum(sum(rho.*indultram.*T.*h^2))./sum(sum(rho.*indultram.*h^2));
 
-% fraction, composition, and temperature of magma mush (0.15<mu<0.55)
-indmush = max(0,min(1,1-indmagma-indpluton));
-hist.Fmush(stp) = sum(sum(rho.*indmush.*h^2))./sum(sum(rho.*h^2));
-hist.Cmush(stp) = sum(sum(rho.*indmush.*c.*h^2))./sum(sum(rho.*indmush.*h^2));
-hist.Tmush(stp) = sum(sum(rho.*indmush.*T.*h^2))./sum(sum(rho.*indmush.*h^2));
+% % differentiation index
+% nobnd = topshape<1e-3 & botshape<1e-3 & sdsshape<1e-3;
+% if any(nobnd(:))
+%     hist.Rdiff(stp) = (max(max(c(nobnd)))-min(min(c(nobnd))))./(cal.cphs1-cal.cphs0);
+% end
 
-% fraction, crystallinity, and temperature of felsic materials (c > (perCm_cphs1)/2)
-indfelsic = max(0,min(1,(1+erf((c-(cal.perCm+cal.cphs1)/2)./0.005))/2));
-hist.Ffelsic(stp) = sum(sum(rho.*indfelsic.*h^2))./sum(sum(rho.*h^2));
-hist.Xfelsic(stp) = sum(sum(rho.*indfelsic.*x.*h^2))./sum(sum(rho.*indfelsic.*h^2));
-hist.Tfelsic(stp) = sum(sum(rho.*indfelsic.*T.*h^2))./sum(sum(rho.*indfelsic.*h^2));
-
-% fraction, crystallinity, and temperature of intermediate materials (perCm < c < (perCm_cphs1)/2)
-indinterm = max(0,min(1,(1+erf((c-cal.perCm)./0.005))/2 .* (1-indfelsic)));
-hist.Finterm(stp) = sum(sum(rho.*indinterm.*h^2))./sum(sum(rho.*h^2));
-hist.Xinterm(stp) = sum(sum(rho.*indinterm.*x.*h^2))./sum(sum(rho.*indinterm.*h^2));
-hist.Tinterm(stp) = sum(sum(rho.*indinterm.*T.*h^2))./sum(sum(rho.*indinterm.*h^2));
-
-% fraction, crystallinity, and temperature of mafic materials (perCx < c < perCm)
-indmafic = max(0,min(1,(1+erf((c-cal.perCx)./0.005))/2 .* (1-indinterm-indfelsic)));
-hist.Fmafic(stp) = sum(sum(rho.*indmafic.*h^2))./sum(sum(rho.*h^2));
-hist.Xmafic(stp) = sum(sum(rho.*indmafic.*x.*h^2))./sum(sum(rho.*indmafic.*h^2));
-hist.Tmafic(stp) = sum(sum(rho.*indmafic.*T.*h^2))./sum(sum(rho.*indmafic.*h^2));
-
-% fraction, crystallinity, and temperature of ultramafic materials (c < perCx)
-indultram = max(0,min(1,1-indmafic-indinterm-indfelsic));
-hist.Fultram(stp) = sum(sum(rho.*indultram.*h^2))./sum(sum(rho.*h^2));
-hist.Xultram(stp) = sum(sum(rho.*indultram.*x.*h^2))./sum(sum(rho.*indultram.*h^2));
-hist.Tultram(stp) = sum(sum(rho.*indultram.*T.*h^2))./sum(sum(rho.*indultram.*h^2));
-
-% differentiation index
-nobnd = topshape<1e-3 & botshape<1e-3 & sdsshape<1e-3;
-if any(nobnd(:))
-    hist.Rdiff(stp) = (max(max(c(nobnd)))-min(min(c(nobnd))))./(cal.cphs1-cal.cphs0);
-end
-
-% index of assimilation
-if step>1
-    hist.Ra (stp) = hist.Ra (stp-1) + sum(sum((topshape+botshape+sdsshape).*rho./tau_a.*h^2))./sum(sum(rho.*h^2)).*dt;
-else
-    hist.Ra(stp,1) = 0;
-end
+% % index of assimilation
+% if step>1
+%     hist.Ra (stp) = hist.Ra (stp-1) + sum(sum((topshape+botshape+sdsshape).*rho./tau_a.*h^2))./sum(sum(rho.*h^2)).*dt;
+% else
+%     hist.Ra(stp,1) = 0;
+% end

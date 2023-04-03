@@ -22,15 +22,15 @@ if Nx <= 1 && Nz <= 1  % create 0D plots
     plot(hist.time/hr,hist.Tsol(:,2),CL{[1,4]},LW{:});
     title('$T [^\circ$C]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(4,1,2)
-    plot(hist.time/hr,hist.cx_oxd(:,2,cal.Si),CL{[1,4]},LW{:}); axis xy tight; box on; hold on;
-    plot(hist.time/hr,hist.cm_oxd(:,2,cal.Si),CL{[1,3]},LW{:});
-    plot(hist.time/hr,hist.c_oxd(:,2,cal.Si)./(1-hist.f(:,2)),CL{[1,2]},LW{:});
+    plot(hist.time/hr,hist.cx_oxd(:,2,cal.Si)./sum(hist.cx_oxd(:,2,1:end-1),3).*100,CL{[1,4]},LW{:}); axis xy tight; box on; hold on;
+    plot(hist.time/hr,hist.cm_oxd(:,2,cal.Si)./sum(hist.cm_oxd(:,2,1:end-1),3).*100,CL{[1,3]},LW{:});
+    plot(hist.time/hr,hist.c_oxd (:,2,cal.Si)./sum(hist.c_oxd (:,2,1:end-1),3).*100,CL{[1,2]},LW{:});
     title('$\bar{c}$ [wt\% SiO$_2$]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(4,1,3)
-    semilogy(hist.time/hr,hist.vf(:,2)*100,CL{[1,4]},LW{:}); axis xy tight; box on; hold on;
-    semilogy(hist.time/hr,hist.vm(:,2)*100,CL{[1,3]},LW{:});
-    semilogy(hist.time/hr,hist.v (:,2)*100,CL{[1,2]},LW{:});
-    title('$\bar{v}$ [wt\% H$_2$O]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+    plot(hist.time/hr,hist.cx_oxd(:,2,cal.H),CL{[1,4]},LW{:}); axis xy tight; box on; hold on;
+    plot(hist.time/hr,hist.cm_oxd(:,2,cal.H),CL{[1,3]},LW{:});
+    plot(hist.time/hr,hist.c_oxd (:,2,cal.H),CL{[1,2]},LW{:});
+    title('$\bar{c}$ [wt\% H$_2$O]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(4,1,4)
     plot(hist.time/hr,hist.mu (:,2)*100.*(hist.mu (:,2)>1e-9),CL{[1,3]},LW{:}); axis xy tight; box on; hold on;
     plot(hist.time/hr,hist.chi(:,2)*100.*(hist.chi(:,2)>1e-9),CL{[1,4]},LW{:});
@@ -63,13 +63,13 @@ if Nx <= 1 && Nz <= 1  % create 0D plots
     else; set(0, 'CurrentFigure', fh3); clf;
     end
     subplot(3,1,1)
-    for i=1:cal.noxd
-        plot(hist.time/hr,squeeze(hist.cm_oxd(:,2,i)),'-',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis xy tight; box on; hold on
+    for i=1:cal.noxd-1
+        plot(hist.time/hr,squeeze(hist.cm_oxd(:,2,i)./sum(hist.cm_oxd(:,2,1:end-1),3)).*100,'-',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis xy tight; box on; hold on
     end
-    title('Melt oxds [wt\%]',TX{:},FS{:}); legend(cal.oxdStr,TX{:},FS{1},8,'Location','northeast'); set(gca,TL{:},TS{:});
+    title('Melt oxds [wt\%]',TX{:},FS{:}); legend(cal.oxdStr(1:end-1),TX{:},FS{1},8,'Location','northeast'); set(gca,TL{:},TS{:});
     subplot(3,1,2)
-    for i=1:cal.noxd
-        plot(hist.time/hr,squeeze(hist.cx_oxd(:,2,i)),'-',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis xy tight; box on; hold on
+    for i=1:cal.noxd-1
+        plot(hist.time/hr,squeeze(hist.cx_oxd(:,2,i)./sum(hist.cx_oxd(:,2,1:end-1),3)).*100,'-',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis xy tight; box on; hold on
     end
     title('Xtal oxds [wt\%]',TX{:},FS{:});
     subplot(3,1,3)
@@ -357,10 +357,9 @@ if Nz>1 || step==0; clf; end
 % plot(CCm.*100,TT,'k-','LineWidth',2);
 % end
 
-Tplt = T-273.15 - (Pt-Ptop)*cal.clap;
-plot(c_oxd(:,:,cal.Si)./(1-f),Tplt,'.',CL{[1,2]},LW{:},'MarkerSize',15); axis tight; hold on
-plot(cx_oxd(:,:,cal.Si)      ,Tplt,'.',CL{[1,4]},LW{:},'MarkerSize',15);
-plot(cm_oxd(:,:,cal.Si)      ,Tplt,'.',CL{[1,3]},LW{:},'MarkerSize',15);
+plot( c_oxd(:,:,cal.Si)./sum( c_oxd(:,:,1:end-1),3).*100,T-273.15,'.',CL{[1,2]},LW{:},'MarkerSize',15); axis tight; hold on
+plot(cx_oxd(:,:,cal.Si)./sum(cx_oxd(:,:,1:end-1),3).*100,T-273.15,'.',CL{[1,4]},LW{:},'MarkerSize',15);
+plot(cm_oxd(:,:,cal.Si)./sum(cm_oxd(:,:,1:end-1),3).*100,T-273.15,'.',CL{[1,3]},LW{:},'MarkerSize',15);
 
 set(gca,'TickLabelInterpreter','latex','FontSize',15)
 title('Phase Diagram','Interpreter','latex','FontSize',18)
@@ -374,9 +373,9 @@ end
 if Nz>1 || step==0; clf;
 TAS; axis tight; box on; hold on;
 end
-scatter(cx_oxd(:,:,cal.Si)       ,sum(cx_oxd(:,:,[cal.Na,cal.K]),3)       ,50,T-273.15,'filled','^','MarkerEdgeColor','k'); colormap(ocean); cb = colorbar;
-scatter(cm_oxd(:,:,cal.Si)       ,sum(cm_oxd(:,:,[cal.Na,cal.K]),3)       ,50,T-273.15,'filled','o','MarkerEdgeColor','k');
-scatter( c_oxd(:,:,cal.Si)./(1-f),sum( c_oxd(:,:,[cal.Na,cal.K]),3)./(1-f),80,T-273.15,'filled','s','MarkerEdgeColor','k');
+scatter(cx_oxd(:,:,cal.Si)./sum(cx_oxd(:,:,1:end-1),3).*100,sum(cx_oxd(:,:,[cal.Na,cal.K]),3)./sum(cx_oxd(:,:,1:end-1),3).*100,50,T-273.15,'filled','^','MarkerEdgeColor','k'); colormap(ocean); cb = colorbar;
+scatter(cm_oxd(:,:,cal.Si)./sum(cm_oxd(:,:,1:end-1),3).*100,sum(cm_oxd(:,:,[cal.Na,cal.K]),3)./sum(cm_oxd(:,:,1:end-1),3).*100,50,T-273.15,'filled','o','MarkerEdgeColor','k');
+scatter( c_oxd(:,:,cal.Si)./sum( c_oxd(:,:,1:end-1),3).*100,sum( c_oxd(:,:,[cal.Na,cal.K]),3)./sum( c_oxd(:,:,1:end-1),3).*100,80,T-273.15,'filled','s','MarkerEdgeColor','k');
 set(cb,TL{:},'FontSize',12); set(gca,TL{:},'FontSize',15); xlabel('SiO$_2$ [wt \%]',TX{:},'FontSize',15); ylabel('Na$_2$O + K$_2$O [wt \%]',TX{:},'FontSize',15);
 
 if ~exist('fh9','var'); fh9 = figure(VIS{:});
@@ -393,9 +392,9 @@ scatter(A,B,50,T-273.15,'filled','^','MarkerEdgeColor','k'); colormap(ocean); cb
                    cm_oxd(:,:, cal.Fe          )./sum(cm_oxd(:,:,[cal.Fe,cal.Mg,cal.Na,cal.K]),3), ...
                sum(cm_oxd(:,:,[cal.Na,cal.K]),3)./sum(cm_oxd(:,:,[cal.Fe,cal.Mg,cal.Na,cal.K]),3));
 scatter(A,B,50,T-273.15,'filled','o','MarkerEdgeColor','k'); colormap(ocean);
-[A,B] = terncoords(c_oxd(:,:, cal.Mg          )./(1-f)./(sum(c_oxd(:,:,[cal.Fe,cal.Mg,cal.Na,cal.K]),3)./(1-f)), ...
-                   c_oxd(:,:, cal.Fe          )./(1-f)./(sum(c_oxd(:,:,[cal.Fe,cal.Mg,cal.Na,cal.K]),3)./(1-f)), ...
-               sum(c_oxd(:,:,[cal.Na,cal.K]),3)./(1-f)./(sum(c_oxd(:,:,[cal.Fe,cal.Mg,cal.Na,cal.K]),3)./(1-f)));
+[A,B] = terncoords(c_oxd(:,:, cal.Mg          )./(sum(c_oxd(:,:,[cal.Fe,cal.Mg,cal.Na,cal.K]),3)), ...
+                   c_oxd(:,:, cal.Fe          )./(sum(c_oxd(:,:,[cal.Fe,cal.Mg,cal.Na,cal.K]),3)), ...
+               sum(c_oxd(:,:,[cal.Na,cal.K]),3)./(sum(c_oxd(:,:,[cal.Fe,cal.Mg,cal.Na,cal.K]),3)));
 scatter(A,B,80,T-273.15,'filled','s','MarkerEdgeColor','k'); colormap(ocean);
 set(cb,TL{:},'FontSize',12); set(gca,TL{:},'FontSize',15); xlabel('SiO$_2$ [wt \%]',TX{:},'FontSize',15); ylabel('Na$_2$O + K$_2$O [wt \%]',TX{:},'FontSize',15);
 
@@ -486,9 +485,9 @@ if save_op && ~restart
     end
 
     name = [opdir,'/',runID,'/',runID,'_',num2str(floor(step/nop))];
-    save(name,'U','W','P','Pt','f','x','m','phi','chi','mu','X','F','M','S','C','V','T','c','v','cm','cx','vm','vf','TE','IR','te','ir','dSdt','dCdt','dVdt','dFdt','dXdt','dMdt','drhodt','dTEdt','dIRdt','Gf','Gx','rho','eta','eII','tII','dt','time','step','VolSrc','wf','wx','wm');
+    save(name,'U','W','P','Pt','f','x','m','phi','chi','mu','X','F','M','S','C','T','c','cm','cx','cf','TE','IR','te','ir','dSdt','dCdt','dFdt','dXdt','dMdt','drhodt','dTEdt','dIRdt','Gf','Gx','Gm','rho','eta','eII','tII','dt','time','step','VolSrc','wf','wx','wm');
     name = [opdir,'/',runID,'/',runID,'_cont'];
-    save(name,'U','W','P','Pt','f','x','m','phi','chi','mu','X','F','M','S','C','V','T','c','v','cm','cx','vm','vf','TE','IR','te','ir','dSdt','dCdt','dVdt','dFdt','dXdt','dMdt','drhodt','dTEdt','dIRdt','Gf','Gx','rho','eta','eII','tII','dt','time','step','VolSrc','wf','wx','wm');
+    save(name,'U','W','P','Pt','f','x','m','phi','chi','mu','X','F','M','S','C','T','c','cm','cx','cf','TE','IR','te','ir','dSdt','dCdt','dFdt','dXdt','dMdt','drhodt','dTEdt','dIRdt','Gf','Gx','Gm','rho','eta','eII','tII','dt','time','step','VolSrc','wf','wx','wm');
     name = [opdir,'/',runID,'/',runID,'_hist'];
     save(name,'hist');
 

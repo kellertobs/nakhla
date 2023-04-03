@@ -4,14 +4,14 @@ function  [var,cal,flag]  =  meltmodel(var,cal,type)
 
 if strcmp(type,'K')
     
-    var.H2Om  =  max(var.H2O,min(1,min(var.H2O./(var.m+1e-16),cal.H2Osat)));
+    var.H2Om  =  max(0,min(1,min(var.H2O./(var.m+1e-16),cal.H2Osat)));
     cal       =  K(var.T,var.P,var.H2Om,cal);
     
 %*****  compute Tsol, Tliq at P,C^i  **************************************
 
 elseif strcmp(type,'T')
     
-    [cal,flag.Tsol]  =  Tsolidus( var,cal);
+    [cal,flag.Tsol]  =  Tsolidus (var,cal);
     [cal,flag.Tliq]  =  Tliquidus(var,cal);
 
 %*****  compute equilibrium f, C_s^i, C_l^i fraction at P,T,C^i  **********
@@ -30,10 +30,11 @@ function  [cal, flag]  =  Tsolidus(var,cal)
 %*****  subroutine to compute solidus temperature at given bulk composition
 
 %***  exclude invalid compositions
-ii   =  sum(var.c(:,sum(var.c,1)>1),2)<=1+1e-14;
+ii  =  sum(var.c(:,sum(var.c,1)>1),2)<=1;
 
 %***  get T,P-,H2O-dependent partition coefficients Kci
-cal     = H2Osat(var.T,var.P,var.SiO2m,cal);
+cal       = H2Osat(var.T,var.P,var.SiO2m,cal);
+var.m     = 1;
 [var,cal] = meltmodel(var,cal,'K');
 
 %***  set starting guess for Tsol
@@ -49,7 +50,7 @@ cal     = H2Osat(var.T,var.P,var.SiO2m,cal);
 [var,cal] = meltmodel(var,cal,'K');
 
 
-%***  get residual for sum(ci_b/Kci) = 1
+%***  get residual for sum(ci_b/Kci) = sum(ci_v)
 r    =  sum(var.c./cal.Kc,2)-1;
 
 rnorm      =  1;     % initialize residual norm for iterations
@@ -66,7 +67,7 @@ while rnorm > rnorm_tol  % iterate down to full accuracy
     cal     = H2Osat(var.T,var.P,var.SiO2m,cal);
     [var,cal] = meltmodel(var,cal,'K');
     
-    %***  get residual at T+eps_T
+    %***  get residual at T+eps_T/2
     rp   =  sum(var.c./cal.Kc,2)-1;
     
     %***  compute partition coefficients Kci at T-eps_T/2
@@ -74,7 +75,7 @@ while rnorm > rnorm_tol  % iterate down to full accuracy
     cal     = H2Osat(var.T,var.P,var.SiO2m,cal);
     [var,cal] = meltmodel(var,cal,'K');
     
-    %***  get residual at T-eps_T
+    %***  get residual at T-eps_T/2
     rm   =  sum(var.c./cal.Kc,2)-1;
     
     %***  finite difference drdT = (r(T+eps_T/2)-r(T-eps_T/2))/eps_T
@@ -113,10 +114,10 @@ function  [cal, flag]  =  Tliquidus(var,cal)
 %*****  subroutine to compute liquidus temperature at given bulk composition
 
 %***  exclude invalid compositions
-ii  =  sum(var.c(:,sum(var.c,1)>1),2)<=1+1e-14;
+ii  =  sum(var.c(:,sum(var.c,1)>1),2)<=1;
 
 %***  get T,P-,H2O-dependent partition coefficients Kci
-cal     = H2Osat(var.T,var.P,var.SiO2m,cal);
+cal       = H2Osat(var.T,var.P,var.SiO2m,cal);
 [var,cal] = meltmodel(var,cal,'K');
 
 %***  set starting guess for Tliq
@@ -131,7 +132,7 @@ var.T   = Tliq;
 cal     = H2Osat(var.T,var.P,var.SiO2m,cal);
 [var,cal] = meltmodel(var,cal,'K');
 
-%***  get residual for sum(ci_b*Kci) = 1
+%***  get residual for sum(ci_b*Kci) = sum(ci_v)
 r  =  sum(var.c.*cal.Kc,2)-1;
 
 rnorm      =  1;     % initialize residual norm for iterations
@@ -148,7 +149,7 @@ while rnorm > rnorm_tol  % iterate down to full accuracy
     cal     = H2Osat(var.T,var.P,var.SiO2m,cal);
     [var,cal] = meltmodel(var,cal,'K');
 
-    %***  get residual at T+eps_T
+    %***  get residual at T+eps_T/2
     rp  =  sum(var.c.*cal.Kc,2)-1;
     
     %***  compute partition coefficients Kci at T-eps_T/2
@@ -156,7 +157,7 @@ while rnorm > rnorm_tol  % iterate down to full accuracy
     cal     = H2Osat(var.T,var.P,var.SiO2m,cal);
     [var,cal] = meltmodel(var,cal,'K');
     
-    %***  get residual at T-eps_T
+    %***  get residual at T-eps_T/2
     rm  =  sum(var.c.*cal.Kc,2)-1;
     
     %***  compute difference drdT = (r(T+eps_T/2)-r(T-eps_T/2))/eps_T
@@ -206,9 +207,9 @@ var.T = max(cal.Tsol,min(cal.Tliq,var.T));
 
 %***  set reasonable initial guess for melt fraction
 if ~isfield(var,'m') 
-    var.m = max(0,min(1,(var.T-cal.Tsol)./(cal.Tliq-cal.Tsol)));
+    var.m = max(2e-6,min(1-2e-6,(var.T-cal.Tsol)./(cal.Tliq-cal.Tsol)));
 elseif ~any(var.m(:)>1e-9 & var.m(:)<1-1e-9)
-    var.m = max(0,min(1,(var.T-cal.Tsol)./(cal.Tliq-cal.Tsol)));
+    var.m = max(2e-6,min(1-2e-6,(var.T-cal.Tsol)./(cal.Tliq-cal.Tsol)));
 end
 
 %***  get P-, H2O-dependent partition coefficients
@@ -225,11 +226,11 @@ end
 var.x = 1-var.m-var.f;
     
 %***  compute residual of unity sum of components
-rm   =  sum(var.c./(var.m + var.x.*cal.Kc),2) - sum(var.c./(var.m./cal.Kc + var.x),2);
+r   =  sum(var.c./(var.m + var.x.*cal.Kc),2) - sum(var.c./(var.m./cal.Kc + var.x),2);
 
 rnorm      =  1;     % initialize residual norm for iterations
 n          =  0;     % initialize iteration count
-rnorm_tol  =  1e-9;  % tolerance for Newton residual
+rnorm_tol  =  1e-12;  % tolerance for Newton residual
 its_tol    =  1e3;   % maximum number of iterations
 eps_m      =  1e-6;  % temperature perturbation for finite differencing, degrees
 flag.eql   =  1;     % tells us whether the Newton solver converged
@@ -241,46 +242,46 @@ while rnorm > rnorm_tol     % Newton iteration
 
     %***  get T,P-,H2O-dependent partition coefficients Kci
     varp = var;  varm = var;
-    varp.m = max(0,min(1,var.m+eps_m/2));
-    varm.m = max(0,min(1,var.m-eps_m/2));
+    varp.m = var.m+eps_m/2;
+    varm.m = var.m-eps_m/2;
 
     [varp,calp] = meltmodel(varp,cal,'K');
     [varm,calm] = meltmodel(varm,cal,'K');
 
-    varp.f = max(0,min(var.H2O,var.H2O - varp.m.*varp.H2Om));
+    varp.f = (var.H2O - varp.m * varp.H2Om)./(1 - varp.m * varp.H2Om);
     varp.x = 1-varp.m-varp.f;
-    varm.f = max(0,min(var.H2O,var.H2O - varm.m.*varm.H2Om));
+    varm.f = (var.H2O - varm.m * varm.H2Om)./(1 - varm.m * varm.H2Om);
     varm.x = 1-varm.m-varm.f;
 
-    rmp  =  sum(var.c./(varp.m + varp.x.*calp.Kc),2) - sum(varp.c./(varp.m./calp.Kc + varp.x),2);
-    rmm  =  sum(var.c./(varm.m + varm.x.*calm.Kc),2) - sum(varm.c./(varm.m./calm.Kc + varm.x),2);
+    rp  =  sum(var.c./(varp.m + varp.x.*calp.Kc),2) - sum(var.c./(varp.m./calp.Kc + varp.x),2);
+    rm  =  sum(var.c./(varm.m + varm.x.*calm.Kc),2) - sum(var.c./(varm.m./calm.Kc + varm.x),2);
 
     %***  compute analytic derivative of residual dr/dm
 %     dr_dm  =  sum(-(var.c.*(cal.Kc - 1).^2)./(var.x.*cal.Kc + var.m).^2,2);
-    dr_dm = (rmp-rmm)./(varp.m-varm.m);
+    dr_dm = (rp-rm)./(varp.m-varm.m);
 
     %***  apply Newton correction to melt fraction m
-    var.m = max(0,min(1-var.f,var.m - rm./dr_dm/4));
-    var.m(liq) = 1-var.f(liq);
+    var.m = max(0,min(1,var.m - r./dr_dm/4));
+    var.m(liq) = 1;
     var.m(sol) = 0;
 
     %***  get crystal fraction x
-    var.f        = max(0,min(var.H2O,var.H2O - var.m.*var.H2Om));
+    var.f        = max(0,min(var.H2O, (var.H2O - var.m * var.H2Om)./(1 - var.m * var.H2Om) ));
     unsat        = var.H2Om<cal.H2Osat;
     var.f(unsat) = 0;
     var.f(liq)   = max(0,(var.H2O(liq) - var.H2Om(liq))./(1 - var.H2Om(liq)));
     var.f(sol)   = max(0, var.H2O(sol));
 
     %***  get crystal fraction x
-    var.x = 1-var.m-var.f;
+    var.x = 1-var.m;
 
     %***  compute residual of unity sum of components
     [var,cal] = meltmodel(var,cal,'K');
-    rm   =  sum(var.c./(var.m + var.x.*cal.Kc),2) - sum(var.c./(var.m./cal.Kc + var.x),2);
-    rm(liq | sol) = 0;
+    r   =  sum(var.c./(var.m + var.x.*cal.Kc),2) - sum(var.c./(var.m./cal.Kc + var.x),2);
+    r(liq | sol) = 0;
 
     %***  get non-linear residual norm
-    rnorm  = norm(rm./dr_dm,2)./sqrt(length(rm)+1);
+    rnorm  = norm(r(var.m>0 & var.x>0)./dr_dm(var.m>0 & var.x>0),2)./sqrt(length(r(var.m>0 & var.x>0))+1);
     
     n  =  n+1;  % update iteration count
     if (n==its_tol)
@@ -292,6 +293,9 @@ end
 %***  get cxi, cmi as functions of Kci, ci and x, m, safeguard bounds
 var.cm  =  max(0,min(1, var.c./(var.m + var.x.*cal.Kc) ));
 var.cx  =  max(0,min(1, var.c./(var.m./cal.Kc + var.x) ));
+
+var.m   =  var.m.*(1-var.f);
+var.x   =  var.x.*(1-var.f);
 
 end
 
