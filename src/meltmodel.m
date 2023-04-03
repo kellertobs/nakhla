@@ -34,7 +34,6 @@ ii  =  sum(var.c(:,sum(var.c,1)>1),2)<=1;
 
 %***  get T,P-,H2O-dependent partition coefficients Kci
 cal       = H2Osat(var.T,var.P,var.SiO2m,cal);
-var.m     = 1;
 [var,cal] = meltmodel(var,cal,'K');
 
 %***  set starting guess for Tsol
@@ -55,7 +54,7 @@ r    =  sum(var.c./cal.Kc,2)-1;
 
 rnorm      =  1;     % initialize residual norm for iterations
 n          =  0;     % initialize iteration count
-rnorm_tol  =  1e-9;  % tolerance for Newton residual
+rnorm_tol  =  1e-10; % tolerance for Newton residual
 its_tol    =  1e3;   % maximum number of iterations
 eps_T      =  1e-3;  % temperature perturbation for finite differencing, degrees
 flag       =  1;     % tells us whether the Newton solver converged
@@ -137,7 +136,7 @@ r  =  sum(var.c.*cal.Kc,2)-1;
 
 rnorm      =  1;     % initialize residual norm for iterations
 n          =  0;     % initialize iteration count
-rnorm_tol  =  1e-9;  % tolerance for Newton residual
+rnorm_tol  =  1e-10; % tolerance for Newton residual
 its_tol    =  1e3;   % maximum number of iterations
 eps_T      =  1e-3;  % temperature perturbation for finite differencing, degrees
 flag       =  1;     % tells us whether the Newton solver converged
@@ -230,7 +229,7 @@ r   =  sum(var.c./(var.m + var.x.*cal.Kc),2) - sum(var.c./(var.m./cal.Kc + var.x
 
 rnorm      =  1;     % initialize residual norm for iterations
 n          =  0;     % initialize iteration count
-rnorm_tol  =  1e-12;  % tolerance for Newton residual
+rnorm_tol  =  1e-10;  % tolerance for Newton residual
 its_tol    =  1e3;   % maximum number of iterations
 eps_m      =  1e-6;  % temperature perturbation for finite differencing, degrees
 flag.eql   =  1;     % tells us whether the Newton solver converged
@@ -248,9 +247,9 @@ while rnorm > rnorm_tol     % Newton iteration
     [varp,calp] = meltmodel(varp,cal,'K');
     [varm,calm] = meltmodel(varm,cal,'K');
 
-    varp.f = (var.H2O - varp.m * varp.H2Om)./(1 - varp.m * varp.H2Om);
+    varp.f = (var.H2O - varp.m.*varp.H2Om)./(1 - varp.m.*varp.H2Om);
     varp.x = 1-varp.m-varp.f;
-    varm.f = (var.H2O - varm.m * varm.H2Om)./(1 - varm.m * varm.H2Om);
+    varm.f = (var.H2O - varm.m.*varm.H2Om)./(1 - varm.m.*varm.H2Om);
     varm.x = 1-varm.m-varm.f;
 
     rp  =  sum(var.c./(varp.m + varp.x.*calp.Kc),2) - sum(var.c./(varp.m./calp.Kc + varp.x),2);
@@ -266,7 +265,7 @@ while rnorm > rnorm_tol     % Newton iteration
     var.m(sol) = 0;
 
     %***  get crystal fraction x
-    var.f        = max(0,min(var.H2O, (var.H2O - var.m * var.H2Om)./(1 - var.m * var.H2Om) ));
+    var.f        = max(0,min(var.H2O, (var.H2O - var.m.*var.H2Om)./(1 - var.m.*var.H2Om) ));
     unsat        = var.H2Om<cal.H2Osat;
     var.f(unsat) = 0;
     var.f(liq)   = max(0,(var.H2O(liq) - var.H2Om(liq))./(1 - var.H2Om(liq)));

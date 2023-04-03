@@ -91,15 +91,15 @@ elseif Nx <= 1  % create 1D plots
     plot(cal.Tsol,Zc.',CL{[1,4]},LW{:});
     title('$T [^\circ$C]',TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,5,2)
-    plot(cx_oxd(:,:,cal.Si),Zc.',CL{[1,4]},LW{:}); axis ij tight; box on; hold on;
-    plot(cm_oxd(:,:,cal.Si),Zc.',CL{[1,3]},LW{:});
-    plot( c_oxd(:,:,cal.Si)./(1-f),Zc.',CL{[1,2]},LW{:});
-    title('$\bar{c}$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+    plot(cx_oxd(:,:,cal.Si)./sum(cx_oxd(:,:,1:end-1),3).*100,Zc.',CL{[1,4]},LW{:}); axis ij tight; box on; hold on;
+    plot(cm_oxd(:,:,cal.Si)./sum(cm_oxd(:,:,1:end-1),3).*100,Zc.',CL{[1,3]},LW{:});
+    plot( c_oxd(:,:,cal.Si)./sum( c_oxd(:,:,1:end-1),3).*100,Zc.',CL{[1,2]},LW{:});
+    title('SiO$_2$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,5,3)
-    semilogx(max(1e-6,vf*100).*any(v(:)>10*TINY),Zc.',CL{[1,5]},LW{:}); axis ij tight; box on; hold on;
-    semilogx(max(1e-6,vm*100).*any(v(:)>10*TINY),Zc.',CL{[1,3]},LW{:});
-    semilogx(max(1e-6,v *100).*any(v(:)>10*TINY),Zc.',CL{[1,2]},LW{:});
-    title('$\bar{v}$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+    plot(cx_oxd(:,:,cal.H ),Zc.',CL{[1,4]},LW{:}); axis ij tight; box on; hold on;
+    plot(cm_oxd(:,:,cal.H ),Zc.',CL{[1,3]},LW{:});
+    plot( c_oxd(:,:,cal.H ),Zc.',CL{[1,2]},LW{:});
+    title('H$_2$O [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,5,4)
     plot(mu *100.*(mu >1e-9),Zc.',CL{[1,3]},LW{:}); axis ij tight; box on; hold on;
     plot(chi*100.*(chi>1e-9),Zc.',CL{[1,4]},LW{:});
@@ -142,17 +142,17 @@ elseif Nx <= 1  % create 1D plots
     sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
     subplot(1,4,1)
     for i=1:cal.noxd
-        plot(squeeze( c_oxd(:,:,i)),Zc.',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis ij tight; box on; hold on;
+        plot(squeeze( c_oxd(:,:,i)./sum(c_oxd(:,:,1:end-1),3)).*100,Zc.',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis ij tight; box on; hold on;
     end
     title('Bulk oxds [wt\%]',TX{:},FS{:});ylabel('Depth [m]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,4,2)
     for i=1:cal.noxd
-        plot(squeeze(cm_oxd(:,:,i)),Zc.',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis ij tight; box on; hold on;
+        plot(squeeze(cm_oxd(:,:,i)./sum(cm_oxd(:,:,1:end-1),3)).*100,Zc.',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis ij tight; box on; hold on;
     end
     title('Melt oxds [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,4,3)
     for i=1:cal.noxd
-        plot(squeeze(cx_oxd(:,:,i)),Zc.',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis ij tight; box on; hold on;
+        plot(squeeze(cx_oxd(:,:,i)./sum(cx_oxd(:,:,1:end-1),3)).*100,Zc.',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis ij tight; box on; hold on;
     end
     title('Xtal oxds [wt\%]',TX{:},FS{:}); legend(cal.oxdStr,TX{:},FS{:},'Location','west'); set(gca,TL{:},TS{:});
     subplot(1,4,4)

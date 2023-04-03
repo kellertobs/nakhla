@@ -26,20 +26,19 @@ dtmax    =  36;                  % maximum time step [s]
 
 % set initial thermo-chemical state
 T0       =  1155;                % temperature top layer [deg C]
-c0       =  [0.09,0.28,0.60,0.03]; % major component top layer [wt SiO2]
-c1       =  [0.09,0.28,0.60,0.03];
-dcr      =  [0,0,0,0];
-dcg      =  [0,0,0,0];
-v0       =  0.02;                % volatile component top layer [wt H2O]
+c0       =  [0.09,0.27,0.59,0.03,0.02]; % major component top layer [wt SiO2]
+c1       =  [0.09,0.27,0.59,0.03,0.02];
+dcr      =  [0,0,0,0,0];
+dcg      =  [0,0,0,0,0];
 
 % set thermo-chemical boundary parameters
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
 bnd_w    =  h;                % boundary layer width [m]
 tau_T    =  6*hr;                % wall cooling/assimilation time [s]
 Twall    =  [300,300,nan];       % [top,bot,sds] wall rock temperature [degC] (nan = insulating)
-cwall    =  [nan,nan,nan,nan; ...
-             nan,nan,nan,nan; ...
-             nan,nan,nan,nan];
+cwall    =  [nan,nan,nan,nan,nan; ...
+             nan,nan,nan,nan,nan; ...
+             nan,nan,nan,nan,nan];
 Ptop     =  1.25e8;              % top pressure [Pa]
 
 % set thermo-chemical material parameters

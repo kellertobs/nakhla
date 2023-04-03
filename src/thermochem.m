@@ -31,7 +31,7 @@ res_S = (a1*S-a2*So-a3*Soo)/dt - (b1*dSdt + b2*dSdto + b3*dSdtoo);
 S = (a2*So+a3*Soo + (b1*dSdt + b2*dSdto + b3*dSdtoo)*dt)/a1;
 
 % convert entropy desnity to temperature
-T = (min(cal.Tm)+273.15)*exp((S - X.*Dsx - F.*Dsf)./RHO./cP + Adbt./cP.*(Pt-Ptop));
+T = (min(cal.T0)+273.15)*exp((S - X.*Dsx - F.*Dsf)./RHO./cP + Adbt./cP.*(Pt-Ptop));
 
 
 %***  update major component (SiO2) density
@@ -43,9 +43,9 @@ advn_C = - advect(M.*cm,Um(2:end-1,:),Wm(:,2:end-1),h,{ADVN,''},[1,2],BCA) ...  
 
 % boundary layers
 bnd_C = zeros(size(C));
-if ~isnan(cwall(1)); bnd_C = bnd_C + (RHO.*cwall(1,:).*(1-f)-C).*mu./tau_a .* topshape; end
-if ~isnan(cwall(2)); bnd_C = bnd_C + (RHO.*cwall(2,:).*(1-f)-C).*mu./tau_a .* botshape; end
-if ~isnan(cwall(3)); bnd_C = bnd_C + (RHO.*cwall(3,:).*(1-f)-C).*mu./tau_a .* sdsshape; end
+if ~isnan(cwall(1)); bnd_C = bnd_C + (RHO.*cwall(1,:)-C).*mu./tau_a .* topshape; end
+if ~isnan(cwall(2)); bnd_C = bnd_C + (RHO.*cwall(2,:)-C).*mu./tau_a .* botshape; end
+if ~isnan(cwall(3)); bnd_C = bnd_C + (RHO.*cwall(3,:)-C).*mu./tau_a .* sdsshape; end
 
 % total rate of change
 dCdt = advn_C + bnd_C;                                            
@@ -58,6 +58,9 @@ C = (a2*Co+a3*Coo + (b1*dCdt + b2*dCdto + b3*dCdtoo)*dt)/a1;
 
 % apply minimum/maximum bounds
 C = max(0, C );
+
+% convert component density to concentration
+c = C./sum(C,3);
 
 
 %*** update phase equilibrium
@@ -128,7 +131,7 @@ f = F./RHO;
 m = M./RHO;
 
 % convert major component density to concentration
-c = C./RHO;
+% c = C./RHO; c = c./sum(c,3);
 
 % update phase entropies
 sm = (S - X.*Dsx - F.*Dsf)./RHO;
@@ -137,7 +140,7 @@ sf = sm + Dsf;
 
 % update major component phase composition
 Kc  = (cxq+TINY)./(cmq+TINY);
-res = 1; tol  = 1e-12;
+res = 1; tol  = 1e-10;
 it  = 1; mxit = 25;
 while res>tol && it<maxit
     Kci = Kc;

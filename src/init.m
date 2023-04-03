@@ -366,7 +366,7 @@ rhoo = rho;
 dto  = dt; 
 
 % get bulk enthalpy, silica, volatile content densities
-S   = rho.*(cP.*log(T/(min(cal.Tm)+273.15)) + x.*Dsx + f.*Dsf - Adbt.*(Pt-Ptop));  So = S;  res_S = 0.*S;
+S   = rho.*(cP.*log(T/(min(cal.T0)+273.15)) + x.*Dsx + f.*Dsf - Adbt.*(Pt-Ptop));  So = S;  res_S = 0.*S;
 S0  = rho.*(cP.*log(min(cal.Tm)+273.15) + x.*Dsx + f.*Dsf - Adbt.*Ptop);  
 C   = rho.*(m.*cm + x.*cx + f.*cf); Co = C;  res_C = 0.*C;
 X   = rho.*x; Xo = X;  res_X = 0.*X;
