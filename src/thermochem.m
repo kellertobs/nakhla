@@ -66,7 +66,7 @@ c = C./sum(C,3);
 %*** update phase equilibrium
 eqtime = tic;
 
-var.c     = reshape(c(:,:,1:end-1)./sum(c(:,:,1:end-1),3),Nx*Nz,cal.ncmp-1);   % component fractions [wt]
+var.c     = reshape(c,Nx*Nz,cal.ncmp);   % component fractions [wt]
 var.T     = reshape(T,Nx*Nz,1)-273.15;   % temperature [C]
 var.P     = reshape(Pt,Nx*Nz,1)/1e9;     % pressure [GPa]
 var.m     = reshape(mq,Nx*Nz,1);         % melt fraction [wt]
@@ -74,14 +74,14 @@ var.f     = reshape(fq,Nx*Nz,1);         % bubble fraction [wt]
 var.H2O   = reshape(c(:,:,end),Nx*Nz,1); % water concentration [wt]
 var.SiO2m = reshape(cm_oxd(:,:,1)./sum(cm_oxd(:,:,1:end-1),3),Nx*Nz,1); % melt silica concentration [wt]
 
-[var,cal] =  meltmodel(var,cal,'E');
+[var,cal] = meltmodel(var,cal,'E');
 
 mq = reshape(var.m,Nz,Nx);
 fq = reshape(var.f,Nz,Nx);
 xq = reshape(var.x,Nz,Nx);
 
-cxq = reshape([var.cx,zeros(size(var.T))    ],Nz,Nx,cal.ncmp);
-cmq = reshape([var.cm.*(1-var.H2Om),var.H2Om],Nz,Nx,cal.ncmp);
+cxq = reshape(var.cx,Nz,Nx,cal.ncmp);  cxq = cxq./sum(cxq,3);
+cmq = reshape(var.cm,Nz,Nx,cal.ncmp);  cmq = cmq./sum(cmq,3);
 
 eqtime = toc(eqtime);
 EQtime = EQtime + eqtime;
@@ -139,16 +139,19 @@ sx = sm + Dsx;
 sf = sm + Dsf;
 
 % update major component phase composition
-Kc  = (cxq+TINY)./(cmq+TINY);
+Kx  = reshape(cal.Kx,Nz,Nx,cal.ncmp);
+Kf  = reshape(cal.Kf,Nz,Nx,cal.ncmp);
 res = 1; tol  = 1e-10;
 it  = 1; mxit = 25;
 while res>tol && it<maxit
-    Kci = Kc;
-    Kc  = Kc .* sum((c-f.*cfq)./(m + x.*Kc),3)./sum((c-f.*cfq)./(m./Kc + x),3);
-    res = norm(Kci-Kc,'fro')./norm(Kc,'fro');
+    Kxi = Kx;  Kfi = Kf;
+    cm  = max(0,min(1, c./(m + x.*Kx + f.*Kf)));
+    cx  = max(0,min(1,(c-f.*cf).*Kx./(m + x.*Kx)));
+    cf  = max(0,min(1,(c-x.*cx).*Kf./(m + f.*Kf)));
+    Kx  = Kx .* sum(cm,3)./sum(cx,3);
+    Kf  = Kf .* sum(cm,3)./sum(cf,3);
+    res = norm(Kxi-Kx+Kfi-Kf,'fro')./norm(Kx+Kf,'fro');
     it = it+1;
 end
-cm  = (c-f.*cfq)./(m + x.*Kc);
-cx  = (c-f.*cfq)./(m./Kc + x);
 
 TCtime = TCtime + toc - eqtime;

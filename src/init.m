@@ -35,9 +35,9 @@ f0      = 0;
 for i=1:3
 
 % calculate dimensionless numbers characterising the system dynamics
-var0.c     = c0(1:end-1)./sum(c0(1:end-1)); % [wt]
+var0.c     = c0;          % [wt]
 var0.H2O   = c0(end);     % [wt]
-var0.SiO2m = cm0_oxd(1)./sum(cm0_oxd(1:end-1));  % [wt]
+var0.SiO2m = cm0_oxd(1)./sum(cm0_oxd(1:end-1)); % [wt]
 var0.T     = T-273.15;    % [C]
 var0.P     = Ptop/1e9;    % [GPa]
 var0.m     = m0;          % [wt]
@@ -48,8 +48,8 @@ var0.f     = f0;          % [wt]
 m0  = var0.m; 
 x0  = var0.x;
 f0  = var0.f;
-cx0 = [var0.cx,0                       ];
-cm0 = [var0.cm.*(1-var0.H2Om),var0.H2Om];
+cx0 = var0.cx;
+cm0 = var0.cm;
 
 cm0_mem = cm0*cal.cmp_mem;
 cx0_mem = cx0*cal.cmp_mem;
@@ -328,11 +328,11 @@ while res > tol
         Pt(2:end,:) = Pt(1,:) + repmat(cumsum(mean(rhofz,2).*g0.*h),1,Nx);
     end
 
-    T      =  (Tp+273.15).*exp(Adbt./cP.*Pt);
+    T  =  (Tp+273.15).*exp(Adbt./cP.*Pt);
 
     eqtime = tic;
 
-    var.c     = reshape(c(:,:,1:end-1)./sum(c(:,:,1:end-1),3),Nx*Nz,cal.ncmp-1);   % component fractions [wt]
+    var.c     = reshape(c,Nx*Nz,cal.ncmp);   % component fractions [wt]
     var.T     = reshape(T,Nx*Nz,1)-273.15;   % temperature [C]
     var.P     = reshape(Pt,Nx*Nz,1)/1e9;     % pressure [GPa]
     var.m     = reshape(mq,Nx*Nz,1);         % melt fraction [wt]
@@ -340,15 +340,15 @@ while res > tol
     var.H2O   = reshape(c(:,:,end),Nx*Nz,1); % water concentration [wt]
     var.SiO2m = reshape(cm_oxd(:,:,1)./sum(cm_oxd(:,:,1:end-1),3),Nx*Nz,1); % melt silica concentration [wt]
 
-    [var,cal] =  meltmodel(var,cal,'E');
+    [var,cal] = meltmodel(var,cal,'E');
 
     mq = reshape(var.m,Nz,Nx);
     fq = reshape(var.f,Nz,Nx);
     xq = reshape(var.x,Nz,Nx);
     x  = xq;  m = mq;  f = fq;
 
-    cxq = reshape([var.cx,zeros(size(var.T))    ],Nz,Nx,cal.ncmp);
-    cmq = reshape([var.cm.*(1-var.H2Om),var.H2Om],Nz,Nx,cal.ncmp);
+    cxq = reshape(var.cx,Nz,Nx,cal.ncmp);
+    cmq = reshape(var.cm,Nz,Nx,cal.ncmp);
     cm  = cmq; cx = cxq;
 
     cm_oxd = reshape(reshape(cm,Nz*Nx,cal.ncmp)*cal.cmp_oxd,Nz,Nx,cal.noxd);
@@ -442,7 +442,7 @@ if restart
     end
     if exist(name,'file')
         fprintf('\n   restart from %s \n\n',name);
-        load(name,'U','W','P','Pt','f','x','m','phi','chi','mu','X','F','M','S','C','V','T','c','v','cm','cx','vm','vf','TE','IR','te','ir','dSdt','dCdt','dVdt','dFdt','dXdt','dMdt','drhodt','dTEdt','dIRdt','Gf','Gx','rho','eta','eII','tII','dt','time','step','VolSrc','wf','wx','wm');
+        load(name,'U','W','P','Pt','f','x','m','phi','chi','mu','X','F','M','S','C','T','c','cm','cx','cf','TE','IR','te','ir','dSdt','dCdt','dFdt','dXdt','dMdt','drhodt','dTEdt','dIRdt','Gf','Gx','Gm','rho','eta','eII','tII','dt','time','step','VolSrc','wf','wx','wm');
         name = [opdir,'/',runID,'/',runID,'_hist'];
         load(name,'hist');
 
@@ -451,7 +451,6 @@ if restart
 
         So = S;
         Co = C;
-        Vo = V;
         Xo = X;
         Fo = F;
         Mo = M;
@@ -460,7 +459,6 @@ if restart
         IRo = IR;
         dSdto = dSdt;
         dCdto = dCdt;
-        dVdto = dVdt;
         dXdto = dXdt;
         dFdto = dFdt;
         dMdto = dMdt;
