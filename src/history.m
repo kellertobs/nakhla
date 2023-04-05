@@ -104,13 +104,6 @@ for i=1:cal.noxd
     hist.c_oxd(stp,2,i) = mean(mean(c_oxd(:,:,i)));
     hist.c_oxd(stp,3,i) = max(max(c_oxd(:,:,i)));
 end
-if any(v(:)>1e-6)
-    hist.v(stp,1) = min(min(v));
-    hist.v(stp,2) = mean(mean(v));
-    hist.v(stp,3) = max(max(v));
-else
-    hist.v(stp,1:3) = NaN;
-end
 
 indx     = x>1e-6;
 indx_cmp = repmat(x>1e-6,1,1,cal.ncmp);

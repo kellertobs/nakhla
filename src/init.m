@@ -27,7 +27,7 @@ cwall = cwall./sum(cwall,2);
 
 cm0_oxd = c0*cal.cmp_oxd;
 rho0    = DensityX(cm0_oxd,T0,Ptop/1e8);
-T       = (T0+273.15).*exp(cal.aT./rho0./cP.*Ptop);
+T       = (T0+273.15).*exp(aT./rho0./cP.*Ptop);
 
 m0      = 1;
 f0      = 0;
@@ -60,7 +60,7 @@ cx0_oxd = cx0*cal.cmp_oxd;
  c0_oxd =  c0*cal.cmp_oxd;
 
 rhof0 = cal.rhof0;
-rhox0 = sum(cx0_mem(1:end-1)/100./cal.rhox0).^-1;
+rhox0 = sum(cx0_mem/100./cal.rhox0).^-1;
 
 cm1_oxd = (0.9.*cm0_mem + 0.1.*cal.cmp_mem(4,:))*cal.mem_oxd/100;
 cm2_oxd = (0.9.*cm0_mem - 0.1.*cal.cmp_mem(4,:))*cal.mem_oxd/100;
@@ -69,33 +69,33 @@ etam0 = Giordano08(cm0_oxd,T0);
 rhom0 = DensityX(cm0_oxd,T0,Ptop/1e8);
 
 rho0  = (x0./rhox0 + m0./rhom0).^-1;
-T     = (T0+273.15).*exp(cal.aT./rho0./cP.*Ptop);
+T     = (T0+273.15).*exp(aT./rho0./cP.*Ptop);
 
 end
 
-fprintf('    initial T: %4.3f \n'  ,T0);
-fprintf('    initial c: %4.3f \n'  ,c0);
-fprintf('    initial v: %4.3f \n'  ,v0);
-fprintf('    initial x: %4.3f \n'  ,x0);
-fprintf('    initial f: %4.3f \n\n',f0);
+fprintf('    initial T   : %4.3f \n'  ,T0);
+fprintf('    initial SiO2: %4.3f \n'  ,c0_oxd(1)./sum(c0_oxd(1:end-1)).*100);
+fprintf('    initial H2O : %4.3f \n'  ,c0_oxd(end));
+fprintf('    initial x   : %4.3f \n'  ,x0);
+fprintf('    initial f   : %4.3f \n\n',f0);
 
 rhom1 = DensityX(cm1_oxd,T0,Ptop/1e8);
 rhom2 = DensityX(cm2_oxd,T0,Ptop/1e8);
 
-DrhoT = rhom0.*cal.aT*max([abs(T0-Twall)/10,abs(T0-T1),T0/100]);
+DrhoT = rhom0.*aT*max([abs(T0-Twall)/10,abs(T0-T1),T0/100]);
 Drhoc = abs(rhom1-rhom2);
 Drhox = 0.1*abs(rhox0-rhom0);
-Drhof = 0.1*abs(cal.rhof0-rhom0) * (max([v0,v1,vwall])>TINY);
+Drhof = 0.1*abs(cal.rhof0-rhom0) * (max([c0(end),c1(end),max(cwall(:,end))])>TINY);
 Drho0 = DrhoT + Drhoc + Drhox + Drhof;
 
 uT    = DrhoT*g0*(D/10)^2/etam0/cnvreg;
 uc    = Drhoc*g0*(D/10)^2/etam0/cnvreg;
 ux    = Drhox*g0*(D/10)^2/etam0/cnvreg;
-uf    = Drhof*g0*(D/10)^2/etam0/cnvreg * (max([v0,v1,vwall])>TINY);
+uf    = Drhof*g0*(D/10)^2/etam0/cnvreg * (max([c0(end),c1(end),max(cwall(:,end))])>TINY);
 u0    = Drho0*g0*(D/10)^2/etam0/cnvreg;
 
 wx0   = abs(rhox0-rhom0)*g0*dx^2/etam0/sgrreg;
-wf0   = abs(rhof0-rhom0)*g0*df^2/etam0/sgrreg * (max([v0,v1,vwall])>TINY);
+wf0   = abs(rhof0-rhom0)*g0*df^2/etam0/sgrreg * (max([c0(end),c1(end),max(cwall(:,end))])>TINY);
 
 ud0   = kT0/rhom0/cP/(D/10);
 
@@ -241,8 +241,6 @@ c = zeros(Nz,Nx,cal.ncmp);
 for i = 1:cal.ncmp
     c(:,:,i)  =  c0(i) + (c1(i)-c0(i)) .* (1+erf((ZZ/D-zlay+rp*h*dlay)/wlay_c))/2 + dcr(i).*rp + dcg(i).*gp;  % trace elements
 end
-% c   =  c0 + (c1-c0) .* (1+erf((ZZ/D-zlay+rp*h*dlay)/wlay_c))/2 + dcr.*rp + dcg.*gp;  % major component
-v   =  v0 + (v1-v0) .* (1+erf((ZZ/D-zlay+rp*h*dlay)/wlay_c))/2 + dvr.*rp + dvg.*gp;  % volatile component
 
 te = zeros(Nz,Nx,cal.nte);
 for i = 1:cal.nte
@@ -263,11 +261,6 @@ if any(topinit(:)) && ~isnan(cwall(1)); c  = c  + (cwall(1)-c ).*topinit; end
 if any(botinit(:)) && ~isnan(cwall(2)); c  = c  + (cwall(2)-c ).*botinit; end
 if any(sdsinit(:)) && ~isnan(cwall(3)); c  = c  + (cwall(3)-c ).*sdsinit; end
 cin = c;
-
-if any(topinit(:)) && ~isnan(vwall(1)); v  = v  + (vwall(1)-v ).*topinit; end
-if any(botinit(:)) && ~isnan(vwall(2)); v  = v  + (vwall(2)-v ).*botinit; end
-if any(sdsinit(:)) && ~isnan(vwall(3)); v  = v  + (vwall(3)-v ).*sdsinit; end
-vin = v;
 
 for i = 1:cal.nte
     if any(topinit(:)) && ~isnan(tewall(1,i)); te(:,:,i) = te(:,:,i) + (tewall(1,i)-te(:,:,i)).*topinit; end
@@ -306,7 +299,6 @@ rhoref = mean(rho,'all');
 Pt     = Ptop + rhoref.*g0.*ZZ;
 fq     = f0.*ones(size(Tp));  mq = m0.*ones(size(Tp));  xq = 1-mq-fq; 
 cmq    = c; cxq = c;  cfq = 0.*c;  cfq(:,:,end) = 1;  cf = cfq;
-vmq    = v; vfq = ones(size(v)); 
 cm_oxd = reshape(reshape(cmq,Nz*Nx,cal.ncmp)*cal.cmp_oxd,Nz,Nx,cal.noxd);
 
 
@@ -321,7 +313,7 @@ while res > tol
     Pti = Pt; xi = xq; fi = fq;
     
     rhoref = mean(rho,'all');
-    Adbt   = cal.aT./rhoref;
+    Adbt   = aT./rhoref;
     if Nz==1; Pt = Ptop.*ones(size(Tp)); else
         rhofz  = (rho(1:end-1,:)+rho(2:end,:))/2;
         Pt(1,:)     = repmat(mean(rhofz(1,:),2).*g0.*h/2,1,Nx) + Ptop;
@@ -367,7 +359,7 @@ dto  = dt;
 
 % get bulk enthalpy, silica, volatile content densities
 S   = rho.*(cP.*log(T/(min(cal.T0)+273.15)) + x.*Dsx + f.*Dsf - Adbt.*(Pt-Ptop));  So = S;  res_S = 0.*S;
-S0  = rho.*(cP.*log(min(cal.Tm)+273.15) + x.*Dsx + f.*Dsf - Adbt.*Ptop);  
+S0  = rho.*(cP.*log(min(cal.T0)+273.15) + x.*Dsx + f.*Dsf - Adbt.*Ptop);  
 C   = rho.*(m.*cm + x.*cx + f.*cf); Co = C;  res_C = 0.*C;
 X   = rho.*x; Xo = X;  res_X = 0.*X;
 F   = rho.*f; Fo = F;  res_F = 0.*F;
@@ -416,7 +408,6 @@ Gx  = 0.*x;  Gf  = 0.*f;  Gm  = 0.*m;
 % initialise auxiliary variables 
 dSdt   = 0.*T;  dSdto  = dSdt; diss_h = 0.*T;
 dCdt   = 0.*c;  dCdto  = dCdt;
-dVdt   = 0.*v;  dVdto  = dVdt;
 dFdt   = 0.*f;  dFdto  = dFdt;
 dXdt   = 0.*x;  dXdto  = dXdt;
 dMdt   = 0.*m;  dMdto  = dMdt;
@@ -431,7 +422,6 @@ hist    = [];
 dsumMdt = 0; dsumMdto = 0;
 dsumSdt = 0; dsumSdto = 0;
 dsumCdt = 0; dsumCdto = 0;
-dsumVdt = 0; dsumVdto = 0;
 
 % overwrite fields from file if restarting run
 if restart

@@ -28,18 +28,14 @@ zlay     =  2.0;                 % layer thickness (relative to domain depth D)
 dlay     =  0.2;                 % random perturbation to layer thickness (relative to grid spacing h)
 wlay_T   =  0*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
 wlay_c   =  0*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
-T0       =  1250;                % temperature top layer [deg C]
-T1       =  1250;                % temperature base layer [deg C]
+T0       =  1150;                % temperature top layer [deg C]
+T1       =  1150;                % temperature base layer [deg C]
 dTr      =  0;                   % amplitude of random noise [deg C]
 dTg      =  0;                   % amplitude of centred gaussian [deg C]
-c0       =  0.51;                % major component top layer [wt SiO2]
-c1       =  0.51;                % major component base layer [wt SiO2]
-dcr      =  0e-5;                % amplitude of random noise [wt SiO2]
-dcg      =  0e-5;                % amplitude of centred gaussian [wt SiO2]
-v0       =  0.00;                % volatile component top layer [wt H2O]
-v1       =  0.00;                % volatile component base layer [wt H2O]
-dvr      =  0e-6;                % amplitude of random noise [wt H2O]
-dvg      =  0e-6;                % amplitude of centred gaussian [wt H2O]
+c0       =  [0.09,0.27,0.59,0.03,0.02]; % major component top  layer [wt]
+c1       =  [0.09,0.27,0.59,0.03,0.02]; % major component base layer [wt]
+dcr      =  [0,0,0,0,0];         % amplitude of random noise [wt SiO2]
+dcg      =  [0,0,0,0,0];         % amplitude of centred gaussian [wt SiO2]
 
 % set model trace and isotope geochemistry parameters (must match # trace elements and isotope ratios in calibration!)
 te0      =  [1,1,1,1];           % trace elements top layer [wt ppm]
@@ -61,8 +57,9 @@ fout     =  1;                   % outgassing factor (0 = no outgassing; 1 = fre
 tau_T    =  12*hr;               % wall cooling/assimilation time [s]
 tau_a    =  24*hr;               % wall cooling/assimilation tie [s]
 Twall    =  [300,300,nan];       % [top,bot,sds] wall rock temperature [degC] (nan = insulating)
-cwall    =  [nan,nan,nan];       % [top,bot,sds] wall rock major component [wt SiO2] (nan = no assimilation)
-vwall    =  [nan,nan,nan];       % [top,bot,sds] wall rock volatile component [wt H2O] (nan = no assimilation)
+cwall    =  [nan,nan,nan,nan,nan; ...
+             nan,nan,nan,nan,nan; ...
+             nan,nan,nan,nan,nan]; % [top,bot,sds] wall rock major component [wt SiO2] (nan = no assimilation)
 tewall   =  [nan,nan,nan,nan; ...
              nan,nan,nan,nan; ...
              nan,nan,nan,nan];   % [top,bot,sds] wall rock trace elements [wt ppm] (nan = no assimilation)
@@ -71,7 +68,7 @@ irwall   =  [nan,nan; ...
              nan,nan];           % [top,bot,sds] wall rock isotope ratios [delta] (nan = no assimilation)
 
 % set thermo-chemical material parameters
-calID    =  'default';           % phase diagram calibration
+calID    =  'andesSVZ';          % phase diagram calibration
 kT0      =  4;                   % thermal conductivity [W/m/K]
 cP       =  1200;                % heat capacity [J/kg/K]
 Dsx      = -300;                 % entropy change of crystallisation [J/kg]
@@ -79,6 +76,8 @@ Dsf      =  400;                 % entropy change of exsolution [J/kg]
 tau_r    =  0;                   % reaction time scale (set to zero for quasi-equilibrium mode)
 
 % set model buoyancy parameters
+aT       =  4e-5;                 % thermal expansivity [1/K]
+bP       =  1e-8;                 % fluid compressibility [1/Pa]
 dx       =  1e-3;                % crystal size [m]
 df       =  1e-3;                % bubble size [m]
 g0       =  10.;                 % gravity [m/s2]

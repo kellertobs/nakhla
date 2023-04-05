@@ -116,11 +116,8 @@ cal.nir     = 2;                    % number of isotope ratios
 cal.Kte_mem = [0.01;0.10;3.00;10.0].*ones(cal.nte,cal.nmem);
 
 % specify density parameters
-cal.rhox0   = [3270,4390,7700,4300,3200,3500,3250,3350,2730,2620,2520,2650]; % mineral end-member reference densities [kg/m3]
+cal.rhox0   = [3270,4390,7700,4300,3200,3500,3250,3350,2730,2620,2520,2650,1000]; % mineral end-member reference densities [kg/m3]
 cal.rhof0   = 1000;                 % fluid reference density [kg/m3]
-cal.aT      = 4e-5;                 % thermal expansivity [1/K]
-cal.gH      = 0.75;                 % hydrous melt expansivity [1/(wt H2O)]
-cal.bP      = 1e-8;                 % fluid compressibility [1/Pa]
 
 % specify mixture viscosity parameters (Costa et al., 2009)
 cal.Bphi    = 2.0;                  % Einstein-Roscoe powerlaw coefficient bubbles

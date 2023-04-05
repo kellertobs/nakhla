@@ -80,8 +80,8 @@ mq = reshape(var.m,Nz,Nx);
 fq = reshape(var.f,Nz,Nx);
 xq = reshape(var.x,Nz,Nx);
 
-cxq = reshape(var.cx,Nz,Nx,cal.ncmp);  cxq = cxq./sum(cxq,3);
-cmq = reshape(var.cm,Nz,Nx,cal.ncmp);  cmq = cmq./sum(cmq,3);
+cxq = reshape(var.cx,Nz,Nx,cal.ncmp);
+cmq = reshape(var.cm,Nz,Nx,cal.ncmp);
 
 eqtime = toc(eqtime);
 EQtime = EQtime + eqtime;
@@ -96,9 +96,9 @@ advn_M   = - advect(M,Um(2:end-1,:),Wm(:,2:end-1),h,{ADVN,''},[1,2],BCA);
 advn_rho = advn_X+advn_F+advn_M;
 
 % phase mass transfer rates
-Gx = 2/3*Gx + 1/3*(xq.*RHO-X)./max(tau_r,4*dt);
-Gf = 2/3*Gf + 1/3*(fq.*RHO-F)./max(tau_r,4*dt);
-Gm = 2/3*Gm + 1/3*(mq.*RHO-M)./max(tau_r,4*dt);
+Gx = 2/3*Gx + 1/3*(xq.*RHO-X)./max(tau_r,3*dt);
+Gf = 2/3*Gf + 1/3*(fq.*RHO-F)./max(tau_r,3*dt);
+Gm = 2/3*Gm + 1/3*(mq.*RHO-M)./max(tau_r,3*dt);
 
 % total rates of change
 dXdt   = advn_X + Gx;
@@ -139,19 +139,16 @@ sx = sm + Dsx;
 sf = sm + Dsf;
 
 % update major component phase composition
-Kx  = reshape(cal.Kx,Nz,Nx,cal.ncmp);
-Kf  = reshape(cal.Kf,Nz,Nx,cal.ncmp);
-res = 1; tol  = 1e-10;
-it  = 1; mxit = 25;
-while res>tol && it<maxit
-    Kxi = Kx;  Kfi = Kf;
+Kx  = cxq./max(TINY,cmq);
+Kf  = cfq./max(TINY,cmq);
+res = 1; tol  = 1e-12;
+it  = 1; mxit = 20;
+while res>tol && it<mxit
     cm  = max(0,min(1, c./(m + x.*Kx + f.*Kf)));
     cx  = max(0,min(1,(c-f.*cf).*Kx./(m + x.*Kx)));
-    cf  = max(0,min(1,(c-x.*cx).*Kf./(m + f.*Kf)));
     Kx  = Kx .* sum(cm,3)./sum(cx,3);
-    Kf  = Kf .* sum(cm,3)./sum(cf,3);
-    res = norm(Kxi-Kx+Kfi-Kf,'fro')./norm(Kx+Kf,'fro');
-    it = it+1;
+    res = norm(sum(cm,3)./sum(cx,3)-1,'fro')./sqrt(length(cm(:)));
+    it  = it+1;
 end
 
 TCtime = TCtime + toc - eqtime;

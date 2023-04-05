@@ -263,10 +263,10 @@ else % create 2D plots
     imagesc(Xc,Zc,T-273.15); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$T [^\circ$C]'],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel('Depth [m]',TX{:},FS{:}); 
     set(fh2,'CurrentAxes',ax(22));
-    imagesc(Xc,Zc,c_oxd(:,:,cal.Si)); axis ij equal tight; box on; cb = colorbar;
+    imagesc(Xc,Zc,squeeze(c_oxd(:,:,cal.Si)./sum(c_oxd(:,:,1:end-1),3).*100)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\bar{c}$ [wt\% SiO$_2$]'],TX{:},FS{:}); set(gca,'YTickLabel',[]); xlabel('Width [m]',TX{:},FS{:});
     set(fh2,'CurrentAxes',ax(23));
-    imagesc(Xc,Zc,v.*100.*(v>1e-9)); axis ij equal tight; box on; cb = colorbar;
+    imagesc(Xc,Zc,squeeze(c_oxd(:,:,cal.H))); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\bar{v}$ [wt\% H$_2$O]'],TX{:},FS{:}); set(gca,'YTickLabel',[]);
     sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
 
@@ -331,31 +331,6 @@ if ~exist('fh7','var'); fh7 = figure(VIS{:});
 else; set(0, 'CurrentFigure', fh7);
 end
 if Nz>1 || step==0; clf; end
-% TT = [linspace(cal.Tphs0+Ptop*cal.clap,cal.perTm+Ptop*cal.clap,200),linspace(cal.perTm+Ptop*cal.clap,cal.Tphs1+Ptop*cal.clap,200)];
-% cc = [linspace(cal.cphs1,(cal.perCx+cal.perCm)/2,200),linspace((cal.perCx+cal.perCm)/2,cal.cphs0,200)];
-% [~,CCx,CCm,~,~,~] = equilibrium(0*TT,0*TT,TT,cc,0*TT,Ptop*ones(size(TT)),cal,TINY);
-% plot(CCx.*100,TT,'k-','LineWidth',2); axis tight; hold on; box on;
-% plot(CCm.*100,TT,'k-','LineWidth',2);
-% perTms  = cal.perTm;
-% Tphs0s = cal.Tphs0;
-% Tphs1s = cal.Tphs1;
-% vv = 0.10*ones(size(TT));
-% xx = 0.50*ones(size(TT));
-% ff = 0.05*ones(size(TT));
-% for i = 1:5
-%     TT = [linspace(Tphs0s+Ptop*cal.clap,perTms+Ptop*cal.clap,200),linspace(perTms+Ptop*cal.clap,Tphs1s+Ptop*cal.clap,200)];
-%     cc = [linspace(cal.cphs1,(cal.perCx+cal.perCm)/2,200),linspace((cal.perCx+cal.perCm)/2,cal.cphs0,200)];
-%     vmq_c0 = (4.7773e-7.*Ptop.^0.6 + 1e-11.*Ptop) .* exp(2565*(1./(TT+273.15)-1./(1200+273.15))); % Katz et al., 2003; Moore et al., 1998
-%     vmq_c1 = (3.5494e-3.*Ptop.^0.5 + 9.623e-8.*Ptop - 1.5223e-11.*Ptop.^1.5)./(TT+273.15) + 1.2436e-14.*Ptop.^1.5; % Liu et al., 2015
-%     vmq0   = (1-cc).*vmq_c0 + cc.*vmq_c1;
-%     perTms  = cal.perTm -cal.dTH2O(2).*vmq0(round((perTms-Tphs1s)./(Tphs0s-Tphs1s)*200)).^0.75;
-%     Tphs0s = cal.Tphs0-cal.dTH2O(1).*vmq0(1  ).^0.75;
-%     Tphs1s = cal.Tphs1-cal.dTH2O(3).*vmq0(end).^0.75;
-% end
-% [~,CCx,CCm,~,~,~] = equilibrium(0*TT,0*TT,TT,cc,vmq0,Ptop*ones(size(TT)),cal,TINY);
-% plot(CCx.*100,TT,'k-','LineWidth',2); axis tight; hold on; box on;
-% plot(CCm.*100,TT,'k-','LineWidth',2);
-% end
 
 plot( c_oxd(:,:,cal.Si)./sum( c_oxd(:,:,1:end-1),3).*100,T-273.15,'.',CL{[1,2]},LW{:},'MarkerSize',15); axis tight; hold on
 plot(cx_oxd(:,:,cal.Si)./sum(cx_oxd(:,:,1:end-1),3).*100,T-273.15,'.',CL{[1,4]},LW{:},'MarkerSize',15);
@@ -373,9 +348,15 @@ end
 if Nz>1 || step==0; clf;
 TAS; axis tight; box on; hold on;
 end
-scatter(cx_oxd(:,:,cal.Si)./sum(cx_oxd(:,:,1:end-1),3).*100,sum(cx_oxd(:,:,[cal.Na,cal.K]),3)./sum(cx_oxd(:,:,1:end-1),3).*100,50,T-273.15,'filled','^','MarkerEdgeColor','k'); colormap(ocean); cb = colorbar;
-scatter(cm_oxd(:,:,cal.Si)./sum(cm_oxd(:,:,1:end-1),3).*100,sum(cm_oxd(:,:,[cal.Na,cal.K]),3)./sum(cm_oxd(:,:,1:end-1),3).*100,50,T-273.15,'filled','o','MarkerEdgeColor','k');
-scatter( c_oxd(:,:,cal.Si)./sum( c_oxd(:,:,1:end-1),3).*100,sum( c_oxd(:,:,[cal.Na,cal.K]),3)./sum( c_oxd(:,:,1:end-1),3).*100,80,T-273.15,'filled','s','MarkerEdgeColor','k');
+cxSi = cx_oxd(:,:,cal.Si)./sum(cx_oxd(:,:,1:end-1),3).*100;
+cmSi = cm_oxd(:,:,cal.Si)./sum(cm_oxd(:,:,1:end-1),3).*100;
+ cSi =  c_oxd(:,:,cal.Si)./sum( c_oxd(:,:,1:end-1),3).*100;
+cxNK = sum(cx_oxd(:,:,[cal.Na,cal.K]),3)./sum(cx_oxd(:,:,1:end-1),3).*100;
+cmNK = sum(cm_oxd(:,:,[cal.Na,cal.K]),3)./sum(cm_oxd(:,:,1:end-1),3).*100;
+ cNK = sum( c_oxd(:,:,[cal.Na,cal.K]),3)./sum( c_oxd(:,:,1:end-1),3).*100;
+scatter(cxSi(:),cxNK(:),50,T(:)-273.15,'filled','^'); colormap(ocean); cb = colorbar;
+scatter(cmSi(:),cmNK(:),50,T(:)-273.15,'filled','o');
+scatter( cSi(:), cNK(:),80,T(:)-273.15,'filled','s');
 set(cb,TL{:},'FontSize',12); set(gca,TL{:},'FontSize',15); xlabel('SiO$_2$ [wt \%]',TX{:},'FontSize',15); ylabel('Na$_2$O + K$_2$O [wt \%]',TX{:},'FontSize',15);
 
 if ~exist('fh9','var'); fh9 = figure(VIS{:});
@@ -387,15 +368,15 @@ end
 [A,B] = terncoords(cx_oxd(:,:, cal.Mg          )./sum(cx_oxd(:,:,[cal.Fe,cal.Mg,cal.Na,cal.K]),3), ...
                    cx_oxd(:,:, cal.Fe          )./sum(cx_oxd(:,:,[cal.Fe,cal.Mg,cal.Na,cal.K]),3), ...
                sum(cx_oxd(:,:,[cal.Na,cal.K]),3)./sum(cx_oxd(:,:,[cal.Fe,cal.Mg,cal.Na,cal.K]),3));
-scatter(A,B,50,T-273.15,'filled','^','MarkerEdgeColor','k'); colormap(ocean); cb = colorbar;
+scatter(A(:),B(:),50,T(:)-273.15,'filled','^'); colormap(ocean); cb = colorbar;
 [A,B] = terncoords(cm_oxd(:,:, cal.Mg          )./sum(cm_oxd(:,:,[cal.Fe,cal.Mg,cal.Na,cal.K]),3), ...
                    cm_oxd(:,:, cal.Fe          )./sum(cm_oxd(:,:,[cal.Fe,cal.Mg,cal.Na,cal.K]),3), ...
                sum(cm_oxd(:,:,[cal.Na,cal.K]),3)./sum(cm_oxd(:,:,[cal.Fe,cal.Mg,cal.Na,cal.K]),3));
-scatter(A,B,50,T-273.15,'filled','o','MarkerEdgeColor','k'); colormap(ocean);
+scatter(A(:),B(:),50,T(:)-273.15,'filled','o'); colormap(ocean);
 [A,B] = terncoords(c_oxd(:,:, cal.Mg          )./(sum(c_oxd(:,:,[cal.Fe,cal.Mg,cal.Na,cal.K]),3)), ...
                    c_oxd(:,:, cal.Fe          )./(sum(c_oxd(:,:,[cal.Fe,cal.Mg,cal.Na,cal.K]),3)), ...
                sum(c_oxd(:,:,[cal.Na,cal.K]),3)./(sum(c_oxd(:,:,[cal.Fe,cal.Mg,cal.Na,cal.K]),3)));
-scatter(A,B,80,T-273.15,'filled','s','MarkerEdgeColor','k'); colormap(ocean);
+scatter(A(:),B(:),80,T(:)-273.15,'filled','s'); colormap(ocean);
 set(cb,TL{:},'FontSize',12); set(gca,TL{:},'FontSize',15); xlabel('SiO$_2$ [wt \%]',TX{:},'FontSize',15); ylabel('Na$_2$O + K$_2$O [wt \%]',TX{:},'FontSize',15);
 
 % plot model history

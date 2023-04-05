@@ -82,8 +82,8 @@ while time <= tend && step <= Nt && any(m(:)>1e-6)
     fprintf(1,'         fluid-mechanics solve  = %1.3e sec\n\n',FMtime/(iter-1));
     
     fprintf(1,'         min T   =  %4.1f;    mean T   = %4.1f;    max T   = %4.1f;   [degC]\n' ,min(T(:)-273.15),mean(T(:)-273.15),max(T(:)-273.15));
-    fprintf(1,'         min c   =  %1.4f;    mean c   = %1.4f;    max c   = %1.4f;   [wt]\n'   ,min(c_oxd(:,:,cal.Si),[],'all'),mean(c_oxd(:,:,cal.Si),'all'),max(c_oxd(:,:,cal.Si),[],'all'));
-    fprintf(1,'         min v   =  %1.4f;    mean v   = %1.4f;    max v   = %1.4f;   [wt]\n\n' ,min(c_oxd(:,:,cal.H ),[],'all'),mean(c_oxd(:,:,cal.H ),'all'),max(c_oxd(:,:,cal.H ),[],'all'));
+    fprintf(1,'         min SiO2=  %1.4f;    mean SiO2= %1.4f;    max SiO2= %1.4f;   [wt]\n'   ,min(c_oxd(:,:,cal.Si)./sum(c_oxd(:,:,1:end-1),3),[],'all'),mean(c_oxd(:,:,cal.Si)./sum(c_oxd(:,:,1:end-1),3),'all'),max(c_oxd(:,:,cal.Si)./sum(c_oxd(:,:,1:end-1),3),[],'all'));
+    fprintf(1,'         min H2O =  %1.4f;    mean H2O = %1.4f;    max H2O = %1.4f;   [wt]\n\n' ,min(c_oxd(:,:,cal.H ),[],'all'),mean(c_oxd(:,:,cal.H ),'all'),max(c_oxd(:,:,cal.H ),[],'all'));
     
     fprintf(1,'         min x   =  %1.4f;    mean x   = %1.4f;    max x   = %1.4f;   [wt]\n'   ,min(x(:)  ),mean(x(:)  ),max(x(:)  ));
     fprintf(1,'         min f   =  %1.4f;    mean f   = %1.4f;    max f   = %1.4f;   [wt]\n'   ,min(f(:)  ),mean(f(:)  ),max(f(:)  ));
