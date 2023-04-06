@@ -141,11 +141,11 @@ sf = sm + Dsf;
 % update major component phase composition
 Kx  = cxq./max(TINY,cmq);
 Kf  = cfq./max(TINY,cmq);
-res = 1; tol  = 1e-12;
+res = 1; tol  = 1e-9;
 it  = 1; mxit = 20;
 while res>tol && it<mxit
-    cm  = max(0,min(1, c./(m + x.*Kx + f.*Kf)));
-    cx  = max(0,min(1,(c-f.*cf).*Kx./(m + x.*Kx)));
+cm  = max(0,min(1, c./(m + x.*Kx + f.*Kf)));
+cx  = max(0,min(1,(c-f.*cf).*Kx./(m + x.*Kx)));
     Kx  = Kx .* sum(cm,3)./sum(cx,3);
     res = norm(sum(cm,3)./sum(cx,3)-1,'fro')./sqrt(length(cm(:)));
     it  = it+1;
