@@ -8,7 +8,7 @@ Kte    = zeros(Nz,Nx,cal.nte);
 for i = 1:cal.nte
     
     % update bulk partitioning coefficients
-    for j=1:cal.nmem; Kte(:,:,i) = Kte(:,:,i) + cal.Kte_mem(i,j) .* c_mem(:,:,j); end
+    for j=1:cal.nmem; Kte(:,:,i) = Kte(:,:,i) + cal.Kte_mem(i,j) .* c_mem(:,:,j)./100; end
 
     % update trace element phase compositions
     tem(:,:,i) = te(:,:,i)./(m + x.*Kte(:,:,i));

@@ -94,18 +94,6 @@ cal.r(cal.bas)  =  22.0;
 cal.r(cal.and)  =  20.0;
 cal.r(cal.rhy)  =  16.0;
 
-% specify melting model phase diagram parameters
-% cal.cphs0   = cal.cmp_oxd(1,1)/100; % phase diagram lower bound composition [wt SiO2]
-% cal.cphs1   = cal.cmp_oxd(4,1)/100; % phase diagram upper bound composition [wt SiO2]
-% cal.Tphs0   = 850;                  % phase diagram lower bound temperature [degC]
-% cal.Tphs1   = 1890;                 % phase diagram upper bound temperature [degC]
-% cal.PhDg    = [8.5,2.2,1.3,1.3];    % phase diagram curvature factor (> 1)
-% cal.perCm   = cal.cmp_oxd(3,1)/100; % peritectic liquidus composition [wt SiO2]
-% cal.perCx   = cal.cmp_oxd(2,1)/100; % peritectic solidus  composition [wt SiO2]
-% cal.perTm   = 1120;                 % peritectic temperature [degC]
-% cal.perTx   = 1150;                 % peritectic temperature [degC]
-% cal.clap    = 1e-7;                 % Clapeyron slope for P-dependence of melting T [degC/Pa]
-
 % specify melting point dependence on H2O
 cal.dTH2O   = 1400;                 % solidus shift from water content [degC/wt^pH2O]
 cal.pH2O    = 0.75;                 % solidus shift from water content [degC/wt^pH2O]
