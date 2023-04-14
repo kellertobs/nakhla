@@ -230,16 +230,65 @@ else % create 2D plots
     end 
     colormap(ocean);
     fh = axb + 2*axh + 1*avs + axt;
-    fw = axl + 3*axw + 2*ahs + axr;
+    fw = axl + 2*axw + 1*ahs + axr;
     set(fh5,UN{:},'Position',[9 9 fw fh]);
     set(fh5,'PaperUnits','Centimeters','PaperPosition',[0 0 fw fh],'PaperSize',[fw fh]);
     set(fh5,'Color','w','InvertHardcopy','off','Resize','off');
     ax(51) = axes(UN{:},'position',[axl+0*axw+0*ahs axb+1*axh+1*avs axw axh]);
     ax(52) = axes(UN{:},'position',[axl+1*axw+1*ahs axb+1*axh+1*avs axw axh]);
-    ax(53) = axes(UN{:},'position',[axl+2*axw+2*ahs axb+1*axh+1*avs axw axh]);
-    ax(54) = axes(UN{:},'position',[axl+0*axw+0*ahs axb+0*axh+0*avs axw axh]);
-    ax(55) = axes(UN{:},'position',[axl+1*axw+1*ahs axb+0*axh+0*avs axw axh]);
-    ax(56) = axes(UN{:},'position',[axl+2*axw+2*ahs axb+0*axh+0*avs axw axh]);
+    ax(53) = axes(UN{:},'position',[axl+0*axw+0*ahs axb+0*axh+0*avs axw axh]);
+    ax(54) = axes(UN{:},'position',[axl+1*axw+1*ahs axb+0*axh+0*avs axw axh]);
+
+    if ~exist('fh6','var'); fh6 = figure(VIS{:});
+    else; set(0, 'CurrentFigure', fh6); clf;
+    end 
+    colormap(ocean);
+    fh = axb + 3*axh + 2*avs + axt;
+    fw = axl + 3*axw + 2*ahs + axr;
+    set(fh6,UN{:},'Position',[11 11 fw fh]);
+    set(fh6,'PaperUnits','Centimeters','PaperPosition',[0 0 fw fh],'PaperSize',[fw fh]);
+    set(fh6,'Color','w','InvertHardcopy','off','Resize','off');
+    ax(61) = axes(UN{:},'position',[axl+0*axw+0*ahs axb+2*axh+2*avs axw axh]);
+    ax(62) = axes(UN{:},'position',[axl+1*axw+1*ahs axb+2*axh+2*avs axw axh]);
+    ax(63) = axes(UN{:},'position',[axl+2*axw+2*ahs axb+2*axh+2*avs axw axh]);
+    ax(64) = axes(UN{:},'position',[axl+0*axw+0*ahs axb+1*axh+1*avs axw axh]);
+    ax(65) = axes(UN{:},'position',[axl+1*axw+1*ahs axb+1*axh+1*avs axw axh]);
+    ax(66) = axes(UN{:},'position',[axl+2*axw+2*ahs axb+1*axh+1*avs axw axh]);
+    ax(67) = axes(UN{:},'position',[axl+0*axw+0*ahs axb+0*axh+0*avs axw axh]);
+    ax(68) = axes(UN{:},'position',[axl+1*axw+1*ahs axb+0*axh+0*avs axw axh]);
+    ax(69) = axes(UN{:},'position',[axl+2*axw+2*ahs axb+0*axh+0*avs axw axh]);
+
+    if ~exist('fh7','var'); fh7 = figure(VIS{:});
+    else; set(0, 'CurrentFigure', fh7); clf;
+    end 
+    colormap(ocean);
+    fh = axb + 2*axh + 1*avs + axt;
+    fw = axl + 3*axw + 2*ahs + axr;
+    set(fh7,UN{:},'Position',[13 13 fw fh]);
+    set(fh7,'PaperUnits','Centimeters','PaperPosition',[0 0 fw fh],'PaperSize',[fw fh]);
+    set(fh7,'Color','w','InvertHardcopy','off','Resize','off');
+    ax(71) = axes(UN{:},'position',[axl+0*axw+0*ahs axb+1*axh+1*avs axw axh]);
+    ax(72) = axes(UN{:},'position',[axl+1*axw+1*ahs axb+1*axh+1*avs axw axh]);
+    ax(73) = axes(UN{:},'position',[axl+2*axw+2*ahs axb+1*axh+1*avs axw axh]);
+    ax(74) = axes(UN{:},'position',[axl+0*axw+0*ahs axb+0*axh+0*avs axw axh]);
+    ax(75) = axes(UN{:},'position',[axl+1*axw+1*ahs axb+0*axh+0*avs axw axh]);
+    ax(76) = axes(UN{:},'position',[axl+2*axw+2*ahs axb+0*axh+0*avs axw axh]);
+
+    if ~exist('fh8','var'); fh8 = figure(VIS{:});
+    else; set(0, 'CurrentFigure', fh8); clf;
+    end 
+    colormap(ocean);
+    fh = axb + 2*axh + 1*avs + axt;
+    fw = axl + 3*axw + 2*ahs + axr;
+    set(fh8,UN{:},'Position',[15 15 fw fh]);
+    set(fh8,'PaperUnits','Centimeters','PaperPosition',[0 0 fw fh],'PaperSize',[fw fh]);
+    set(fh8,'Color','w','InvertHardcopy','off','Resize','off');
+    ax(81) = axes(UN{:},'position',[axl+0*axw+0*ahs axb+1*axh+1*avs axw axh]);
+    ax(82) = axes(UN{:},'position',[axl+1*axw+1*ahs axb+1*axh+1*avs axw axh]);
+    ax(83) = axes(UN{:},'position',[axl+2*axw+2*ahs axb+1*axh+1*avs axw axh]);
+    ax(84) = axes(UN{:},'position',[axl+0*axw+0*ahs axb+0*axh+0*avs axw axh]);
+    ax(85) = axes(UN{:},'position',[axl+1*axw+1*ahs axb+0*axh+0*avs axw axh]);
+    ax(86) = axes(UN{:},'position',[axl+2*axw+2*ahs axb+0*axh+0*avs axw axh]);
 
     % plot velocity-pressure solution in Fig. 1
     set(0,'CurrentFigure',fh1)
@@ -302,33 +351,104 @@ else % create 2D plots
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$w_\Delta^f$ [m/hr]'],TX{:},FS{:}); xlabel('Width [m]',TX{:},FS{:}); set(gca,'YTickLabel',[]);
     sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
 
-    % plot geochemical variables in Fig. 5
+    % plot pseudo-component composition in Fig. 5
     set(0,'CurrentFigure',fh5)
     set(fh5,'CurrentAxes',ax(51));
+    imagesc(Xc./1e3,Zc./1e3,c(:,:,1).*100); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.cmpStr{1},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel('Depth [km]',TX{:},FS{:});
+    set(fh5,'CurrentAxes',ax(52));
+    imagesc(Xc./1e3,Zc./1e3,c(:,:,2).*100); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.cmpStr{2},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
+    set(fh5,'CurrentAxes',ax(53));
+    imagesc(Xc./1e3,Zc./1e3,c(:,:,3).*100); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.cmpStr{3},' [wt\%]'],TX{:},FS{:}); ylabel('Depth [km]',TX{:},FS{:});
+    set(fh5,'CurrentAxes',ax(54));
+    imagesc(Xc./1e3,Zc./1e3,c(:,:,4).*100); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.cmpStr{4},' [wt\%]'],TX{:},FS{:}); set(gca,'YTickLabel',[]); xlabel('Width [km]',TX{:},FS{:});
+    sgtitle(['time = ',num2str(time/yr,3),' [yr]'],TX{:},FS{:},'Color','k');
+
+     % plot major oxide composition in Fig. 6
+    set(0,'CurrentFigure',fh6)
+    set(fh6,'CurrentAxes',ax(61));
+    sumanh = sum(c_oxd(:,:,1:end-1));
+    imagesc(Xc,Zc,c_oxd(:,:,1)./sumanh.*100); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.oxdStr{1},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[]);
+    set(fh6,'CurrentAxes',ax(62));
+    imagesc(Xc,Zc,c_oxd(:,:,2)./sumanh.*100); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.oxdStr{2},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
+    set(fh6,'CurrentAxes',ax(63));
+    imagesc(Xc,Zc,c_oxd(:,:,3)./sumanh.*100); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.oxdStr{3},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
+    set(fh6,'CurrentAxes',ax(64));
+    imagesc(Xc,Zc,c_oxd(:,:,4)./sumanh.*100); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.oxdStr{4},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel('Depth [km]',TX{:},FS{:});
+    set(fh6,'CurrentAxes',ax(65));
+    imagesc(Xc,Zc,c_oxd(:,:,5)./sumanh.*100); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.oxdStr{5},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]); 
+    set(fh6,'CurrentAxes',ax(66));
+    imagesc(Xc,Zc,c_oxd(:,:,6)./sumanh.*100); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.oxdStr{6},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
+    set(fh6,'CurrentAxes',ax(67));
+    imagesc(Xc,Zc,c_oxd(:,:,7)./sumanh.*100); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.oxdStr{7},' [wt\%]'],TX{:},FS{:});
+    set(fh6,'CurrentAxes',ax(68));
+    imagesc(Xc,Zc,c_oxd(:,:,8)./sumanh.*100); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.oxdStr{8},' [wt\%]'],TX{:},FS{:}); set(gca,'YTickLabel',[]); xlabel('Width [km]',TX{:},FS{:});
+    set(fh6,'CurrentAxes',ax(69));
+    imagesc(Xc,Zc,c_oxd(:,:,9)./sumanh.*100); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.oxdStr{9},' [wt\%]'],TX{:},FS{:}); set(gca,'YTickLabel',[]);
+    sgtitle(['time = ',num2str(time/yr,3),' [yr]'],TX{:},FS{:},'Color','k');
+
+    % plot mineral assemblage in Fig. 7
+    set(0,'CurrentFigure',fh7)
+    set(fh7,'CurrentAxes',ax(71));
+    imagesc(Xc,Zc,cx_msy(:,:,1).*x); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.msyStr{1},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel('Depth [m]',TX{:},FS{:}); 
+    set(fh7,'CurrentAxes',ax(72));
+    imagesc(Xc,Zc,cx_msy(:,:,2).*x); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.msyStr{2},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
+    set(fh7,'CurrentAxes',ax(73));
+    imagesc(Xc,Zc,cx_msy(:,:,3).*x); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.msyStr{3},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
+    set(fh7,'CurrentAxes',ax(74));
+    imagesc(Xc,Zc,cx_msy(:,:,4).*x); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.msyStr{4},' [wt\%]'],TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:});
+    set(fh7,'CurrentAxes',ax(75));
+    imagesc(Xc,Zc,cx_msy(:,:,5).*x); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.msyStr{5},' [wt\%]'],TX{:},FS{:}); set(gca,'YTickLabel',[]); xlabel('Width [m]',TX{:},FS{:});
+    set(fh7,'CurrentAxes',ax(76));
+    imagesc(Xc,Zc,cx_msy(:,:,6).*x); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.msyStr{6},' [wt\%]'],TX{:},FS{:}); set(gca,'YTickLabel',[]);
+    sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
+
+    % plot geochemical variables in Fig. 7
+    set(0,'CurrentFigure',fh8)
+    set(fh8,'CurrentAxes',ax(81));
     imagesc(Xc,Zc,te(:,:,1)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['trace element 1'],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel('Depth [m]',TX{:},FS{:}); 
-    set(fh5,'CurrentAxes',ax(52));
+    set(fh8,'CurrentAxes',ax(82));
     imagesc(Xc,Zc,te(:,:,2)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['trace element 2'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
-    set(fh5,'CurrentAxes',ax(53));
+    set(fh8,'CurrentAxes',ax(83));
     imagesc(Xc,Zc,ir(:,:,1)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['isotope ratio 1'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
-    set(fh5,'CurrentAxes',ax(54));
+    set(fh8,'CurrentAxes',ax(84));
     imagesc(Xc,Zc,te(:,:,3)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['trace element 3'],TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:});
-    set(fh5,'CurrentAxes',ax(55));
+    set(fh8,'CurrentAxes',ax(85));
     imagesc(Xc,Zc,te(:,:,4)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['trace element 4'],TX{:},FS{:}); set(gca,'YTickLabel',[]); xlabel('Width [m]',TX{:},FS{:});
-    set(fh5,'CurrentAxes',ax(56));
+    set(fh8,'CurrentAxes',ax(86));
     imagesc(Xc,Zc,ir(:,:,2)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['isotope ratio 2'],TX{:},FS{:}); set(gca,'YTickLabel',[]);
     sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
 
+
 end
 
 % plot phase diagram
-if ~exist('fh7','var'); fh7 = figure(VIS{:});
-else; set(0, 'CurrentFigure', fh7);
+if ~exist('fh9','var'); fh9 = figure(VIS{:});
+else; set(0, 'CurrentFigure', fh9);
 end
 if Nz>1 || step==0; clf; end
 
@@ -342,8 +462,8 @@ xlabel('Major component [wt\% SiO$_2$]','Interpreter','latex','FontSize',15)
 ylabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',15)
 
 % plot composition on TAS, AFM diagrams
-if ~exist('fh8','var'); fh8 = figure(VIS{:});
-else; set(0, 'CurrentFigure', fh8);
+if ~exist('fh10','var'); fh10 = figure(VIS{:});
+else; set(0, 'CurrentFigure', fh10);
 end
 if Nz>1 || step==0; clf;
 TAS; axis tight; box on; hold on;
@@ -359,8 +479,8 @@ scatter(cmSi(:),cmNK(:),50,T(:)-273.15,'filled','o');
 scatter( cSi(:), cNK(:),80,T(:)-273.15,'filled','s');
 set(cb,TL{:},'FontSize',12); set(gca,TL{:},'FontSize',15); xlabel('SiO$_2$ [wt \%]',TX{:},'FontSize',15); ylabel('Na$_2$O + K$_2$O [wt \%]',TX{:},'FontSize',15);
 
-if ~exist('fh9','var'); fh9 = figure(VIS{:});
-else; set(0, 'CurrentFigure', fh9);
+if ~exist('fh11','var'); fh11 = figure(VIS{:});
+else; set(0, 'CurrentFigure', fh11);
 end
 if Nz>1 || step==0; clf;
 AFM; axis tight; box on; hold on;
@@ -381,8 +501,8 @@ set(cb,TL{:},'FontSize',12); set(gca,TL{:},'FontSize',15); xlabel('SiO$_2$ [wt \
 
 % plot model history
 if plot_cv
-    if ~exist('fh10','var'); fh10 = figure(VIS{:});
-    else; set(0, 'CurrentFigure', fh10); clf;
+    if ~exist('fh12','var'); fh12 = figure(VIS{:});
+    else; set(0, 'CurrentFigure', fh12); clf;
     end 
     subplot(4,1,1);
     plot(hist.time/hr,hist.DM./hist.sumM,'k-',LW{:}); hold on; axis tight; box on;
@@ -398,8 +518,8 @@ if plot_cv
     ylabel('consv. $V$',TX{:},FS{:}); set(gca,TL{:},TS{:});
     xlabel('Time [hr]',TX{:},FS{:});
 
-    if ~exist('fh11','var'); fh11 = figure(VIS{:});
-    else; set(0, 'CurrentFigure', fh11); clf;
+    if ~exist('fh13','var'); fh13 = figure(VIS{:});
+    else; set(0, 'CurrentFigure', fh13); clf;
     end 
     subplot(4,1,1);
     plot(hist.time/hr,hist.EM,'k-',LW{:}); hold on; axis tight; box on;
@@ -455,14 +575,18 @@ if save_op && ~restart
         print(fh3,name,'-dpng','-r300','-image');
         name = [opdir,'/',runID,'/',runID,'_sgr_',num2str(floor(step/nop))];
         print(fh4,name,'-dpng','-r300','-image');
-        name = [opdir,'/',runID,'/',runID,'_gch',num2str(floor(step/nop))];
+        name = [opdir,'/',runID,'/',runID,'_cmp',num2str(floor(step/nop))];
         print(fh5,name,'-dpng','-r300','-image');
-        name = [opdir,'/',runID,'/',runID,'_eql',num2str(floor(step/nop))];
+        name = [opdir,'/',runID,'/',runID,'_oxd',num2str(floor(step/nop))];
+        print(fh6,name,'-dpng','-r300','-image');
+        name = [opdir,'/',runID,'/',runID,'_mnr',num2str(floor(step/nop))];
         print(fh7,name,'-dpng','-r300','-image');
-        name = [opdir,'/',runID,'/',runID,'_TAS',num2str(floor(step/nop))];
+        name = [opdir,'/',runID,'/',runID,'_gch',num2str(floor(step/nop))];
         print(fh8,name,'-dpng','-r300','-image');
+        name = [opdir,'/',runID,'/',runID,'_TAS',num2str(floor(step/nop))];
+        print(fh10,name,'-dpng','-r300','-image');
         name = [opdir,'/',runID,'/',runID,'_AFM',num2str(floor(step/nop))];
-        print(fh9,name,'-dpng','-r300','-image');
+        print(fh11,name,'-dpng','-r300','-image');
     end
 
     name = [opdir,'/',runID,'/',runID,'_',num2str(floor(step/nop))];

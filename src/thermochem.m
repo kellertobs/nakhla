@@ -43,9 +43,11 @@ advn_C = - advect(M.*cm,Um(2:end-1,:),Wm(:,2:end-1),h,{ADVN,''},[1,2],BCA) ...  
 
 % boundary layers
 bnd_C = zeros(size(C));
-if ~isnan(cwall(1)); bnd_C = bnd_C + (RHO.*cwall(1,:)-C).*mu./tau_a .* topshape; end
-if ~isnan(cwall(2)); bnd_C = bnd_C + (RHO.*cwall(2,:)-C).*mu./tau_a .* botshape; end
-if ~isnan(cwall(3)); bnd_C = bnd_C + (RHO.*cwall(3,:)-C).*mu./tau_a .* sdsshape; end
+for i = 1:cal.ncmp
+    if ~isnan(cwall(1)); bnd_C(:,:,i) = bnd_C(:,:,i) + (RHO.*cwall(1,i)-C(:,:,i)).*mu./tau_a .* topshape; end
+    if ~isnan(cwall(2)); bnd_C(:,:,i) = bnd_C(:,:,i) + (RHO.*cwall(2,i)-C(:,:,i)).*mu./tau_a .* botshape; end
+    if ~isnan(cwall(3)); bnd_C(:,:,i) = bnd_C(:,:,i) + (RHO.*cwall(3,i)-C(:,:,i)).*mu./tau_a .* sdsshape; end
+end
 
 % total rate of change
 dCdt = advn_C + bnd_C;                                            

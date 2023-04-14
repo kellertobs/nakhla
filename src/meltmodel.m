@@ -276,7 +276,7 @@ while rnorm > rnorm_tol     % Newton iteration
     drm_dm    = (rmp-rmm)./(varp.m-varm.m);
 
     %***  apply Newton correction to crystal fraction x
-    var.m      = max(0,min(1, var.m - rm./drm_dm/4 ));
+    var.m      = max(0,min(1, var.m - rm./drm_dm/2 ));
     var.m(liq) = 1-var.f(liq);
     var.m(sol) = 0;
 
