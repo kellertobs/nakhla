@@ -308,7 +308,7 @@ EQtime  = 0;
 FMtime  = 0;
 TCtime  = 0;
 UDtime  = 0;
-res  = 1;  tol = 1e-12;  
+res  = 1;  tol = 1e-12;  it = 1;
 while res > tol
     Pti = Pt; xi = xq; fi = fq;
     
@@ -320,7 +320,8 @@ while res > tol
         Pt(2:end,:) = Pt(1,:) + repmat(cumsum(mean(rhofz,2).*g0.*h),1,Nx);
     end
 
-    T  =  (Tp+273.15).*exp(Adbt./cP.*Pt);
+    wt = min(1,it/10);
+    T  =  ((wt.*Tp+(1-wt).*cal0.Tliq)+273.15).*exp(Adbt./cP.*Pt);
 
     eqtime = tic;
 
@@ -353,6 +354,8 @@ while res > tol
     res  = norm(Pt(:)-Pti(:),2)./norm(Pt(:),2) ...
          + norm((x(:)-xi(:)).*(x(:)>TINY^0.5),2)./(norm(x(:),2)+TINY) ...
          + norm((f(:)-fi(:)).*(f(:)>TINY^0.5),2)./(norm(f(:),2)+TINY);
+
+    it = it+1;
 end
 rhoo = rho;
 dto  = dt; 

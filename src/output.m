@@ -367,10 +367,10 @@ else % create 2D plots
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.cmpStr{4},' [wt\%]'],TX{:},FS{:}); set(gca,'YTickLabel',[]); xlabel('Width [km]',TX{:},FS{:});
     sgtitle(['time = ',num2str(time/yr,3),' [yr]'],TX{:},FS{:},'Color','k');
 
-     % plot major oxide composition in Fig. 6
+    % plot major oxide composition in Fig. 6
     set(0,'CurrentFigure',fh6)
     set(fh6,'CurrentAxes',ax(61));
-    sumanh = sum(c_oxd(:,:,1:end-1));
+    sumanh = sum(c_oxd(:,:,1:end-1),3);
     imagesc(Xc,Zc,c_oxd(:,:,1)./sumanh.*100); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.oxdStr{1},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[]);
     set(fh6,'CurrentAxes',ax(62));
