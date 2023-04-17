@@ -11,29 +11,6 @@ c_mem  = reshape(reshape(c ,Nz*Nx,cal.ncmp)*cal.cmp_mem,Nz,Nx,cal.nmem);
 cm_mem = reshape(reshape(cm,Nz*Nx,cal.ncmp)*cal.cmp_mem,Nz,Nx,cal.nmem);
 cx_mem = reshape(reshape(cx,Nz*Nx,cal.ncmp)*cal.cmp_mem,Nz,Nx,cal.nmem);
 
-% % update melting model component compositions
-% wt0 = (cal.perCm-cm(:))./(cal.perCm-cal.cphs0);
-% wt1 = (cal.cphs1-cm(:))./(cal.cphs1-cal.perCm);
-% cm_cmp = reshape((wt0 .* [1 0 0 0] + (1-wt0) .* [0 0 1 0]) .* (cm(:)< cal.perCm) ...
-%        +         (wt1 .* [0 0 1 0] + (1-wt1) .* [0 0 0 1]) .* (cm(:)>=cal.perCm),Nz,Nx,cal.ncmp);
-% 
-% wt0 = (cal.perCx-cx(:))./(cal.perCx-cal.cphs0);
-% wt1 = (cal.cphs1-cx(:))./(cal.cphs1-cal.perCx);
-% cx_cmp = reshape((wt0 .* [1 0 0 0] + (1-wt0) .* [0 1 0 0]) .* (cx(:)< cal.perCx) ...
-%        +         (wt1 .* [0 1 0 0] + (1-wt1) .* [0 0 0 1]) .* (cx(:)>=cal.perCx),Nz,Nx,cal.ncmp);
-% 
-% c_cmp = (m.*cm_cmp + x.*cx_cmp);
-% 
-% % update mineral end-member compositions
-% cm_mem = reshape(reshape(cm_cmp,Nz*Nx,cal.ncmp)*cal.cmp_mem/100,Nz,Nx,cal.nmem);
-% cx_mem = reshape(reshape(cx_cmp,Nz*Nx,cal.ncmp)*cal.cmp_mem/100,Nz,Nx,cal.nmem);
-% c_mem  = (m.*cm_mem + x.*cx_mem);
-% 
-% % update phase oxide compositions
-% cm_oxd = reshape(reshape(cm_mem,Nz*Nx,cal.nmem)*cal.mem_oxd/100,Nz,Nx,cal.noxd);
-% cx_oxd = reshape(reshape(cx_mem,Nz*Nx,cal.nmem)*cal.mem_oxd/100,Nz,Nx,cal.noxd);
-% c_oxd  = (m.*cm_oxd + x.*cx_oxd);
-
 % update mineral systems composition for solid assemblage
 cx_msy = reshape(reshape(cx_mem,Nz*Nx,cal.nmem)*cal.msy_mem.',Nz,Nx,cal.nmsy);
 

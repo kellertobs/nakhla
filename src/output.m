@@ -365,7 +365,7 @@ else % create 2D plots
     set(fh5,'CurrentAxes',ax(54));
     imagesc(Xc./1e3,Zc./1e3,c(:,:,4).*100); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.cmpStr{4},' [wt\%]'],TX{:},FS{:}); set(gca,'YTickLabel',[]); xlabel('Width [km]',TX{:},FS{:});
-    sgtitle(['time = ',num2str(time/yr,3),' [yr]'],TX{:},FS{:},'Color','k');
+    sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
 
     % plot major oxide composition in Fig. 6
     set(0,'CurrentFigure',fh6)
@@ -397,7 +397,7 @@ else % create 2D plots
     set(fh6,'CurrentAxes',ax(69));
     imagesc(Xc,Zc,c_oxd(:,:,9)./sumanh.*100); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.oxdStr{9},' [wt\%]'],TX{:},FS{:}); set(gca,'YTickLabel',[]);
-    sgtitle(['time = ',num2str(time/yr,3),' [yr]'],TX{:},FS{:},'Color','k');
+    sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
 
     % plot mineral assemblage in Fig. 7
     set(0,'CurrentFigure',fh7)
@@ -547,12 +547,10 @@ if save_op && ~restart
         print(fh2,name,'-dpng','-r300','-image');
         name = [opdir,'/',runID,'/',runID,'_cmp',num2str(floor(step/nop))];
         print(fh3,name,'-dpng','-r300','-image');
-        name = [opdir,'/',runID,'/',runID,'_eql',num2str(floor(step/nop))];
-        print(fh7,name,'-dpng','-r300','-image');
         name = [opdir,'/',runID,'/',runID,'_TAS',num2str(floor(step/nop))];
-        print(fh8,name,'-dpng','-r300','-image');
+        print(fh10,name,'-dpng','-r300','-image');
         name = [opdir,'/',runID,'/',runID,'_AFM',num2str(floor(step/nop))];
-        print(fh9,name,'-dpng','-r300','-image');
+        print(fh11,name,'-dpng','-r300','-image');
     elseif Nx <= 10  % create 1D plots
         name = [opdir,'/',runID,'/',runID,'_sol_',num2str(floor(step/nop))];
         print(fh1,name,'-dpng','-r300','-image');
@@ -560,12 +558,10 @@ if save_op && ~restart
         print(fh2,name,'-dpng','-r300','-image');
         name = [opdir,'/',runID,'/',runID,'_cmp_',num2str(floor(step/nop))];
         print(fh3,name,'-dpng','-r300','-image');
-        name = [opdir,'/',runID,'/',runID,'_eql',num2str(floor(step/nop))];
-        print(fh7,name,'-dpng','-r300','-image');
         name = [opdir,'/',runID,'/',runID,'_TAS',num2str(floor(step/nop))];
-        print(fh8,name,'-dpng','-r300','-image');
+        print(fh10,name,'-dpng','-r300','-image');
         name = [opdir,'/',runID,'/',runID,'_AFM',num2str(floor(step/nop))];
-        print(fh9,name,'-dpng','-r300','-image');
+        print(fh11,name,'-dpng','-r300','-image');
     else
         name = [opdir,'/',runID,'/',runID,'_vep_',num2str(floor(step/nop))];
         print(fh1,name,'-dpng','-r300','-image');

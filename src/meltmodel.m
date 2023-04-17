@@ -331,7 +331,7 @@ cal.Kx(:,cal.ncmp) = 0;
 %***  compute volatile component equilibrium partition coefficient
 
 cal.Kf = zeros(size(cal.Kx));
-cal.Kf(:,cal.ncmp) = 1./var.H2Om;
+cal.Kf(:,cal.ncmp) = 1./(var.H2Om+1e-16);
         
 end % function
 

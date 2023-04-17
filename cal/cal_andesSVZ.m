@@ -49,7 +49,7 @@ cal.msy_mem = [1  1  0  0  0  0  0  0  0  0  0  0  0    % olivine (olv)
 %               for     fay  Fe-spn Ti-spn  ens    hyp    aug    pig    ant     alb    kfs    qtz    wat
 cal.cmp_mem =[   0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0  100.0    0.0    0.0    0.0    0.0    % anorthosite (ano)
                  3.5    1.5    0.1    3.7   12.7    1.5   17.0    1.5   50.0    8.5    0.0    0.0    0.0    % basalt (bas)
-                 0.05   0.95   1.8    2.5    6.0   12.5    7.2   10.5   16.5   38.0    4.0    0.0    0.0    % andesite (and)
+                 0.05   0.95   1.8    2.5    6.0   12.5    7.2   10.5   16.0   38.0    4.5    0.0    0.0    % andesite (and)
                  0.0    0.0    0.8    0.05   0.0    1.0    0.5    9.0    1.5   16.6   25.25  45.3    0.0    % rhyolite (rhy)
                  0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0  100.0];  % hydrous fluid (fld)
 cal.cmp_mem = cal.cmp_mem./sum(cal.cmp_mem,2)*100;

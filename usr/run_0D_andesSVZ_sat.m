@@ -19,22 +19,27 @@ N        =  1;                   % number of grid points in z-direction
 h        =  D/N;                 % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
-Nt       =  600;                 % number of time steps to take
-tend     =  6*hr;                % end time for simulation [s]
+Nt       =  900;                 % number of time steps to take
+tend     =  9*hr;                % end time for simulation [s]
 dt       =  36;                  % initial time step [s]
 dtmax    =  36;                  % maximum time step [s]
 
 % set initial thermo-chemical state
-T0       =  1185;                % temperature top layer [deg C]
-c0       =  0.515;               % major component top layer [wt SiO2]
-v0       =  0.04;                % volatile component top layer [wt H2O]
+T0       =  1150;                % temperature top layer [deg C]
+c0       =  [0.10,0.28,0.59,0.03,0.04]; % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
+c1       =  c0;                         % components (maj comp, H2O) bot layer [wt] (will be normalised to unit sum!)
 
 % set thermo-chemical boundary parameters
 bndmode  =  1;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
 bnd_w    =  1e16;                % boundary layer width [m]
-tau_T    =  6*hr;                % wall cooling/assimilation time [s]
+tau_T    =  8*hr;                % wall cooling/assimilation time [s]
 Twall    =  [300,300,nan];       % [top,bot,sds] wall rock temperature [degC] (nan = insulating)
+cwall    =  [nan,nan,nan,nan,nan; ...
+             nan,nan,nan,nan,nan; ...
+             nan,nan,nan,nan,nan];
 Ptop     =  1.25e8;              % top pressure [Pa]
+fin      =  0;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
+fout     =  0;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
 
 % set thermo-chemical material parameters
 calID    =  'andesSVZ';          % phase diagram calibration
