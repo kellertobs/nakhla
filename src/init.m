@@ -415,12 +415,12 @@ if restart
     end
     if exist(name,'file')
         fprintf('\n   restart from %s \n\n',name);
-        load(name,'U','W','P','Pt','f','x','m','phi','chi','mu','X','F','M','S','C','T','c','cm','cx','cf','TE','IR','te','ir','dSdt','dCdt','dFdt','dXdt','dMdt','drhodt','dTEdt','dIRdt','Gf','Gx','Gm','rho','eta','eII','tII','dt','time','step','VolSrc','wf','wx','wm');
+        load(name,'U','W','P','Pt','f','x','m','fq','xq','mq','phi','chi','mu','X','F','M','S','C','T','c','cm','cx','cf','TE','IR','te','ir','dSdt','dCdt','dFdt','dXdt','dMdt','drhodt','dTEdt','dIRdt','Gf','Gx','Gm','rho','eta','eII','tII','dt','time','step','VolSrc','wf','wx','wm');
         name = [opdir,'/',runID,'/',runID,'_hist'];
         load(name,'hist');
 
-        xq  = x; fq = f; mq = 1-x-f;
         SOL = [W(:);U(:);P(:)];
+        RHO = X+M+F;
 
         So = S;
         Co = C;
@@ -440,6 +440,9 @@ if restart
         dIRdto = dIRdt;
 
         update; output; restart = 0;
+        sm = (S - X.*Dsx - F.*Dsf)./RHO;
+        sx = sm + Dsx;
+        sf = sm + Dsf;
     else % continuation file does not exist, start from scratch
         fprintf('\n   !!! restart file does not exist !!! \n   => starting run from scratch %s \n\n',runID);
         update;

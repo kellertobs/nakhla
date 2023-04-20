@@ -136,9 +136,6 @@ x = X./RHO;
 f = F./RHO;
 m = M./RHO;
 
-% convert major component density to concentration
-% c = C./RHO; c = c./sum(c,3);
-
 % update phase entropies
 sm = (S - X.*Dsx - F.*Dsf)./RHO;
 sx = sm + Dsx;

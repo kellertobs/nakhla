@@ -1,7 +1,8 @@
 % initialise model run
 init;
-    
+
 % physical time stepping loop
+frst=1;
 while time <= tend && step <= Nt && any(m(:)>1e-6)
     
     fprintf(1,'*****  step %d;  dt = %4.4e;  time = %4.4e [hr]\n\n',step,dt./3600,time./3600);
@@ -11,16 +12,16 @@ while time <= tend && step <= Nt && any(m(:)>1e-6)
     TCtime  = 0;
     UDtime  = 0;
 
-    if     strcmp(TINT,'be1im') || step==1 % first step / 1st-order backward-Euler implicit scheme
+    if     strcmp(TINT,'be1im') || step==1 || frst % first step / 1st-order backward-Euler implicit scheme
         a1 = 1; a2 = 1; a3 = 0;
         b1 = 1; b2 = 0; b3 = 0;
-    elseif strcmp(TINT,'bd2im') || step==2 % second step / 2nd-order 3-point backward-difference implicit scheme
-        a1 = 3/2; a2 = 4/2; a3 = -1/2;
-        b1 = 1;   b2 =  0;  b3 = 0;
-    elseif strcmp(TINT,'cn2si')            % other steps / 2nd-order Crank-Nicolson semi-implicit scheme
+    elseif strcmp(TINT,'cn2si') || step==2         % other steps / 2nd-order Crank-Nicolson semi-implicit scheme
         a1 = 1;   a2 = 1;   a3 = 0;
         b1 = 1/2; b2 = 1/2; b3 = 0;
-    elseif strcmp(TINT,'bd2si')            % other steps / 2nd-order 3-point backward-difference semi-implicit scheme
+    elseif strcmp(TINT,'bd2im')                    % second step / 2nd-order 3-point backward-difference implicit scheme
+        a1 = 3/2; a2 = 4/2; a3 = -1/2;
+        b1 = 1;   b2 =  0;  b3 = 0;
+    elseif strcmp(TINT,'bd2si')                    % other steps / 2nd-order 3-point backward-difference semi-implicit scheme
         a1 = 3/2; a2 = 4/2; a3 = -1/2;
         b1 = 3/4; b2 = 2/4; b3 = -1/4;
     end
@@ -102,6 +103,7 @@ while time <= tend && step <= Nt && any(m(:)>1e-6)
     % increment time/step
     time = time+dt;
     step = step+1;
+    if frst; frst=0; end
     
 end
 
