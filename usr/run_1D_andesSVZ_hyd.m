@@ -25,21 +25,23 @@ dt       =  36;                  % initial time step [s]
 dtmax    =  36;                  % maximum time step [s]
 
 % set initial thermo-chemical state
-T0       =  1150;                % temperature top layer [deg C]
-c0       =  [0.10,0.28,0.59,0.03,0.02]; % major component top  layer [wt]
+T0       =  1160;                % temperature top layer [deg C]
+c0       =  [0.10,0.30,0.58,0.02,0.02]; % major component top  layer [wt]
 c1       =  c0;                         % major component base layer [wt]
 dcr      =  [0,0,0,0,0];
 dcg      =  [0,0,0,0,0];
 
 % set thermo-chemical boundary parameters
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
-bnd_w    =  h;                % boundary layer width [m]
+bnd_w    =  h;                   % boundary layer width [m]
 tau_T    =  8*hr;                % wall cooling/assimilation time [s]
 Twall    =  [300,300,nan];       % [top,bot,sds] wall rock temperature [degC] (nan = insulating)
 cwall    =  [nan,nan,nan,nan,nan; ...
              nan,nan,nan,nan,nan; ...
              nan,nan,nan,nan,nan];
 Ptop     =  1.25e8;              % top pressure [Pa]
+fin      =  1;
+fout     =  1;
 
 % set thermo-chemical material parameters
 calID    =  'andesSVZ';          % phase diagram calibration
@@ -52,7 +54,7 @@ ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fro
 CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 rtol     =  1e-6;                % outer its relative tolerance
 atol     =  1e-9;                % outer its absolute tolerance
-maxit    =  20;                  % maximum outer its
+maxit    =  30;                  % maximum outer its
 
 
 %*****  RUN NAKHLA MODEL  *************************************************

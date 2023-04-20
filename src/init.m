@@ -211,17 +211,18 @@ while res > tol
         Pt(2:end,:) = Pt(1,:) + repmat(cumsum(mean(rhofz,2).*g0.*h),1,Nx);
     end
 
-    wt = min(1,it/10);
+    wt = min(1,it/5);
 
     eqtime = tic;
 
-    var.c     = reshape(c,Nx*Nz,cal.ncmp);   % component fractions [wt]
-    var.T     = reshape(T,Nx*Nz,1)-273.15;   % temperature [C]
-    var.P     = reshape(Pt,Nx*Nz,1)/1e9;     % pressure [GPa]
-    var.m     = reshape(mq,Nx*Nz,1);         % melt fraction [wt]
-    var.f     = reshape(fq,Nx*Nz,1);         % bubble fraction [wt]
-    var.H2O   = reshape(c(:,:,end),Nx*Nz,1); % water concentration [wt]
-    var.SiO2m = reshape(cm_oxd(:,:,1)./sum(cm_oxd(:,:,1:end-1),3),Nx*Nz,1); % melt silica concentration [wt]
+    var.c      = reshape(c,Nx*Nz,cal.ncmp);   % component fractions [wt]
+    var.T      = reshape(T,Nx*Nz,1)-273.15;   % temperature [C]
+    var.P      = reshape(Pt,Nx*Nz,1)/1e9;     % pressure [GPa]
+    var.m      = reshape(mq,Nx*Nz,1);         % melt fraction [wt]
+    var.f      = reshape(fq,Nx*Nz,1);         % bubble fraction [wt]
+    var.H2O    = reshape(c(:,:,end),Nx*Nz,1); % water concentration [wt]
+    var.SiO2m  = reshape(cm_oxd(:,:,1)./sum(cm_oxd(:,:,1:end-1),3),Nx*Nz,1); % melt silica concentration [wt]
+    cal.H2Osat = fluidsat(var.T,var.P*1e9,var.SiO2m,cal);
 
     [var,cal] = meltmodel(var,cal,'E');
 

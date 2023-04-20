@@ -5,7 +5,7 @@ clear; close all;
 run('./par_default')
 
 % set run parameters
-runID    =  '2D_andesSVZ_assml'; % run identifier
+runID    =  '1D_andesSVZ_anh';   % run identifier
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  100;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot results
@@ -14,44 +14,34 @@ plot_cv  =  0;                   % switch on to live plot iterative convergence
 
 % set model domain parameters
 D        =  10;                  % chamber depth [m]
-N        =  100;                 % number of grid points in z-direction
+N        =  400;                 % number of grid points in z-direction
 h        =  D/N;                 % grid spacing (equal in both dimensions, do not set) [m]
-L        =  D;                   % chamber width (equal to h for 1-D mode) [m]
+L        =  h;                   % chamber width (equal to h for 1-D mode) [m]
 
 % set model timing parameters
 Nt       =  1e5;                 % number of time steps to take
 tend     =  1*yr;                % end time for simulation [s]
 dt       =  36;                  % initial time step [s]
-dtmax    =  360;                 % maximum time step [s]
+dtmax    =  36;                  % maximum time step [s]
 
 % set initial thermo-chemical state
-T0       =  1150;                % temperature top layer [deg C]
-c0       =  [0.10,0.30,0.58,0.02,0.02]; % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
-c1       =  c0;                         % components (maj comp, H2O) bot layer [wt] (will be normalised to unit sum!)
-dcr      =  [1,1,-1,-1,0]*1e-5;
+T0       =  1240;                % temperature top layer [deg C]
+c0       =  [0.11,0.25,0.63,0.01,0.00]; % major component top  layer [wt]
+c1       =  c0;                         % major component base layer [wt]
+dcr      =  [0,0,0,0,0];
 dcg      =  [0,0,0,0,0];
-te0      =  [2,1,0.3,0.03];      % trace elements top layer [wt ppm]
-te1      =  te0;                 % trace elements base layer [wt ppm]
-ir0      =  [5, 0.70];           % isotope ratios top layer [delta]
-ir1      =  ir0;                 % isotope ratios base layer [delta]
-
 
 % set thermo-chemical boundary parameters
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
 bnd_w    =  h;                   % boundary layer width [m]
 tau_T    =  8*hr;                % wall cooling/assimilation time [s]
-tau_a    =  8*hr;                % wall cooling/assimilation tie [s]
 Twall    =  [300,300,nan];       % [top,bot,sds] wall rock temperature [degC] (nan = insulating)
-cwall    =  [0.01,0.07,0.24,0.70,0.05; ...
-             0.01,0.07,0.24,0.70,0.05; ...
+cwall    =  [nan,nan,nan,nan,nan; ...
+             nan,nan,nan,nan,nan; ...
              nan,nan,nan,nan,nan];
-tewall   =  [1,0.3,0.1,0.01; ...
-             1,0.3,0.1,0.01; ...
-             nan,nan,nan,nan];   % [top,bot,sds] wall rock trace elements [wt ppm] (nan = no assimilation)
-irwall   =  [-2,0.72; ...
-             -2,0.72; ...
-             nan,nan];           % [top,bot,sds] wall rock isotope ratios [delta] (nan = no assimilation)
 Ptop     =  1.25e8;              % top pressure [Pa]
+fin      =  1;
+fout     =  1;
 
 % set thermo-chemical material parameters
 calID    =  'andesSVZ';          % phase diagram calibration
@@ -59,13 +49,12 @@ Dsx      = -300;                 % entropy change of crystallisation [J/kg]
 Dsf      =  400;                 % entropy change of exsolution [J/kg]
 
 % set numerical model parameters
-TINT     =  'bd2si';             % time integration scheme ('be1im','bd2im','cn2si','bd2si')
+TINT     =  'bd2im';             % time integration scheme ('be1im','bd2im','cn2si','bd2si')
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
 CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
-rtol     =  1e-5;                % outer its relative tolerance
+rtol     =  1e-6;                % outer its relative tolerance
 atol     =  1e-9;                % outer its absolute tolerance
-maxit    =  20;                  % maximum outer its
-cnvreg   =  10;                  % convection regularisation parameter
+maxit    =  30;                  % maximum outer its
 
 
 %*****  RUN NAKHLA MODEL  *************************************************

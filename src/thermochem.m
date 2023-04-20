@@ -68,13 +68,14 @@ c = C./sum(C,3);
 %*** update phase equilibrium
 eqtime = tic;
 
-var.c     = reshape(c,Nx*Nz,cal.ncmp);   % component fractions [wt]
-var.T     = reshape(T,Nx*Nz,1)-273.15;   % temperature [C]
-var.P     = reshape(Pt,Nx*Nz,1)/1e9;     % pressure [GPa]
-var.m     = reshape(mq,Nx*Nz,1);         % melt fraction [wt]
-var.f     = reshape(fq,Nx*Nz,1);         % bubble fraction [wt]
-var.H2O   = reshape(c(:,:,end),Nx*Nz,1); % water concentration [wt]
-var.SiO2m = reshape(cm_oxd(:,:,1)./sum(cm_oxd(:,:,1:end-1),3),Nx*Nz,1); % melt silica concentration [wt]
+var.c      = reshape(c,Nx*Nz,cal.ncmp);   % component fractions [wt]
+var.T      = reshape(T,Nx*Nz,1)-273.15;   % temperature [C]
+var.P      = reshape(Pt,Nx*Nz,1)/1e9;     % pressure [GPa]
+var.m      = reshape(mq,Nx*Nz,1);         % melt fraction [wt]
+var.f      = reshape(fq,Nx*Nz,1);         % bubble fraction [wt]
+var.H2O    = reshape(c(:,:,end),Nx*Nz,1); % water concentration [wt]
+var.SiO2m  = reshape(cm_oxd(:,:,1)./sum(cm_oxd(:,:,1:end-1),3),Nx*Nz,1); % melt silica concentration [wt]
+cal.H2Osat = fluidsat(var.T,var.P*1e9,var.SiO2m,cal);
 
 [var,cal] = meltmodel(var,cal,'E');
 
@@ -101,9 +102,9 @@ advn_rho = advn_X+advn_F+advn_M;
 res_Gx = Gx - (xq.*RHO-X)./max(tau_r,3*dt);
 res_Gf = Gf - (fq.*RHO-F)./max(tau_r,3*dt);
 res_Gm = Gm - (mq.*RHO-M)./max(tau_r,3*dt);
-Gx = Gx - res_Gx/2;
-Gf = Gf - res_Gf/2;
-Gm = Gm - res_Gm/2;
+Gx = Gx - res_Gx/3;
+Gf = Gf - res_Gf/3;
+Gm = Gm - res_Gm/3;
 
 % total rates of change
 dXdt   = advn_X + Gx;
@@ -144,14 +145,16 @@ sx = sm + Dsx;
 sf = sm + Dsf;
 
 % update major component phase composition
-Kx  = cxq./max(TINY,cmq);
-Kf  = cfq./max(TINY,cmq);
-res = 1; tol  = 1e-9;
-it  = 1; mxit = 20;
+Kx  = cxq./(cmq+TINY);
+Kf  = cfq./(cmq+TINY);
+res = 1; tol  = 1e-6;
+it  = 1; mxit = 30;
 while res>tol && it<mxit
-cm  = max(0,min(1, c./(m + x.*Kx + f.*Kf)));
-cx  = max(0,min(1,(c-f.*cf).*Kx./(m + x.*Kx)));
+    cm  =  c./(m + x.*Kx + f.*Kf);
+    cx  = (c-f.*cf).*Kx./(m + x.*Kx + TINY);
+%     cf  = (c-x.*cx).*Kf./(m + f.*Kx + TINY);
     Kx  = Kx .* sum(cm,3)./sum(cx,3);
+    Kf  = Kf .* sum(cm,3)./sum(cf,3);
     res = norm(sum(cm,3)./sum(cx,3)-1,'fro')./sqrt(length(cm(:)));
     it  = it+1;
 end

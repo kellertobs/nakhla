@@ -14,7 +14,7 @@ plot_cv  =  0;                   % switch on to live plot iterative convergence
 
 % set model domain parameters
 D        =  10;                  % chamber depth [m]
-N        =  100;                 % number of grid points in z-direction
+N        =  120;                 % number of grid points in z-direction
 h        =  D/N;                 % grid spacing (equal in both dimensions, do not set) [m]
 L        =  D;                   % chamber width (equal to h for 1-D mode) [m]
 
@@ -22,12 +22,12 @@ L        =  D;                   % chamber width (equal to h for 1-D mode) [m]
 Nt       =  1e5;                 % number of time steps to take
 tend     =  1*yr;                % end time for simulation [s]
 dt       =  36;                  % initial time step [s]
-dtmax    =  360;                 % maximum time step [s]
+dtmax    =  100;                 % maximum time step [s]
 
 % set initial thermo-chemical state
-T0       =  765;                 % temperature top layer [deg C]
-c0       =  [0.01,0.05,0.20,0.74,0.04]; % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
-c1       =  c0;                         % components (maj comp, H2O) bot layer [wt] (will be normalised to unit sum!)
+T0       =  800;                % temperature top layer [deg C]
+c0       =  [0.01,0.07,0.24,0.70,0.05]; % major component top layer [wt]
+c1       =  c0;                         % major component base layer [wt]
 dcr      =  [1,1,-1,-1,0]*1e-5;
 dcg      =  [0,0,0,0,0];
 te0      =  [1,0.3,0.1,0.01];    % trace elements top layer [wt ppm]
@@ -39,11 +39,11 @@ ir1      =  ir0;                 % isotope ratios base layer [delta]
 % set thermo-chemical boundary parameters
 bndmode  =  2;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
 bnd_w    =  h;                   % boundary layer width [m]
-tau_T    =  8*hr;                % wall cooling/assimilation time [s]
-tau_a    =  8*hr;                % wall cooling/assimilation tie [s]
+tau_T    =  6*hr;                % wall cooling/assimilation time [s]
+tau_a    =  6*hr;                % wall cooling/assimilation tie [s]
 Twall    =  [nan,1150,nan];      % [top,bot,sds] wall rock temperature [degC] (nan = insulating)
 cwall    =  [nan,nan,nan,nan,nan; ...
-             0.10,0.28,0.59,0.03,0.02; ...
+             0.10,0.30,0.58,0.02,0.02; ...
              nan,nan,nan,nan,nan];
 tewall   =  [nan,nan,nan,nan; ...
              2,1,0.3,0.03; ...
@@ -59,12 +59,12 @@ Dsx      = -300;                 % entropy change of crystallisation [J/kg]
 Dsf      =  400;                 % entropy change of exsolution [J/kg]
 
 % set numerical model parameters
-TINT     =  'bd2si';             % time integration scheme ('be1im','bd2im','cn2si','bd2si')
+TINT     =  'bd2im';             % time integration scheme ('be1im','bd2im','cn2si','bd2si')
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
 CFL      =  0.25;                % (physical) time stepping courant number (multiplies stable step) [0,1]
-rtol     =  1e-6;                % outer its relative tolerance
+rtol     =  1e-5;                % outer its relative tolerance
 atol     =  1e-9;                % outer its absolute tolerance
-maxit    =  20;                  % maximum outer its
+maxit    =  50;                  % maximum outer its
 cnvreg   =  1;                   % convection regularisation parameter
 
 

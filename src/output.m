@@ -30,6 +30,7 @@ if Nx <= 1 && Nz <= 1  % create 0D plots
     plot(hist.time/hr,hist.cx_oxd(:,2,cal.H),CL{[1,4]},LW{:}); axis xy tight; box on; hold on;
     plot(hist.time/hr,hist.cm_oxd(:,2,cal.H),CL{[1,3]},LW{:});
     plot(hist.time/hr,hist.c_oxd (:,2,cal.H),CL{[1,2]},LW{:});
+    plot(time/hr,cal.H2Osat*100,'.',CL{[1,2]},LW{:});
     title('$\bar{c}$ [wt\% H$_2$O]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(4,1,4)
     plot(hist.time/hr,hist.mu (:,2)*100.*(hist.mu (:,2)>1e-9),CL{[1,3]},LW{:}); axis xy tight; box on; hold on;

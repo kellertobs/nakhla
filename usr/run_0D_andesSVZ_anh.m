@@ -9,7 +9,7 @@ runID    =  '0D_andesSVZ_anh';   % run identifier
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  50;                  % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot results
-save_op  =  0;                   % switch on to save output to file
+save_op  =  1;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
 
 % set model domain parameters
@@ -25,9 +25,9 @@ dt       =  36;                  % initial time step [s]
 dtmax    =  36;                  % maximum time step [s]
 
 % set initial thermo-chemical state
-T0       =  1270;                % temperature top layer [deg C]
-c0       =  [0.10,0.28,0.59,0.03,0.0];  % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
-c1       =  c0;                         % components (maj comp, H2O) bot layer [wt] (will be normalised to unit sum!)
+T0       =  1050;                % temperature top layer [deg C]
+c0       =  [0.10,0.30,0.58,0.02,0.00];  % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
+c1       =  c0;                          % components (maj comp, H2O) bot layer [wt] (will be normalised to unit sum!)
 
 % set thermo-chemical boundary parameters
 bndmode  =  1;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
@@ -50,7 +50,7 @@ Dsf      =  400;                 % entropy change of exsolution [J/kg]
 TINT     =  'bd2im';             % time integration scheme ('be1im','bd2im','cn2si','bd2si')
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
 CFL      =  1.00;                % (physical) time stepping courant number (multiplies stable step) [0,1]
-rtol     =  1e-5;                % outer its relative tolerance
+rtol     =  1e-6;                % outer its relative tolerance
 atol     =  1e-9;                % outer its absolute tolerance
 maxit    =  50;                  % maximum outer its
 

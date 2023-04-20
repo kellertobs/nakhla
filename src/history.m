@@ -162,7 +162,6 @@ if any(indm(:)>0)
 else
     hist.cm(stp,1:3,1:cal.ncmp) = NaN;
     hist.cm_oxd(stp,1:3,1:cal.noxd) = NaN;
-    hist.vm(stp,1:3) = NaN;
     hist.rhom(stp,1:3) = NaN;
     hist.etam(stp,1:3) = NaN;
 end

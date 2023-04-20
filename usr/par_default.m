@@ -76,8 +76,8 @@ Dsf      =  400;                 % entropy change of exsolution [J/kg]
 tau_r    =  0;                   % reaction time scale (set to zero for quasi-equilibrium mode)
 
 % set model buoyancy parameters
-aT       =  4e-5;                 % thermal expansivity [1/K]
-bP       =  1e-8;                 % fluid compressibility [1/Pa]
+aT       =  4e-5;                % thermal expansivity [1/K]
+bP       =  1e-8;                % fluid compressibility [1/Pa]
 dx       =  1e-3;                % crystal size [m]
 df       =  1e-3;                % bubble size [m]
 g0       =  10.;                 % gravity [m/s2]
