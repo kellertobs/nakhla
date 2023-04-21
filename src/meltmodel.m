@@ -55,9 +55,9 @@ r  =  sum((var.c-f.*cf)./((1-f).*cal.Kx + 1e-16),2)-1;
 
 rnorm      =  1;     % initialize residual norm for iterations
 n          =  0;     % initialize iteration count
-rnorm_tol  =  1e-9; % tolerance for Newton residual
+rnorm_tol  =  1e-10; % tolerance for Newton residual
 its_tol    =  200;   % maximum number of iterations
-eps_T      =  1e-3;  % temperature perturbation for finite differencing, degrees
+eps_T      =  1e-5;  % temperature perturbation for finite differencing, degrees
 flag       =  1;     % tells us whether the Newton solver converged
 
 while rnorm > rnorm_tol  % iterate down to full accuracy
@@ -137,9 +137,9 @@ r  =  sum((var.c-f.*cf).*cal.Kx./(1-f),2)-1;
 
 rnorm      =  1;     % initialize residual norm for iterations
 n          =  0;     % initialize iteration count
-rnorm_tol  =  1e-9; % tolerance for Newton residual
+rnorm_tol  =  1e-10; % tolerance for Newton residual
 its_tol    =  200;   % maximum number of iterations
-eps_T      =  1e-3;  % temperature perturbation for finite differencing, degrees
+eps_T      =  1e-5;  % temperature perturbation for finite differencing, degrees
 flag       =  1;     % tells us whether the Newton solver converged
 
 while rnorm > rnorm_tol  % iterate down to full accuracy
@@ -147,7 +147,6 @@ while rnorm > rnorm_tol  % iterate down to full accuracy
     %***  compute partition coefficients Kxi at T+eps_T/2
     var.T      = Tliq+eps_T/2;
     [var,cal]  = meltmodel(var,cal,'K');
-    f          = (var.H2O-var.H2Om)./(1-var.H2Om);
 
     %***  get residual at T+eps_T/2
     rp  =  sum((var.c-f.*cf).*cal.Kx./(1-f),2)-1;
@@ -155,7 +154,6 @@ while rnorm > rnorm_tol  % iterate down to full accuracy
     %***  compute partition coefficients Kxi at T-eps_T/2
     var.T      = Tliq-eps_T/2;
     [var,cal]  = meltmodel(var,cal,'K');
-    f          = (var.H2O-var.H2Om)./(1-var.H2Om);
 
     %***  get residual at T-eps_T/2
     rm  =  sum((var.c-f.*cf).*cal.Kx./(1-f),2)-1;
@@ -169,7 +167,6 @@ while rnorm > rnorm_tol  % iterate down to full accuracy
     %***  compute partition coefficients Kxi at Tliq
     var.T      = Tliq;
     [var,cal]  = meltmodel(var,cal,'K');
-    f          = (var.H2O-var.H2Om)./(1-var.H2Om);
 
     %***  compute residual at Tliq
     r  =  sum((var.c-f.*cf).*cal.Kx./(1-f),2)-1;
@@ -196,11 +193,8 @@ function  [cal,var,flag]  =  equilibrium(var,cal)
 %*****  subroutine to compute equilibrium melt fraction and phase 
 %       compositions at given bulk composition, pressure and temperature
 
-%***  get P-, H2O-dependent partition coefficients
-var.H2Om   = max(0,min(1,min(var.H2O./(var.m+1e-16),cal.H2Osat)));
-[var,cal]  = meltmodel(var,cal,'K');
-
 %***  get Tsol, Tliq at c
+var.H2Om   = max(0,min(cal.H2Osat, var.H2O./(var.m+1e-16) ));
 [var,cal,flag]  =  meltmodel(var,cal,'T');
 
 var.T = max(cal.Tsol,min(cal.Tliq,var.T));
@@ -212,78 +206,44 @@ elseif ~any(var.m(:)>1e-9 & var.m(:)<1-1e-9)
     var.m = max(0,min(1,(var.T-cal.Tsol)./(cal.Tliq-cal.Tsol)));
 end
 
-%***  set reasonable initial guess for bubble fraction
-if ~isfield(var,'f') 
-    var.f = max(0,min(1-var.m,var.H2O - var.m.*var.H2Om));
-elseif ~any(var.f(:)>1e-9)
-    var.f = max(0,min(1-var.m,var.H2O - var.m.*var.H2Om));
-end
-
 var.f = max(0,min(var.H2O, var.H2O - var.m.*var.H2Om ));
 var.m = min(1-var.f,var.m);
 var.x = 1-var.m-var.f;
-    
-%***  compute residual of unity sum of components
-var.H2Om  = max(0,min(1,min(var.H2O./(var.m+1e-16),cal.H2Osat)));
-[var,cal] = meltmodel(var,cal,'K');
-var.cf    = zeros(size(var.c)); var.cf(:,end) = 1;
-var.cm    = var.c./(var.m + var.x.*cal.Kx + var.f.*cal.Kf + 1e-16);
-var.cx    = (var.c-var.f.*var.cf).*cal.Kx./(var.m + var.x.*cal.Kx + 1e-16);
-rm        = sum(var.cm,2) - sum(var.cx,2);
 
 rnorm     = 1;     % initialize residual norm for iterations
 n         = 0;     % initialize iteration count
-rnorm_tol = 1e-9;  % tolerance for Newton residual
-its_tol   = 200;   % maximum number of iterations
-eps_m     = 1e-9;  % temperature perturbation for finite differencing, degrees
+rnorm_tol = 1e-10; % tolerance for Newton residual
+its_tol   = 500;   % maximum number of iterations
+epsm      = 1e-8;  % temperature perturbation for finite differencing, degrees
 flag.eql  = 1;     % tells us whether the Newton solver converged
+mi        = var.m;
 
 while rnorm > rnorm_tol     % Newton iteration
+    mii = mi; mi = var.m; 
+    epsm = epsm .* (1+randn/10);
+
+    %***  compute residual of unity sum of components
+    [r,var.cm,var.cx,var.cf] = resm(var.m,var,cal);
+    r((var.m==0 & var.T<=cal.Tsol) | (var.x==0 & var.T>=cal.Tliq)) = 0;
 
     %***  compute numerical derivative of residual dr/dm
-    varp        = var;
-    varp.m      = var.m+eps_m/2;
-    varp.H2Om   = max(0,min(1,min(var.H2O./(var.m+1e-16),cal.H2Osat)));
-    [varp,calp] = meltmodel(varp,cal,'K');
-    varp.f      = varp.H2O - varp.m.*varp.H2Om;
-    varp.x      = 1-varp.m-varp.f;
-    varp.cm     =  varp.c./(varp.m + varp.x.*calp.Kx + varp.f.*calp.Kf + 1e-16);
-    varp.cx     = (varp.c-varp.f.*varp.cf).*calp.Kx./(varp.m + varp.x.*calp.Kx + 1e-16);
-    rmp         = sum(varp.cm,2) - sum(varp.cx,2);
+    rp = resm(var.m+epsm/2,var,cal);
+    rm = resm(var.m-epsm/2,var,cal);
 
-    varm        = var;
-    varm.m      = var.m-eps_m/2;
-    varm.H2Om   = max(0,min(1,min(var.H2O./(var.m+1e-16),cal.H2Osat)));
-    [varm,calm] = meltmodel(varm,cal,'K');
-    varm.f      = varm.H2O - varm.m.*varm.H2Om;
-    varm.x      = 1-varm.m-varm.f;
-    varm.cm     =  varm.c./(varm.m + varm.x.*calm.Kx + varm.f.*calm.Kf + 1e-16);
-    varm.cx     = (varm.c-varm.f.*varm.cf).*calm.Kx./(varm.m + varm.x.*calm.Kx + 1e-16);
-    rmm         = sum(varm.cm,2) - sum(varm.cx,2);
-
-    drm_dm      = (rmp-rmm)./(varp.m-varm.m);
+    drdm = (rp-rm)./epsm;
 
     %***  apply Newton correction to crystal fraction x
-    var.m = max(0,min(1-var.f, var.m - rm./drm_dm/3 ));
+    updm  = r./drdm/4; updm(r==0) = 0;
+    var.m = max(0,min(1-var.f, var.m - updm + (mi-mii)/4 ));
 
     %***  get droplet fraction f
     var.f = max(0,min(var.H2O, var.H2O - var.m.*var.H2Om ));
     
     %***  get crystal fraction x
     var.x = max(0,min(1, 1-var.m-var.f ));
-
-    %***  compute residual of unity sum of components
-    var.H2Om  = max(0,min(1,min(var.H2O./(var.m+1e-16),cal.H2Osat)));
-    [var,cal] = meltmodel(var,cal,'K');
-
-    var.cm  =  var.c./(var.m + var.x.*cal.Kx + var.f.*cal.Kf + 1e-16);
-    var.cx  = (var.c-var.f.*var.cf).*cal.Kx./(var.m + var.x.*cal.Kx + 1e-16);
-
-    rm  = sum(var.cm,2) - sum(var.cx,2);
-    rm((var.m==0 & var.T<cal.Tsol) | (var.x==0 & var.T>cal.Tliq)) = 0;
     
     %***  get non-linear residual norm
-    rnorm  = norm(rm./drm_dm,2)./sqrt(length(rm)+1);
+    rnorm  = norm(updm,2)/norm(var.m+1,2);
 
     n  =  n+1;  % update iteration count
     if (n==its_tol)
@@ -294,6 +254,18 @@ end
 
 end
 
+function [r,cm,cx,cf] = resm(m,var,cal)
+
+var.H2Om  = max(0,min(cal.H2Osat, var.H2O./(m+1e-16) ));
+[var,cal] = meltmodel(var,cal,'K');
+f         = var.H2O - m.*var.H2Om;
+x         = 1-m-f;
+cf        = zeros(size(var.c)); cf(:,cal.ncmp-1) = 1;
+cm        =  var.c               ./(m + x.*cal.Kx + f.*cal.Kf + 1e-16);
+cx        = (var.c-f.*cf).*cal.Kx./(m + x.*cal.Kx             + 1e-16);
+r         = sum(cm,2) - sum(cx,2);
+
+end
 
 function  [var,cal]  =  K(var,cal)
 

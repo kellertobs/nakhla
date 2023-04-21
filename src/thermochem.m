@@ -149,7 +149,6 @@ it  = 1; mxit = 30;
 while res>tol && it<mxit
     cm  =  c./(m + x.*Kx + f.*Kf);
     cx  = (c-f.*cf).*Kx./(m + x.*Kx + TINY);
-%     cf  = (c-x.*cx).*Kf./(m + f.*Kx + TINY);
     Kx  = Kx .* sum(cm,3)./sum(cx,3);
     Kf  = Kf .* sum(cm,3)./sum(cf,3);
     res = norm(sum(cm,3)./sum(cx,3)-1,'fro')./sqrt(length(cm(:)));
