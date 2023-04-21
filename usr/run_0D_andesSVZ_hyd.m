@@ -7,9 +7,9 @@ run('./par_default')
 % set run parameters
 runID    =  '0D_andesSVZ_hyd';   % run identifier
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
-nop      =  10;                  % output frame plotted/saved every 'nop' time steps
+nop      =  50;                  % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot results
-save_op  =  0;                   % switch on to save output to file
+save_op  =  1;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
 
 % set model domain parameters
@@ -19,7 +19,7 @@ N        =  1;                   % number of grid points in z-direction
 h        =  D/N;                 % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
-Nt       =  800;                 % number of time steps to take
+Nt       =  850;                 % number of time steps to take
 tend     =  8*hr;                % end time for simulation [s]
 dt       =  36;                  % initial time step [s]
 dtmax    =  36;                  % maximum time step [s]

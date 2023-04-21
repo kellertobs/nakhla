@@ -25,7 +25,7 @@ dt       =  36;                  % initial time step [s]
 dtmax    =  36;                  % maximum time step [s]
 
 % set initial thermo-chemical state
-T0       =  1050;                % temperature top layer [deg C]
+T0       =  1275;                % temperature top layer [deg C]
 c0       =  [0.10,0.30,0.58,0.02,0.00];  % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
 c1       =  c0;                          % components (maj comp, H2O) bot layer [wt] (will be normalised to unit sum!)
 
