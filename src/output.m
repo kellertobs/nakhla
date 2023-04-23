@@ -86,27 +86,22 @@ elseif Nx <= 1  % create 1D plots
     else; set(0, 'CurrentFigure', fh1); clf;
     end
     sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
-    subplot(1,5,1)
+    subplot(1,4,1)
     plot(T-273.15,Zc.',CL{[1,2]},LW{:}); axis ij tight; box on; hold on;
     plot(cal.Tliq,Zc.',CL{[1,3]},LW{:});
     plot(cal.Tsol,Zc.',CL{[1,4]},LW{:});
     title('$T [^\circ$C]',TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:}); set(gca,TL{:},TS{:});
-    subplot(1,5,2)
-    plot(cx_oxd(:,:,cal.Si)./sum(cx_oxd(:,:,1:end-1),3).*100,Zc.',CL{[1,4]},LW{:}); axis ij tight; box on; hold on;
-    plot(cm_oxd(:,:,cal.Si)./sum(cm_oxd(:,:,1:end-1),3).*100,Zc.',CL{[1,3]},LW{:});
-    plot( c_oxd(:,:,cal.Si)./sum( c_oxd(:,:,1:end-1),3).*100,Zc.',CL{[1,2]},LW{:});
-    title('SiO$_2$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
-    subplot(1,5,3)
-    plot(cx_oxd(:,:,cal.H ),Zc.',CL{[1,4]},LW{:}); axis ij tight; box on; hold on;
-    plot(cm_oxd(:,:,cal.H ),Zc.',CL{[1,3]},LW{:});
-    plot( c_oxd(:,:,cal.H ),Zc.',CL{[1,2]},LW{:});
-    title('H$_2$O [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
-    subplot(1,5,4)
+    subplot(1,4,2)
+    for i=1:cal.ncmp
+        plot(squeeze(c(:,:,i)).*100.*(1+9.*cfq(:,:,i)),Zc.',LW{:},'color',ocean(round((i-1)*213/cal.ncmp)+1,:)); axis ij tight; box on; hold on;
+    end
+    title('Bulk cmps [wt\%]',TX{:},FS{:}); legend(cal.cmpStr,TX{:},FS{:},'Location','west'); ylabel('Depth [m]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+    subplot(1,4,3)
     plot(mu *100.*(mu >1e-9),Zc.',CL{[1,3]},LW{:}); axis ij tight; box on; hold on;
     plot(chi*100.*(chi>1e-9),Zc.',CL{[1,4]},LW{:});
     plot(phi*100.*(phi>1e-9),Zc.',CL{[1,5]},LW{:});
     title('$\mu$, $\chi$, $\phi$ [vol\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
-    subplot(1,5,5)
+    subplot(1,4,4)
     plot(-(phi([1,1:end],:)+phi([1:end,end],:))/2.*wf(:,2:end-1)*hr,Zf.',CL{[1,5]},LW{:}); axis ij tight; box on; hold on;
     plot(-(chi([1,1:end],:)+chi([1:end,end],:))/2.*wx(:,2:end-1)*hr,Zf.',CL{[1,4]},LW{:});
     plot(-(mu ([1,1:end],:)+mu ([1:end,end],:))/2.*wm(:,2:end-1)*hr,Zf.',CL{[1,3]},LW{:});

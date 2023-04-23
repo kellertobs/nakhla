@@ -258,6 +258,7 @@ var.cx = max(0,min(1, (var.c-var.f.*var.cf).*cal.Kx./(var.m + var.x.*cal.Kx     
 
 end
 
+
 function [r,var,cal] = resm(m,var,cal)
 
 var.H2Om  = max(0,min(cal.H2Osat, var.H2O./(m+1e-16) ));
@@ -267,10 +268,9 @@ x         = 1-m-f;
 var.cm    = max(0,min(1,  var.c                   ./(m + x.*cal.Kx + f.*cal.Kf + 1e-16) ));
 var.cx    = max(0,min(1, (var.c-f.*var.cf).*cal.Kx./(m + x.*cal.Kx             + 1e-16) ));
 r         = sum(var.cm,2) - sum(var.cx,2);
-% r         = x.*sum(cm,2) + m.*sum(cx,2) - 1;
-% r         = x.*sum(var.cx,2) + m.*sum(var.cm,2) + f.*sum(var.cf,2) - 1;
 
 end
+
 
 function  [var,cal]  =  K(var,cal)
 
