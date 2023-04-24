@@ -50,7 +50,7 @@ Dsf      =  400;                 % entropy change of exsolution [J/kg]
 TINT     =  'bd2im';             % time integration scheme ('be1im','bd2im','cn2si','bd2si')
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
 CFL      =  1.00;                % (physical) time stepping courant number (multiplies stable step) [0,1]
-rtol     =  1e-5;                % outer its relative tolerance
+rtol     =  1e-6;                % outer its relative tolerance
 atol     =  1e-9;                % outer its absolute tolerance
 maxit    =  50;                  % maximum outer its
 

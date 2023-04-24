@@ -55,9 +55,9 @@ r  =  sum((var.c-f.*cf)./((1-f).*cal.Kx + 1e-16),2)-1;
 
 rnorm      =  1;     % initialize residual norm for iterations
 n          =  0;     % initialize iteration count
-rnorm_tol  =  1e-10; % tolerance for Newton residual
+rnorm_tol  =  1e-12; % tolerance for Newton residual
 its_tol    =  200;   % maximum number of iterations
-eps_T      =  1e-5;  % temperature perturbation for finite differencing, degrees
+eps_T      =  1e-6;  % temperature perturbation for finite differencing, degrees
 flag       =  1;     % tells us whether the Newton solver converged
 
 while rnorm > rnorm_tol  % iterate down to full accuracy
@@ -137,9 +137,9 @@ r  =  sum((var.c-f.*cf).*cal.Kx./(1-f),2)-1;
 
 rnorm      =  1;     % initialize residual norm for iterations
 n          =  0;     % initialize iteration count
-rnorm_tol  =  1e-10; % tolerance for Newton residual
+rnorm_tol  =  1e-12; % tolerance for Newton residual
 its_tol    =  200;   % maximum number of iterations
-eps_T      =  1e-5;  % temperature perturbation for finite differencing, degrees
+eps_T      =  1e-6;  % temperature perturbation for finite differencing, degrees
 flag       =  1;     % tells us whether the Newton solver converged
 
 while rnorm > rnorm_tol  % iterate down to full accuracy
@@ -213,9 +213,9 @@ var.x  = 1-var.m-var.f;
 
 rnorm     = 1;     % initialize residual norm for iterations
 n         = 0;     % initialize iteration count
-rnorm_tol = 1e-12; % tolerance for Newton residual
+rnorm_tol = 1e-13; % tolerance for Newton residual
 its_tol   = 500;   % maximum number of iterations
-epsm      = 1e-12; % temperature perturbation for finite differencing, degrees
+epsm      = 1e-9;  % temperature perturbation for finite differencing, degrees
 flag.eql  = 1;     % tells us whether the Newton solver converged
 mi        = var.m;
 

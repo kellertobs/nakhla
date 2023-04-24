@@ -16,23 +16,19 @@ if Nx <= 1 && Nz <= 1  % create 0D plots
     if ~exist('fh1','var'); fh1 = figure(VIS{:});
     else; set(0, 'CurrentFigure', fh1); clf;
     end
-    subplot(4,1,1)
+    subplot(3,1,1)
     plot(hist.time/hr,hist.T(:,2)-273.15,CL{[1,2]},LW{:}); axis xy tight; box on; hold on;
     plot(hist.time/hr,hist.Tliq(:,2),CL{[1,3]},LW{:});
     plot(hist.time/hr,hist.Tsol(:,2),CL{[1,4]},LW{:});
     title('$T [^\circ$C]',TX{:},FS{:}); set(gca,TL{:},TS{:});
-    subplot(4,1,2)
-    plot(hist.time/hr,hist.cx_oxd(:,2,cal.Si)./sum(hist.cx_oxd(:,2,1:end-1),3).*100,CL{[1,4]},LW{:}); axis xy tight; box on; hold on;
-    plot(hist.time/hr,hist.cm_oxd(:,2,cal.Si)./sum(hist.cm_oxd(:,2,1:end-1),3).*100,CL{[1,3]},LW{:});
-    plot(hist.time/hr,hist.c_oxd (:,2,cal.Si)./sum(hist.c_oxd (:,2,1:end-1),3).*100,CL{[1,2]},LW{:});
-    title('$\bar{c}$ [wt\% SiO$_2$]',TX{:},FS{:}); set(gca,TL{:},TS{:});
-    subplot(4,1,3)
-    plot(hist.time/hr,hist.cx_oxd(:,2,cal.H),CL{[1,4]},LW{:}); axis xy tight; box on; hold on;
-    plot(hist.time/hr,hist.cm_oxd(:,2,cal.H),CL{[1,3]},LW{:});
-    plot(hist.time/hr,hist.c_oxd (:,2,cal.H),CL{[1,2]},LW{:});
-    plot(time/hr,cal.H2Osat*100,'.',CL{[1,2]},LW{:});
-    title('$\bar{c}$ [wt\% H$_2$O]',TX{:},FS{:}); set(gca,TL{:},TS{:});
-    subplot(4,1,4)
+    subplot(3,1,2)
+    for i=1:cal.ncmp
+        plot(hist.time/hr,squeeze(hist.cm(:,2,i)./sum(hist.cm(:,2,1:end-1),3)).*100,'--',LW{:},'color',ocean(round((i-1)*213/cal.ncmp)+1,:)); axis xy tight; box on; hold on
+        plot(hist.time/hr,squeeze(hist.cx(:,2,i)./sum(hist.cx(:,2,1:end-1),3)).*100,'-.',LW{:},'color',ocean(round((i-1)*213/cal.ncmp)+1,:)); axis xy tight; box on; hold on
+        pcmp(i) = plot(hist.time/hr,squeeze(hist. c(:,2,i)./sum(hist. c(:,2,1:end-1),3))./(1-hist.f(:,2)).*100,'-' ,LW{:},'color',ocean(round((i-1)*213/cal.ncmp)+1,:)); axis xy tight; box on; hold on
+    end
+    title('cmps [wt\%]',TX{:},FS{:}); legend(pcmp,cal.cmpStr(1:end),TX{:},FS{1},8,'Location','northeast'); set(gca,TL{:},TS{:});
+    subplot(3,1,3)
     plot(hist.time/hr,hist.mu (:,2)*100.*(hist.mu (:,2)>1e-9),CL{[1,3]},LW{:}); axis xy tight; box on; hold on;
     plot(hist.time/hr,hist.chi(:,2)*100.*(hist.chi(:,2)>1e-9),CL{[1,4]},LW{:});
     plot(hist.time/hr,hist.phi(:,2)*100.*(hist.phi(:,2)>1e-9),CL{[1,5]},LW{:});
