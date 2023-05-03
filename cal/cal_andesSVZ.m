@@ -48,8 +48,8 @@ cal.msy_mem = [1  1  0  0  0  0  0  0  0  0  0  0  0    % olivine (olv)
 % mineral end-member composition of melting model components
 %               for     fay  Fe-spn Ti-spn  ens    hyp    aug    pig    ant     alb    kfs    qtz    wat
 cal.cmp_mem =[   0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0  100.0    0.0    0.0    0.0    0.0    % anorthosite (ano)
-                 4.0    2.0    0.3    3.5   12.7    1.5   18.0    2.5   49.5    6.0    0.0    0.0    0.0    % basalt (bas)
-                 0.2    0.8    1.8    2.5    7.0   11.5    8.2    9.0   12.0   43.0    4.0    0.0    0.0    % andesite (and)
+                 5.0    2.5    1.0    3.5   11.1    3.5   14.5    2.9   38.5   17.5    0.0    0.0    0.0    % basalt (bas)
+                 0.1    0.8    1.8    2.0    7.6   12.7    8.7    7.5   11.0   38.1    6.0    2.0    0.0    % andesite (and)
                  0.0    0.0    0.8    0.05   0.0    1.0    0.5    9.0    1.5   16.6   25.25  45.3    0.0    % rhyolite (rhy)
                  0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0  100.0];  % hydrous fluid (fld)
 cal.cmp_mem = cal.cmp_mem./sum(cal.cmp_mem,2)*100;
@@ -68,19 +68,19 @@ for i=1:cal.ncmp
 end
 
 % set pure component melting points T_m^i at P=0
-cal.T0(cal.for) =  1550;
+cal.T0(cal.ano) =  1420;
 cal.T0(cal.bas) =  1220;
-cal.T0(cal.and) =  1080;
-cal.T0(cal.rhy) =  800;
+cal.T0(cal.and) =  1060;
+cal.T0(cal.rhy) =  870;
 
 % set first coeff. for P-dependence of T_m^i [GPa]
-cal.A(cal.for)  =   6.1;
+cal.A(cal.ano)  =   6.1;
 cal.A(cal.bas)  =   4.7;
 cal.A(cal.and)  =   2.85;
 cal.A(cal.rhy)  =   2.7;
 
 % set second coeff. for P-dependence of T_m^i [1]
-cal.B(cal.for)  =  8.9;
+cal.B(cal.ano)  =  8.9;
 cal.B(cal.bas)  =  3.3;
 cal.B(cal.and)  =  2.5;
 cal.B(cal.rhy)  =  2.5;
@@ -89,13 +89,13 @@ cal.B(cal.rhy)  =  2.5;
 cal.dS          =  300;
 
 % set coeff. for T-dependence of partition coefficients K^i [1/K]
-cal.r(cal.for)  =  24.0;
-cal.r(cal.bas)  =  22.0;
-cal.r(cal.and)  =  20.0;
-cal.r(cal.rhy)  =  16.0;
+cal.r(cal.ano)  =  20.0;
+cal.r(cal.bas)  =  18.0;
+cal.r(cal.and)  =  16.0;
+cal.r(cal.rhy)  =  14.0;
 
 % specify melting point dependence on H2O
-cal.dTH2O   = 1400;                 % solidus shift from water content [degC/wt^pH2O]
+cal.dTH2O   = 1500;                 % solidus shift from water content [degC/wt^pH2O]
 cal.pH2O    = 0.75;                 % solidus shift from water content [degC/wt^pH2O]
 
 % specify geochemical model parameters
