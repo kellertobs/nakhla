@@ -25,13 +25,13 @@ for i = 1:cal.noxd; cal.(elStr{i}) = i; end
 cal.mem_oxd    = [  42.7    0.0    0.0    0.0   57.3    0.0    0.0    0.0    0.0     % forsterite (for)
                     29.5    0.0    0.0   70.5    0.0    0.0    0.0    0.0    0.0     % fayalite (fay)
                     0.0    32.0    2.6   46.2   19.2    0.0    0.0    0.0    0.0     % ulvospinel (ulv)
-                    0.0    20.6    0.3   77.0    2.1    0.0    0.0    0.0    0.0     % magnetite (mgt)
-                    0.0    42.6    5.0   52.3    0.1    0.0    0.0    0.0    0.0     % ilmenite (ilm)
-                    51.5    0.1    3.4   20.0   22.5    2.5    0.0    0.0    0.0     % enstatite (ens)
-                    49.4    0.0    1.0   36.5   12.1    1.0    0.0    0.0    0.0     % hypersthene (hyp)
-                    52.2    0.2    2.1   10.5   14.8   19.67   0.5    0.03   0.0     % Al-augite (cp1)
-                    53.0    0.2    0.8   13.1   13.4   18.7    0.9    0.08   0.0     % augite (aug)
-                    51.3    0.5    1.32  21.9    5.9   16.0    2.8    0.38   0.0     % pigeonite (pig)
+                    0.0    22.3    1.3   71.0    5.4    0.0    0.0    0.0    0.0     % magnetite (mgt)
+                    0.0    44.2    0.6   54.9    0.3    0.0    0.0    0.0    0.0     % ilmenite (ilm)
+                    51.5    0.0    3.3   20.4   22.2    2.6    0.0    0.0    0.0     % enstatite (ens)
+                    49.4    0.0    1.0   36.4   12.0    1.2    0.0    0.0    0.0     % hypersthene (hyp)
+                    52.6    0.0    2.15   9.3   15.58  19.87   0.44   0.06   0.0     % Al-augite (cp1)
+                    52.78   0.0    0.85  15.41  11.78  18.07   1.06   0.05   0.0     % augite (aug)
+                    51.4    0.0    1.31  23.25   5.03  15.72   2.95   0.34   0.0     % pigeonite (pig)
                     44.4    0.0   35.8    0.0    0.0   19.3    0.5    0.0    0.0     % anorthite (ant)
                     67.3    0.0   20.2    0.0    0.0    0.5   11.5    0.5    0.0     % albite (alb)
                     64.8    0.0   18.3    0.0    0.0    0.0    0.5   16.4    0.0     % sanidine (san)
@@ -50,9 +50,9 @@ cal.msy_mem = [1  1  0  0  0  0  0  0  0  0  0  0  0  0  0    % olivine (olv)
 % mineral end-member composition of melting model components
 %                   for       fay       ulv       mgt       ilm       ens       hyp       cp1       aug       pig       ant       alb       kfs       qtz       wat
 cal.cmp_mem =   [      0         0         0         0         0         0         0         0         0         0  100.0000         0         0         0         0
-                  6.7542    8.9546    3.9788    1.8484    0.2356   11.8743    2.2291   16.3188    2.2568    0.5971   34.6419   10.3104    0.0000    0.0000         0
-                  0.5298    4.0581    0.3463    2.0716    0.1853    0.3080    6.7981    0.0808    5.2206    1.8054   10.6887   65.0505    1.8161    1.0405         0
-                  0.0000    0.0000    0.0000    0.0222    0.1358    0.0000    0.0000    0.0000    0.0000    1.1779    0.0000   27.5962   28.1076   42.9603         0
+                  6.4076    8.3824    3.5673    2.6152    0.1895   14.9130    1.9441   16.4259    1.8293    0.5374   36.2401    6.9479    0.0000    0.0000         0
+                  0.2370    3.5808    0.4630    1.9573    0.1854    0.3270    8.1072    0.0696    6.1343    1.0907   10.3055   65.4250    1.3607    0.7563         0
+                  0.0000    0.0000    0.0000    0.0243    0.1009    0.0000    0.0000    0.0000    0.0000    1.0525    0.0000   27.1414   28.9690   42.7119         0
                        0         0         0         0         0         0         0         0         0         0         0         0         0         0  100.0000 ];  % hydrous fluid (fld)
 cal.cmp_mem = cal.cmp_mem./sum(cal.cmp_mem,2)*100;
 
@@ -70,10 +70,10 @@ for i=1:cal.ncmp
 end
 
 % set pure component melting points T_m^i at P=0
-cal.T0(cal.ano) =  1450;
-cal.T0(cal.bas) =  1180;
-cal.T0(cal.and) =  980;
-cal.T0(cal.rhy) =  860;
+cal.T0(cal.ano) =  1553;
+cal.T0(cal.bas) =  1135;
+cal.T0(cal.and) =  1010;
+cal.T0(cal.rhy) =  820;
 
 % set first coeff. for P-dependence of T_m^i [GPa]
 cal.A(cal.ano)  =   6.1;
@@ -91,10 +91,10 @@ cal.B(cal.rhy)  =  2.5;
 cal.dS          =  300;
 
 % set coeff. for T-dependence of partition coefficients K^i [1/K]
-cal.r(cal.ano)  =  20.0;
-cal.r(cal.bas)  =  18.0;
-cal.r(cal.and)  =  16.0;
-cal.r(cal.rhy)  =  14.0;
+cal.r(cal.ano)  =  19.7;
+cal.r(cal.bas)  =  10.6;
+cal.r(cal.and)  =  19.4;
+cal.r(cal.rhy)  =  9.3;
 
 % specify melting point dependence on H2O
 cal.dTH2O   = 1500;                 % solidus shift from water content [degC/wt^pH2O]

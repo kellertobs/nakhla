@@ -2,7 +2,6 @@
 init;
 
 % physical time stepping loop
-frst=1;
 while time <= tend && step <= Nt && any(m(:)>1e-6)
     
     fprintf(1,'*****  step %d;  dt = %4.4e;  time = %4.4e [hr]\n\n',step,dt./3600,time./3600);

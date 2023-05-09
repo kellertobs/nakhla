@@ -398,6 +398,7 @@ dTEdt  = 0.*te; dTEdto = dTEdt;
 dIRdt  = 0.*ir; dIRdto = dIRdt;
 
 % initialise timing and iterative parameters
+frst    = 1;
 step    = 0;
 time    = 0;
 iter    = 0;

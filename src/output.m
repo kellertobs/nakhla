@@ -16,19 +16,22 @@ if Nx <= 1 && Nz <= 1  % create 0D plots
     if ~exist('fh1','var'); fh1 = figure(VIS{:});
     else; set(0, 'CurrentFigure', fh1); clf;
     end
-    subplot(3,1,1)
+    subplot(4,1,1)
     plot(hist.time/hr,hist.T(:,2)-273.15,CL{[1,2]},LW{:}); axis xy tight; box on; hold on;
     plot(hist.time/hr,hist.Tliq(:,2),CL{[1,3]},LW{:});
     plot(hist.time/hr,hist.Tsol(:,2),CL{[1,4]},LW{:});
     title('$T [^\circ$C]',TX{:},FS{:}); set(gca,TL{:},TS{:});
-    subplot(3,1,2)
+    subplot(4,1,2)
     for i=1:cal.ncmp
-        plot(hist.time/hr,squeeze(hist.cm(:,2,i)./sum(hist.cm(:,2,1:end-1),3)).*100,'--',LW{:},'color',ocean(round((i-1)*213/cal.ncmp)+1,:)); axis xy tight; box on; hold on
-        plot(hist.time/hr,squeeze(hist.cx(:,2,i)./sum(hist.cx(:,2,1:end-1),3)).*100,'-.',LW{:},'color',ocean(round((i-1)*213/cal.ncmp)+1,:)); axis xy tight; box on; hold on
-        pcmp(i) = plot(hist.time/hr,squeeze(hist. c(:,2,i)./sum(hist. c(:,2,1:end-1),3))./(1-hist.f(:,2)).*100,'-' ,LW{:},'color',ocean(round((i-1)*213/cal.ncmp)+1,:)); axis xy tight; box on; hold on
+        pcmp(i) = plot(hist.time/hr,squeeze(hist.cm(:,2,i)./sum(hist.cm(:,2,1:end-1),3)).*100,'-',LW{:},'color',ocean(round((i-1)*213/cal.ncmp)+1,:)); axis xy tight; box on; hold on
     end
-    title('cmps [wt\%]',TX{:},FS{:}); legend(pcmp,cal.cmpStr(1:end),TX{:},FS{1},8,'Location','northeast'); set(gca,TL{:},TS{:});
-    subplot(3,1,3)
+    title('melt cmps [wt\%]',TX{:},FS{:}); legend(pcmp,cal.cmpStr(1:end),TX{:},FS{1},8,'Location','northeast'); set(gca,TL{:},TS{:});
+    subplot(4,1,3)
+    for i=1:cal.ncmp
+        plot(hist.time/hr,squeeze(hist.cx(:,2,i)./sum(hist.cx(:,2,1:end-1),3)).*100,'-',LW{:},'color',ocean(round((i-1)*213/cal.ncmp)+1,:)); axis xy tight; box on; hold on
+    end
+    title('xtal cmps [wt\%]',TX{:},FS{:}); legend(pcmp,cal.cmpStr(1:end),TX{:},FS{1},8,'Location','northeast'); set(gca,TL{:},TS{:});
+    subplot(4,1,4)
     plot(hist.time/hr,hist.mu (:,2)*100.*(hist.mu (:,2)>1e-9),CL{[1,3]},LW{:}); axis xy tight; box on; hold on;
     plot(hist.time/hr,hist.chi(:,2)*100.*(hist.chi(:,2)>1e-9),CL{[1,4]},LW{:});
     plot(hist.time/hr,hist.phi(:,2)*100.*(hist.phi(:,2)>1e-9),CL{[1,5]},LW{:});
@@ -457,7 +460,7 @@ ylabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',15)
 if ~exist('fh10','var'); fh10 = figure(VIS{:});
 else; set(0, 'CurrentFigure', fh10);
 end
-if Nz>1 || step==0; clf;
+if Nz>1 || step==0 || frst; clf;
 TAS; axis tight; box on; hold on;
 end
 cxSi = cx_oxd(:,:,cal.Si)./sum(cx_oxd(:,:,1:end-1),3).*100;
@@ -474,7 +477,7 @@ set(cb,TL{:},'FontSize',12); set(gca,TL{:},'FontSize',15); xlabel('SiO$_2$ [wt \
 if ~exist('fh11','var'); fh11 = figure(VIS{:});
 else; set(0, 'CurrentFigure', fh11);
 end
-if Nz>1 || step==0; clf;
+if Nz>1 || step==0 || frst; clf;
 AFM; axis tight; box on; hold on;
 end
 [A,B] = terncoords(cx_oxd(:,:, cal.Mg          )./sum(cx_oxd(:,:,[cal.Fe,cal.Mg,cal.Na,cal.K]),3), ...
