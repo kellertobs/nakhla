@@ -4,15 +4,15 @@
 
 % number of oxides, mineral end-members, mineral systems, model components
 cal.noxd   = 9;
-cal.nmem   = 13;
+cal.nmem   = 15;
 cal.nmsy   = 6;
 cal.ncmp   = 5;
 
 % label strings for all compositional representations
 cal.oxdStr = {'SiO$_2$','TiO$_2$','Al$_2$O$_3$','FeO','MgO','CaO','Na$_2$O','K$_2$O','H$_2$O'};
      elStr = {'Si','Ti','Al','Fe','Mg','Ca','Na','K','H'};
-cal.memStr = {'for','fay','mgt','ulv','ens','hyp','aug','pig','ant','alb','san','qtz','wat'};
-cal.msyStr = {'olv','spn','opx','cpx','fsp','qtz'};
+cal.memStr = {'for','fay','ulv','mgt','ilm','ens','hyp','cp1','aug','pig','ant','alb','san','qtz','wat'};
+cal.msyStr = {'olv','oxs','opx','cpx','fsp','qtz'};
 cal.cmpStr = {'ano','bas','and','rhy','fld'};
 
 for i = 1:cal.ncmp; cal.(cal.cmpStr{i}) = i; end
@@ -24,12 +24,14 @@ for i = 1:cal.noxd; cal.(elStr{i}) = i; end
 % oxide composition of mineral end-members
 cal.mem_oxd    = [  42.7    0.0    0.0    0.0   57.3    0.0    0.0    0.0    0.0     % forsterite (for)
                     29.5    0.0    0.0   70.5    0.0    0.0    0.0    0.0    0.0     % fayalite (fay)
-                    0.0     9.0    2.0   89.0    0.0    0.0    0.0    0.0    0.0     % magnetite (mgt)
-                    0.0    38.5    2.0   34.0   25.5    0.0    0.0    0.0    0.0     % ulvospinel (ulv)
-                    52.0    0.0    3.6   17.3   24.5    2.6    0.0    0.0    0.0     % enstatite (ens)
-                    49.4    0.0    0.9   36.7   12.0    1.0    0.0    0.0    0.0     % hypersthene (hyp)
-                    53.0    0.0    1.0   10.0   15.7   19.75   0.5    0.05   0.0     % augite (aug)
-                    50.8    0.0    1.5   23.6    4.8   16.0    2.9    0.40   0.0     % pigeonite (pig)
+                    0.0    32.0    2.6   46.2   19.2    0.0    0.0    0.0    0.0     % ulvospinel (ulv)
+                    0.0    20.6    0.3   77.0    2.1    0.0    0.0    0.0    0.0     % magnetite (mgt)
+                    0.0    42.6    5.0   52.3    0.1    0.0    0.0    0.0    0.0     % ilmenite (ilm)
+                    51.5    0.1    3.4   20.0   22.5    2.5    0.0    0.0    0.0     % enstatite (ens)
+                    49.4    0.0    1.0   36.5   12.1    1.0    0.0    0.0    0.0     % hypersthene (hyp)
+                    52.2    0.2    2.1   10.5   14.8   19.67   0.5    0.03   0.0     % Al-augite (cp1)
+                    53.0    0.2    0.8   13.1   13.4   18.7    0.9    0.08   0.0     % augite (aug)
+                    51.3    0.5    1.32  21.9    5.9   16.0    2.8    0.38   0.0     % pigeonite (pig)
                     44.4    0.0   35.8    0.0    0.0   19.3    0.5    0.0    0.0     % anorthite (ant)
                     67.3    0.0   20.2    0.0    0.0    0.5   11.5    0.5    0.0     % albite (alb)
                     64.8    0.0   18.3    0.0    0.0    0.0    0.5   16.4    0.0     % sanidine (san)
@@ -38,20 +40,20 @@ cal.mem_oxd    = [  42.7    0.0    0.0    0.0   57.3    0.0    0.0    0.0    0.0
 cal.mem_oxd = cal.mem_oxd./sum(cal.mem_oxd,2)*100;
 
 % mineral end-members in mineral systems
-cal.msy_mem = [1  1  0  0  0  0  0  0  0  0  0  0  0    % olivine (olv)
-               0  0  1  1  0  0  0  0  0  0  0  0  0    % spinel (spn)
-               0  0  0  0  1  1  0  0  0  0  0  0  0    % orthopyroxene (opx)
-               0  0  0  0  0  0  1  1  0  0  0  0  0    % clinopyroxene (cpx)
-               0  0  0  0  0  0  0  0  1  1  1  0  0    % feldspar (fsp)
-               0  0  0  0  0  0  0  0  0  0  0  1  0];  % quartz (qtz)
+cal.msy_mem = [1  1  0  0  0  0  0  0  0  0  0  0  0  0  0    % olivine (olv)
+               0  0  1  1  1  0  0  0  0  0  0  0  0  0  0    % oxide (oxd)
+               0  0  0  0  0  1  1  0  0  0  0  0  0  0  0    % orthopyroxene (opx)
+               0  0  0  0  0  0  0  1  1  1  0  0  0  0  0    % clinopyroxene (cpx)
+               0  0  0  0  0  0  0  0  0  0  1  1  1  0  0    % feldspar (fsp)
+               0  0  0  0  0  0  0  0  0  0  0  0  0  1  0];  % quartz (qtz)
 
 % mineral end-member composition of melting model components
-%               for     fay  Fe-spn Ti-spn  ens    hyp    aug    pig    ant     alb    kfs    qtz    wat
-cal.cmp_mem =[   0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0  100.0    0.0    0.0    0.0    0.0    % anorthosite (ano)
-                 5.0    2.5    1.0    3.5   11.1    3.5   14.5    2.9   38.5   17.5    0.0    0.0    0.0    % basalt (bas)
-                 0.1    0.8    1.8    2.0    7.6   12.7    8.7    7.5   11.0   38.1    6.0    2.0    0.0    % andesite (and)
-                 0.0    0.0    0.8    0.05   0.0    1.0    0.5    9.0    1.5   16.6   25.25  45.3    0.0    % rhyolite (rhy)
-                 0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0  100.0];  % hydrous fluid (fld)
+%                   for       fay       ulv       mgt       ilm       ens       hyp       cp1       aug       pig       ant       alb       kfs       qtz       wat
+cal.cmp_mem =   [      0         0         0         0         0         0         0         0         0         0  100.0000         0         0         0         0
+                  6.7542    8.9546    3.9788    1.8484    0.2356   11.8743    2.2291   16.3188    2.2568    0.5971   34.6419   10.3104    0.0000    0.0000         0
+                  0.5298    4.0581    0.3463    2.0716    0.1853    0.3080    6.7981    0.0808    5.2206    1.8054   10.6887   65.0505    1.8161    1.0405         0
+                  0.0000    0.0000    0.0000    0.0222    0.1358    0.0000    0.0000    0.0000    0.0000    1.1779    0.0000   27.5962   28.1076   42.9603         0
+                       0         0         0         0         0         0         0         0         0         0         0         0         0         0  100.0000 ];  % hydrous fluid (fld)
 cal.cmp_mem = cal.cmp_mem./sum(cal.cmp_mem,2)*100;
 
 % mineral systems composition of melting model components
@@ -68,10 +70,10 @@ for i=1:cal.ncmp
 end
 
 % set pure component melting points T_m^i at P=0
-cal.T0(cal.ano) =  1420;
-cal.T0(cal.bas) =  1220;
-cal.T0(cal.and) =  1060;
-cal.T0(cal.rhy) =  870;
+cal.T0(cal.ano) =  1450;
+cal.T0(cal.bas) =  1180;
+cal.T0(cal.and) =  980;
+cal.T0(cal.rhy) =  860;
 
 % set first coeff. for P-dependence of T_m^i [GPa]
 cal.A(cal.ano)  =   6.1;
@@ -104,7 +106,7 @@ cal.nir     = 2;                    % number of isotope ratios
 cal.Kte_mem = [0.01;0.10;3.00;10.0].*ones(cal.nte,cal.nmem);
 
 % specify density parameters
-cal.rhox0   = [3270,4390,7700,4300,3200,3500,3250,3350,2730,2620,2520,2650,1000]; % mineral end-member reference densities [kg/m3]
+cal.rhox0   = [3270,4390,4300,7500,5600,3200,3500,3250,3300,3350,2730,2620,2520,2650,1000]; % mineral end-member reference densities [kg/m3]
 cal.rhof0   = 1000;                 % fluid reference density [kg/m3]
 
 % specify mixture viscosity parameters (Costa et al., 2009)
