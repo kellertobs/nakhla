@@ -185,7 +185,7 @@ rhom   = mean(cal.rhox0-500).*ones(size(Tp));
 rhox   = mean(cal.rhox0).*ones(size(Tp));
 rhof   = cal.rhof0.*ones(size(Tp));
 rho    = rhom;
-T      = (Tp+273.15+100);
+T      = (Tp+273.15+200);
 rhoref = mean(rho,'all');
 Pt     = Ptop + rhoref.*g0.*ZZ;
 fq     = zeros(size(Tp));  mq = ones(size(Tp));  xq = 1-mq-fq; 
@@ -211,7 +211,7 @@ while res > tol
         Pt(2:end,:) = Pt(1,:) + repmat(cumsum(mean(rhofz,2).*g0.*h),1,Nx);
     end
 
-    wt = min(1,it/5);
+    wt = min(1,it/10);
 
     eqtime = tic;
 

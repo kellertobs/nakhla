@@ -227,10 +227,10 @@ while rnorm > rnorm_tol     % Newton iteration
     r((var.m==0 & var.T<=cal.Tsol) | (var.x==0 & var.T>=cal.Tliq)) = 0;
 
     %***  compute numerical derivative of residual dr/dm
-    rp = resm(max(0,min(1-var.f,var.m+epsm/2)),var,cal);
-    rm = resm(max(0,min(1-var.f,var.m-epsm/2)),var,cal);
+    rp = resm(var.m+epsm/2,var,cal);
+    rm = resm(var.m-epsm/2,var,cal);
 
-    drdm = (rp-rm)./(max(0,min(1-var.f,var.m+epsm/2)) - max(0,min(1-var.f,var.m-epsm/2)));
+    drdm = (rp-rm)./epsm;
 
     %***  apply Newton correction to crystal fraction x
     updm  = r./drdm/3; updm(r==0) = 0;
@@ -244,7 +244,7 @@ while rnorm > rnorm_tol     % Newton iteration
     var.x  = max(0,min(1, 1-var.m-var.f ));
     
     %***  get non-linear residual norm
-    rnorm  = norm(updm,2)/norm(var.m+1,2);
+    rnorm  = norm(var.m-mi,2)/norm(var.m+1,2);
 
     n  =  n+1;  % update iteration count
     if (n==its_tol)
@@ -265,8 +265,8 @@ var.H2Om  = max(0,min(cal.H2Osat, var.H2O./(m+1e-16) ));
 [var,cal] = meltmodel(var,cal,'K');
 f         = max(0,min(var.H2O, var.H2O - m.*var.H2Om ));
 x         = 1-m-f;
-var.cm    = max(0,min(1,  var.c                   ./(m + x.*cal.Kx + f.*cal.Kf + 1e-16) ));
-var.cx    = max(0,min(1, (var.c-f.*var.cf).*cal.Kx./(m + x.*cal.Kx             + 1e-16) ));
+var.cm    =  var.c                   ./(m + x.*cal.Kx + f.*cal.Kf + 1e-16);
+var.cx    = (var.c-f.*var.cf).*cal.Kx./(m + x.*cal.Kx             + 1e-16);
 r         = sum(var.cm,2) - sum(var.cx,2);
 
 end
