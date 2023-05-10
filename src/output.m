@@ -64,12 +64,12 @@ if Nx <= 1 && Nz <= 1  % create 0D plots
     end
     subplot(3,1,1)
     for i=1:cal.noxd
-        plot(hist.time/hr,squeeze(hist.cm_oxd(:,2,i)).*100,'-',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis xy tight; box on; hold on
+        plot(hist.time/hr,squeeze(hist.cm_oxd(:,2,i)),'-',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis xy tight; box on; hold on
     end
     title('Melt oxds [wt\%]',TX{:},FS{:}); legend(cal.oxdStr,TX{:},FS{1},8,'Location','northeast'); set(gca,TL{:},TS{:});
     subplot(3,1,2)
     for i=1:cal.noxd
-        plot(hist.time/hr,squeeze(hist.cx_oxd(:,2,i)).*100,'-',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis xy tight; box on; hold on
+        plot(hist.time/hr,squeeze(hist.cx_oxd(:,2,i)),'-',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis xy tight; box on; hold on
     end
     title('Xtal oxds [wt\%]',TX{:},FS{:});
     subplot(3,1,3)
@@ -137,17 +137,17 @@ elseif Nx <= 1  % create 1D plots
     sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
     subplot(1,4,1)
     for i=1:cal.noxd
-        plot(squeeze( c_oxd(:,:,i)).*100,Zc.',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis ij tight; box on; hold on;
+        plot(squeeze( c_oxd(:,:,i)),Zc.',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis ij tight; box on; hold on;
     end
     title('Bulk oxds [wt\%]',TX{:},FS{:});ylabel('Depth [m]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,4,2)
     for i=1:cal.noxd
-        plot(squeeze(cm_oxd(:,:,i)).*100,Zc.',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis ij tight; box on; hold on;
+        plot(squeeze(cm_oxd(:,:,i)),Zc.',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis ij tight; box on; hold on;
     end
     title('Melt oxds [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,4,3)
     for i=1:cal.noxd
-        plot(squeeze(cx_oxd(:,:,i)).*100,Zc.',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis ij tight; box on; hold on;
+        plot(squeeze(cx_oxd(:,:,i)),Zc.',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis ij tight; box on; hold on;
     end
     title('Xtal oxds [wt\%]',TX{:},FS{:}); legend(cal.oxdStr,TX{:},FS{:},'Location','west'); set(gca,TL{:},TS{:});
     subplot(1,4,4)
