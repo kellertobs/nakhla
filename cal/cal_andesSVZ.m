@@ -13,7 +13,7 @@ cal.oxdStr = {'SiO$_2$','TiO$_2$','Al$_2$O$_3$','FeO','MgO','CaO','Na$_2$O','K$_
      elStr = {'Si','Ti','Al','Fe','Mg','Ca','Na','K','H'};
 cal.memStr = {'for','fay','ulv','mgt','ilm','ens','hyp','cp1','aug','pig','ant','alb','san','qtz','wat'};
 cal.msyStr = {'olv','oxs','opx','cpx','fsp','qtz'};
-cal.cmpStr = {'ano','bas','and','rhy','fld'};
+cal.cmpStr = {'ano','bas','and','rhy','vol'};
 
 for i = 1:cal.ncmp; cal.(cal.cmpStr{i}) = i; end
 for i = 1:cal.nmsy; cal.(cal.msyStr{i}) = i; end
@@ -35,7 +35,7 @@ cal.mem_oxd    = [  42.7    0.0    0.0    0.0   57.3    0.0    0.0    0.0    0.0
                     44.4    0.0   35.8    0.0    0.0   19.3    0.5    0.0    0.0     % anorthite (ant)
                     67.3    0.0   20.2    0.0    0.0    0.5   11.5    0.5    0.0     % albite (alb)
                     64.8    0.0   18.3    0.0    0.0    0.0    0.5   16.4    0.0     % sanidine (san)
-                    99.99   0.01   0.0    0.0    0.0    0.0    0.0    0.0    0.0     % quartz (qtz)
+                   100.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0     % quartz (qtz)
                      0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0  100.0];   % water (wat)
 cal.mem_oxd = cal.mem_oxd./sum(cal.mem_oxd,2)*100;
 
@@ -50,9 +50,9 @@ cal.msy_mem = [1  1  0  0  0  0  0  0  0  0  0  0  0  0  0    % olivine (olv)
 % mineral end-member composition of melting model components
 %                   for       fay       ulv       mgt       ilm       ens       hyp       cp1       aug       pig       ant       alb       kfs       qtz       wat
 cal.cmp_mem =   [      0         0         0         0         0         0         0         0         0         0  100.0000         0         0         0         0
-                  6.4076    8.3824    3.5673    2.6152    0.1895   14.9130    1.9441   16.4259    1.8293    0.5374   36.2401    6.9479    0.0000    0.0000         0
-                  0.2370    3.5808    0.4630    1.9573    0.1854    0.3270    8.1072    0.0696    6.1343    1.0907   10.3055   65.4250    1.3607    0.7563         0
-                  0.0000    0.0000    0.0000    0.0243    0.1009    0.0000    0.0000    0.0000    0.0000    1.0525    0.0000   27.1414   28.9690   42.7119         0
+                  5.0543    6.9548    3.6012    3.0760    0.2390   15.9769    1.3431   18.2853    1.5396    0.4692   35.4479    8.0127    0.0000    0.0000         0
+                  0.1965    3.4037    0.5051    2.1748    0.1436    0.3661    8.8642    0.0563    5.6639    0.8425   10.8493   64.1367    1.9340    0.8632         0
+                  0.0000    0.0000    0.0000    0.0244    0.1004    0.0000    0.0000    0.0000    0.0000    1.9774    0.0000   24.1666   29.0199   44.7114         0
                        0         0         0         0         0         0         0         0         0         0         0         0         0         0  100.0000 ];  % hydrous fluid (fld)
 cal.cmp_mem = cal.cmp_mem./sum(cal.cmp_mem,2)*100;
 
@@ -71,9 +71,9 @@ end
 
 % set pure component melting points T_m^i at P=0
 cal.T0(cal.ano) =  1553;
-cal.T0(cal.bas) =  1135;
-cal.T0(cal.and) =  1010;
-cal.T0(cal.rhy) =  820;
+cal.T0(cal.bas) =  1136;
+cal.T0(cal.and) =  1022;
+cal.T0(cal.rhy) =  836;
 
 % set first coeff. for P-dependence of T_m^i [GPa]
 cal.A(cal.ano)  =   6.1;
@@ -91,10 +91,10 @@ cal.B(cal.rhy)  =  2.5;
 cal.dS          =  300;
 
 % set coeff. for T-dependence of partition coefficients K^i [1/K]
-cal.r(cal.ano)  =  19.7;
-cal.r(cal.bas)  =  10.6;
-cal.r(cal.and)  =  19.4;
-cal.r(cal.rhy)  =  9.3;
+cal.r(cal.ano)  =  20.0;
+cal.r(cal.bas)  =  10.1;
+cal.r(cal.and)  =  19.0;
+cal.r(cal.rhy)  =  9.5;
 
 % specify melting point dependence on H2O
 cal.dTH2O   = 1500;                 % solidus shift from water content [degC/wt^pH2O]

@@ -19,14 +19,14 @@ h        =  D/N;                 % grid spacing (equal in both dimensions, do no
 L        =  h;                   % chamber width (equal to h for 1-D mode) [m]
 
 % set model timing parameters
-Nt       =  1e5;                 % number of time steps to take
+Nt       =  2e5;                 % number of time steps to take
 tend     =  1*yr;                % end time for simulation [s]
 dt       =  36;                  % initial time step [s]
 dtmax    =  36;                  % maximum time step [s]
 
 % set initial thermo-chemical state
-T0       =  1210;                % temperature top layer [deg C]
-c0       =  [0.15,0.47,0.28,0.10,0.02];  % components (maj comp, H2O) top  layer [wt] (will be normalised to unit sum!)
+T0       =  1200;                % temperature top layer [deg C]
+c0       =  [0.14,0.49,0.28,0.09,0.02];  % components (maj comp, H2O) top  layer [wt] (will be normalised to unit sum!)
 c1       =  c0;                          % components (maj comp, H2O) base layer [wt] (will be normalised to unit sum!)
 dcr      =  [0,0,0,0,0];
 dcg      =  [0,0,0,0,0];
@@ -51,11 +51,11 @@ Dsf      =  400;                 % entropy change of exsolution [J/kg]
 % set numerical model parameters
 TINT     =  'bd2im';             % time integration scheme ('be1im','bd2im','cn2si','bd2si')
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
-CFL      =  0.25;                % (physical) time stepping courant number (multiplies stable step) [0,1]
+CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 rtol     =  1e-5;                % outer its relative tolerance
 atol     =  1e-9;                % outer its absolute tolerance
 maxit    =  30;                  % maximum outer its
-mink     =  1e-7;
+
 
 %*****  RUN NAKHLA MODEL  *************************************************
 run('../src/main')

@@ -25,10 +25,10 @@ dt       =  36;                  % initial time step [s]
 dtmax    =  360;                 % maximum time step [s]
 
 % set initial thermo-chemical state
-T0       =  1150;                % temperature top layer [deg C]
-c0       =  [0.15,0.32,0.52,0.01,0.02]; % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
-c1       =  c0;                         % components (maj comp, H2O) bot layer [wt] (will be normalised to unit sum!)
-dcr      =  [1,1,-1,-1,0]*1e-5;
+T0       =  1200;                % temperature top layer [deg C]
+c0       =  [0.14,0.49,0.28,0.09,0.02];  % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
+c1       =  c0;                          % components (maj comp, H2O) bot layer [wt] (will be normalised to unit sum!)
+dcr      =  [1/2,1/2,-1/3,-1/3,-1/3]*1e-5;
 dcg      =  [0,0,0,0,0];
 
 % set thermo-chemical boundary parameters
@@ -40,6 +40,8 @@ cwall    =  [nan,nan,nan,nan,nan; ...
              nan,nan,nan,nan,nan; ...
              nan,nan,nan,nan,nan];
 Ptop     =  1.25e8;              % top pressure [Pa]
+fin      =  0;
+fout     =  1;
 
 % set thermo-chemical material parameters
 calID    =  'andesSVZ';          % phase diagram calibration
@@ -54,7 +56,6 @@ rtol     =  1e-5;                % outer its relative tolerance
 atol     =  1e-9;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its
 cnvreg   =  10;                  % convection regularisation parameter
-
 
 %*****  RUN NAKHLA MODEL  *************************************************
 run('../src/main')

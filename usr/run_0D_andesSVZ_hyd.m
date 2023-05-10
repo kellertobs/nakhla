@@ -6,7 +6,7 @@ run('./par_default')
 
 % set run parameters
 runID    =  '0D_andesSVZ_hyd';   % run identifier
-restart  =  16;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
+restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  50;                  % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot results
 save_op  =  1;                   % switch on to save output to file
@@ -25,8 +25,8 @@ dt       =  36;                  % initial time step [s]
 dtmax    =  36;                  % maximum time step [s]
 
 % set initial thermo-chemical state
-T0       =  1265;                % temperature top layer [deg C]
-c0       =  [0.15,0.47,0.28,0.10,0.02];  % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
+T0       =  1250;                % temperature top layer [deg C]
+c0       =  [0.14,0.49,0.28,0.09,0.02];  % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
 c1       =  c0;                          % components (maj comp, H2O) bot layer [wt] (will be normalised to unit sum!)
 
 % set thermo-chemical boundary parameters

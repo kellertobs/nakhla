@@ -26,8 +26,8 @@ dtmax    =  36;                  % maximum time step [s]
 
 % set initial thermo-chemical state
 T0       =  1215;                % temperature top layer [deg C]
-c0       =  [0.15,0.47,0.28,0.10,0.04]; % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
-c1       =  c0;                         % components (maj comp, H2O) bot layer [wt] (will be normalised to unit sum!)
+c0       =  [0.14,0.49,0.28,0.09,0.04];  % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
+c1       =  c0;                          % components (maj comp, H2O) bot layer [wt] (will be normalised to unit sum!)
 
 % set thermo-chemical boundary parameters
 bndmode  =  1;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)

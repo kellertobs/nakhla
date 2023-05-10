@@ -102,9 +102,9 @@ advn_rho = advn_X+advn_F+advn_M;
 res_Gx = Gx - (xq.*RHO-X)./max(tau_r,3*dt);
 res_Gf = Gf - (fq.*RHO-F)./max(tau_r,3*dt);
 res_Gm = Gm - (mq.*RHO-M)./max(tau_r,3*dt);
-Gx = Gx - res_Gx/5;
-Gf = Gf - res_Gf/5;
-Gm = Gm - res_Gm/5;
+Gx = Gx - res_Gx/2;
+Gf = Gf - res_Gf/2;
+Gm = Gm - res_Gm/2;
 
 % total rates of change
 dXdt   = advn_X + Gx;
@@ -147,8 +147,8 @@ Kf  = reshape(cal.Kf,Nz,Nx,cal.ncmp);
 rnorm = 1; tol  = 1e-16;
 it    = 1; mxit = 30;
 while rnorm>tol && it<mxit
-    cm  = (c-f.*cf)./(m + x.*Kx + TINY);
-    cx  = (c-f.*cf)./(m./Kx + x + TINY);
+    cm  =  c           ./(m + x.*Kx + f.*Kf + TINY);
+    cx  = (c-f.*cf).*Kx./(m + x.*Kx         + TINY);
 
     res = sum(cx,3) - sum(cm,3);
 

@@ -51,7 +51,7 @@ f  = var.H2O;
 cf = [zeros(1,cal.ncmp-1),1];
 
 %***  get residual for sum(ci_b/Kxi) = sum(ci_v)
-r  =  sum((var.c-f.*cf)./((1-f).*cal.Kx + 1e-16),2)-1;
+r  =  sum(var.c./((1-f).*cal.Kx + f.*cal.Kf + 1e-16),2)-1;
 
 rnorm      =  1;     % initialize residual norm for iterations
 n          =  0;     % initialize iteration count
@@ -67,27 +67,27 @@ while rnorm > rnorm_tol  % iterate down to full accuracy
     [var,cal]  = meltmodel(var,cal,'K');
     
     %***  get residual at T+eps_T/2
-    rp  =  sum((var.c-f.*cf)./((1-f).*cal.Kx + 1e-16),2)-1;
+    rp  =  sum(var.c./((1-f).*cal.Kx + f.*cal.Kf + 1e-16),2)-1;
     
     %***  compute partition coefficients Kxi at T-eps_T/2
     var.T      = Tsol-eps_T/2;
     [var,cal]  = meltmodel(var,cal,'K');
     
     %***  get residual at T-eps_T/2
-    rm  =  sum((var.c-f.*cf)./((1-f).*cal.Kx + 1e-16),2)-1;
+    rm  =  sum(var.c./((1-f).*cal.Kx + f.*cal.Kf + 1e-16),2)-1;
     
     %***  finite difference drdT = (r(T+eps_T/2)-r(T-eps_T/2))/eps_T
     drdT  =  (rp - rm)/eps_T;
     
     %***  apply Newton correction to current guess of Tsol
-    Tsol(ii)  =  max(min(cal.Tm(:)),Tsol(ii) - r(ii)./drdT(ii)/2);
+    Tsol(ii)  =  Tsol(ii) - r(ii)./drdT(ii)/2;
     
     %***  compute partition coefficients Kxi at Tsol
     var.T      = Tsol;
     [var,cal]  = meltmodel(var,cal,'K');
     
     %***  compute residual at Tsol
-    r  =  sum((var.c-f.*cf)./((1-f).*cal.Kx + 1e-16),2)-1;
+    r  =  sum(var.c./((1-f).*cal.Kx + f.*cal.Kf + 1e-16),2)-1;
     
     %***  compute Newton residual norm
     rnorm  =  norm(r(ii),2)./sqrt(length(r(ii)));
@@ -233,8 +233,7 @@ while rnorm > rnorm_tol     % Newton iteration
     drdm = (rp-rm)./epsm;
 
     %***  apply Newton correction to crystal fraction x
-    updm  = r./drdm/3; updm(r==0) = 0;
-    var.m = max(0,min(1-var.f, var.m - updm + (mi-mii)/3 ));
+    var.m = max(0,min(1-var.f, var.m - r./drdm/4 + (mi-mii)/4 ));
 
     %***  get droplet fraction f
     var.H2Om = max(0,min(cal.H2Osat, var.H2O./(var.m+1e-16) ));

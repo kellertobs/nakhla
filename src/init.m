@@ -211,7 +211,7 @@ while res > tol
         Pt(2:end,:) = Pt(1,:) + repmat(cumsum(mean(rhofz,2).*g0.*h),1,Nx);
     end
 
-    wt = min(1,it/10);
+    wt = min(1,it/5);
 
     eqtime = tic;
 

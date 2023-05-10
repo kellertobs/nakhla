@@ -23,14 +23,14 @@ if Nx <= 1 && Nz <= 1  % create 0D plots
     title('$T [^\circ$C]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(4,1,2)
     for i=1:cal.ncmp
-        pcmp(i) = plot(hist.time/hr,squeeze(hist.cm(:,2,i)./sum(hist.cm(:,2,1:end-1),3)).*100,'-',LW{:},'color',ocean(round((i-1)*213/cal.ncmp)+1,:)); axis xy tight; box on; hold on
+        pcmp(i) = plot(hist.time/hr,squeeze(hist.cm(:,2,i)).*100,'-',LW{:},'color',ocean(round((i-1)*213/cal.ncmp)+1,:)); axis xy tight; box on; hold on
     end
     title('melt cmps [wt\%]',TX{:},FS{:}); legend(pcmp,cal.cmpStr(1:end),TX{:},FS{1},8,'Location','northeast'); set(gca,TL{:},TS{:});
     subplot(4,1,3)
     for i=1:cal.ncmp
-        plot(hist.time/hr,squeeze(hist.cx(:,2,i)./sum(hist.cx(:,2,1:end-1),3)).*100,'-',LW{:},'color',ocean(round((i-1)*213/cal.ncmp)+1,:)); axis xy tight; box on; hold on
+        plot(hist.time/hr,squeeze(hist.cx(:,2,i)).*100,'-',LW{:},'color',ocean(round((i-1)*213/cal.ncmp)+1,:)); axis xy tight; box on; hold on
     end
-    title('xtal cmps [wt\%]',TX{:},FS{:}); legend(pcmp,cal.cmpStr(1:end),TX{:},FS{1},8,'Location','northeast'); set(gca,TL{:},TS{:});
+    title('xtal cmps [wt\%]',TX{:},FS{:}); legend(pcmp,cal.cmpStr,TX{:},FS{1},8,'Location','northeast'); set(gca,TL{:},TS{:});
     subplot(4,1,4)
     plot(hist.time/hr,hist.mu (:,2)*100.*(hist.mu (:,2)>1e-9),CL{[1,3]},LW{:}); axis xy tight; box on; hold on;
     plot(hist.time/hr,hist.chi(:,2)*100.*(hist.chi(:,2)>1e-9),CL{[1,4]},LW{:});
@@ -63,13 +63,13 @@ if Nx <= 1 && Nz <= 1  % create 0D plots
     else; set(0, 'CurrentFigure', fh3); clf;
     end
     subplot(3,1,1)
-    for i=1:cal.noxd-1
-        plot(hist.time/hr,squeeze(hist.cm_oxd(:,2,i)./sum(hist.cm_oxd(:,2,1:end-1),3)).*100,'-',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis xy tight; box on; hold on
+    for i=1:cal.noxd
+        plot(hist.time/hr,squeeze(hist.cm_oxd(:,2,i)).*100,'-',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis xy tight; box on; hold on
     end
-    title('Melt oxds [wt\%]',TX{:},FS{:}); legend(cal.oxdStr(1:end-1),TX{:},FS{1},8,'Location','northeast'); set(gca,TL{:},TS{:});
+    title('Melt oxds [wt\%]',TX{:},FS{:}); legend(cal.oxdStr,TX{:},FS{1},8,'Location','northeast'); set(gca,TL{:},TS{:});
     subplot(3,1,2)
-    for i=1:cal.noxd-1
-        plot(hist.time/hr,squeeze(hist.cx_oxd(:,2,i)./sum(hist.cx_oxd(:,2,1:end-1),3)).*100,'-',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis xy tight; box on; hold on
+    for i=1:cal.noxd
+        plot(hist.time/hr,squeeze(hist.cx_oxd(:,2,i)).*100,'-',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis xy tight; box on; hold on
     end
     title('Xtal oxds [wt\%]',TX{:},FS{:});
     subplot(3,1,3)
@@ -92,7 +92,7 @@ elseif Nx <= 1  % create 1D plots
     title('$T [^\circ$C]',TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,4,2)
     for i=1:cal.ncmp
-        plot(squeeze(c(:,:,i)).*100.*(1+9.*cfq(:,:,i)),Zc.',LW{:},'color',ocean(round((i-1)*213/cal.ncmp)+1,:)); axis ij tight; box on; hold on;
+        plot(squeeze(c(:,:,i)).*100,Zc.',LW{:},'color',ocean(round((i-1)*213/cal.ncmp)+1,:)); axis ij tight; box on; hold on;
     end
     title('Bulk cmps [wt\%]',TX{:},FS{:}); legend(cal.cmpStr,TX{:},FS{:},'Location','west'); ylabel('Depth [m]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,4,3)
@@ -136,20 +136,20 @@ elseif Nx <= 1  % create 1D plots
     end 
     sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
     subplot(1,4,1)
-    for i=1:cal.noxd-1
-        plot(squeeze( c_oxd(:,:,i)./sum(c_oxd(:,:,1:end-1),3)).*100,Zc.',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis ij tight; box on; hold on;
+    for i=1:cal.noxd
+        plot(squeeze( c_oxd(:,:,i)).*100,Zc.',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis ij tight; box on; hold on;
     end
     title('Bulk oxds [wt\%]',TX{:},FS{:});ylabel('Depth [m]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,4,2)
-    for i=1:cal.noxd-1
-        plot(squeeze(cm_oxd(:,:,i)./sum(cm_oxd(:,:,1:end-1),3)).*100,Zc.',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis ij tight; box on; hold on;
+    for i=1:cal.noxd
+        plot(squeeze(cm_oxd(:,:,i)).*100,Zc.',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis ij tight; box on; hold on;
     end
     title('Melt oxds [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,4,3)
-    for i=1:cal.noxd-1
-        plot(squeeze(cx_oxd(:,:,i)./sum(cx_oxd(:,:,1:end-1),3)).*100,Zc.',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis ij tight; box on; hold on;
+    for i=1:cal.noxd
+        plot(squeeze(cx_oxd(:,:,i)).*100,Zc.',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis ij tight; box on; hold on;
     end
-    title('Xtal oxds [wt\%]',TX{:},FS{:}); legend(cal.oxdStr(1:end-1),TX{:},FS{:},'Location','west'); set(gca,TL{:},TS{:});
+    title('Xtal oxds [wt\%]',TX{:},FS{:}); legend(cal.oxdStr,TX{:},FS{:},'Location','west'); set(gca,TL{:},TS{:});
     subplot(1,4,4)
     for i=1:cal.nmsy
         plot(squeeze(x.*cx_msy(:,:,i)),Zc.',LW{:},'color',ocean(round((i-1)*213/cal.nmsy)+1,:)); axis ij tight; box on; hold on;
@@ -390,7 +390,7 @@ else % create 2D plots
     imagesc(Xc,Zc,c_oxd(:,:,8)./sumanh.*100); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.oxdStr{8},' [wt\%]'],TX{:},FS{:}); set(gca,'YTickLabel',[]); xlabel('Width [km]',TX{:},FS{:});
     set(fh6,'CurrentAxes',ax(69));
-    imagesc(Xc,Zc,c_oxd(:,:,9)./sumanh.*100); axis ij equal tight; box on; cb = colorbar;
+    imagesc(Xc,Zc,c_oxd(:,:,9)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.oxdStr{9},' [wt\%]'],TX{:},FS{:}); set(gca,'YTickLabel',[]);
     sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
 
@@ -437,7 +437,6 @@ else % create 2D plots
     imagesc(Xc,Zc,ir(:,:,2)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['isotope ratio 2'],TX{:},FS{:}); set(gca,'YTickLabel',[]);
     sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
-
 
 end
 

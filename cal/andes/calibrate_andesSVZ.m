@@ -619,7 +619,7 @@ for ic = nc
         DATA.P = [DATA.P;MAG(ic).OUT.P(hasmlt)*1e8];
     end
 end
-c      = max(1e-2,cal.cmp_oxd.'\DATA.c_oxd.').'; c = c./sum(c,2);
+c      = max(1e-3,cal.cmp_oxd.'\DATA.c_oxd.').'; c = c./sum(c,2);
 oxdfit = c*cal.cmp_oxd;
 T = DATA.T;
 P = DATA.P;
@@ -638,7 +638,7 @@ Nz = length(T); Nx = 1;
 % cal.r(cal.bas)  =  16.0;
 % cal.r(cal.and)  =  14.0;
 % cal.r(cal.rhy)  =  12.0;
-
+cal_best = cal;
 misfit = 4; bestfit = 5; dfit = 0.01; tol = 1e-3; it = 1;
 while misfit>tol && dfit>1e-5 && it<1e6
 
