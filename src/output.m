@@ -349,17 +349,17 @@ else % create 2D plots
     % plot pseudo-component composition in Fig. 5
     set(0,'CurrentFigure',fh5)
     set(fh5,'CurrentAxes',ax(51));
-    imagesc(Xc./1e3,Zc./1e3,c(:,:,1).*100); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.cmpStr{1},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel('Depth [km]',TX{:},FS{:});
+    imagesc(Xc,Zc,c(:,:,1).*100); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.cmpStr{1},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel('Depth [m]',TX{:},FS{:});
     set(fh5,'CurrentAxes',ax(52));
-    imagesc(Xc./1e3,Zc./1e3,c(:,:,2).*100); axis ij equal tight; box on; cb = colorbar;
+    imagesc(Xc,Zc,c(:,:,2).*100); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.cmpStr{2},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
     set(fh5,'CurrentAxes',ax(53));
-    imagesc(Xc./1e3,Zc./1e3,c(:,:,3).*100); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.cmpStr{3},' [wt\%]'],TX{:},FS{:}); ylabel('Depth [km]',TX{:},FS{:});
+    imagesc(Xc,Zc,c(:,:,3).*100); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.cmpStr{3},' [wt\%]'],TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:});
     set(fh5,'CurrentAxes',ax(54));
-    imagesc(Xc./1e3,Zc./1e3,c(:,:,4).*100); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.cmpStr{4},' [wt\%]'],TX{:},FS{:}); set(gca,'YTickLabel',[]); xlabel('Width [km]',TX{:},FS{:});
+    imagesc(Xc,Zc,c(:,:,4).*100); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.cmpStr{4},' [wt\%]'],TX{:},FS{:}); set(gca,'YTickLabel',[]); xlabel('Width [m]',TX{:},FS{:});
     sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
 
     % plot major oxide composition in Fig. 6
@@ -376,7 +376,7 @@ else % create 2D plots
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.oxdStr{3},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
     set(fh6,'CurrentAxes',ax(64));
     imagesc(Xc,Zc,c_oxd(:,:,4)./sumanh.*100); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.oxdStr{4},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel('Depth [km]',TX{:},FS{:});
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.oxdStr{4},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel('Depth [m]',TX{:},FS{:});
     set(fh6,'CurrentAxes',ax(65));
     imagesc(Xc,Zc,c_oxd(:,:,5)./sumanh.*100); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.oxdStr{5},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]); 
@@ -388,7 +388,7 @@ else % create 2D plots
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.oxdStr{7},' [wt\%]'],TX{:},FS{:});
     set(fh6,'CurrentAxes',ax(68));
     imagesc(Xc,Zc,c_oxd(:,:,8)./sumanh.*100); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.oxdStr{8},' [wt\%]'],TX{:},FS{:}); set(gca,'YTickLabel',[]); xlabel('Width [km]',TX{:},FS{:});
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.oxdStr{8},' [wt\%]'],TX{:},FS{:}); set(gca,'YTickLabel',[]); xlabel('Width [m]',TX{:},FS{:});
     set(fh6,'CurrentAxes',ax(69));
     imagesc(Xc,Zc,c_oxd(:,:,9)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.oxdStr{9},' [wt\%]'],TX{:},FS{:}); set(gca,'YTickLabel',[]);

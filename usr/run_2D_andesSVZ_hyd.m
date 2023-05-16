@@ -9,7 +9,7 @@ runID    =  '2D_andesSVZ_hyd';   % run identifier
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  100;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot results
-save_op  =  1;                   % switch on to save output to file
+save_op  =  0;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
 
 % set model domain parameters
@@ -25,10 +25,11 @@ dt       =  36;                  % initial time step [s]
 dtmax    =  360;                 % maximum time step [s]
 
 % set initial thermo-chemical state
-T0       =  1200;                % temperature top layer [deg C]
+T0       =  1200;                % temperature top  layer [deg C]
+T1       =  T0;                  % temperature base layer [deg C]
 c0       =  [0.14,0.49,0.28,0.09,0.02];  % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
 c1       =  c0;                          % components (maj comp, H2O) bot layer [wt] (will be normalised to unit sum!)
-dcr      =  [1/2,1/2,-1/3,-1/3,-1/3]*1e-5;
+dcr      =  [1/2,1/2,-1/3,-1/3,-1/3]*1e-4;
 dcg      =  [0,0,0,0,0];
 
 % set thermo-chemical boundary parameters

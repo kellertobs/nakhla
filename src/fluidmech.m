@@ -75,6 +75,8 @@ EtaP1 =  eta  (1:end-1,:      );   EtaP2 =  eta  (2:end,:      );
 %             top          ||         bottom          ||           left            ||          right
 jj1 = MapW(1:end-2,2:end-1); jj2 = MapW(3:end,2:end-1); jj3 = MapW(2:end-1,1:end-2); jj4 = MapW(2:end-1,3:end);
 
+aa  = - a1.*rhofz./dt;
+IIL = [IIL; ii(:)]; JJL = [JJL;  ii(:)];   AAL = [AAL; aa(:)           ];      % W on stencil centre
 aa  = - 1/2*(EtaP1+EtaP2)/h^2 - 1/2*(EtaC1+EtaC2)/h^2;
 IIL = [IIL; ii(:)]; JJL = [JJL;  ii(:)];   AAL = [AAL; aa(:)           ];      % W on stencil centre
 IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; 1/2*EtaP1(:)/h^2];      % W one above
@@ -99,7 +101,7 @@ IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL; (1/2*EtaC2(:)-1/2*EtaP2(:
 
 
 % z-RHS vector
-rr  = - (rhofz - mean(rhofz,2)) .* g0;
+rr  = - (rhofz - mean(rhofz,2)) .* g0 - (a2.*rhoWo+a3.*rhoWoo)/dt;
 if bnchm; rr = rr + src_W_mms(2:end-1,2:end-1); end
 
 IIR = [IIR; ii(:)];  AAR = [AAR; rr(:)];
@@ -145,6 +147,8 @@ EtaP1 =  eta  (:      ,1:end-1);   EtaP2 =  eta  (:    ,2:end  );
 %            left          ||          right          ||           top             ||          bottom
 jj1 = MapU(2:end-1,1:end-2); jj2 = MapU(2:end-1,3:end); jj3 = MapU(1:end-2,2:end-1); jj4 = MapU(3:end,2:end-1);
 
+aa  = - a1.*rhofx./dt;
+IIL = [IIL; ii(:)]; JJL = [JJL;  ii(:)];   AAL = [AAL; aa(:)           ];      % U on stencil centre
 aa  = - 1/2*(EtaP1+EtaP2)/h^2 - 1/2*(EtaC1+EtaC2)/h^2;
 IIL = [IIL; ii(:)]; JJL = [JJL;  ii(:)];   AAL = [AAL; aa(:)           ];      % U on stencil centre
 IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; 1/2*EtaP1(:)/h^2];      % U one to the left
@@ -163,7 +167,7 @@ IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL; (1/2*EtaC2(:)-1/2*EtaP2(:
 
 
 % x-RHS vector
-rr  = zeros(size(ii));
+rr  = zeros(size(ii)) - (a2.*rhoUo+a3.*rhoUoo)/dt;
 if bnchm; rr = rr + src_U_mms(2:end-1,2:end-1); end
 
 IIR = [IIR; ii(:)];  AAR = [AAR; rr(:)];
@@ -358,7 +362,7 @@ if ~bnchm
 
     
     %% update time step
-    dtk = (h/2)^2./max(kT(:)./rho(:)./cP)/3;                                      % diffusive time step size
+    dtk = (h/2)^2./max(kT(:)./rho(:)./cP)/1.1;                                    % diffusive time step size
     dta = CFL*h/2/max(abs([Um(:).*any(m(:)>10*TINY);Wm(:).*any(m(:)>10*TINY); ... % advective time step size
                            Ux(:).*any(x(:)>10*TINY);Wx(:).*any(x(:)>10*TINY); ...
                            Uf(:).*any(f(:)>10*TINY);Wf(:).*any(f(:)>10*TINY)]+1e-16));   

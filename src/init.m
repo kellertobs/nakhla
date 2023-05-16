@@ -181,11 +181,16 @@ Div_V  = 0.*Tp;  advn_rho = 0.*Tp;  drhodt = 0.*Tp;  drhodto = drhodt;
 exx    = 0.*Tp;  ezz = 0.*Tp;  exz = zeros(Nz-1,Nx-1);  eII = 0.*Tp;  
 txx    = 0.*Tp;  tzz = 0.*Tp;  txz = zeros(Nz-1,Nx-1);  tII = 0.*Tp; 
 VolSrc = 0.*Tp; 
+kW     = 0;
 rhom   = mean(cal.rhox0-500).*ones(size(Tp)); 
 rhox   = mean(cal.rhox0).*ones(size(Tp));
 rhof   = cal.rhof0.*ones(size(Tp));
 rho    = rhom;
-T      = (Tp+273.15+200);
+rhofz  = (rho(1:end-1,:)+rho(2:end,:))/2;
+rhofx  = (rho(:,1:end-1)+rho(:,2:end))/2;
+rhoWo  = rhofz.*W(2:end-1,2:end-1); rhoWoo = rhoWo;
+rhoUo  = rhofx.*U(2:end-1,2:end-1); rhoUoo = rhoUo;
+T      = (Tp+273.15+100);
 rhoref = mean(rho,'all');
 Pt     = Ptop + rhoref.*g0.*ZZ;
 fq     = zeros(size(Tp));  mq = ones(size(Tp));  xq = 1-mq-fq; 
@@ -399,6 +404,7 @@ dIRdt  = 0.*ir; dIRdto = dIRdt;
 
 % initialise timing and iterative parameters
 frst    = 1;
+a1      = 1; a2 = 0; a3 = 0;
 step    = 0;
 time    = 0;
 iter    = 0;
@@ -446,15 +452,15 @@ if restart
         sf = sm + Dsf;
     else % continuation file does not exist, start from scratch
         fprintf('\n   !!! restart file does not exist !!! \n   => starting run from scratch %s \n\n',runID);
-        update;
         fluidmech;
+        update;
         history;
         output;
     end
 else
     % complete, plot, and save initial condition
-    update;
     fluidmech;
+    update;
     history;
     output;
 end

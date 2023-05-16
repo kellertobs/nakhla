@@ -5,9 +5,9 @@ clear; close all;
 run('./par_default')
 
 % set run parameters
-runID    =  '1D_andesSVZ_hyd';   % run identifier
+runID    =  '1D_andesSVZ_hyd_newreg';   % run identifier
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
-nop      =  200;                 % output frame plotted/saved every 'nop' time steps
+nop      =  500;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot results
 save_op  =  1;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
@@ -19,13 +19,14 @@ h        =  D/N;                 % grid spacing (equal in both dimensions, do no
 L        =  h;                   % chamber width (equal to h for 1-D mode) [m]
 
 % set model timing parameters
-Nt       =  2e5;                 % number of time steps to take
+Nt       =  5e5;                 % number of time steps to take
 tend     =  1*yr;                % end time for simulation [s]
 dt       =  36;                  % initial time step [s]
 dtmax    =  36;                  % maximum time step [s]
 
 % set initial thermo-chemical state
-T0       =  1200;                % temperature top layer [deg C]
+T0       =  1200;                % temperature top  layer [deg C]
+T1       =  T0;                  % temperature base layer [deg C]
 c0       =  [0.14,0.49,0.28,0.09,0.02];  % components (maj comp, H2O) top  layer [wt] (will be normalised to unit sum!)
 c1       =  c0;                          % components (maj comp, H2O) base layer [wt] (will be normalised to unit sum!)
 dcr      =  [0,0,0,0,0];

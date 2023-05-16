@@ -21,14 +21,15 @@ for j = 1:cal.nmsy
 end
 
 % update phase densities
-rhom   = reshape(DensityX(reshape(cm_oxd,Nz*Nx,cal.noxd),T0,Ptop./1e8),Nz,Nx) .* (1 - aT.*(T-T0-273.15));
-rhox   = reshape(sum(reshape(cx_mem/100,Nz*Nx,cal.nmem)./cal.rhox0,2).^-1,Nz,Nx) .* (1 - aT.*(T-T0-273.15));
-rhof   = cal.rhof0 .* (1 - aT.*(T-T0-273.15) + bP.*(Pt-Ptop ));
+rhom   = reshape(DensityX(reshape(cm_oxd,Nz*Nx,cal.noxd),T0,Ptop./1e8),Nz,Nx)    .* (1 - aT.*(T-T0-273.15) + bPm.*(Pt-Ptop));
+rhox   = reshape(sum(reshape(cx_mem/100,Nz*Nx,cal.nmem)./cal.rhox0,2).^-1,Nz,Nx) .* (1 - aT.*(T-T0-273.15) + bPx.*(Pt-Ptop));
+rhof   = cal.rhof0                                                               .* (1 - aT.*(T-T0-273.15) + bPf.*(Pt-Ptop));
 
 % convert weight to volume fraction, update bulk density
 rho    = 1./(m./rhom + x./rhox + f./rhof);
 
 rhofz  = (rho(1:end-1,:)+rho(2:end,:))/2;
+rhofx  = (rho(:,1:end-1)+rho(:,2:end))/2;
 
 chi    = max(0,min(1, x.*rho./rhox ));
 phi    = max(0,min(1, f.*rho./rhof ));
@@ -51,24 +52,37 @@ eta    = etam .* (1+(max(TINY^0.5,chi)./cal.chi_pck).^cal.delta) .* (1-hh).^-cal
 % phase segregation coefficients
 Ksgr_x = 2/9*dx^2./eta/sgrreg                                                                      ;
 Ksgr_f = 2/9*df^2./eta/sgrreg + dx^2/cal.bf./cal.etaf0/sgrreg.*max(TINY^0.5,phi-cal.cf).^(cal.nf-1).*max(TINY^0.5,1-phi).^cal.mf;
-Ksgr_m =                            dx^2/cal.bm./    etam /sgrreg.*max(TINY^0.5,mu -cal.cm).^(cal.nm-1).*max(TINY^0.5,1-mu ).^cal.mm;
+Ksgr_m =                        dx^2/cal.bm./    etam /sgrreg.*max(TINY^0.5,mu -cal.cm).^(cal.nm-1).*max(TINY^0.5,1-mu ).^cal.mm;
 
 % bound and regularise viscosity
 if ~calibrt; etamax = etacntr.*min(eta(:)); else; etamax = 1e+32.*min(eta(:)); end
-eta    = (etamax.^-0.5 + eta.^-0.5).^-2 .* cnvreg;
-etaco  = (eta([1,1:end],[1  ,1:end]).*eta([1:end,end],[1  ,1:end]) ...
-       .* eta([1,1:end],[1:end,end]).*eta([1:end,end],[1:end,end])).^0.25;
+eta    = (etamax.^-0.5 + eta.^-0.5).^-2;
 
 if ~calibrt % skip the following if called from calibration script
 
 % diffusion parameters
-kW  = Vel/10*h/10;                                                         % convection fluctuation diffusivity
-kwx = abs((rhox-rho).*g0.*Ksgr_x*dx*10);                                   % segregation fluctuation diffusivity
-kwf = abs((rhof-rho).*g0.*Ksgr_f*df*10);                                   % segregation fluctuation diffusivity
-kx  = chi.*mu.*(kwx + kW + mink);                                          % solid fraction diffusion 
-kf  = phi.*mu.*(kwf + kW + mink);                                          % fluid fraction diffusion 
-kT  = kT0 + mu.*rho.*cP.*(phi.*kwf + chi.*kwx + kW + mink);                % heat diffusion
+W0  = (Vel./mean(Vel(:)+TINY)).*mean(abs(rho-mean(rho,2)).*g0.*(D/10)^2./eta,'all');
+wx0 = abs(wx(1:end-1,2:end-1)+wx(2:end,2:end-1))/2;
+wf0 = abs(wf(1:end-1,2:end-1)+wf(2:end,2:end-1))/2;
+Ra0 = W0.*D/10./(kT0./rho./cP);
+Re0 = W0.*rho.*D/10./eta;
+
+if Nx==1 && Nz==1; kW = 0;
+elseif Nx==1;      kW = (kW + 1e-6.*rho.*g0.*(D/10)^1./eta.*(0.18*2*D/50)^2 .* (1-min(1,topshape+botshape)/2))/2;
+else;              kW = (kW + eII.*(0.18*2*D/50)^2 .* (1-min(1,topshape+botshape+sdsshape)/2))/2;
+end
+kwx = wx0*dx*10;                                                           % segregation fluctuation diffusivity
+kwf = wf0*df*10;                                                           % segregation fluctuation diffusivity
+kx  = chi.*(kwx + kW + mink);                                              % solid fraction diffusion 
+kf  = phi.*(kwf + kW + mink);                                              % fluid fraction diffusion 
+kT  = kT0 + rho.*cP.*(phi.*kwf + chi.*kwx + kW + mink);                    % heat diffusion
 ks  = kT./T;                                                               % entropy diffusion
+eta = eta + rho.*(phi.*kwf + chi.*kwx + kW + mink);
+etaco  = (eta([1,1:end],[1  ,1:end]).*eta([1:end,end],[1  ,1:end]) ...
+       .* eta([1,1:end],[1:end,end]).*eta([1:end,end],[1:end,end])).^0.25;
+
+Ra  = Vel.*D/10./(kT./rho./cP);
+Re  = Vel.*rho.*D/10./eta;
 
 % update velocity divergence
 Div_V = ddz(W(:,2:end-1),h) + ddx(U(2:end-1,:),h);                         % get velocity divergence
@@ -93,7 +107,7 @@ tII = (0.5.*(txx.^2 + tzz.^2 ...
        +     txz(1:end-1,2:end  ).^2+txz(2:end,2:end).^2)/4)).^0.5 + TINY;
 
 % heat dissipation (entropy production) rate
-if Nz==1 && Nx==1  
+if Nz==1 && Nx==1
     diss = 0.*T;  % no dissipation in 0-D mode (no diffusion, no shear deformation, no segregation)
 else
     [grdTx,grdTz] = gradient(T([1,1:end,end],[1,1:end,end]),h);

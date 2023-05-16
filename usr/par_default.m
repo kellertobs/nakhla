@@ -77,7 +77,9 @@ tau_r    =  0;                   % reaction time scale (set to zero for quasi-eq
 
 % set model buoyancy parameters
 aT       =  4e-5;                % thermal expansivity [1/K]
-bP       =  1e-8;                % fluid compressibility [1/Pa]
+bPx      =  1e-11;               % fluid compressibility [1/Pa]
+bPm      =  5e-11;               % fluid compressibility [1/Pa]
+bPf      =  1e-8;                % fluid compressibility [1/Pa]
 dx       =  1e-3;                % crystal size [m]
 df       =  1e-3;                % bubble size [m]
 g0       =  10.;                 % gravity [m/s2]
@@ -89,7 +91,7 @@ CFL      =  0.50;                % (physical) time stepping courant number (mult
 rtol     =  1e-6;                % outer its relative tolerance
 atol     =  1e-9;                % outer its absolute tolerance
 maxit    =  50;                  % maximum outer its
-mink     =  1e-9;                % minimum diffusivity for phase, component fractions
+mink     =  1e-8;                % minimum diffusivity for phase, component fractions
 etacntr  =  1e+6;                % maximum viscosity contrast
 cnvreg   =  1e0;                 % convection regularisation parameter
 sgrreg   =  1e0;                 % segregation regularisation parameter
