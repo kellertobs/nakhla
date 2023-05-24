@@ -32,8 +32,8 @@ T0       =  1150;                % temperature top layer [deg C]
 T1       =  1150;                % temperature base layer [deg C]
 dTr      =  0;                   % amplitude of random noise [deg C]
 dTg      =  0;                   % amplitude of centred gaussian [deg C]
-c0       =  [0.09,0.27,0.59,0.03,0.02]; % major component top  layer [wt]
-c1       =  [0.09,0.27,0.59,0.03,0.02]; % major component base layer [wt]
+c0       =  [0.14,0.49,0.28,0.09,0.02];  % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
+c1       =  [0.14,0.49,0.28,0.09,0.02];  % components (maj comp, H2O) bot layer [wt] (will be normalised to unit sum!)
 dcr      =  [0,0,0,0,0];         % amplitude of random noise [wt SiO2]
 dcg      =  [0,0,0,0,0];         % amplitude of centred gaussian [wt SiO2]
 
@@ -93,13 +93,11 @@ atol     =  1e-9;                % outer its absolute tolerance
 maxit    =  50;                  % maximum outer its
 mink     =  1e-8;                % minimum diffusivity for phase, component fractions
 etacntr  =  1e+6;                % maximum viscosity contrast
-cnvreg   =  1e0;                 % convection regularisation parameter
-sgrreg   =  1e0;                 % segregation regularisation parameter
+Delta    =  2*D/80;              % correlation length for eddy viscosity
+Prt      =  8;                   % turbulent Prandtl number (ratio of momentum to heat diffusivity)
 
 % set various options
 calibrt  =  0;                   % not in calibrate mode
 TINY     =  1e-16;               % minimum cutoff phase, component fractions
-BCA      =  {'',''};             % boundary condition on advection (top/bot, sides)
-BCD      =  {'',''};             % boundary condition on advection (top/bot, sides)
 bnchm    =  0;                   % not a benchmark run
 

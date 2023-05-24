@@ -29,7 +29,7 @@ function  [cal, flag]  =  Tsolidus(var,cal)
 %*****  subroutine to compute solidus temperature at given bulk composition
 
 %***  exclude invalid compositions
-ii  =  sum(var.c(:,sum(var.c,1)>1),2)<=1;
+ii  =  sum(var.c,2)<=1+1e-15;
 
 %***  get T,P-,H2O-dependent partition coefficients Kxi
 var.H2Om  = cal.H2Osat .* (var.H2O>0);
@@ -111,7 +111,7 @@ function  [cal, flag]  =  Tliquidus(var,cal)
 %*****  subroutine to compute liquidus temperature at given bulk composition
 
 %***  exclude invalid compositions
-ii  =  sum(var.c(:,sum(var.c,1)>1),2)<=1;
+ii  =  sum(var.c,2)<=1+1e-15;
 
 %***  get T,P-,H2O-dependent partition coefficients Kxi
 var.H2Om   = min(var.H2O,cal.H2Osat);

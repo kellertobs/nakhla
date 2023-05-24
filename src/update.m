@@ -28,19 +28,16 @@ rhof   = cal.rhof0                                                              
 % convert weight to volume fraction, update bulk density
 rho    = 1./(m./rhom + x./rhox + f./rhof);
 
-rhofz  = (rho(1:end-1,:)+rho(2:end,:))/2;
-rhofx  = (rho(:,1:end-1)+rho(:,2:end))/2;
-
 chi    = max(0,min(1, x.*rho./rhox ));
 phi    = max(0,min(1, f.*rho./rhof ));
 mu     = max(0,min(1, m.*rho./rhom ));
 
 % update lithostatic pressure
 if Nz==1; Pt = Ptop.*ones(size(Tp)); else
-    rhofz       = (rho(1:end-1,:)+rho(2:end,:))/2;
     Pt(1,:)     = repmat(mean(rhofz(1,:),2).*g0.*h/2,1,Nx) + Ptop;
     Pt(2:end,:) = Pt(1,:) + repmat(cumsum(mean(rhofz,2).*g0.*h),1,Nx);
 end
+rhofx  = (rho(:,[end,1:end])+rho(:,[1:end,1]))/2;
 
 % update melt viscosity
 etam   = reshape(Giordano08(reshape(cm_oxd,Nz*Nx,cal.noxd),T(:)-273.15),Nz,Nx);
@@ -50,9 +47,9 @@ hh     = (1-cal.xi).*erf(sqrt(pi)./(2.*(1-cal.xi)).*(max(TINY^0.5,chi)./cal.chi_
 eta    = etam .* (1+(max(TINY^0.5,chi)./cal.chi_pck).^cal.delta) .* (1-hh).^-cal.Bchi .* max(TINY^0.5,1-phi).^-cal.Bphi;
 
 % phase segregation coefficients
-Ksgr_x = 2/9*dx^2./eta/sgrreg                                                                      ;
-Ksgr_f = 2/9*df^2./eta/sgrreg + dx^2/cal.bf./cal.etaf0/sgrreg.*max(TINY^0.5,phi-cal.cf).^(cal.nf-1).*max(TINY^0.5,1-phi).^cal.mf;
-Ksgr_m =                        dx^2/cal.bm./    etam /sgrreg.*max(TINY^0.5,mu -cal.cm).^(cal.nm-1).*max(TINY^0.5,1-mu ).^cal.mm;
+Ksgr_x = 2/9*dx^2./eta                                                                      ;
+Ksgr_f = 2/9*df^2./eta + dx^2/cal.bf./cal.etaf0.*max(TINY^0.5,phi-cal.cf).^(cal.nf-1).*max(TINY^0.5,1-phi).^cal.mf;
+Ksgr_m =                 dx^2/cal.bm./    etam .*max(TINY^0.5,mu -cal.cm).^(cal.nm-1).*max(TINY^0.5,1-mu ).^cal.mm;
 
 % bound and regularise viscosity
 if ~calibrt; etamax = etacntr.*min(eta(:)); else; etamax = 1e+32.*min(eta(:)); end
@@ -61,25 +58,25 @@ eta    = (etamax.^-0.5 + eta.^-0.5).^-2;
 if ~calibrt % skip the following if called from calibration script
 
 % diffusion parameters
-W0  = (Vel./mean(Vel(:)+TINY)).*mean(abs(rho-mean(rho,2)).*g0.*(D/10)^2./eta,'all');
+W0  = (Vel./mean(Vel(:)+TINY)).*mean(abs(rho-mean(rho,2))./100.*g0.*(D/10)^2./eta,'all');
 wx0 = abs(wx(1:end-1,2:end-1)+wx(2:end,2:end-1))/2;
 wf0 = abs(wf(1:end-1,2:end-1)+wf(2:end,2:end-1))/2;
 Ra0 = W0.*D/10./(kT0./rho./cP);
 Re0 = W0.*rho.*D/10./eta;
 
 if Nx==1 && Nz==1; kW = 0;
-elseif Nx==1;      kW = (kW + 1e-6.*rho.*g0.*(D/10)^1./eta.*(0.18*2*D/50)^2 .* (1-min(1,topshape+botshape)/2))/2;
-else;              kW = (kW + eII.*(0.18*2*D/50)^2 .* (1-min(1,topshape+botshape+sdsshape)/2))/2;
+elseif Nx==1;      kW = 1e-6.*rho.*g0.*(D/10)^1./eta.*(0.18*Delta .* (1-min(1,topshape+botshape)/10)).^2;
+else;              kW = (kW + 2.*eII.*(0.18*Delta .* (1-min(1,topshape+botshape+sdsshape)/10)).^2)/2;
 end
 kwx = wx0*dx*10;                                                           % segregation fluctuation diffusivity
 kwf = wf0*df*10;                                                           % segregation fluctuation diffusivity
-kx  = chi.*(kwx + kW + mink);                                              % solid fraction diffusion 
-kf  = phi.*(kwf + kW + mink);                                              % fluid fraction diffusion 
-kT  = kT0 + rho.*cP.*(phi.*kwf + chi.*kwx + kW + mink);                    % heat diffusion
+kx  = chi.*(kwx + kW/Prt + mink);                                          % solid fraction diffusion 
+kf  = phi.*(kwf + kW/Prt + mink);                                          % fluid fraction diffusion 
+kT  = kT0 + rho.*cP.*(phi.*kwf + chi.*kwx + kW/Prt + mink);                % heat diffusion
 ks  = kT./T;                                                               % entropy diffusion
 eta = eta + rho.*(phi.*kwf + chi.*kwx + kW + mink);
-etaco  = (eta([1,1:end],[1  ,1:end]).*eta([1:end,end],[1  ,1:end]) ...
-       .* eta([1,1:end],[1:end,end]).*eta([1:end,end],[1:end,end])).^0.25;
+etaco  = (eta([1,1:end],[end,1:end]).*eta([1:end,end],[end,1:end]) ...
+       .* eta([1,1:end],[1:end,1  ]).*eta([1:end,end],[1:end,1  ])).^0.25;
 
 Ra  = Vel.*D/10./(kT./rho./cP);
 Re  = Vel.*rho.*D/10./eta;

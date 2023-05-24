@@ -17,6 +17,13 @@ fprintf('\n   run ID: %s \n\n',runID);
 
 load ocean;                  % load custom colormap
 run(['../cal/cal_',calID]);  % load melt model calibration
+if bndmode < 4 % periodic sides
+    BCA     =  {'','periodic'};  % boundary condition on advection (top/bot, sides)
+    BCD     =  {'','periodic'};  % boundary condition on advection (top/bot, sides)
+else % closed sides
+    BCA     =  {'',''};  % boundary condition on advection (top/bot, sides)
+    BCD     =  {'',''};  % boundary condition on advection (top/bot, sides) 
+end
 
 % normalise major components to anhydrous unit sum, rescale to hydrous
 c0(1:end-1) = c0(1:end-1)./sum(c0(1:end-1)).*(1-c0(end));
@@ -187,10 +194,10 @@ rhox   = mean(cal.rhox0).*ones(size(Tp));
 rhof   = cal.rhof0.*ones(size(Tp));
 rho    = rhom;
 rhofz  = (rho(1:end-1,:)+rho(2:end,:))/2;
-rhofx  = (rho(:,1:end-1)+rho(:,2:end))/2;
+rhofx  = (rho(:,[end,1:end])+rho(:,[1:end,1]))/2;
 rhoWo  = rhofz.*W(2:end-1,2:end-1); rhoWoo = rhoWo;
-rhoUo  = rhofx.*U(2:end-1,2:end-1); rhoUoo = rhoUo;
-T      = (Tp+273.15+100);
+rhoUo  = rhofx.*U(2:end-1,:      ); rhoUoo = rhoUo;
+T      = 0.*Tp + max(cal.T0)+273.15;
 rhoref = mean(rho,'all');
 Pt     = Ptop + rhoref.*g0.*ZZ;
 fq     = zeros(size(Tp));  mq = ones(size(Tp));  xq = 1-mq-fq; 
@@ -299,14 +306,14 @@ Drhox = 0.1*abs(rhox0-rhom0);
 Drhof = 0.1*abs(cal.rhof0-rhom0) * (max([c0(end),c1(end),max(cwall(:,end))])>TINY);
 Drho0 = DrhoT + Drhoc + Drhox + Drhof;
 
-uT    = DrhoT*g0*(D/10)^2/etam0/cnvreg;
-uc    = Drhoc*g0*(D/10)^2/etam0/cnvreg;
-ux    = Drhox*g0*(D/10)^2/etam0/cnvreg;
-uf    = Drhof*g0*(D/10)^2/etam0/cnvreg * (max([c0(end),c1(end),max(cwall(:,end))])>TINY);
-u0    = Drho0*g0*(D/10)^2/etam0/cnvreg;
+uT    = DrhoT*g0*(D/10)^2/etam0;
+uc    = Drhoc*g0*(D/10)^2/etam0;
+ux    = Drhox*g0*(D/10)^2/etam0;
+uf    = Drhof*g0*(D/10)^2/etam0 * (max([c0(end),c1(end),max(cwall(:,end))])>TINY);
+u0    = Drho0*g0*(D/10)^2/etam0;
 
-wx0   = abs(rhox0-rhom0)*g0*dx^2/etam0/sgrreg;
-wf0   = abs(rhof0-rhom0)*g0*df^2/etam0/sgrreg * (max([c0(end),c1(end),max(cwall(:,end))])>TINY);
+wx0   = abs(rhox0-rhom0)*g0*dx^2/etam0;
+wf0   = abs(rhof0-rhom0)*g0*df^2/etam0 * (max([c0(end),c1(end),max(cwall(:,end))])>TINY);
 
 ud0   = kT0/rhom0/cP/(D/10);
 
@@ -325,9 +332,9 @@ Ruf   = wf0/u0;
 RwT   = uwT/u0;
 Rwc   = uwc/u0;
 
-Re    = u0*rhom0*(D/10)/etam0/cnvreg;
-Rex   = wx0*rhom0*dx/etam0/sgrreg;
-Ref   = wf0*rhom0*df/etam0/sgrreg;
+Re    = u0*rhom0*(D/10)/etam0;
+Rex   = wx0*rhom0*dx/etam0;
+Ref   = wf0*rhom0*df/etam0;
 
 fprintf('    crystal Re: %1.3e \n'  ,Rex);
 fprintf('     bubble Re: %1.3e \n'  ,Ref);
@@ -422,7 +429,7 @@ if restart
     end
     if exist(name,'file')
         fprintf('\n   restart from %s \n\n',name);
-        load(name,'U','W','P','Pt','f','x','m','fq','xq','mq','phi','chi','mu','X','F','M','S','C','T','c','cm','cx','cf','TE','IR','te','ir','dSdt','dCdt','dFdt','dXdt','dMdt','drhodt','dTEdt','dIRdt','Gf','Gx','Gm','rho','eta','eII','tII','dt','time','step','VolSrc','wf','wx','wm');
+        load(name,'U','W','P','Pt','f','x','m','fq','xq','mq','phi','chi','mu','X','F','M','S','C','T','c','cm','cx','cf','TE','IR','te','ir','dSdt','dCdt','dFdt','dXdt','dMdt','drhodt','dTEdt','dIRdt','Gf','Gx','Gm','rho','eta','eII','tII','dt','time','step','VolSrc','wf','wx','wm','cal');
         name = [opdir,'/',runID,'/',runID,'_hist'];
         load(name,'hist');
 

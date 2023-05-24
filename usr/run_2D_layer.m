@@ -9,12 +9,12 @@ runID    =  '2D_layer';          % run identifier
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  100;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot results
-save_op  =  0;                   % switch on to save output to file
+save_op  =  1;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
 
 % set model domain parameters
-D        =  10;                  % chamber depth [m]
-L        =  10;                  % chamber width [m]
+D        =  20;                  % chamber depth [m]
+L        =  D/2;                 % chamber width [m]
 N        =  120 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
 h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
 
@@ -23,18 +23,15 @@ Nt       =  5e5;                 % number of time steps to take
 tend     =  1*yr;                % end time for simulation [s]
 
 % set initial thermo-chemical state
-T0       =  1035;                % temperature top layer [deg C]
-T1       =  1150;                % temperature base layer [deg C]
-c0       =  0.58;                % major component top layer [wt SiO2]
-c1       =  0.51;                % major component base layer [wt SiO2]
-dcr      =  1e-4;                % amplitude of random noise [wt SiO2]
-v0       =  0.01;                % volatile component top layer [wt H2O]
-v1       =  0.03;                % volatile component base layer [wt H2O]
-dvr      =  0e-4;                % amplitude of random noise [wt H2O]
+T0       =  985;                  % temperature top layer [deg C]
+T1       =  1235;                 % temperature base layer [deg C]
+c0       =  [0.01,0.40,0.40,0.20,0.04];  % components (maj comp, H2O) top  layer [wt] (will be normalised to unit sum!)
+c1       =  [0.14,0.49,0.28,0.09,0.02];  % components (maj comp, H2O) base layer [wt] (will be normalised to unit sum!)
+dcr      =  [1/2,1/2,-1/3,-1/3,-1/3]*1e-4;
 zlay     =  0.8;                 % layer thickness (relative to domain depth D)
-dlay     =  0.1;                 % random perturbation to layer thickness (relative to grid spacing h)
-wlay_T   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
-wlay_c   =  1*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
+dlay     =  0.0;                 % random perturbation to layer thickness (relative to grid spacing h)
+wlay_T   =  0.1*h/D;             % thickness of smooth layer boundary (relative to domain depth D)
+wlay_c   =  0.1*h/D;             % thickness of smooth layer boundary (relative to domain depth D)
 
 % set model trace and isotope geochemistry parameters (must match # trace elements and isotope ratios in calibration!)
 te0      =  [0.1,0.3,1,3];       % trace elements top layer [wt ppm]
@@ -49,6 +46,7 @@ Twall    =  [300,300,nan];       % [top,bot,sds] wall rock temperature [degC] (n
 Ptop     =  1.25e8;              % top pressure [Pa]
 
 % set thermo-chemical material parameters
+calID    =  'andesSVZ';          % phase diagram calibration
 Dsx      = -300;                 % entropy change of crystallisation [J/kg]
 Dsf      =  400;                 % entropy change of exsolution [J/kg]
 
@@ -63,7 +61,6 @@ CFL      =  0.50;                % (physical) time stepping courant number (mult
 rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-8;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its
-cnvreg   =  10;                  % convection regularisation parameter
 dtmax    =  5;                   % maximum time step [s]
 
 

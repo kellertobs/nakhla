@@ -293,13 +293,13 @@ else % create 2D plots
     set(fh1,'CurrentAxes',ax(12));
     imagesc(Xc,Zc, U(2:end-1,:      ).*hr); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$U$ [m/hr]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
+    text(-0.1,1.1,['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k','HorizontalAlignment','center','Units','normalized');
     set(fh1,'CurrentAxes',ax(13));
     imagesc(Xc,Zc, P); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$P$ [Pa]'],TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:}); xlabel('Width [m]',TX{:},FS{:});
     set(fh1,'CurrentAxes',ax(14));
     imagesc(Xc,Zc,Div_V); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\nabla \cdot \mathbf{v}$ [1/s]'],TX{:},FS{:}); xlabel('Width [m]',TX{:},FS{:}); set(gca,'YTickLabel',[]);
-    sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
 
     % plot temperature and composition in Fig. 2
     set(0,'CurrentFigure',fh2)
@@ -309,10 +309,10 @@ else % create 2D plots
     set(fh2,'CurrentAxes',ax(22));
     imagesc(Xc,Zc,squeeze(c_oxd(:,:,cal.Si)./sum(c_oxd(:,:,1:end-1),3).*100)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\bar{c}$ [wt\% SiO$_2$]'],TX{:},FS{:}); set(gca,'YTickLabel',[]); xlabel('Width [m]',TX{:},FS{:});
+    text(0.5,1.1,['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k','HorizontalAlignment','center','Units','normalized');
     set(fh2,'CurrentAxes',ax(23));
     imagesc(Xc,Zc,squeeze(c_oxd(:,:,cal.H))); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\bar{v}$ [wt\% H$_2$O]'],TX{:},FS{:}); set(gca,'YTickLabel',[]);
-    sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
 
     % plot phase fractions and reaction rates in Fig. 3
     set(0,'CurrentFigure',fh3)
@@ -322,13 +322,13 @@ else % create 2D plots
     set(fh3,'CurrentAxes',ax(32));
     imagesc(Xc,Zc,phi.*100.*(phi>1e-9)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\phi$ [vol\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
+    text(-0.1,1.1,['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k','HorizontalAlignment','center','Units','normalized');
     set(fh3,'CurrentAxes',ax(33));
     imagesc(Xc,Zc,Gx./rho*hr*100.*(chi>1e-9)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\Gamma_x/\bar{\rho}$ [wt\%/hr]'],TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:}); xlabel('Width [m]',TX{:},FS{:});
     set(fh3,'CurrentAxes',ax(34));
     imagesc(Xc,Zc,Gf./rho*hr*100.*(phi>1e-9)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\Gamma_f/\bar{\rho}$ [wt\%/hr]'],TX{:},FS{:}); xlabel('Width [m]',TX{:},FS{:}); set(gca,'YTickLabel',[]);
-    sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
 
     % plot density, rheology, and segregation speeds in Fig. 4
     set(0,'CurrentFigure',fh4)
@@ -338,13 +338,13 @@ else % create 2D plots
     set(fh4,'CurrentAxes',ax(42));
     imagesc(Xc,Zc,log10(eta)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\bar{\eta}$ [log$_{10}$ Pas]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
+    text(-0.1,1.1,['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k','HorizontalAlignment','center','Units','normalized');
     set(fh4,'CurrentAxes',ax(43));
     imagesc(Xc,Zc,-(chi([1,1:end],:)+chi([1:end,end],:))/2.*wx(:,2:end-1).*hr); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$w_\Delta^x$ [m/hr]'],TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:}); xlabel('Width [m]',TX{:},FS{:});
     set(fh4,'CurrentAxes',ax(44));
     imagesc(Xc,Zc,-(phi([1,1:end],:)+phi([1:end,end],:))/2.*wf(:,2:end-1).*hr.*(any(phi>1e-9))); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$w_\Delta^f$ [m/hr]'],TX{:},FS{:}); xlabel('Width [m]',TX{:},FS{:}); set(gca,'YTickLabel',[]);
-    sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
 
     % plot pseudo-component composition in Fig. 5
     set(0,'CurrentFigure',fh5)
@@ -354,23 +354,24 @@ else % create 2D plots
     set(fh5,'CurrentAxes',ax(52));
     imagesc(Xc,Zc,c(:,:,2).*100); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.cmpStr{2},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
+    text(-0.1,1.1,['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k','HorizontalAlignment','center','Units','normalized');
     set(fh5,'CurrentAxes',ax(53));
     imagesc(Xc,Zc,c(:,:,3).*100); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.cmpStr{3},' [wt\%]'],TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:});
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.cmpStr{3},' [wt\%]'],TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:}); xlabel('Width [m]',TX{:},FS{:});
     set(fh5,'CurrentAxes',ax(54));
     imagesc(Xc,Zc,c(:,:,4).*100); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.cmpStr{4},' [wt\%]'],TX{:},FS{:}); set(gca,'YTickLabel',[]); xlabel('Width [m]',TX{:},FS{:});
-    sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
 
     % plot major oxide composition in Fig. 6
     set(0,'CurrentFigure',fh6)
-    set(fh6,'CurrentAxes',ax(61));
     sumanh = sum(c_oxd(:,:,1:end-1),3);
+    set(fh6,'CurrentAxes',ax(61));
     imagesc(Xc,Zc,c_oxd(:,:,1)./sumanh.*100); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.oxdStr{1},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[]);
     set(fh6,'CurrentAxes',ax(62));
     imagesc(Xc,Zc,c_oxd(:,:,2)./sumanh.*100); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.oxdStr{2},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
+    text(0.5,1.1,['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k','HorizontalAlignment','center','Units','normalized');
     set(fh6,'CurrentAxes',ax(63));
     imagesc(Xc,Zc,c_oxd(:,:,3)./sumanh.*100); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.oxdStr{3},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
@@ -392,7 +393,6 @@ else % create 2D plots
     set(fh6,'CurrentAxes',ax(69));
     imagesc(Xc,Zc,c_oxd(:,:,9)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.oxdStr{9},' [wt\%]'],TX{:},FS{:}); set(gca,'YTickLabel',[]);
-    sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
 
     % plot mineral assemblage in Fig. 7
     set(0,'CurrentFigure',fh7)
@@ -402,6 +402,7 @@ else % create 2D plots
     set(fh7,'CurrentAxes',ax(72));
     imagesc(Xc,Zc,cx_msy(:,:,2).*x); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.msyStr{2},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
+    text(0.5,1.1,['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k','HorizontalAlignment','center','Units','normalized');
     set(fh7,'CurrentAxes',ax(73));
     imagesc(Xc,Zc,cx_msy(:,:,3).*x); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.msyStr{3},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
@@ -414,7 +415,6 @@ else % create 2D plots
     set(fh7,'CurrentAxes',ax(76));
     imagesc(Xc,Zc,cx_msy(:,:,6).*x); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.msyStr{6},' [wt\%]'],TX{:},FS{:}); set(gca,'YTickLabel',[]);
-    sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
 
     % plot geochemical variables in Fig. 7
     set(0,'CurrentFigure',fh8)
@@ -424,6 +424,7 @@ else % create 2D plots
     set(fh8,'CurrentAxes',ax(82));
     imagesc(Xc,Zc,te(:,:,2)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['trace element 2'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
+    text(0.5,1.1,['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k','HorizontalAlignment','center','Units','normalized');
     set(fh8,'CurrentAxes',ax(83));
     imagesc(Xc,Zc,ir(:,:,1)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['isotope ratio 1'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
@@ -436,7 +437,6 @@ else % create 2D plots
     set(fh8,'CurrentAxes',ax(86));
     imagesc(Xc,Zc,ir(:,:,2)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['isotope ratio 2'],TX{:},FS{:}); set(gca,'YTickLabel',[]);
-    sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
 
 end
 
@@ -533,7 +533,7 @@ end
 drawnow
 
 % save output to file
-if save_op && ~restart
+if save_op && restart<=0
     if Nx <= 10 && Nz <= 10  % print 0D plots
         name = [opdir,'/',runID,'/',runID,'_tch_',num2str(floor(step/nop))];
         print(fh1,name,'-dpng','-r300','-image');

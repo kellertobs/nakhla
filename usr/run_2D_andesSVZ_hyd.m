@@ -16,7 +16,7 @@ plot_cv  =  0;                   % switch on to live plot iterative convergence
 D        =  10;                  % chamber depth [m]
 N        =  100;                 % number of grid points in z-direction
 h        =  D/N;                 % grid spacing (equal in both dimensions, do not set) [m]
-L        =  D;                   % chamber width (equal to h for 1-D mode) [m]
+L        =  D/2;                 % chamber width (equal to h for 1-D mode) [m]
 
 % set model timing parameters
 Nt       =  1e5;                 % number of time steps to take
@@ -29,8 +29,7 @@ T0       =  1200;                % temperature top  layer [deg C]
 T1       =  T0;                  % temperature base layer [deg C]
 c0       =  [0.14,0.49,0.28,0.09,0.02];  % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
 c1       =  c0;                          % components (maj comp, H2O) bot layer [wt] (will be normalised to unit sum!)
-dcr      =  [1/2,1/2,-1/3,-1/3,-1/3]*1e-4;
-dcg      =  [0,0,0,0,0];
+dcr      =  [1/2,1/2,-1/3,-1/3,-1/3]*1e-5;
 
 % set thermo-chemical boundary parameters
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
@@ -50,13 +49,12 @@ Dsx      = -300;                 % entropy change of crystallisation [J/kg]
 Dsf      =  400;                 % entropy change of exsolution [J/kg]
 
 % set numerical model parameters
-TINT     =  'bd2si';             % time integration scheme ('be1im','bd2im','cn2si','bd2si')
+TINT     =  'bd2im';             % time integration scheme ('be1im','bd2im','cn2si','bd2si')
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
-CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
+CFL      =  0.75;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 rtol     =  1e-5;                % outer its relative tolerance
 atol     =  1e-9;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its
-cnvreg   =  10;                  % convection regularisation parameter
 
 %*****  RUN NAKHLA MODEL  *************************************************
 run('../src/main')

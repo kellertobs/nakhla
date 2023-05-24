@@ -11,8 +11,8 @@ res_rho = (a1*rho-a2*rhoo-a3*rhooo)/dt - (b1*drhodt + b2*drhodto + b3*drhodtoo);
 % volume source and background velocity passed to fluid-mechanics solver
 VolSrc  = Div_V - res_rho./rho/2;  % correct volume source term by scaled residual
 
-UBG     = - mean(VolSrc,'all')./2 .* (L/2-XXu);
-WBG     = - mean(VolSrc,'all')./2 .* (D/2-ZZw);
+UBG     = - 0*mean(VolSrc,'all')./2 .* (L/2-XXu);
+WBG     = - 2*mean(VolSrc,'all')./2 .* (D/2-ZZw);
 
 end
 
@@ -38,31 +38,31 @@ AAR = [];       % forcing entries for R
 % assemble coefficients of z-stress divergence
     
 % left boundary
-ii  = MapW(:,1); jj1 = ii; jj2 = MapW(:,2);
+ii  = MapW(:,1); jj1 = ii; jj2 = MapW(:,end-1);
 aa  = zeros(size(ii));
 IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; aa(:)+1];
-IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL; aa(:)+sds];
+IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL; aa(:)-1];
 IIR = [IIR; ii(:)]; AAR = [AAR; aa(:)];
 
 % right boundary
-ii  = MapW(:,end); jj1 = ii; jj2 = MapW(:,end-1);
+ii  = MapW(:,end); jj1 = ii; jj2 = MapW(:,2);
 aa  = zeros(size(ii));
 IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; aa(:)+1];
-IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL; aa(:)+sds];
+IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL; aa(:)-1];
 IIR = [IIR; ii(:)]; AAR = [AAR; aa(:)];
 
 % top boundary
-ii  = MapW(1,2:end-1); jj = ii;
+ii  = MapW(1,:); jj = ii;
 aa  = zeros(size(ii));
 IIL = [IIL; ii(:)]; JJL = [JJL; jj(:)];   AAL = [AAL; aa(:)+1];
-aa  = zeros(size(ii)) + WBG(1,2:end-1);
+aa  = zeros(size(ii)) + WBG(1,:);
 IIR = [IIR; ii(:)]; AAR = [AAR; aa(:)];
 
 % bottom boundary
-ii  = MapW(end,2:end-1); jj = ii;
+ii  = MapW(end,:); jj = ii;
 aa  = zeros(size(ii));
 IIL = [IIL; ii(:)]; JJL = [JJL; jj(:)];   AAL = [AAL; aa(:)+1];
-aa  = zeros(size(ii)) + WBG(end,2:end-1);
+aa  = zeros(size(ii)) + WBG(end,:);
 IIR = [IIR; ii(:)]; AAR = [AAR; aa(:)];
 
 
@@ -76,7 +76,8 @@ EtaP1 =  eta  (1:end-1,:      );   EtaP2 =  eta  (2:end,:      );
 jj1 = MapW(1:end-2,2:end-1); jj2 = MapW(3:end,2:end-1); jj3 = MapW(2:end-1,1:end-2); jj4 = MapW(2:end-1,3:end);
 
 aa  = - a1.*rhofz./dt;
-IIL = [IIL; ii(:)]; JJL = [JJL;  ii(:)];   AAL = [AAL; aa(:)           ];      % W on stencil centre
+IIL = [IIL; ii(:)]; JJL = [JJL;  ii(:)];   AAL = [AAL; aa(:)           ];      % inertial term
+
 aa  = - 1/2*(EtaP1+EtaP2)/h^2 - 1/2*(EtaC1+EtaC2)/h^2;
 IIL = [IIL; ii(:)]; JJL = [JJL;  ii(:)];   AAL = [AAL; aa(:)           ];      % W on stencil centre
 IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; 1/2*EtaP1(:)/h^2];      % W one above
@@ -123,32 +124,18 @@ IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; aa(:)+1];
 IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL; aa(:)+bot];
 IIR = [IIR; ii(:)]; AAR = [AAR; aa(:)];
 
-% left side boundary
-ii  = MapU(2:end-1,1); jj = ii;
-aa  = zeros(size(ii));
-IIL = [IIL; ii(:)]; JJL = [JJL; jj(:)];   AAL = [AAL; aa(:)+1];
-aa  = zeros(size(ii)) + UBG(2:end-1,1);
-IIR = [IIR; ii(:)]; AAR = [AAR; aa(:)];
-
-% right side boundary
-ii  = MapU(2:end-1,end); jj = ii;
-aa  = zeros(size(ii));
-IIL = [IIL; ii(:)]; JJL = [JJL; jj(:)];   AAL = [AAL; aa(:)+1];
-aa  = zeros(size(ii)) + UBG(2:end-1,end);
-IIR = [IIR; ii(:)]; AAR = [AAR; aa(:)];
-
-
 % internal points
-ii    = MapU(2:end-1,2:end-1);
-EtaC1 =  etaco(1:end-1,2:end-1);   EtaC2 =  etaco(2:end,2:end-1);
-EtaP1 =  eta  (:      ,1:end-1);   EtaP2 =  eta  (:    ,2:end  );
+ii    = MapU(2:end-1,:);
+EtaC1 = etaco(1:end-1,:    );  EtaC2 = etaco(2:end,:    );
+EtaP1 = eta  (:,[end,1:end]);  EtaP2 = eta  (:,[1:end,1]);
 
 % coefficients multiplying x-velocities U
 %            left          ||          right          ||           top             ||          bottom
-jj1 = MapU(2:end-1,1:end-2); jj2 = MapU(2:end-1,3:end); jj3 = MapU(1:end-2,2:end-1); jj4 = MapU(3:end,2:end-1);
+jj1 = MapU(2:end-1,[end-1,1:end-1]); jj2 = MapU(2:end-1,[2:end,2]); jj3 = MapU(1:end-2,:); jj4 = MapU(3:end,:);
 
 aa  = - a1.*rhofx./dt;
-IIL = [IIL; ii(:)]; JJL = [JJL;  ii(:)];   AAL = [AAL; aa(:)           ];      % U on stencil centre
+IIL = [IIL; ii(:)]; JJL = [JJL;  ii(:)];   AAL = [AAL; aa(:)           ];      % inertial term
+
 aa  = - 1/2*(EtaP1+EtaP2)/h^2 - 1/2*(EtaC1+EtaC2)/h^2;
 IIL = [IIL; ii(:)]; JJL = [JJL;  ii(:)];   AAL = [AAL; aa(:)           ];      % U on stencil centre
 IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; 1/2*EtaP1(:)/h^2];      % U one to the left
@@ -158,7 +145,7 @@ IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL; 1/2*EtaC2(:)/h^2];      %
 
 % coefficients multiplying z-velocities W
 %         top left         ||        top right          ||       bottom left       ||       bottom right
-jj1 = MapW(1:end-1,2:end-2); jj2 = MapW(1:end-1,3:end-1); jj3 = MapW(2:end,2:end-2); jj4 = MapW(2:end,3:end-1);
+jj1 = MapW(1:end-1,1:end-1); jj2 = MapW(1:end-1,2:end); jj3 = MapW(2:end,1:end-1); jj4 = MapW(2:end,2:end);
 
 IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; (1/2*EtaC1(:)-1/2*EtaP1(:))/h^2];  % W one to the top and left
 IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL;-(1/2*EtaC1(:)-1/2*EtaP2(:))/h^2];  % W one to the top and right
@@ -167,8 +154,8 @@ IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL; (1/2*EtaC2(:)-1/2*EtaP2(:
 
 
 % x-RHS vector
-rr  = zeros(size(ii)) - (a2.*rhoUo+a3.*rhoUoo)/dt;
-if bnchm; rr = rr + src_U_mms(2:end-1,2:end-1); end
+rr  = - (a2.*rhoUo+a3.*rhoUoo)/dt;
+if bnchm; rr = rr + src_U_mms(2:end-1,:); end
 
 IIR = [IIR; ii(:)];  AAR = [AAR; rr(:)];
 
@@ -198,10 +185,10 @@ if ~exist('GG','var') || bnchm
     
     
     % coefficients for x-gradient
-    ii  = MapU(2:end-1,2:end-1);
+    ii  = MapU(2:end-1,:);
     
     %         left             ||           right
-    jj1 = MapP(2:end-1,2:end-2); jj2 = MapP(2:end-1,3:end-1);
+    jj1 = MapP(2:end-1,1:end-1); jj2 = MapP(2:end-1,2:end);
     
     aa  = zeros(size(ii));
     IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; aa(:)-1/h];     % one to the left
@@ -254,9 +241,13 @@ if ~exist('KP','var') || bnchm
     IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; aa(:)+1];
     IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL; aa(:)-1];
     
-    ii  = [MapP(:,1); MapP(:,end  )]; % left & right
+    ii  = [MapP(:,1    ); MapP(:,end)]; % left & right
     jj1 = ii;
-    jj2 = [MapP(:,2); MapP(:,end-1)];
+    if bndmode < 4
+        jj2 = [MapP(:,end-1); MapP(:,2    )];
+    else
+        jj2 = [MapP(:,2    ); MapP(:,end-1)];
+    end
     
     aa  = zeros(size(ii));
     IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; aa(:)+1];
@@ -287,12 +278,29 @@ IIR = [IIR; ii(:)]; AAR = [AAR; rr(:)];
 % assemble right-hand side vector
 RP  = sparse(IIR,ones(size(IIR)),AAR,NP,1);
 
-nzp = round(Nz/2)+1;
-nxp = round(Nx/2)+1;
+if bndmode < 4 % periodic sides, set U = 0 in fixed point
+    nzu = round(Nz/2)+2;
+    nxu = round(Nx/2)+2;
+    GG(MapU(nzu,nxu),:) = 0;
+    KV(MapU(nzu,nxu),:) = 0;
+    KV(MapU(nzu,nxu),MapU(nzu,nxu)) = 1;
+    RV(MapU(nzu,nxu),:) = 0;
+else % closed sides, set U = 0 on sides
+    indsds = MapU(:,[1 end]);
+    GG(indsds(:),:) = 0;
+    KV(indsds(:),:) = 0;
+    KV(indsds(:),indsds(:)) = spdiags(ones(size(indsds(:))),0,sparse(length(indsds(:)),length(indsds(:))));
+    RV(indsds(:),:) = 0;
+end
+
+% set P = 0 in fixed point
+nzp = round(Nz/2)-2;
+nxp = round(Nx/2)-2;
 DD(MapP(nzp,nxp),:) = 0;
 KP(MapP(nzp,nxp),:) = 0;
 KP(MapP(nzp,nxp),MapP(nzp,nxp)) = 1;
 RP(MapP(nzp,nxp),:) = 0;
+
 if bnchm; RP(MapP(nzp,nxp),:) = P_mms(nzp,nxp); end
 
 
@@ -315,9 +323,9 @@ RR  = SCL*RR;
 SOL = SCL*(LL\RR);  % update solution
 
 % map solution vector to 2D arrays
-W   = full(reshape(SOL(MapW(:))        ,Nz+1,Nx+2));                       % matrix z-velocity
-U   = full(reshape(SOL(MapU(:))        ,Nz+2,Nx+1));                       % matrix x-velocity
-P   = full(reshape(SOL(MapP(:)+(NW+NU)),Nz+2,Nx+2));                       % matrix dynamic pressure
+W   = full(reshape(SOL(MapW(:))        ,Nz+1,Nx+2)); % matrix z-velocity
+U   = full(reshape(SOL(MapU(:))        ,Nz+2,Nx+1)); %U = U-mean(U(2:end-1,:      ),'all');     % matrix x-velocity
+P   = full(reshape(SOL(MapP(:)+(NW+NU)),Nz+2,Nx+2)); %P = P-mean(P(2:end-1,2:end-1),'all');     % matrix dynamic pressure
 
 % magma velocity magnitude
 Vel = sqrt(((W(1:end-1,2:end-1)+W(2:end,2:end-1))/2).^2 ...
@@ -328,29 +336,29 @@ if ~bnchm
     % phase segregation speeds
     wm(2:end-1,2:end-1) = ((rhom(1:end-1,:)+rhom(2:end,:))/2-mean(rhofz,2)).*g0.*(Ksgr_m(1:end-1,:).*Ksgr_m(2:end,:)).^0.5; % melt segregation speed
     wm([1,end],:) = min(1,1-[top;bot]).*wm([2,end-1],:);
-    wm(:,[1 end]) = -sds*wm(:,[2 end-1]);
+    wm(:,[1 end]) = wm(:,[end-1 2]);
 
     wx(2:end-1,2:end-1) = ((rhox(1:end-1,:)+rhox(2:end,:))/2-mean(rhofz,2)).*g0.*(Ksgr_x(1:end-1,:).*Ksgr_x(2:end,:)).^0.5; % solid segregation speed
     wx([1,end],:) = min(1,1-[top;bot]).*wx([2,end-1],:);
-    wx(:,[1 end]) = -sds*wx(:,[2 end-1]);
+    wx(:,[1 end]) = wx(:,[end-1 2]);
 
     wf(2:end-1,2:end-1) = ((rhof(1:end-1,:)+rhof(2:end,:))/2-mean(rhofz,2)).*g0.*(Ksgr_f(1:end-1,:).*Ksgr_f(2:end,:)).^0.5; % fluid segregation speed
     wf([1,end],:) = min(1,1-[top-fout;bot-fin]).*wf([2,end-1],:);
-    wf(:,[1 end]) = -sds*wf(:,[2 end-1]);
+    wf(:,[1 end]) = wf(:,[end-1 2]);
 
     % phase diffusion fluxes and speeds
     [~,qxz,qxx] = diffus(chi,kx,h,[1,2],BCD);
     [~,qfz,qfx] = diffus(phi,kf,h,[1,2],BCD);
     qmz  = -qxz-qfz;  qmx = -qxx-qfx;
 
-    wqf = qfz./max(TINY^0.5,(phi([1,1:end],[1,1:end,end])+phi([1:end,end],[1,1:end,end]))./2);
-    uqf = qfx./max(TINY^0.5,(phi([1,1:end,end],[1,1:end])+phi([1,1:end,end],[1:end,end]))./2);
+    wqf = qfz./max(TINY^0.5,(phi([1,1:end],[end,1:end,1])+phi([1:end,end],[end,1:end,1]))./2);
+    uqf = qfx./max(TINY^0.5,(phi([1,1:end,end],[end,1:end])+phi([1,1:end,end],[1:end,1]))./2);
 
-    wqx = qxz./max(TINY^0.5,(chi([1,1:end],[1,1:end,end])+chi([1:end,end],[1,1:end,end]))./2);
-    uqx = qxx./max(TINY^0.5,(chi([1,1:end,end],[1,1:end])+chi([1,1:end,end],[1:end,end]))./2);
+    wqx = qxz./max(TINY^0.5,(chi([1,1:end],[end,1:end,1])+chi([1:end,end],[end,1:end,1]))./2);
+    uqx = qxx./max(TINY^0.5,(chi([1,1:end,end],[end,1:end])+chi([1,1:end,end],[1:end,1]))./2);
 
-    wqm = qmz./max(TINY^0.5,(mu ([1,1:end],[1,1:end,end])+mu ([1:end,end],[1,1:end,end]))./2);
-    uqm = qmx./max(TINY^0.5,(mu ([1,1:end,end],[1,1:end])+mu ([1,1:end,end],[1:end,end]))./2);
+    wqm = qmz./max(TINY^0.5,(mu ([1,1:end],[end,1:end,1])+mu ([1:end,end],[end,1:end,1]))./2);
+    uqm = qmx./max(TINY^0.5,(mu ([1,1:end,end],[end,1:end])+mu ([1,1:end,end],[1:end,1]))./2);
 
     % update phase velocities
     Wf   = W + wf + wqf;  % mvp z-velocity
@@ -365,7 +373,7 @@ if ~bnchm
     dtk = (h/2)^2./max(kT(:)./rho(:)./cP)/1.1;                                    % diffusive time step size
     dta = CFL*h/2/max(abs([Um(:).*any(m(:)>10*TINY);Wm(:).*any(m(:)>10*TINY); ... % advective time step size
                            Ux(:).*any(x(:)>10*TINY);Wx(:).*any(x(:)>10*TINY); ...
-                           Uf(:).*any(f(:)>10*TINY);Wf(:).*any(f(:)>10*TINY)]+1e-16));   
+                           Uf(:).*any(f(:)>10*TINY);Wf(:).*any(f(:)>10*TINY)]+TINY));   
     dt  = min([1.1*dto,min(dtk,dta),dtmax]);                                      % time step size
 end
 
