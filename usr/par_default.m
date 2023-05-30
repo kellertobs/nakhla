@@ -18,7 +18,7 @@ Nt       =  3e5;                 % number of time steps to take
 hr       =  3600;                % conversion seconds to hours
 yr       =  24*365.25*hr;        % conversion seconds to years
 tend     =  1*yr;                % end time for simulation [s]
-dt       =  1;                   % initial time step [s]
+dt       =  100;                 % initial time step [s]
 dtmax    =  1e3;                 % maximum time step [s]
 
 % set initial thermo-chemical state

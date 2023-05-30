@@ -75,7 +75,7 @@ EtaP1 =  eta  (1:end-1,:      );   EtaP2 =  eta  (2:end,:      );
 %             top          ||         bottom          ||           left            ||          right
 jj1 = MapW(1:end-2,2:end-1); jj2 = MapW(3:end,2:end-1); jj3 = MapW(2:end-1,1:end-2); jj4 = MapW(2:end-1,3:end);
 
-aa  = - a1.*rhofz./dt;
+aa  = - a1.*rhofz(2:end-1,:)./dt;
 IIL = [IIL; ii(:)]; JJL = [JJL;  ii(:)];   AAL = [AAL; aa(:)           ];      % inertial term
 
 aa  = - 1/2*(EtaP1+EtaP2)/h^2 - 1/2*(EtaC1+EtaC2)/h^2;
@@ -102,7 +102,7 @@ IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL; (1/2*EtaC2(:)-1/2*EtaP2(:
 
 
 % z-RHS vector
-rr  = - (rhofz - mean(rhofz,2)) .* g0 - (a2.*rhoWo+a3.*rhoWoo)/dt;
+rr  = - (rhofz(2:end-1,:) - mean(rhofz(2:end-1,:),2)) .* g0 - (a2.*rhoWo(2:end-1,:)+a3.*rhoWoo(2:end-1,:))/dt;
 if bnchm; rr = rr + src_W_mms(2:end-1,2:end-1); end
 
 IIR = [IIR; ii(:)];  AAR = [AAR; rr(:)];
@@ -213,7 +213,7 @@ if ~exist('DD','var') || bnchm
     % coefficients multiplying velocities U, W
     %          left U          ||           right U       ||           top W           ||          bottom W
     jj1 = MapU(2:end-1,1:end-1); jj2 = MapU(2:end-1,2:end); jj3 = MapW(1:end-1,2:end-1); jj4 = MapW(2:end,2:end-1);
-    
+    rhofx1 = rhofx(:,1:end-1); rhofx2 = rhofx(:,2:end); rhofz1 = rhofz(1:end-1,:); rhofz2 = rhofz(2:end,:); 
     aa  = zeros(size(ii));
     IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; aa(:)-1/h];  % U one to the left
     IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL; aa(:)+1/h];  % U one to the right
@@ -334,15 +334,15 @@ Vel = sqrt(((W(1:end-1,2:end-1)+W(2:end,2:end-1))/2).^2 ...
 if ~bnchm
 
     % phase segregation speeds
-    wm(2:end-1,2:end-1) = ((rhom(1:end-1,:)+rhom(2:end,:))/2-mean(rhofz,2)).*g0.*(Ksgr_m(1:end-1,:).*Ksgr_m(2:end,:)).^0.5; % melt segregation speed
+    wm(2:end-1,2:end-1) = ((rhom(1:end-1,:)+rhom(2:end,:))/2-mean(rhofz(2:end-1,:),2)).*g0.*(Ksgr_m(1:end-1,:).*Ksgr_m(2:end,:)).^0.5; % melt segregation speed
     wm([1,end],:) = min(1,1-[top;bot]).*wm([2,end-1],:);
     wm(:,[1 end]) = wm(:,[end-1 2]);
 
-    wx(2:end-1,2:end-1) = ((rhox(1:end-1,:)+rhox(2:end,:))/2-mean(rhofz,2)).*g0.*(Ksgr_x(1:end-1,:).*Ksgr_x(2:end,:)).^0.5; % solid segregation speed
+    wx(2:end-1,2:end-1) = ((rhox(1:end-1,:)+rhox(2:end,:))/2-mean(rhofz(2:end-1,:),2)).*g0.*(Ksgr_x(1:end-1,:).*Ksgr_x(2:end,:)).^0.5; % solid segregation speed
     wx([1,end],:) = min(1,1-[top;bot]).*wx([2,end-1],:);
     wx(:,[1 end]) = wx(:,[end-1 2]);
 
-    wf(2:end-1,2:end-1) = ((rhof(1:end-1,:)+rhof(2:end,:))/2-mean(rhofz,2)).*g0.*(Ksgr_f(1:end-1,:).*Ksgr_f(2:end,:)).^0.5; % fluid segregation speed
+    wf(2:end-1,2:end-1) = ((rhof(1:end-1,:)+rhof(2:end,:))/2-mean(rhofz(2:end-1,:),2)).*g0.*(Ksgr_f(1:end-1,:).*Ksgr_f(2:end,:)).^0.5; % fluid segregation speed
     wf([1,end],:) = min(1,1-[top-fout;bot-fin]).*wf([2,end-1],:);
     wf(:,[1 end]) = wf(:,[end-1 2]);
 
@@ -374,7 +374,7 @@ if ~bnchm
     dta = CFL*h/2/max(abs([Um(:).*any(m(:)>10*TINY);Wm(:).*any(m(:)>10*TINY); ... % advective time step size
                            Ux(:).*any(x(:)>10*TINY);Wx(:).*any(x(:)>10*TINY); ...
                            Uf(:).*any(f(:)>10*TINY);Wf(:).*any(f(:)>10*TINY)]+TINY));   
-    dt  = min([1.1*dto,min(dtk,dta),dtmax]);                                      % time step size
+    dt  = min([1.01*dto,min(dtk,dta),dtmax]);                                      % time step size
 end
 
 end

@@ -32,12 +32,13 @@ chi    = max(0,min(1, x.*rho./rhox ));
 phi    = max(0,min(1, f.*rho./rhof ));
 mu     = max(0,min(1, m.*rho./rhom ));
 
+rhofx  = (rho(:,[end,1:end])+rho(:,[1:end,1]))/2;
+rhofz  = (rho([1,1:end],:)+rho([1:end,end],:))/2;
 % update lithostatic pressure
 if Nz==1; Pt = Ptop.*ones(size(Tp)); else
     Pt(1,:)     = repmat(mean(rhofz(1,:),2).*g0.*h/2,1,Nx) + Ptop;
-    Pt(2:end,:) = Pt(1,:) + repmat(cumsum(mean(rhofz,2).*g0.*h),1,Nx);
+    Pt(2:end,:) = Pt(1,:) + repmat(cumsum(mean(rhofz(2:end-1,:),2).*g0.*h),1,Nx);
 end
-rhofx  = (rho(:,[end,1:end])+rho(:,[1:end,1]))/2;
 
 % update melt viscosity
 etam   = reshape(Giordano08(reshape(cm_oxd,Nz*Nx,cal.noxd),T(:)-273.15),Nz,Nx);
@@ -58,7 +59,7 @@ eta    = (etamax.^-0.5 + eta.^-0.5).^-2;
 if ~calibrt % skip the following if called from calibration script
 
 % diffusion parameters
-W0  = (Vel./mean(Vel(:)+TINY)).*mean(abs(rho-mean(rho,2))./100.*g0.*(D/10)^2./eta,'all');
+W0  = (Vel./mean(Vel(:)+TINY))./4.*mean(abs(rho-mean(rho,2)).*g0.*(D/10)^2./eta,'all');
 wx0 = abs(wx(1:end-1,2:end-1)+wx(2:end,2:end-1))/2;
 wf0 = abs(wf(1:end-1,2:end-1)+wf(2:end,2:end-1))/2;
 Ra0 = W0.*D/10./(kT0./rho./cP);
@@ -83,7 +84,8 @@ Re  = Vel.*rho.*D/10./eta;
 
 % update velocity divergence
 Div_V = ddz(W(:,2:end-1),h) + ddx(U(2:end-1,:),h);                         % get velocity divergence
-      
+% Div_rhoV = reshape(DD*[W(:);U(:)],Nz+2,Nx+2);
+
 % update strain rates
 exx = diff(U(2:end-1,:),1,2)./h - Div_V./2;                                % x-normal strain rate
 ezz = diff(W(:,2:end-1),1,1)./h - Div_V./2;                                % z-normal strain rate

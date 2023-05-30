@@ -43,8 +43,8 @@ while time <= tend && step <= Nt && any(m(:)>1e-6)
     dTEdtoo = dTEdto; dTEdto = dTEdt;
     dIRdtoo = dIRdto; dIRdto = dIRdt;
     Div_Vo  = Div_V;
-    rhoWoo = rhoWo; rhoWo = rhofz.*W(2:end-1,2:end-1);
-    rhoUoo = rhoUo; rhoUo = rhofx.*U(2:end-1,:      );
+    rhoWoo = rhoWo; rhoWo = rhofz.*W(:,2:end-1);
+    rhoUoo = rhoUo; rhoUo = rhofx.*U(2:end-1,:);
     dto     = dt;
 
     

@@ -13,10 +13,10 @@ save_op  =  1;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
 
 % set model domain parameters
-D        =  50;                  % chamber depth [m]
+D        =  100;                 % chamber depth [m]
 N        =  120;                 % number of grid points in z-direction
 h        =  D/N;                 % grid spacing (equal in both dimensions, do not set) [m]
-L        =  D;                   % chamber width (equal to h for 1-D mode) [m]
+L        =  D/2;                 % chamber width (equal to h for 1-D mode) [m]
 
 % set model timing parameters
 Nt       =  5e5;                 % number of time steps to take

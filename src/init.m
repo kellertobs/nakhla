@@ -175,7 +175,7 @@ irin = ir;
 
 U   =  zeros(Nz+2,Nx+1);  UBG = U; Ui = U;
 W   =  zeros(Nz+1,Nx+2);  WBG = W; Wi = W; wf = 0.*W; wx = 0.*W; wm = 0.*W;
-P   =  zeros(Nz+2,Nx+2);  Vel = 0.*Tp;
+P   =  zeros(Nz+2,Nx+2);  Vel = 0.*Tp; %Div_rhoV = 0.*P;  DD = sparse(length(P(:)),length([W(:);U(:)]));
 SOL = [W(:);U(:);P(:)];
 
 % initialise auxiliary fields
@@ -193,13 +193,13 @@ rhom   = mean(cal.rhox0-500).*ones(size(Tp));
 rhox   = mean(cal.rhox0).*ones(size(Tp));
 rhof   = cal.rhof0.*ones(size(Tp));
 rho    = rhom;
-rhofz  = (rho(1:end-1,:)+rho(2:end,:))/2;
+rhofz  = (rho([1,1:end],:)+rho([1:end,end],:))/2;
 rhofx  = (rho(:,[end,1:end])+rho(:,[1:end,1]))/2;
-rhoWo  = rhofz.*W(2:end-1,2:end-1); rhoWoo = rhoWo;
-rhoUo  = rhofx.*U(2:end-1,:      ); rhoUoo = rhoUo;
-T      = 0.*Tp + max(cal.T0)+273.15;
+rhoWo  = rhofz.*W(:,2:end-1); rhoWoo = rhoWo;
+rhoUo  = rhofx.*U(2:end-1,:); rhoUoo = rhoUo;
 rhoref = mean(rho,'all');
 Pt     = Ptop + rhoref.*g0.*ZZ;
+T      =  (Tp+273.15).*exp(aT./rhoref./cP.*Pt);
 fq     = zeros(size(Tp));  mq = ones(size(Tp));  xq = 1-mq-fq; 
 cmq    = c; cxq = c;  cfq = 0.*c;  cfq(:,:,end) = 1;  cf = cfq;
 cm_oxd = reshape(reshape(cmq,Nz*Nx,cal.ncmp)*cal.cmp_oxd,Nz,Nx,cal.noxd);
@@ -217,10 +217,11 @@ while res > tol
     
     rhoref = mean(rho,'all');
     Adbt   = aT./rhoref;
+    rhofz  = (rho([1,1:end],:)+rho([1:end,end],:))/2;
+    rhofx  = (rho(:,[end,1:end])+rho(:,[1:end,1]))/2;
     if Nz==1; Pt = Ptop.*ones(size(Tp)); else
-        rhofz  = (rho(1:end-1,:)+rho(2:end,:))/2;
         Pt(1,:)     = repmat(mean(rhofz(1,:),2).*g0.*h/2,1,Nx) + Ptop;
-        Pt(2:end,:) = Pt(1,:) + repmat(cumsum(mean(rhofz,2).*g0.*h),1,Nx);
+        Pt(2:end,:) = Pt(1,:) + repmat(cumsum(mean(rhofz(2:end-1,:),2).*g0.*h),1,Nx);
     end
 
     wt = min(1,it/5);
@@ -238,7 +239,7 @@ while res > tol
 
     [var,cal] = meltmodel(var,cal,'E');
 
-    T  =  ((wt.*Tp+(1-wt).*reshape(cal.Tliq,Nz,Nx))+273.15).*exp(Adbt./cP.*Pt);
+    T  =  (Tp+273.15).*exp(Adbt./cP.*Pt);
 
     mq = reshape(var.m,Nz,Nx);
     fq = reshape(var.f,Nz,Nx);
