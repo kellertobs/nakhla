@@ -192,13 +192,15 @@ kW     = 0;
 rhom   = mean(cal.rhox0-500).*ones(size(Tp)); 
 rhox   = mean(cal.rhox0).*ones(size(Tp));
 rhof   = cal.rhof0.*ones(size(Tp));
+Pt     = Ptop + mean(rhom,'all').*g0.*ZZ;
+rhox   = rhox.*(1+bPx.*(Pt-Ptop));
+rhom   = rhom.*(1+bPx.*(Pt-Ptop));
 rho    = rhom;
 rhofz  = (rho([1,1:end],:)+rho([1:end,end],:))/2;
 rhofx  = (rho(:,[end,1:end])+rho(:,[1:end,1]))/2;
 rhoWo  = rhofz.*W(:,2:end-1); rhoWoo = rhoWo;
 rhoUo  = rhofx.*U(2:end-1,:); rhoUoo = rhoUo;
 rhoref = mean(rho,'all');
-Pt     = Ptop + rhoref.*g0.*ZZ;
 T      =  (Tp+273.15).*exp(aT./rhoref./cP.*Pt);
 fq     = zeros(size(Tp));  mq = ones(size(Tp));  xq = 1-mq-fq; 
 cmq    = c; cxq = c;  cfq = 0.*c;  cfq(:,:,end) = 1;  cf = cfq;
@@ -223,8 +225,8 @@ while res > tol
         Pt(1,:)     = repmat(mean(rhofz(1,:),2).*g0.*h/2,1,Nx) + Ptop;
         Pt(2:end,:) = Pt(1,:) + repmat(cumsum(mean(rhofz(2:end-1,:),2).*g0.*h),1,Nx);
     end
-
-    wt = min(1,it/5);
+    
+    T  =  (Tp+273.15).*exp(Adbt./cP.*Pt);
 
     eqtime = tic;
 
@@ -235,11 +237,10 @@ while res > tol
     var.f      = reshape(fq,Nx*Nz,1);         % bubble fraction [wt]
     var.H2O    = reshape(c(:,:,end),Nx*Nz,1); % water concentration [wt]
     var.SiO2m  = reshape(cm_oxd(:,:,1)./sum(cm_oxd(:,:,1:end-1),3),Nx*Nz,1); % melt silica concentration [wt]
-    cal.H2Osat = fluidsat(var.T,var.P*1e9,var.SiO2m,cal);
+    cal.H2Osat = fluidsat(var.T,var.P,var.SiO2m,cal);
 
     [var,cal] = meltmodel(var,cal,'E');
 
-    T  =  (Tp+273.15).*exp(Adbt./cP.*Pt);
 
     mq = reshape(var.m,Nz,Nx);
     fq = reshape(var.f,Nz,Nx);

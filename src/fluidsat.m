@@ -1,5 +1,7 @@
 function  [H2Osat]  =  fluidsat(T,P,SiO2,cal)
 
+P = min(P,0.5)*1e9;
+
 % cal.H2Osat_bas = (4.7773e-7.*P.^0.6 + 1e-11.*P) .* exp(2565/2*(1./(T+273.15)-1./(1473.15))); % Katz et al., 2003; Moore et al., 1998
 cal.H2Osat_rhy = (3.5494e-3.*P.^0.5 + 9.623e-8.*P - 1.5223e-11.*P.^1.5)./(T+273.15) + 1.2436e-14.*P.^1.5; % Liu et al., 2005
 

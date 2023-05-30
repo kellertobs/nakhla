@@ -20,7 +20,6 @@ for i = 1:cal.nmsy; cal.(cal.msyStr{i}) = i; end
 for i = 1:cal.nmem; cal.(cal.memStr{i}) = i; end
 for i = 1:cal.noxd; cal.(elStr{i}) = i; end
 
-
 % oxide composition of mineral end-members
 cal.mem_oxd    = [  42.7    0.0    0.0    0.0   57.3    0.0    0.0    0.0    0.0     % forsterite (for)
                     29.5    0.0    0.0   70.5    0.0    0.0    0.0    0.0    0.0     % fayalite (fay)
@@ -40,12 +39,12 @@ cal.mem_oxd    = [  42.7    0.0    0.0    0.0   57.3    0.0    0.0    0.0    0.0
 cal.mem_oxd = cal.mem_oxd./sum(cal.mem_oxd,2)*100;
 
 % mineral end-members in mineral systems
-cal.msy_mem = [1  1  0  0  0  0  0  0  0  0  0  0  0  0  0    % olivine (olv)
-               0  0  1  1  1  0  0  0  0  0  0  0  0  0  0    % oxide (oxd)
-               0  0  0  0  0  1  1  0  0  0  0  0  0  0  0    % orthopyroxene (opx)
-               0  0  0  0  0  0  0  1  1  1  0  0  0  0  0    % clinopyroxene (cpx)
-               0  0  0  0  0  0  0  0  0  0  1  1  1  0  0    % feldspar (fsp)
-               0  0  0  0  0  0  0  0  0  0  0  0  0  1  0];  % quartz (qtz)
+cal.msy_mem = [ 1  1  0  0  0  0  0  0  0  0  0  0  0  0  0    % olivine (olv)
+                0  0  1  1  1  0  0  0  0  0  0  0  0  0  0    % oxide (oxd)
+                0  0  0  0  0  1  1  0  0  0  0  0  0  0  0    % orthopyroxene (opx)
+                0  0  0  0  0  0  0  1  1  1  0  0  0  0  0    % clinopyroxene (cpx)
+                0  0  0  0  0  0  0  0  0  0  1  1  1  0  0    % feldspar (fsp)
+                0  0  0  0  0  0  0  0  0  0  0  0  0  1  0];  % quartz (qtz)
 
 % mineral end-member composition of melting model components
 %                   for       fay       ulv       mgt       ilm       ens       hyp       cp1       aug       pig       ant       alb       kfs       qtz       wat

@@ -48,7 +48,6 @@ var.T      = Tsol;
 
 %***  get fluid fraction and composition
 f  = var.H2O;
-cf = [zeros(1,cal.ncmp-1),1];
 
 %***  get residual for sum(ci_b/Kxi) = sum(ci_v)
 r  =  sum(var.c./((1-f).*cal.Kx + f.*cal.Kf + 1e-16),2)-1;

@@ -1,0 +1,65 @@
+% prepare workspace
+clear; close all;
+
+% load default parameters
+run('./par_default')
+
+% set run parameters
+runID    =  '2D_luna_ref';       % run identifier
+opdir    =  '../out';            % output directory
+restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
+nop      =  1;                   % output frame plotted/saved every 'nop' time steps
+plot_op  =  1;                   % switch on to live plot of results
+save_op  =  0;                   % switch on to save output to file
+plot_cv  =  0;                   % switch on to live plot iterative convergence
+
+% set model domain parameters
+D        =  1000e3;              % chamber depth [m]
+N        =  100;                 % number of grid points in z-direction (incl. 2 ghosts)
+h        =  D/N;                 % grid spacing (equal in both dimensions, do not set) [m]
+L        =  D/2;                   % chamber width [m]
+
+% set model timing parameters
+Nt       =  1e5;                 % number of time steps to take
+tend     =  100*yr;              % end time for simulation [s]
+dt       =  100*hr;
+dtmax    =  1*yr;
+
+% set initial thermo-chemical state
+T0       =  1750;                % temperature top  layer [deg C]
+T1       =  T0;                  % temperature base layer [deg C]
+c0       =  [0.36,0.31,0.32,0.01,0.0];   % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
+c1       =  c0;                          % components (maj comp, H2O) bot layer [wt] (will be normalised to unit sum!)
+dcr      =  [1/2,1/2,-1/2,-1/2,0]*1e-3;
+
+% set thermo-chemical boundary parameters
+bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
+bnd_w    =  h;                   % boundary layer width [m]
+tau_T    =  20*yr;               % wall cooling/assimilation time [s]
+Twall    =  [0,1950,nan];        % [top,bot,sds] wall rock temperature [degC] (nan = insulating)
+cwall    =  [nan,nan,nan,nan,nan; ...
+             nan,nan,nan,nan,nan; ...
+             nan,nan,nan,nan,nan];
+Ptop     =  1e4;                 % top pressure [Pa]
+
+% set thermo-chemical material parameters
+calID    =  'luna';              % phase diagram calibration
+Dsx      = -300;                 % entropy change of crystallisation [J/kg]
+Dsf      =  400;                 % entropy change of exsolution [J/kg]
+
+% set gravity
+g0       =  1.62;                % gravity [m/s2]
+
+% set numerical model parameters
+TINT     =  'bd2im';             % time integration scheme ('be1im','bd2im','cn2si','bd2si')
+ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
+CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
+rtol     =  1e-4;                % outer its relative tolerance
+atol     =  1e-8;                % outer its absolute tolerance
+Delta    =  2*D/80;              % correlation length for eddy viscosity
+maxit    =  20;                  % maximum outer its
+
+%*****  RUN NAKHLA MODEL  *************************************************
+run('../src/main')
+%**************************************************************************
+

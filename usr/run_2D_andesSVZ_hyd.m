@@ -21,8 +21,6 @@ L        =  D/2;                 % chamber width (equal to h for 1-D mode) [m]
 % set model timing parameters
 Nt       =  1e5;                 % number of time steps to take
 tend     =  1*yr;                % end time for simulation [s]
-dt       =  36;                  % initial time step [s]
-dtmax    =  360;                 % maximum time step [s]
 
 % set initial thermo-chemical state
 T0       =  1200;                % temperature top  layer [deg C]
@@ -52,8 +50,8 @@ Dsf      =  400;                 % entropy change of exsolution [J/kg]
 TINT     =  'bd2im';             % time integration scheme ('be1im','bd2im','cn2si','bd2si')
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
 CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
-rtol     =  1e-5;                % outer its relative tolerance
-atol     =  1e-9;                % outer its absolute tolerance
+rtol     =  1e-4;                % outer its relative tolerance
+atol     =  1e-8;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its
 
 %*****  RUN NAKHLA MODEL  *************************************************

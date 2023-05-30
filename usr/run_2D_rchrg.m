@@ -34,8 +34,8 @@ ir0      =  [-1,5];              % isotope ratios top layer [delta]
 % set thermo-chemical boundary parameters
 bndmode  =  2;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
 bnd_w    =  h;                   % boundary layer width [m]
-tau_T    =  12*hr;               % wall cooling/assimilation time [s]
-tau_a    =  21*hr;               % wall cooling/assimilation time [s]
+tau_T    =  16*hr;               % wall cooling/assimilation time [s]
+tau_a    =  16*hr;               % wall cooling/assimilation time [s]
 Twall    =  [nan,1200,nan];      % [top,bot,sds] wall rock temperature [degC] (nan = insulating)
 cwall    =  [nan,nan,nan,nan,nan; ...
              0.14,0.49,0.28,0.09,0.02; ...
@@ -60,7 +60,7 @@ df       =  1e-3;                % bubble size [m]
 % set numerical model parameters
 TINT     =  'bd2im';             % time integration scheme ('be1im','bd2im','cn2si','bd2si')
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
-CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
+CFL      =  0.5;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-8;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its

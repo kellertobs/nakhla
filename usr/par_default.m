@@ -78,7 +78,7 @@ tau_r    =  0;                   % reaction time scale (set to zero for quasi-eq
 % set model buoyancy parameters
 aT       =  4e-5;                % thermal expansivity [1/K]
 bPx      =  1e-11;               % fluid compressibility [1/Pa]
-bPm      =  5e-11;               % fluid compressibility [1/Pa]
+bPm      =  3e-11;               % fluid compressibility [1/Pa]
 bPf      =  1e-8;                % fluid compressibility [1/Pa]
 dx       =  1e-3;                % crystal size [m]
 df       =  1e-3;                % bubble size [m]

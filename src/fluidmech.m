@@ -279,8 +279,8 @@ IIR = [IIR; ii(:)]; AAR = [AAR; rr(:)];
 RP  = sparse(IIR,ones(size(IIR)),AAR,NP,1);
 
 if bndmode < 4 % periodic sides, set U = 0 in fixed point
-    nzu = round(Nz/2)+2;
-    nxu = round(Nx/2)+2;
+    nzu = round(Nz/4);
+    nxu = round(Nx/2);
     GG(MapU(nzu,nxu),:) = 0;
     KV(MapU(nzu,nxu),:) = 0;
     KV(MapU(nzu,nxu),MapU(nzu,nxu)) = 1;
@@ -294,8 +294,8 @@ else % closed sides, set U = 0 on sides
 end
 
 % set P = 0 in fixed point
-nzp = round(Nz/2)-2;
-nxp = round(Nx/2)-2;
+nzp = round(Nz/2);
+nxp = round(Nx/2);
 DD(MapP(nzp,nxp),:) = 0;
 KP(MapP(nzp,nxp),:) = 0;
 KP(MapP(nzp,nxp),MapP(nzp,nxp)) = 1;
