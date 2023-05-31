@@ -84,7 +84,6 @@ Re  = Vel.*rho.*D/10./eta;
 
 % update velocity divergence
 Div_V = ddz(W(:,2:end-1),h) + ddx(U(2:end-1,:),h);                         % get velocity divergence
-% Div_rhoV = reshape(DD*[W(:);U(:)],Nz+2,Nx+2);
 
 % update strain rates
 exx = diff(U(2:end-1,:),1,2)./h - Div_V./2;                                % x-normal strain rate

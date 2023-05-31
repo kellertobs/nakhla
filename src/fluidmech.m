@@ -213,7 +213,7 @@ if ~exist('DD','var') || bnchm
     % coefficients multiplying velocities U, W
     %          left U          ||           right U       ||           top W           ||          bottom W
     jj1 = MapU(2:end-1,1:end-1); jj2 = MapU(2:end-1,2:end); jj3 = MapW(1:end-1,2:end-1); jj4 = MapW(2:end,2:end-1);
-    rhofx1 = rhofx(:,1:end-1); rhofx2 = rhofx(:,2:end); rhofz1 = rhofz(1:end-1,:); rhofz2 = rhofz(2:end,:); 
+    
     aa  = zeros(size(ii));
     IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; aa(:)-1/h];  % U one to the left
     IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL; aa(:)+1/h];  % U one to the right

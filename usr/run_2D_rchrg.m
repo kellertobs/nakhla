@@ -24,28 +24,21 @@ tend     =  1*yr;                % end time for simulation [s]
 
 % set initial thermo-chemical state
 T0       =  725;                 % temperature top layer [deg C]
-c0       =  [0.01,0.01,0.28,0.70,0.04];  % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
+T1       =  1200;                % temperature top layer [deg C]
+c0       =  [0.01,0.01,0.28,0.70,0.04];  % components (maj comp, H2O) top  layer [wt] (will be normalised to unit sum!)
+c1       =  [0.14,0.49,0.28,0.09,0.02];  % components (maj comp, H2O) base layer [wt] (will be normalised to unit sum!)
 dcr      =  [1/2,1/2,-1/3,-1/3,-1/3]*1e-4;
+zlay     =  0.9;                 % layer thickness (relative to domain depth D)
+dlay     =  0.001;               % random perturbation to layer thickness (relative to grid spacing h)
 
 % set model trace and isotope geochemistry parameters (must match # trace elements and isotope ratios in calibration!)
-te0      =  [1,1,1,1];           % trace elements top layer [wt ppm]
+te0      =  [1 ,1,  1,   1];     % trace elements top layer [wt ppm]
+te1      =  [10,3,0.1,0.01];     % trace elements top layer [wt ppm]
 ir0      =  [-1,5];              % isotope ratios top layer [delta]
+ir1      =  [ 1,1];              % isotope ratios top layer [delta]
 
 % set thermo-chemical boundary parameters
-bndmode  =  2;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
-bnd_w    =  h;                   % boundary layer width [m]
-tau_T    =  16*hr;               % wall cooling/assimilation time [s]
-tau_a    =  16*hr;               % wall cooling/assimilation time [s]
-Twall    =  [nan,1200,nan];      % [top,bot,sds] wall rock temperature [degC] (nan = insulating)
-cwall    =  [nan,nan,nan,nan,nan; ...
-             0.14,0.49,0.28,0.09,0.02; ...
-             nan,nan,nan,nan,nan]; % [top,bot,sds] wall rock major component [wt SiO2] (nan = no assimilation)
-tewall   =  [nan,nan,nan,nan; ...
-             10,3,0.1,0.01;   ...
-             nan,nan,nan,nan];   % [top,bot,sds] wall rock trace elements [wt ppm] (nan = no assimilation)
-irwall   =  [nan,nan; ...
-             1,1;     ...
-             nan,nan];           % [top,bot,sds] wall rock isotope ratios [delta] (nan = no assimilation)
+bndmode  =  0;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
 Ptop     =  1.25e8;              % top pressure [Pa]
 
 % set thermo-chemical material parameters

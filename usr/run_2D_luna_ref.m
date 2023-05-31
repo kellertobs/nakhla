@@ -8,21 +8,21 @@ run('./par_default')
 runID    =  '2D_luna_ref';       % run identifier
 opdir    =  '../out';            % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
-nop      =  1;                   % output frame plotted/saved every 'nop' time steps
+nop      =  100;                   % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot of results
-save_op  =  0;                   % switch on to save output to file
+save_op  =  1;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
 
 % set model domain parameters
 D        =  1000e3;              % chamber depth [m]
-N        =  100;                 % number of grid points in z-direction (incl. 2 ghosts)
+N        =  120;                 % number of grid points in z-direction (incl. 2 ghosts)
 h        =  D/N;                 % grid spacing (equal in both dimensions, do not set) [m]
 L        =  D/2;                   % chamber width [m]
 
 % set model timing parameters
 Nt       =  1e5;                 % number of time steps to take
 tend     =  100*yr;              % end time for simulation [s]
-dt       =  100*hr;
+dt       =  1000*hr;
 dtmax    =  1*yr;
 
 % set initial thermo-chemical state

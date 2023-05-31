@@ -75,7 +75,7 @@ var.m      = reshape(mq,Nx*Nz,1);         % melt fraction [wt]
 var.f      = reshape(fq,Nx*Nz,1);         % bubble fraction [wt]
 var.H2O    = reshape(c(:,:,end),Nx*Nz,1); % water concentration [wt]
 var.SiO2m  = reshape(cm_oxd(:,:,1)./sum(cm_oxd(:,:,1:end-1),3),Nx*Nz,1); % melt silica concentration [wt]
-cal.H2Osat = fluidsat(var.T,var.P*1e9,var.SiO2m,cal);
+cal.H2Osat = fluidsat(var.T,var.P,var.SiO2m,cal);
 
 [var,cal] = meltmodel(var,cal,'E');
 
@@ -102,9 +102,9 @@ advn_rho = advn_X+advn_F+advn_M;
 res_Gx = Gx - (xq.*RHO-X)./max(tau_r,3*dt);
 res_Gf = Gf - (fq.*RHO-F)./max(tau_r,3*dt);
 res_Gm = Gm - (mq.*RHO-M)./max(tau_r,3*dt);
-Gx = Gx - res_Gx/5;
-Gf = Gf - res_Gf/5;
-Gm = Gm - res_Gm/5;
+Gx = Gx - res_Gx/4;
+Gf = Gf - res_Gf/4;
+Gm = Gm - res_Gm/4;
 
 % total rates of change
 dXdt   = advn_X + Gx;
@@ -155,7 +155,7 @@ while rnorm>tol && it<mxit
     drdK = ((1-f).*(c - cf.*f))./(m + Kx.*x).^2;
     
     Kx = max(0,Kx - min(Kx/2,res./drdK/4));
-    Kx(:,end) = 0;
+    Kx(:,:,end) = 0;
 
     rnorm = norm(res,'fro')./norm(Kx,'fro');
     it  = it+1;
