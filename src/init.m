@@ -213,6 +213,7 @@ EQtime  = 0;
 FMtime  = 0;
 TCtime  = 0;
 UDtime  = 0;
+a1      = 1; a2 = 0; a3 = 0; b1 = 1; b2 = 0; b3 = 0;
 res  = 1;  tol = 1e-12;  it = 1;
 while res > tol
     Pti = Pt; Ti = T; xi = xq; fi = fq;
@@ -413,7 +414,6 @@ dIRdt  = 0.*ir; dIRdto = dIRdt;
 
 % initialise timing and iterative parameters
 frst    = 1;
-a1      = 1; a2 = 0; a3 = 0;
 step    = 0;
 time    = 0;
 iter    = 0;

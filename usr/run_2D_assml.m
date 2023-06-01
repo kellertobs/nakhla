@@ -60,13 +60,15 @@ dx       =  1e-3;                % crystal size [m]
 df       =  1e-3;                % bubble size [m]
 
 % set numerical model parameters
-TINT     =  'bd2si';             % time integration scheme ('be1im','bd2im','cn2si','bd2si')
+TINT     =  'bd2im';             % time integration scheme ('be1im','bd2im','cn2si','bd2si')
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
-CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
+CFL      =  0.5;                 % (physical) time stepping courant number (multiplies stable step) [0,1]
 rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-8;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its
-dtmax    =  20;                   % maximum time step [s]
+Delta    =  2*D/100;             % correlation length for eddy viscosity
+Prt      =  1;                   % turbulent Prandtl number (ratio of momentum to heat diffusivity)
+mink     =  1e-8;                % minimum diffusivity for phase, component fractions
 
 
 %*****  RUN NAKHLA MODEL  *************************************************

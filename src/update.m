@@ -52,35 +52,7 @@ Ksgr_x = 2/9*dx^2./eta                                                          
 Ksgr_f = 2/9*df^2./eta + dx^2/cal.bf./cal.etaf0.*max(TINY^0.5,phi-cal.cf).^(cal.nf-1).*max(TINY^0.5,1-phi).^cal.mf;
 Ksgr_m =                 dx^2/cal.bm./    etam .*max(TINY^0.5,mu -cal.cm).^(cal.nm-1).*max(TINY^0.5,1-mu ).^cal.mm;
 
-% bound and regularise viscosity
-if ~calibrt; etamax = etacntr.*min(eta(:)); else; etamax = 1e+32.*min(eta(:)); end
-eta    = (etamax.^-0.5 + eta.^-0.5).^-2;
-
 if ~calibrt % skip the following if called from calibration script
-
-% diffusion parameters
-W0  = (Vel./mean(Vel(:)+TINY))./4.*mean(abs(rho-mean(rho,2)).*g0.*(D/10)^2./eta,'all');
-wx0 = abs(wx(1:end-1,2:end-1)+wx(2:end,2:end-1))/2;
-wf0 = abs(wf(1:end-1,2:end-1)+wf(2:end,2:end-1))/2;
-Ra0 = W0.*D/10./(kT0./rho./cP);
-Re0 = W0.*rho.*D/10./eta;
-
-if Nx==1 && Nz==1; kW = 0;
-elseif Nx==1;      kW = 1e-6.*rho.*g0.*(D/10)^1./eta.*(0.18*Delta .* (1-min(1,topshape+botshape)/10)).^2;
-else;              kW = (kW + 2.*eII.*(0.18*Delta .* (1-min(1,topshape+botshape+sdsshape)/10)).^2)/2;
-end
-kwx = wx0*dx*10;                                                           % segregation fluctuation diffusivity
-kwf = wf0*df*10;                                                           % segregation fluctuation diffusivity
-kx  = chi.*(kwx + kW/Prt + mink);                                          % solid fraction diffusion 
-kf  = phi.*(kwf + kW/Prt + mink);                                          % fluid fraction diffusion 
-kT  = kT0 + rho.*cP.*(phi.*kwf + chi.*kwx + kW/Prt + mink);                % heat diffusion
-ks  = kT./T;                                                               % entropy diffusion
-eta = eta + rho.*(phi.*kwf + chi.*kwx + kW + mink);
-etaco  = (eta([1,1:end],[end,1:end]).*eta([1:end,end],[end,1:end]) ...
-       .* eta([1,1:end],[1:end,1  ]).*eta([1:end,end],[1:end,1  ])).^0.25;
-
-Ra  = Vel.*D/10./(kT./rho./cP);
-Re  = Vel.*rho.*D/10./eta;
 
 % update velocity divergence
 Div_V = ddz(W(:,2:end-1),h) + ddx(U(2:end-1,:),h);                         % get velocity divergence
@@ -90,15 +62,42 @@ exx = diff(U(2:end-1,:),1,2)./h - Div_V./2;                                % x-n
 ezz = diff(W(:,2:end-1),1,1)./h - Div_V./2;                                % z-normal strain rate
 exz = 1/2.*(diff(U,1,1)./h+diff(W,1,2)./h);                                % shear strain rate
 
+eII = (0.5.*(exx.^2 + ezz.^2 ...
+       + 2.*(exz(1:end-1,1:end-1).^2+exz(2:end,1:end-1).^2 ...
+       +     exz(1:end-1,2:end  ).^2+exz(2:end,2:end  ).^2)/4)).^0.5 + TINY;
+
+% update diffusion parameters
+W0  = (Vel./mean(Vel(:)+TINY))./4.*mean(abs(rho-mean(rho,2)).*g0.*(D/10)^2./eta,'all');
+wx0 = abs(wx(1:end-1,2:end-1)+wx(2:end,2:end-1))/2;
+wf0 = abs(wf(1:end-1,2:end-1)+wf(2:end,2:end-1))/2;
+Ra0 = W0.*D/10./(kT0./rho./cP);
+Re0 = W0.*rho.*D/10./eta;
+
+if Nx==1 && Nz==1; kW = 0;
+elseif Nx==1;      kW = mink + 1e-6.*rho.*g0.*(D/10)^1./eta.*(0.18*Delta).^2;
+else;              kW = mink + (kW + 2.*eII.*(0.18*Delta).^2)/2;
+end
+kwx = wx0*dx*10;                                                           % segregation fluctuation diffusivity
+kwf = wf0*df*10;                                                           % segregation fluctuation diffusivity
+kx  = chi.*(kwx + kW/Prt);                                                 % solid fraction diffusion 
+kf  = phi.*(kwf + kW/Prt);                                                 % fluid fraction diffusion 
+kT  = kT0 + rho.*cP.*(phi.*kwf + chi.*kwx + kW/Prt);                       % heat diffusion
+ks  = kT./T;                                                               % entropy diffusion
+eta = eta + rho.*(phi.*kwf + chi.*kwx + kW);
+
+etamax = etacntr.*min(eta(:));
+eta    = (etamax.^-0.5 + eta.^-0.5).^-2;
+
+etaco  = (eta([1,1:end],[end,1:end]).*eta([1:end,end],[end,1:end]) ...
+       .* eta([1,1:end],[1:end,1  ]).*eta([1:end,end],[1:end,1  ])).^0.25;
+
+Ra  = Vel.*D/10./(kT./rho./cP);
+Re  = Vel.*rho.*D/10./eta;
+
 % update stresses
 txx = eta   .* exx;                                                        % x-normal stress
 tzz = eta   .* ezz;                                                        % z-normal stress
 txz = etaco .* exz;                                                        % xz-shear stress
-
-% update tensor magnitudes
-eII = (0.5.*(exx.^2 + ezz.^2 ...
-       + 2.*(exz(1:end-1,1:end-1).^2+exz(2:end,1:end-1).^2 ...
-       +     exz(1:end-1,2:end  ).^2+exz(2:end,2:end  ).^2)/4)).^0.5 + TINY;
 
 tII = (0.5.*(txx.^2 + tzz.^2 ...
        + 2.*(txz(1:end-1,1:end-1).^2+txz(2:end,1:end-1).^2 ...

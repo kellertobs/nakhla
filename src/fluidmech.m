@@ -87,7 +87,7 @@ IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL; 1/2*EtaC2(:)/h^2];      %
 
 % what shall we do with the drunken sailor...
 if ~bnchm
-    aa  = -ddz(rho,h).*g0.*dt/2;
+    aa  = -ddz(rho,h).*g0.*dt;
     IIL = [IIL; ii(:)]; JJL = [JJL;  ii(:)];   AAL = [AAL; aa(:)];
 end
 
@@ -142,6 +142,12 @@ IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; 1/2*EtaP1(:)/h^2];      %
 IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL; 1/2*EtaP2(:)/h^2];      % U one to the right
 IIL = [IIL; ii(:)]; JJL = [JJL; jj3(:)];   AAL = [AAL; 1/2*EtaC1(:)/h^2];      % U one above
 IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL; 1/2*EtaC2(:)/h^2];      % U one below
+
+% what shall we do with the drunken sailor...
+if ~bnchm
+    aa  = -ddx(rho(:,[end,1:end,1]),h).*g0.*dt;
+    IIL = [IIL; ii(:)]; JJL = [JJL;  ii(:)];   AAL = [AAL; aa(:)];
+end
 
 % coefficients multiplying z-velocities W
 %         top left         ||        top right          ||       bottom left       ||       bottom right
@@ -278,21 +284,6 @@ IIR = [IIR; ii(:)]; AAR = [AAR; rr(:)];
 % assemble right-hand side vector
 RP  = sparse(IIR,ones(size(IIR)),AAR,NP,1);
 
-if bndmode < 4 % periodic sides, set U = 0 in fixed point
-    nzu = round(Nz/4);
-    nxu = round(Nx/2);
-    GG(MapU(nzu,nxu),:) = 0;
-    KV(MapU(nzu,nxu),:) = 0;
-    KV(MapU(nzu,nxu),MapU(nzu,nxu)) = 1;
-    RV(MapU(nzu,nxu),:) = 0;
-else % closed sides, set U = 0 on sides
-    indsds = MapU(:,[1 end]);
-    GG(indsds(:),:) = 0;
-    KV(indsds(:),:) = 0;
-    KV(indsds(:),indsds(:)) = spdiags(ones(size(indsds(:))),0,sparse(length(indsds(:)),length(indsds(:))));
-    RV(indsds(:),:) = 0;
-end
-
 % set P = 0 in fixed point
 nzp = round(Nz/2);
 nxp = round(Nx/2);
@@ -370,11 +361,11 @@ if ~bnchm
 
     
     %% update time step
-    dtk = (h/2)^2./max(kT(:)./rho(:)./cP)/1.1;                                    % diffusive time step size
+    dtk = (h/2)^2./max(kT(:)./rho(:)./cP)/2;                                    % diffusive time step size
     dta = CFL*h/2/max(abs([Um(:).*any(m(:)>10*TINY);Wm(:).*any(m(:)>10*TINY); ... % advective time step size
                            Ux(:).*any(x(:)>10*TINY);Wx(:).*any(x(:)>10*TINY); ...
                            Uf(:).*any(f(:)>10*TINY);Wf(:).*any(f(:)>10*TINY)]+TINY));   
-    dt  = min([1.01*dto,min(dtk,dta),dtmax]);                                      % time step size
+    dt  = min([1.05*dto,min(dtk,dta),dtmax]);                                      % time step size
 end
 
 end

@@ -91,10 +91,10 @@ CFL      =  0.50;                % (physical) time stepping courant number (mult
 rtol     =  1e-6;                % outer its relative tolerance
 atol     =  1e-9;                % outer its absolute tolerance
 maxit    =  50;                  % maximum outer its
-mink     =  1e-8;                % minimum diffusivity for phase, component fractions
 etacntr  =  1e+6;                % maximum viscosity contrast
-Delta    =  2*D/80;              % correlation length for eddy viscosity
-Prt      =  8;                   % turbulent Prandtl number (ratio of momentum to heat diffusivity)
+Delta    =  2*D/100;             % correlation length for eddy viscosity
+Prt      =  1;                   % turbulent Prandtl number (ratio of momentum to heat diffusivity)
+mink     =  1e-8;                % minimum diffusivity for phase, component fractions
 
 % set various options
 calibrt  =  0;                   % not in calibrate mode
