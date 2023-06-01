@@ -154,9 +154,11 @@ if any(botinit(:)) && ~isnan(Twall(2)); Tp = Tp + (Twall(2)-Tp).*botinit; end
 if any(sdsinit(:)) && ~isnan(Twall(3)); Tp = Tp + (Twall(3)-Tp).*sdsinit; end
 Tin = Tp;
 
-if any(topinit(:)) && ~isnan(cwall(1)); c  = c  + (cwall(1)-c ).*topinit; end
-if any(botinit(:)) && ~isnan(cwall(2)); c  = c  + (cwall(2)-c ).*botinit; end
-if any(sdsinit(:)) && ~isnan(cwall(3)); c  = c  + (cwall(3)-c ).*sdsinit; end
+for i = 1:cal.ncmp
+    if any(topinit(:)) && ~any(isnan(cwall(1,:))); c(:,:,i) = c(:,:,i) + (cwall(1,i)-c(:,:,i)).*topinit; end
+    if any(botinit(:)) && ~any(isnan(cwall(2,:))); c(:,:,i) = c(:,:,i) + (cwall(2,i)-c(:,:,i)).*botinit; end
+    if any(sdsinit(:)) && ~any(isnan(cwall(3,:))); c(:,:,i) = c(:,:,i) + (cwall(3,i)-c(:,:,i)).*sdsinit; end
+end
 cin = c;
 
 for i = 1:cal.nte

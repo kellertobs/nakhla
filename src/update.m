@@ -74,8 +74,8 @@ Ra0 = W0.*D/10./(kT0./rho./cP);
 Re0 = W0.*rho.*D/10./eta;
 
 if Nx==1 && Nz==1; kW = 0;
-elseif Nx==1;      kW = mink + 1e-6.*rho.*g0.*(D/10)^1./eta.*(0.18*Delta).^2;
-else;              kW = (kW + mink + 2.*eII.*(0.18*Delta).^2)/2;
+else              
+kW = (kW + mink + 2.*eII.*(0.18*Delta).^2)/2;
 end
 kwx = wx0*dx*10;                                                           % segregation fluctuation diffusivity
 kwf = wf0*df*10;                                                           % segregation fluctuation diffusivity

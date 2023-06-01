@@ -44,12 +44,12 @@ ir1      =  [ 1,1];              % isotope ratios top layer [delta]
 Ptop     =  1.25e8;              % top pressure [Pa]
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
 bnd_w    =  h;                   % boundary layer width [m]
-bnd_h    =  [0,0,0];             % internal wall rock layer thickness [m]
+bnd_h    =  [2,2,0];             % internal wall rock layer thickness [m]
 fin      =  0;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
 fout     =  1;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
-tau_T    =  24*hr;               % wall cooling/assimilation time [s]
-tau_a    =  24*hr;               % wall cooling/assimilation tie [s]
-Twall    =  [300,1250,nan];      % [top,bot,sds] wall rock temperature [degC] (nan = insulating)
+tau_T    =  8*hr;                % wall cooling/assimilation time [s]
+tau_a    =  8*hr;                % wall cooling/assimilation tie [s]
+Twall    =  [300,1200,nan];      % [top,bot,sds] wall rock temperature [degC] (nan = insulating)
 cwall    =  [nan,nan,nan,nan,nan; ...
              0.14,0.49,0.28,0.09,0.02; ...
              nan,nan,nan,nan,nan]; % [top,bot,sds] wall rock major component [wt SiO2] (nan = no assimilation)

@@ -444,16 +444,72 @@ end
 if ~exist('fh9','var'); fh9 = figure(VIS{:});
 else; set(0, 'CurrentFigure', fh9);
 end
-if Nz>1 || step==0; clf; end
+if Nz>1; clf; end
 
-plot( c_oxd(:,:,cal.Si)./sum( c_oxd(:,:,1:end-1),3).*100,T-273.15,'.',CL{[1,2]},LW{:},'MarkerSize',15); axis tight; hold on
-plot(cx_oxd(:,:,cal.Si)./sum(cx_oxd(:,:,1:end-1),3).*100,T-273.15,'.',CL{[1,4]},LW{:},'MarkerSize',15);
-plot(cm_oxd(:,:,cal.Si)./sum(cm_oxd(:,:,1:end-1),3).*100,T-273.15,'.',CL{[1,3]},LW{:},'MarkerSize',15);
+subplot(3,3,1)
+plot( c_oxd(:,:,cal.Si)./sum( c_oxd(:,:,1:end-1),3),T-273.15,'k.','LineWidth',2,'MarkerSize',15); axis tight; box on; hold on;
+plot(cx_oxd(:,:,cal.Si)./sum(cx_oxd(:,:,1:end-1),3),T-273.15,'b.','LineWidth',2,'MarkerSize',15);
+plot(cm_oxd(:,:,cal.Si)./sum(cm_oxd(:,:,1:end-1),3),T-273.15,'r.','LineWidth',2,'MarkerSize',15);
+xlabel([cal.oxdStr{cal.Si},' [wt]'],'Interpreter','latex','FontSize',12)
+set(gca,'TickLabelInterpreter','latex','FontSize',10)
 
-set(gca,'TickLabelInterpreter','latex','FontSize',15)
-title('Phase Diagram','Interpreter','latex','FontSize',18)
-xlabel('Major component [wt\% SiO$_2$]','Interpreter','latex','FontSize',15)
+subplot(3,3,2)
+plot( c_oxd(:,:,cal.Ti)./sum( c_oxd(:,:,1:end-1),3),T-273.15,'k.','LineWidth',2,'MarkerSize',15); axis tight; box on; hold on;
+plot(cx_oxd(:,:,cal.Ti)./sum(cx_oxd(:,:,1:end-1),3),T-273.15,'b.','LineWidth',2,'MarkerSize',15);
+plot(cm_oxd(:,:,cal.Ti)./sum(cm_oxd(:,:,1:end-1),3),T-273.15,'r.','LineWidth',2,'MarkerSize',15);
+xlabel([cal.oxdStr{cal.Ti},' [wt]'],'Interpreter','latex','FontSize',12)
+set(gca,'TickLabelInterpreter','latex','FontSize',10)
+
+subplot(3,3,3)
+plot( c_oxd(:,:,cal.Al)./sum( c_oxd(:,:,1:end-1),3),T-273.15,'k.','LineWidth',2,'MarkerSize',15); axis tight; box on; hold on;
+plot(cx_oxd(:,:,cal.Al)./sum(cx_oxd(:,:,1:end-1),3),T-273.15,'b.','LineWidth',2,'MarkerSize',15);
+plot(cm_oxd(:,:,cal.Al)./sum(cm_oxd(:,:,1:end-1),3),T-273.15,'r.','LineWidth',2,'MarkerSize',15);
+xlabel([cal.oxdStr{cal.Al},' [wt]'],'Interpreter','latex','FontSize',12)
+set(gca,'TickLabelInterpreter','latex','FontSize',10)
+
+subplot(3,3,4)
+plot( c_oxd(:,:,cal.Fe)./sum( c_oxd(:,:,1:end-1),3),T-273.15,'k.','LineWidth',2,'MarkerSize',15); axis tight; box on; hold on;
+plot(cx_oxd(:,:,cal.Fe)./sum(cx_oxd(:,:,1:end-1),3),T-273.15,'b.','LineWidth',2,'MarkerSize',15);
+plot(cm_oxd(:,:,cal.Fe)./sum(cm_oxd(:,:,1:end-1),3),T-273.15,'r.','LineWidth',2,'MarkerSize',15);
+xlabel([cal.oxdStr{cal.Fe},' [wt]'],'Interpreter','latex','FontSize',12)
 ylabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',15)
+set(gca,'TickLabelInterpreter','latex','FontSize',10)
+
+subplot(3,3,5)
+plot( c_oxd(:,:,cal.Mg)./sum( c_oxd(:,:,1:end-1),3),T-273.15,'k.','LineWidth',2,'MarkerSize',15); axis tight; box on; hold on;
+plot(cx_oxd(:,:,cal.Mg)./sum(cx_oxd(:,:,1:end-1),3),T-273.15,'b.','LineWidth',2,'MarkerSize',15);
+plot(cm_oxd(:,:,cal.Mg)./sum(cm_oxd(:,:,1:end-1),3),T-273.15,'r.','LineWidth',2,'MarkerSize',15);
+xlabel([cal.oxdStr{cal.Mg},' [wt]'],'Interpreter','latex','FontSize',12)
+set(gca,'TickLabelInterpreter','latex','FontSize',10)
+
+subplot(3,3,6)
+plot( c_oxd(:,:,cal.Ca)./sum( c_oxd(:,:,1:end-1),3),T-273.15,'k.','LineWidth',2,'MarkerSize',15); axis tight; box on; hold on;
+plot(cx_oxd(:,:,cal.Ca)./sum(cx_oxd(:,:,1:end-1),3),T-273.15,'b.','LineWidth',2,'MarkerSize',15);
+plot(cm_oxd(:,:,cal.Ca)./sum(cm_oxd(:,:,1:end-1),3),T-273.15,'r.','LineWidth',2,'MarkerSize',15);
+xlabel([cal.oxdStr{cal.Ca},' [wt]'],'Interpreter','latex','FontSize',12)
+set(gca,'TickLabelInterpreter','latex','FontSize',10)
+
+subplot(3,3,7)
+plot( c_oxd(:,:,cal.Na)./sum( c_oxd(:,:,1:end-1),3),T-273.15,'k.','LineWidth',2,'MarkerSize',15); axis tight; box on; hold on;
+plot(cx_oxd(:,:,cal.Na)./sum(cx_oxd(:,:,1:end-1),3),T-273.15,'b.','LineWidth',2,'MarkerSize',15);
+plot(cm_oxd(:,:,cal.Na)./sum(cm_oxd(:,:,1:end-1),3),T-273.15,'r.','LineWidth',2,'MarkerSize',15);
+xlabel([cal.oxdStr{cal.Na},' [wt]'],'Interpreter','latex','FontSize',12)
+set(gca,'TickLabelInterpreter','latex','FontSize',10)
+
+subplot(3,3,8)
+plot( c_oxd(:,:,cal.K)./sum( c_oxd(:,:,1:end-1),3),T-273.15,'k.','LineWidth',2,'MarkerSize',15); axis tight; box on; hold on;
+plot(cx_oxd(:,:,cal.K)./sum(cx_oxd(:,:,1:end-1),3),T-273.15,'b.','LineWidth',2,'MarkerSize',15);
+plot(cm_oxd(:,:,cal.K)./sum(cm_oxd(:,:,1:end-1),3),T-273.15,'r.','LineWidth',2,'MarkerSize',15);
+xlabel([cal.oxdStr{cal.K},' [wt]'],'Interpreter','latex','FontSize',12)
+set(gca,'TickLabelInterpreter','latex','FontSize',10)
+
+subplot(3,3,9)
+plot( c_oxd(:,:,cal.H),T-273.15,'k.','LineWidth',2,'MarkerSize',15); axis tight; box on; hold on;
+plot(cx_oxd(:,:,cal.H),T-273.15,'b.','LineWidth',2,'MarkerSize',15);
+plot(cm_oxd(:,:,cal.H),T-273.15,'r.','LineWidth',2,'MarkerSize',15);
+xlabel([cal.oxdStr{cal.H},' [wt]'],'Interpreter','latex','FontSize',12)
+set(gca,'TickLabelInterpreter','latex','FontSize',10)
+
 
 % plot composition on TAS, AFM diagrams
 if ~exist('fh10','var'); fh10 = figure(VIS{:});
