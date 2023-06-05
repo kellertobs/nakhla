@@ -102,9 +102,9 @@ advn_rho = advn_X+advn_F+advn_M;
 res_Gx = Gx - (xq.*RHO-X)./max(tau_r,3*dt);
 res_Gf = Gf - (fq.*RHO-F)./max(tau_r,3*dt);
 res_Gm = Gm - (mq.*RHO-M)./max(tau_r,3*dt);
-Gx = Gx - res_Gx/4;
-Gf = Gf - res_Gf/4;
-Gm = Gm - res_Gm/4;
+Gx = Gx - res_Gx/5;
+Gf = Gf - res_Gf/5;
+Gm = Gm - res_Gm/5;
 
 % total rates of change
 dXdt   = advn_X + Gx;
