@@ -44,7 +44,7 @@ while time <= tend && step <= Nt && any(m(:)>1e-6)
     dIRdtoo = dIRdto; dIRdto = dIRdt;
     Div_Vo  = Div_V;
     rhoWoo = rhoWo; rhoWo = rhofz.*W(:,2:end-1);
-    rhoUoo = rhoUo; rhoUo = rhofx.*U(2:end-1,:); rhoUo = rhoUo - mean(rhoUo(:));
+    rhoUoo = rhoUo; rhoUo = rhofx.*U(2:end-1,:);
     dto     = dt;
 
     

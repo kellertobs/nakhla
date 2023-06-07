@@ -44,7 +44,7 @@ ir1      =  [ 1,1];              % isotope ratios top layer [delta]
 Ptop     =  1.25e8;              % top pressure [Pa]
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
 bnd_w    =  h;                   % boundary layer width [m]
-bnd_h    =  [2,2,0];             % internal wall rock layer thickness [m]
+bnd_h    =  [2,10,0];             % internal wall rock layer thickness [m]
 fin      =  0;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
 fout     =  1;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
 tau_T    =  8*hr;                % wall cooling/assimilation time [s]

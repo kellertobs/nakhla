@@ -15,9 +15,9 @@ plot_cv  =  0;                   % switch on to live plot iterative convergence
 
 % set model domain parameters
 D        =  1000e3;              % chamber depth [m]
-N        =  120;                 % number of grid points in z-direction (incl. 2 ghosts)
+N        =  150;                 % number of grid points in z-direction (incl. 2 ghosts)
 h        =  D/N;                 % grid spacing (equal in both dimensions, do not set) [m]
-L        =  D/3;                 % chamber width [m]
+L        =  D/2;                 % chamber width [m]
 
 % set model timing parameters
 Nt       =  1e5;                 % number of time steps to take
@@ -56,13 +56,13 @@ bPm      =  3e-11;               % melt compressibility [1/Pa]
 % set numerical model parameters
 TINT     =  'bd2im';             % time integration scheme ('be1im','bd2im','cn2si','bd2si')
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
-CFL      =  0.75;                % (physical) time stepping courant number (multiplies stable step) [0,1]
+CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-8;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its
-Delta    =  2*D/50;              % correlation length for eddy diffusivity
-Prt      =  1;                   % turbulent Prandtl number (ratio of momentum to heat diffusivity)
-mink     =  1e3;                 % minimum eddy diffusivity constant
+Delta    =  2*D/30;              % correlation length for eddy diffusivity
+Prt      =  30;                  % turbulent Prandtl number (ratio of momentum to heat diffusivity)
+mink     =  1e5;                 % minimum eddy diffusivity constant
 
 %*****  RUN NAKHLA MODEL  *************************************************
 run('../src/main')

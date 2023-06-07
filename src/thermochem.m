@@ -99,9 +99,9 @@ advn_M   = - advect(M,Um(2:end-1,:),Wm(:,2:end-1),h,{ADVN,''},[1,2],BCA);
 advn_rho = advn_X+advn_F+advn_M;
 
 % phase mass transfer rates
-res_Gx = Gx - (xq.*RHO-X)./max(tau_r,3*dt);
-res_Gf = Gf - (fq.*RHO-F)./max(tau_r,3*dt);
-res_Gm = Gm - (mq.*RHO-M)./max(tau_r,3*dt);
+res_Gx = Gx - (xq.*RHO-X)./max(tau_r,4*dt);
+res_Gf = Gf - (fq.*RHO-F)./max(tau_r,4*dt);
+res_Gm = Gm - (mq.*RHO-M)./max(tau_r,4*dt);
 Gx = Gx - res_Gx/5;
 Gf = Gf - res_Gf/5;
 Gm = Gm - res_Gm/5;
@@ -145,7 +145,7 @@ sf = sm + Dsf;
 Kx  = reshape(cal.Kx,Nz,Nx,cal.ncmp);
 Kf  = reshape(cal.Kf,Nz,Nx,cal.ncmp);
 rnorm = 1; tol  = 1e-16;
-it    = 1; mxit = 30;
+it    = 1; mxit = 50;
 while rnorm>tol && it<mxit
     cm  =  c           ./(m + x.*Kx + f.*Kf + TINY);
     cx  = (c-f.*cf).*Kx./(m + x.*Kx         + TINY);

@@ -9,7 +9,7 @@ drhodt  = advn_rho;
 res_rho = (a1*rho-a2*rhoo-a3*rhooo)/dt - (b1*drhodt + b2*drhodto + b3*drhodtoo);
 
 % volume source and background velocity passed to fluid-mechanics solver
-VolSrc  = Div_V - res_rho./rho/2;  % correct volume source term by scaled residual
+VolSrc  = Div_V - res_rho./rho/3;  % correct volume source term by scaled residual
 
 UBG     = - 0*mean(VolSrc,'all')./2 .* (L/2-XXu);
 WBG     = - 2*mean(VolSrc,'all')./2 .* (D/2-ZZw);
@@ -318,6 +318,8 @@ W   = full(reshape(SOL(MapW(:))        ,Nz+1,Nx+2)); % matrix z-velocity
 U   = full(reshape(SOL(MapU(:))        ,Nz+2,Nx+1)); %U = U-mean(U(2:end-1,:      ),'all');     % matrix x-velocity
 P   = full(reshape(SOL(MapP(:)+(NW+NU)),Nz+2,Nx+2)); %P = P-mean(P(2:end-1,2:end-1),'all');     % matrix dynamic pressure
 
+U   = U - mean(U(2:end-1,:),'all');
+
 % magma velocity magnitude
 Vel = sqrt(((W(1:end-1,2:end-1)+W(2:end,2:end-1))/2).^2 ...
          + ((U(2:end-1,1:end-1)+U(2:end-1,2:end))/2).^2);
@@ -361,7 +363,7 @@ if ~bnchm
 
     
     %% update time step
-    dtk = (h/2)^2./max(kT(:)./rho(:)./cP)/2;                                    % diffusive time step size
+    dtk = (h/2)^2./max(kT(:)./rho(:)./cP)/2;                                      % diffusive time step size
     dta = CFL*h/2/max(abs([Um(:).*any(m(:)>10*TINY);Wm(:).*any(m(:)>10*TINY); ... % advective time step size
                            Ux(:).*any(x(:)>10*TINY);Wx(:).*any(x(:)>10*TINY); ...
                            Uf(:).*any(f(:)>10*TINY);Wf(:).*any(f(:)>10*TINY)]+TINY));   
