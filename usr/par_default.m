@@ -18,7 +18,7 @@ Nt       =  3e5;                 % number of time steps to take
 hr       =  3600;                % conversion seconds to hours
 yr       =  24*365.25*hr;        % conversion seconds to years
 tend     =  1*yr;                % end time for simulation [s]
-dt       =  100;                 % initial time step [s]
+dt       =  10;                  % initial time step [s]
 dtmax    =  1e3;                 % maximum time step [s]
 
 % set initial thermo-chemical state
@@ -91,9 +91,11 @@ CFL      =  0.50;                % (physical) time stepping courant number (mult
 rtol     =  1e-6;                % outer its relative tolerance
 atol     =  1e-9;                % outer its absolute tolerance
 maxit    =  50;                  % maximum outer its
+alpha    =  0.6;                 % iterative step size parameter
+beta     =  0.1;                 % iterative damping parameter
 etacntr  =  1e+6;                % maximum viscosity contrast
-Delta    =  2*D/100;             % correlation length for eddy viscosity
-Prt      =  1;                   % turbulent Prandtl number (ratio of momentum to heat diffusivity)
+Delta    =  2*D/50;              % correlation length for eddy viscosity
+Prt      =  10;                  % turbulent Prandtl number (ratio of momentum to heat diffusivity)
 mink     =  1e-8;                % minimum diffusivity for phase, component fractions
 
 % set various options

@@ -9,7 +9,8 @@ drhodt  = advn_rho;
 res_rho = (a1*rho-a2*rhoo-a3*rhooo)/dt - (b1*drhodt + b2*drhodto + b3*drhodtoo);
 
 % volume source and background velocity passed to fluid-mechanics solver
-VolSrc  = Div_V - res_rho./rho/3;  % correct volume source term by scaled residual
+VolSrc  = Div_V - alpha*res_rho./rho + beta*upd_rho;  % correct volume source term by scaled residual
+upd_rho =       - alpha*res_rho./rho + beta*upd_rho;
 
 UBG     = - 0*mean(VolSrc,'all')./2 .* (L/2-XXu);
 WBG     = - 2*mean(VolSrc,'all')./2 .* (D/2-ZZw);
@@ -315,8 +316,8 @@ SOL = SCL*(LL\RR);  % update solution
 
 % map solution vector to 2D arrays
 W   = full(reshape(SOL(MapW(:))        ,Nz+1,Nx+2)); % matrix z-velocity
-U   = full(reshape(SOL(MapU(:))        ,Nz+2,Nx+1)); %U = U-mean(U(2:end-1,:      ),'all');     % matrix x-velocity
-P   = full(reshape(SOL(MapP(:)+(NW+NU)),Nz+2,Nx+2)); %P = P-mean(P(2:end-1,2:end-1),'all');     % matrix dynamic pressure
+U   = full(reshape(SOL(MapU(:))        ,Nz+2,Nx+1)); % matrix x-velocity
+P   = full(reshape(SOL(MapP(:)+(NW+NU)),Nz+2,Nx+2)); % matrix dynamic pressure
 
 U   = U - mean(U(2:end-1,:),'all');
 
@@ -354,12 +355,12 @@ if ~bnchm
     uqm = qmx./max(TINY^0.5,(mu ([1,1:end,end],[end,1:end])+mu ([1,1:end,end],[1:end,1]))./2);
 
     % update phase velocities
-    Wf   = W + wf + wqf;  % mvp z-velocity
-    Uf   = U + 0. + uqf;  % mvp x-velocity
-    Wx   = W + wx + wqx;  % xtl z-velocity
-    Ux   = U + 0. + uqx;  % xtl x-velocity
-    Wm   = W + wm + wqm;  % mlt z-velocity
-    Um   = U + 0. + uqm;  % mlt x-velocity
+    Wf  = W + wf + wqf;  % mvp z-velocity
+    Uf  = U + 0. + uqf;  % mvp x-velocity
+    Wx  = W + wx + wqx;  % xtl z-velocity
+    Ux  = U + 0. + uqx;  % xtl x-velocity
+    Wm  = W + wm + wqm;  % mlt z-velocity
+    Um  = U + 0. + uqm;  % mlt x-velocity
 
     
     %% update time step

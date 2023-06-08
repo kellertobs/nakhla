@@ -28,7 +28,8 @@ dSdt  = advn_S + diff_S + diss_h + bnd_S;
 res_S = (a1*S-a2*So-a3*Soo)/dt - (b1*dSdt + b2*dSdto + b3*dSdtoo);
 
 % semi-implicit update of bulk entropy density
-S = (a2*So+a3*Soo + (b1*dSdt + b2*dSdto + b3*dSdtoo)*dt)/a1;
+S     = S - alpha*res_S*dt/a1 + beta*upd_S;
+upd_S =   - alpha*res_S*dt/a1 + beta*upd_S;
 
 % convert entropy desnity to temperature
 T = (min(cal.T0)+273.15)*exp((S - X.*Dsx - F.*Dsf)./RHO./cP + Adbt./cP.*(Pt-Ptop));
@@ -56,10 +57,11 @@ dCdt = advn_C + bnd_C;
 res_C = (a1*C-a2*Co-a3*Coo)/dt - (b1*dCdt + b2*dCdto + b3*dCdtoo);
 
 % semi-implicit update of major component density
-C = (a2*Co+a3*Coo + (b1*dCdt + b2*dCdto + b3*dCdtoo)*dt)/a1;
-
-% apply minimum/maximum bounds
-C = max(0, C );
+Ci    = C;
+C     = C - alpha*res_C*dt/a1 + beta*upd_C;
+C     = C./sum(C,3).*RHO;
+C     = max(0, C );
+upd_C = C - Ci;
 
 % convert component density to concentration
 c = C./sum(C,3);
@@ -99,12 +101,9 @@ advn_M   = - advect(M,Um(2:end-1,:),Wm(:,2:end-1),h,{ADVN,''},[1,2],BCA);
 advn_rho = advn_X+advn_F+advn_M;
 
 % phase mass transfer rates
-res_Gx = Gx - (xq.*RHO-X)./max(tau_r,4*dt);
-res_Gf = Gf - (fq.*RHO-F)./max(tau_r,4*dt);
-res_Gm = Gm - (mq.*RHO-M)./max(tau_r,4*dt);
-Gx = Gx - res_Gx/5;
-Gf = Gf - res_Gf/5;
-Gm = Gm - res_Gm/5;
+Gx = (xq.*RHO-X)./max(tau_r,4*dt);
+Gf = (fq.*RHO-F)./max(tau_r,4*dt);
+Gm = (mq.*RHO-M)./max(tau_r,4*dt);
 
 % total rates of change
 dXdt   = advn_X + Gx;
@@ -117,9 +116,12 @@ res_F = (a1*F-a2*Fo-a3*Foo)/dt - (b1*dFdt + b2*dFdto + b3*dFdtoo);
 res_M = (a1*M-a2*Mo-a3*Moo)/dt - (b1*dMdt + b2*dMdto + b3*dMdtoo);
 
 % semi-implicit update of phase fraction densities
-X = (a2*Xo+a3*Xoo + (b1*dXdt + b2*dXdto + b3*dXdtoo)*dt)/a1;
-F = (a2*Fo+a3*Foo + (b1*dFdt + b2*dFdto + b3*dFdtoo)*dt)/a1;
-M = (a2*Mo+a3*Moo + (b1*dMdt + b2*dMdto + b3*dMdtoo)*dt)/a1;
+X     = X - alpha*res_X*dt/a1 + beta*upd_X;
+upd_X =   - alpha*res_X*dt/a1 + beta*upd_X;
+F     = F - alpha*res_F*dt/a1 + beta*upd_F;
+upd_F =   - alpha*res_F*dt/a1 + beta*upd_F;
+M     = M - alpha*res_M*dt/a1 + beta*upd_M;
+upd_M =   - alpha*res_M*dt/a1 + beta*upd_M;
 
 % apply minimum bound
 X   = max(0, X );

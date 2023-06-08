@@ -57,11 +57,11 @@ bPm      =  3e-11;               % melt compressibility [1/Pa]
 TINT     =  'bd2im';             % time integration scheme ('be1im','bd2im','cn2si','bd2si')
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
 CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
-rtol     =  1e-4;                % outer its relative tolerance
-atol     =  1e-8;                % outer its absolute tolerance
+rtol     =  1e-6;                % outer its relative tolerance
+atol     =  1e-9;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its
 Delta    =  2*D/30;              % correlation length for eddy diffusivity
-Prt      =  30;                  % turbulent Prandtl number (ratio of momentum to heat diffusivity)
+Prt      =  100;                 % turbulent Prandtl number (ratio of momentum to heat diffusivity)
 mink     =  1e5;                 % minimum eddy diffusivity constant
 
 %*****  RUN NAKHLA MODEL  *************************************************

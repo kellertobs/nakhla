@@ -14,7 +14,7 @@ plot_cv  =  0;                   % switch on to live plot iterative convergence
 
 % set model domain parameters
 D        =  10;                  % chamber depth [m]
-N        =  120;                 % number of grid points in z-direction
+N        =  150;                 % number of grid points in z-direction
 h        =  D/N;                 % grid spacing (equal in both dimensions, do not set) [m]
 L        =  D/2;                 % chamber width (equal to h for 1-D mode) [m]
 
@@ -34,6 +34,7 @@ te0      =  [1,1,1,1];           % trace elements top layer [wt ppm]
 ir0      =  [-1,5];              % isotope ratios top layer [delta]
 
 % set thermo-chemical boundary parameters
+Ptop     =  1.25e8;              % top pressure [Pa]
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
 bnd_w    =  h;                   % boundary layer width [m]
 tau_T    =  8*hr;                % wall cooling/assimilation time [s]
@@ -48,7 +49,6 @@ tewall   =  [0.01,0.1,3,10; ...
 irwall   =  [1,1; ...
              1,1; ...
              nan,nan];           % [top,bot,sds] wall rock isotope ratios [delta] (nan = no assimilation)
-Ptop     =  1.25e8;              % top pressure [Pa]
 
 % set thermo-chemical material parameters
 calID    =  'andesSVZ';          % phase diagram calibration
@@ -62,13 +62,11 @@ df       =  1e-3;                % bubble size [m]
 % set numerical model parameters
 TINT     =  'bd2im';             % time integration scheme ('be1im','bd2im','cn2si','bd2si')
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
-CFL      =  0.5;                 % (physical) time stepping courant number (multiplies stable step) [0,1]
-rtol     =  1e-4;                % outer its relative tolerance
-atol     =  1e-8;                % outer its absolute tolerance
+CFL      =  0.75;                % (physical) time stepping courant number (multiplies stable step) [0,1]
+rtol     =  1e-6;                % outer its relative tolerance
+atol     =  1e-9;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its
-Delta    =  2*D/100;             % correlation length for eddy viscosity
-Prt      =  1;                   % turbulent Prandtl number (ratio of momentum to heat diffusivity)
-mink     =  1e-8;                % minimum diffusivity for phase, component fractions
+Delta    =  2*D/50;              % correlation length for eddy viscosity
 
 
 %*****  RUN NAKHLA MODEL  *************************************************
