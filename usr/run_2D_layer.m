@@ -31,8 +31,8 @@ c1       =  [0.14,0.49,0.28,0.09,0.02];  % components (maj comp, H2O) base layer
 dcr      =  [1/2,1/2,-1/3,-1/3,-1/3]*1e-4;
 zlay     =  0.8;                 % layer thickness (relative to domain depth D)
 dlay     =  0.0;                 % random perturbation to layer thickness (relative to grid spacing h)
-wlay_T   =  0.5*h/D;             % thickness of smooth layer boundary (relative to domain depth D)
-wlay_c   =  0.1*h/D;             % thickness of smooth layer boundary (relative to domain depth D)
+wlay_T   =  1.0*h/D;             % thickness of smooth layer boundary (relative to domain depth D)
+wlay_c   =  0.5*h/D;             % thickness of smooth layer boundary (relative to domain depth D)
 
 % set model trace and isotope geochemistry parameters (must match # trace elements and isotope ratios in calibration!)
 te0      =  [0.1,0.3,1,3];       % trace elements top layer [wt ppm]

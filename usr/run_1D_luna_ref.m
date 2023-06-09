@@ -62,9 +62,8 @@ atol     =  1e-9;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its
 Delta    =  2*D/30;              % correlation length for eddy diffusivity
 Prt      =  100;                 % turbulent Prandtl number (ratio of momentum to heat diffusivity)
-mink     =  1e4;                 % minimum eddy diffusivity constant
-alpha    =  0.75;
-beta     =  0.1;
+mink     =  3e3;                 % minimum eddy diffusivity constant
+
 
 %*****  RUN NAKHLA MODEL  *************************************************
 run('../src/main')
