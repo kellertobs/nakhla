@@ -589,7 +589,7 @@ end
 drawnow
 
 % save output to file
-if save_op && restart<=0
+if save_op && ~restart
     if Nx <= 10 && Nz <= 10  % print 0D plots
         name = [opdir,'/',runID,'/',runID,'_tch_',num2str(floor(step/nop))];
         print(fh1,name,'-dpng','-r300','-image');
@@ -642,10 +642,11 @@ if save_op && restart<=0
     name = [opdir,'/',runID,'/',runID,'_hist'];
     save(name,'hist');
 
-    if step == 0
-        logfile = [opdir,'/',runID,'/',runID,'.log'];
-        if exist(logfile,'file'); delete(logfile); end
-        diary(logfile)
-    end
+end
+
+if save_op && (step==0 || restart)
+    logfile = [opdir,'/',runID,'/',runID,'.log'];
+    if exist(logfile,'file') && step==0; delete(logfile); end
+    diary(logfile)
 end
     

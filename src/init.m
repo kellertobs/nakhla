@@ -457,7 +457,7 @@ if restart
         dTEdto = dTEdt;
         dIRdto = dIRdt;
 
-        update; output; restart = 0;
+        update; output;
         sm = (S - X.*Dsx - F.*Dsf)./RHO;
         sx = sm + Dsx;
         sf = sm + Dsf;
@@ -476,5 +476,6 @@ else
     output;
 end
 
-time  = time+dt;
-step  = step+1;
+restart = 0;
+time    = time+dt;
+step    = step+1;
