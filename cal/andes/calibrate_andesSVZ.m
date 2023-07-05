@@ -571,6 +571,8 @@ oxd0(:,end) = 0.0;
 cmp_mem = cal.cmp_mem; cmp_mem_best = cmp_mem;
 cmp_oxd = cal.cmp_oxd;
 
+figure(100); clf;
+
 misfit = 0.09; bestfit = 0.1; dfit = 0.01; tol = 1e-3; it = 1;
 while misfit>tol && dfit>1e-5 && it<1e6
 
@@ -590,8 +592,8 @@ while misfit>tol && dfit>1e-5 && it<1e6
         cmp_oxd_best = cmp_oxd;
         cfit_best    = cfit;
         oxdfit_best  = oxdfit;
-        figure(100); subplot(2,1,1); loglog(it,(bestfit),'k.'); hold on; axis tight; box on;
-        figure(100); subplot(2,1,2); loglog(it,(dfit   ),'k.'); hold on; axis tight; box on;
+        subplot(2,1,1); loglog(it,(bestfit),'k.'); hold on; axis tight; box on;
+        subplot(2,1,2); loglog(it,(dfit   ),'k.'); hold on; axis tight; box on;
         drawnow;
     end
 
@@ -627,6 +629,7 @@ P = DATA.P;
 % equilibrium phase fractions and compositions
 Nz = length(T); Nx = 1;
 
+figure(100); clf;
 % % set pure component melting points T_m^i at P=0
 % cal.T0(cal.ano) =  1553;
 % cal.T0(cal.bas) =  1190;
@@ -678,8 +681,8 @@ while misfit>tol && dfit>1e-5 && it<1e6
         cal_best = cal;
         cm_oxd_best = cm_oxd;
         cx_oxd_best = cx_oxd;
-        figure(100); subplot(2,1,1); loglog(it,(bestfit),'k.'); hold on; axis tight; box on;
-        figure(100); subplot(2,1,2); loglog(it,(dfit   ),'k.'); hold on; axis tight; box on;
+        subplot(2,1,1); loglog(it,(bestfit),'k.'); hold on; axis tight; box on;
+        subplot(2,1,2); loglog(it,(dfit   ),'k.'); hold on; axis tight; box on;
         drawnow;
     end
 

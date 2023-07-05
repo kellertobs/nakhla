@@ -10,7 +10,7 @@ TINY = 1e-16;
 FS = {'FontSize',15};
 TX = {'Interpreter','latex'};
 
-% run('../../usr/par_default');  % load default parameters
+run('../../usr/par_default');  % load default parameters
 
 % calibration run options
 runID     = 'cal_MORB';           % run ID for output files; [system name_wt.% SiO2_wt.% H2O] 
@@ -29,9 +29,9 @@ g0       =  10.;                 % gravity [m/s2]
 if ~holdfig; close all; end
 
 %% load MAGEMin results
-nc   = [1 2 3 4 5]; % number of compositions modelled
-frct = [1 2 4 8 16];
-MAG  = [];
+nc  = [1 2 3 4 5]; % number of compositions modelled
+frct= [1 2 4 8 16]
+MAG = [];
 ioxd = [1 8 2 5 4 3 7 6]; % oxide indices from MAGEMin to standard
 Si = 1; Ti = 2; Al = 3; Fe = 4; Mg = 5; Ca = 6; Na = 7; K = 8; H = 9;
 for ic = nc
@@ -140,21 +140,19 @@ figure(1); clf;
 subplot(1,2,1);
 scatter(X(:,1)*100,X(:,2)*100,25,DATA.T,'filled'); colormap('copper'); hold on
 scatter(Xp(:,1)*100,Xp(:,2)*100,25,DATA.T);
-scatter(cal.mem_oxd(cal.for,cal.Si),cal.mem_oxd(cal.for,cal.Fe),100,[0.1 0.6 0.1]*1.3,'filled');
-scatter(cal.mem_oxd(cal.fay,cal.Si),cal.mem_oxd(cal.fay,cal.Fe),100,[0.1 0.6 0.1]*0.7,'filled');
-scatter(cal.cmp_msy_oxd(cal.pxn,cal.olv,cal.Si),cal.cmp_msy_oxd(cal.pxn,cal.olv,cal.Fe),100,cal.T0(cal.pxn),'s','filled');
-scatter(cal.cmp_msy_oxd(cal.bas,cal.olv,cal.Si),cal.cmp_msy_oxd(cal.bas,cal.olv,cal.Fe),100,cal.T0(cal.bas),'s','filled');
-scatter(cal.cmp_msy_oxd(cal.eut,cal.olv,cal.Si),cal.cmp_msy_oxd(cal.eut,cal.olv,cal.Fe),100,cal.T0(cal.eut),'s','filled');
+scatter(cal.mem_oxd(cal.dun,cal.Si),cal.mem_oxd(cal.dun,cal.Fe),100,1890,'filled');
+scatter(cal.mem_oxd(cal.fay,cal.Si),cal.mem_oxd(cal.fay,cal.Fe),100,950,'filled');
+scatter(cal.cmp_msy_oxd(cal.dun,cal.olv,cal.Si),cal.cmp_msy_oxd(cal.dun,cal.olv,cal.Fe),100,cal.T0(cal.dun),'s','filled');
+scatter(cal.cmp_msy_oxd(cal.fay,cal.olv,cal.Si),cal.cmp_msy_oxd(cal.fay,cal.olv,cal.Fe),100,cal.T0(cal.fay),'s','filled');
 xlabel(cal.oxdStr(cal.Si),FS{:},TX{:})
 ylabel(cal.oxdStr(cal.Fe),FS{:},TX{:})
 subplot(1,2,2);
 scatter(X(:,1)*100,X(:,3)*100,25,DATA.T,'filled'); colormap('copper'); hold on
 scatter(Xp(:,1)*100,Xp(:,3)*100,25,DATA.T);
-scatter(cal.mem_oxd(cal.for,cal.Si),cal.mem_oxd(cal.for,cal.Mg),100,[0.1 0.6 0.1]*1.3,'filled');
-scatter(cal.mem_oxd(cal.fay,cal.Si),cal.mem_oxd(cal.fay,cal.Mg),100,[0.1 0.6 0.1]*0.7,'filled');
-scatter(cal.cmp_msy_oxd(cal.pxn,cal.olv,cal.Si),cal.cmp_msy_oxd(cal.pxn,cal.olv,cal.Mg),100,cal.T0(cal.pxn),'s','filled');
-scatter(cal.cmp_msy_oxd(cal.bas,cal.olv,cal.Si),cal.cmp_msy_oxd(cal.bas,cal.olv,cal.Mg),100,cal.T0(cal.bas),'s','filled');
-scatter(cal.cmp_msy_oxd(cal.eut,cal.olv,cal.Si),cal.cmp_msy_oxd(cal.eut,cal.olv,cal.Mg),100,cal.T0(cal.eut),'s','filled');
+scatter(cal.mem_oxd(cal.dun,cal.Si),cal.mem_oxd(cal.dun,cal.Mg),100,1890,'filled');
+scatter(cal.mem_oxd(cal.fay,cal.Si),cal.mem_oxd(cal.fay,cal.Mg),100,950,'filled');
+scatter(cal.cmp_msy_oxd(cal.dun,cal.olv,cal.Si),cal.cmp_msy_oxd(cal.dun,cal.olv,cal.Mg),100,cal.T0(cal.dun),'s','filled');
+scatter(cal.cmp_msy_oxd(cal.fay,cal.olv,cal.Si),cal.cmp_msy_oxd(cal.fay,cal.olv,cal.Mg),100,cal.T0(cal.fay),'s','filled');
 xlabel(cal.oxdStr(cal.Si),FS{:},TX{:})
 ylabel(cal.oxdStr(cal.Mg),FS{:},TX{:})
 colorbar;
@@ -183,37 +181,45 @@ figure(3); clf;
 subplot(2,2,1);
 scatter(X(:,1)*100,X(:,2)*100,25,DATA.T,'filled'); colormap('copper'); hold on
 scatter(Xp(:,1)*100,Xp(:,2)*100,25,DATA.T);
-scatter(cal.mem_oxd(cal.hyp,cal.Si),cal.mem_oxd(cal.hyp,cal.Al),100,[0.4 0.2 0.1]*1.3,'filled');
-scatter(cal.mem_oxd(cal.fsl,cal.Si),cal.mem_oxd(cal.fsl,cal.Al),100,[0.4 0.2 0.1]*0.7,'filled');
-scatter(cal.cmp_msy_oxd(cal.pxn,cal.opx,cal.Si),cal.cmp_msy_oxd(cal.pxn,cal.opx,cal.Al),100,cal.T0(cal.pxn),'s','filled');
-scatter(cal.cmp_msy_oxd(cal.bas,cal.opx,cal.Si),cal.cmp_msy_oxd(cal.bas,cal.opx,cal.Al),100,cal.T0(cal.bas),'s','filled');
+scatter(cal.mem_oxd(cal.ens,cal.Si),cal.mem_oxd(cal.ens,cal.Al),100,1250,'filled');
+scatter(cal.mem_oxd(cal.hyp,cal.Si),cal.mem_oxd(cal.hyp,cal.Al),100,1030,'filled');
+scatter(cal.mem_oxd(cal.fsl,cal.Si),cal.mem_oxd(cal.fsl,cal.Al),100,950,'filled');
+scatter(cal.cmp_msy_oxd(cal.pxn,cal.opx,cal.Si),cal.cmp_msy_oxd(cal.pxn,cal.opx,cal.Al),100,cal.T0(2),'s','filled');
+scatter(cal.cmp_msy_oxd(cal.bas,cal.opx,cal.Si),cal.cmp_msy_oxd(cal.bas,cal.opx,cal.Al),100,cal.T0(3),'s','filled');
+scatter(cal.cmp_msy_oxd(cal.eut,cal.opx,cal.Si),cal.cmp_msy_oxd(cal.eut,cal.opx,cal.Al),100,cal.T0(4),'s','filled');
 xlabel(cal.oxdStr(cal.Si),FS{:},TX{:})
 ylabel(cal.oxdStr(cal.Al),FS{:},TX{:})
 subplot(2,2,2);
 scatter(X(:,1)*100,X(:,3)*100,25,DATA.T,'filled'); colormap('copper'); hold on
 scatter(Xp(:,1)*100,Xp(:,3)*100,25,DATA.T);
-scatter(cal.mem_oxd(cal.hyp,cal.Si),cal.mem_oxd(cal.hyp,cal.Fe),100,[0.4 0.2 0.1]*1.3,'filled');
-scatter(cal.mem_oxd(cal.fsl,cal.Si),cal.mem_oxd(cal.fsl,cal.Fe),100,[0.4 0.2 0.1]*0.7,'filled');
-scatter(cal.cmp_msy_oxd(cal.pxn,cal.opx,cal.Si),cal.cmp_msy_oxd(cal.pxn,cal.opx,cal.Fe),100,cal.T0(cal.pxn),'s','filled');
-scatter(cal.cmp_msy_oxd(cal.bas,cal.opx,cal.Si),cal.cmp_msy_oxd(cal.bas,cal.opx,cal.Fe),100,cal.T0(cal.bas),'s','filled');
+scatter(cal.mem_oxd(cal.ens,cal.Si),cal.mem_oxd(cal.ens,cal.Fe),100,1250,'filled');
+scatter(cal.mem_oxd(cal.hyp,cal.Si),cal.mem_oxd(cal.hyp,cal.Fe),100,1030,'filled');
+scatter(cal.mem_oxd(cal.fsl,cal.Si),cal.mem_oxd(cal.fsl,cal.Fe),100,950,'filled');
+scatter(cal.cmp_msy_oxd(cal.pxn,cal.opx,cal.Si),cal.cmp_msy_oxd(cal.pxn,cal.opx,cal.Fe),100,cal.T0(2),'s','filled');
+scatter(cal.cmp_msy_oxd(cal.bas,cal.opx,cal.Si),cal.cmp_msy_oxd(cal.bas,cal.opx,cal.Fe),100,cal.T0(3),'s','filled');
+scatter(cal.cmp_msy_oxd(cal.eut,cal.opx,cal.Si),cal.cmp_msy_oxd(cal.eut,cal.opx,cal.Fe),100,cal.T0(4),'s','filled');
 xlabel(cal.oxdStr(cal.Fe),FS{:},TX{:})
 ylabel(cal.oxdStr(cal.Fe),FS{:},TX{:})
 subplot(2,2,3);
 scatter(X(:,1)*100,X(:,4)*100,25,DATA.T,'filled'); colormap('copper'); hold on
 scatter(Xp(:,1)*100,Xp(:,4)*100,25,DATA.T);
-scatter(cal.mem_oxd(cal.hyp,cal.Si),cal.mem_oxd(cal.hyp,cal.Mg),100,[0.4 0.2 0.1]*1.3,'filled');
-scatter(cal.mem_oxd(cal.fsl,cal.Si),cal.mem_oxd(cal.fsl,cal.Mg),100,[0.4 0.2 0.1]*0.7,'filled');
-scatter(cal.cmp_msy_oxd(cal.pxn,cal.opx,cal.Si),cal.cmp_msy_oxd(cal.pxn,cal.opx,cal.Mg),100,cal.T0(cal.pxn),'s','filled');
-scatter(cal.cmp_msy_oxd(cal.bas,cal.opx,cal.Si),cal.cmp_msy_oxd(cal.bas,cal.opx,cal.Mg),100,cal.T0(cal.bas),'s','filled');
+scatter(cal.mem_oxd(cal.ens,cal.Si),cal.mem_oxd(cal.ens,cal.Mg),100,1250,'filled');
+scatter(cal.mem_oxd(cal.hyp,cal.Si),cal.mem_oxd(cal.hyp,cal.Mg),100,1030,'filled');
+scatter(cal.mem_oxd(cal.fsl,cal.Si),cal.mem_oxd(cal.fsl,cal.Mg),100,950,'filled');
+scatter(cal.cmp_msy_oxd(cal.pxn,cal.opx,cal.Si),cal.cmp_msy_oxd(cal.pxn,cal.opx,cal.Mg),100,cal.T0(2),'s','filled');
+scatter(cal.cmp_msy_oxd(cal.bas,cal.opx,cal.Si),cal.cmp_msy_oxd(cal.bas,cal.opx,cal.Mg),100,cal.T0(3),'s','filled');
+scatter(cal.cmp_msy_oxd(cal.eut,cal.opx,cal.Si),cal.cmp_msy_oxd(cal.eut,cal.opx,cal.Mg),100,cal.T0(4),'s','filled');
 xlabel(cal.oxdStr(cal.Si),FS{:},TX{:})
 ylabel(cal.oxdStr(cal.Mg),FS{:},TX{:})
 subplot(2,2,4);
 scatter(X(:,1)*100,X(:,5)*100,25,DATA.T,'filled'); colormap('copper'); hold on
 scatter(Xp(:,1)*100,Xp(:,5)*100,25,DATA.T);
-scatter(cal.mem_oxd(cal.hyp,cal.Si),cal.mem_oxd(cal.hyp,cal.Ca),100,[0.4 0.2 0.1]*1.3,'filled');
-scatter(cal.mem_oxd(cal.fsl,cal.Si),cal.mem_oxd(cal.fsl,cal.Ca),100,[0.4 0.2 0.1]*0.7,'filled');
-scatter(cal.cmp_msy_oxd(cal.pxn,cal.opx,cal.Si),cal.cmp_msy_oxd(cal.pxn,cal.opx,cal.Ca),100,cal.T0(cal.pxn),'s','filled');
-scatter(cal.cmp_msy_oxd(cal.bas,cal.opx,cal.Si),cal.cmp_msy_oxd(cal.bas,cal.opx,cal.Ca),100,cal.T0(cal.bas),'s','filled');
+scatter(cal.mem_oxd(cal.ens,cal.Si),cal.mem_oxd(cal.ens,cal.Ca),100,1250,'filled');
+scatter(cal.mem_oxd(cal.hyp,cal.Si),cal.mem_oxd(cal.hyp,cal.Ca),100,1030,'filled');
+scatter(cal.mem_oxd(cal.fsl,cal.Si),cal.mem_oxd(cal.fsl,cal.Ca),100,950,'filled');
+scatter(cal.cmp_msy_oxd(cal.pxn,cal.opx,cal.Si),cal.cmp_msy_oxd(cal.pxn,cal.opx,cal.Ca),100,cal.T0(2),'s','filled');
+scatter(cal.cmp_msy_oxd(cal.bas,cal.opx,cal.Si),cal.cmp_msy_oxd(cal.bas,cal.opx,cal.Ca),100,cal.T0(3),'s','filled');
+scatter(cal.cmp_msy_oxd(cal.eut,cal.opx,cal.Si),cal.cmp_msy_oxd(cal.eut,cal.opx,cal.Ca),100,cal.T0(4),'s','filled');
 xlabel(cal.oxdStr(cal.Si),FS{:},TX{:})
 ylabel(cal.oxdStr(cal.Ca),FS{:},TX{:})
 colorbar;
@@ -242,67 +248,61 @@ figure(4); clf;
 subplot(2,3,1);
 scatter(X(:,1)*100,X(:,2)*100,25,DATA.T,'filled'); colormap('copper'); hold on
 scatter(Xp(:,1)*100,Xp(:,2)*100,25,DATA.T);
-scatter(cal.mem_oxd(cal.mau,cal.Si),cal.mem_oxd(cal.mau,cal.Ti),100,[0.6 0.0 0.3]*1.3,'filled');
-scatter(cal.mem_oxd(cal.aug,cal.Si),cal.mem_oxd(cal.aug,cal.Ti),100,[0.6 0.0 0.3]*1.0,'filled');
-scatter(cal.mem_oxd(cal.fau,cal.Si),cal.mem_oxd(cal.fau,cal.Ti),100,[0.6 0.0 0.3]*0.7,'filled');
-scatter(cal.cmp_msy_oxd(cal.pxn,cal.cpx,cal.Si),cal.cmp_msy_oxd(cal.pxn,cal.cpx,cal.Ti),100,cal.T0(cal.pxn),'s','filled');
-scatter(cal.cmp_msy_oxd(cal.bas,cal.cpx,cal.Si),cal.cmp_msy_oxd(cal.bas,cal.cpx,cal.Ti),100,cal.T0(cal.bas),'s','filled');
-scatter(cal.cmp_msy_oxd(cal.eut,cal.cpx,cal.Si),cal.cmp_msy_oxd(cal.eut,cal.cpx,cal.Ti),100,cal.T0(cal.eut),'s','filled');
+scatter(cal.mem_oxd(cal.mau,cal.Si),cal.mem_oxd(cal.mau,cal.Ti),100,1090,'filled');
+scatter(cal.mem_oxd(cal.aug,cal.Si),cal.mem_oxd(cal.aug,cal.Ti),100,1090,'filled');
+scatter(cal.mem_oxd(cal.fau,cal.Si),cal.mem_oxd(cal.fau,cal.Ti),100, 950,'filled');
+scatter(cal.cmp_msy_oxd(cal.bas,cal.cpx,cal.Si),cal.cmp_msy_oxd(cal.bas,cal.cpx,cal.Ti),100,cal.T0(3),'s','filled');
+scatter(cal.cmp_msy_oxd(cal.eut,cal.cpx,cal.Si),cal.cmp_msy_oxd(cal.eut,cal.cpx,cal.Ti),100,cal.T0(4),'s','filled');
 xlabel(cal.oxdStr(cal.Si),FS{:},TX{:})
 ylabel(cal.oxdStr(cal.Ti),FS{:},TX{:})
 subplot(2,3,2);
 scatter(X(:,1)*100,X(:,3)*100,25,DATA.T,'filled'); colormap('copper'); hold on
 scatter(Xp(:,1)*100,Xp(:,3)*100,25,DATA.T);
-scatter(cal.mem_oxd(cal.mau,cal.Si),cal.mem_oxd(cal.mau,cal.Al),100,[0.6 0.0 0.3]*1.3,'filled');
-scatter(cal.mem_oxd(cal.aug,cal.Si),cal.mem_oxd(cal.aug,cal.Al),100,[0.6 0.0 0.3]*1.0,'filled');
-scatter(cal.mem_oxd(cal.fau,cal.Si),cal.mem_oxd(cal.fau,cal.Al),100, [0.6 0.0 0.3]*0.7,'filled');
-scatter(cal.cmp_msy_oxd(cal.pxn,cal.cpx,cal.Si),cal.cmp_msy_oxd(cal.pxn,cal.cpx,cal.Al),100,cal.T0(cal.pxn),'s','filled');
-scatter(cal.cmp_msy_oxd(cal.bas,cal.cpx,cal.Si),cal.cmp_msy_oxd(cal.bas,cal.cpx,cal.Al),100,cal.T0(cal.bas),'s','filled');
-scatter(cal.cmp_msy_oxd(cal.eut,cal.cpx,cal.Si),cal.cmp_msy_oxd(cal.eut,cal.cpx,cal.Al),100,cal.T0(cal.eut),'s','filled');
+scatter(cal.mem_oxd(cal.mau,cal.Si),cal.mem_oxd(cal.mau,cal.Al),100,1090,'filled');
+scatter(cal.mem_oxd(cal.aug,cal.Si),cal.mem_oxd(cal.aug,cal.Al),100,1090,'filled');
+scatter(cal.mem_oxd(cal.fau,cal.Si),cal.mem_oxd(cal.fau,cal.Al),100, 950,'filled');
+scatter(cal.cmp_msy_oxd(cal.bas,cal.cpx,cal.Si),cal.cmp_msy_oxd(cal.bas,cal.cpx,cal.Al),100,cal.T0(3),'s','filled');
+scatter(cal.cmp_msy_oxd(cal.eut,cal.cpx,cal.Si),cal.cmp_msy_oxd(cal.eut,cal.cpx,cal.Al),100,cal.T0(4),'s','filled');
 xlabel(cal.oxdStr(cal.Si),FS{:},TX{:})
 ylabel(cal.oxdStr(cal.Al),FS{:},TX{:})
 subplot(2,3,3);
 scatter(X(:,1)*100,X(:,4)*100,25,DATA.T,'filled'); colormap('copper'); hold on
 scatter(Xp(:,1)*100,Xp(:,4)*100,25,DATA.T);
-scatter(cal.mem_oxd(cal.mau,cal.Si),cal.mem_oxd(cal.mau,cal.Fe),100,[0.6 0.0 0.3]*1.3,'filled');
-scatter(cal.mem_oxd(cal.aug,cal.Si),cal.mem_oxd(cal.aug,cal.Fe),100,[0.6 0.0 0.3]*1.0,'filled');
-scatter(cal.mem_oxd(cal.fau,cal.Si),cal.mem_oxd(cal.fau,cal.Fe),100,[0.6 0.0 0.3]*0.7,'filled');
-scatter(cal.cmp_msy_oxd(cal.pxn,cal.cpx,cal.Si),cal.cmp_msy_oxd(cal.pxn,cal.cpx,cal.Fe),100,cal.T0(cal.pxn),'s','filled');
-scatter(cal.cmp_msy_oxd(cal.bas,cal.cpx,cal.Si),cal.cmp_msy_oxd(cal.bas,cal.cpx,cal.Fe),100,cal.T0(cal.bas),'s','filled');
-scatter(cal.cmp_msy_oxd(cal.eut,cal.cpx,cal.Si),cal.cmp_msy_oxd(cal.eut,cal.cpx,cal.Fe),100,cal.T0(cal.eut),'s','filled');
+scatter(cal.mem_oxd(cal.mau,cal.Si),cal.mem_oxd(cal.mau,cal.Fe),100,1090,'filled');
+scatter(cal.mem_oxd(cal.aug,cal.Si),cal.mem_oxd(cal.aug,cal.Fe),100,1090,'filled');
+scatter(cal.mem_oxd(cal.fau,cal.Si),cal.mem_oxd(cal.fau,cal.Fe),100, 950,'filled');
+scatter(cal.cmp_msy_oxd(cal.bas,cal.cpx,cal.Si),cal.cmp_msy_oxd(cal.bas,cal.cpx,cal.Fe),100,cal.T0(3),'s','filled');
+scatter(cal.cmp_msy_oxd(cal.eut,cal.cpx,cal.Si),cal.cmp_msy_oxd(cal.eut,cal.cpx,cal.Fe),100,cal.T0(4),'s','filled');
 xlabel(cal.oxdStr(cal.Si),FS{:},TX{:})
 ylabel(cal.oxdStr(cal.Fe),FS{:},TX{:})
 subplot(2,3,4);
 scatter(X(:,1)*100,X(:,5)*100,25,DATA.T,'filled'); colormap('copper'); hold on
 scatter(Xp(:,1)*100,Xp(:,5)*100,25,DATA.T);
-scatter(cal.mem_oxd(cal.mau,cal.Si),cal.mem_oxd(cal.mau,cal.Mg),100,[0.6 0.0 0.3]*1.3,'filled');
-scatter(cal.mem_oxd(cal.aug,cal.Si),cal.mem_oxd(cal.aug,cal.Mg),100,[0.6 0.0 0.3]*1.0,'filled');
-scatter(cal.mem_oxd(cal.fau,cal.Si),cal.mem_oxd(cal.fau,cal.Mg),100,[0.6 0.0 0.3]*0.7,'filled');
-scatter(cal.cmp_msy_oxd(cal.pxn,cal.cpx,cal.Si),cal.cmp_msy_oxd(cal.pxn,cal.cpx,cal.Mg),100,cal.T0(cal.pxn),'s','filled');
-scatter(cal.cmp_msy_oxd(cal.bas,cal.cpx,cal.Si),cal.cmp_msy_oxd(cal.bas,cal.cpx,cal.Mg),100,cal.T0(cal.bas),'s','filled');
-scatter(cal.cmp_msy_oxd(cal.eut,cal.cpx,cal.Si),cal.cmp_msy_oxd(cal.eut,cal.cpx,cal.Mg),100,cal.T0(cal.eut),'s','filled');
+scatter(cal.mem_oxd(cal.mau,cal.Si),cal.mem_oxd(cal.mau,cal.Mg),100,1090,'filled');
+scatter(cal.mem_oxd(cal.aug,cal.Si),cal.mem_oxd(cal.aug,cal.Mg),100,1090,'filled');
+scatter(cal.mem_oxd(cal.fau,cal.Si),cal.mem_oxd(cal.fau,cal.Mg),100, 950,'filled');
+scatter(cal.cmp_msy_oxd(cal.bas,cal.cpx,cal.Si),cal.cmp_msy_oxd(cal.bas,cal.cpx,cal.Mg),100,cal.T0(3),'s','filled');
+scatter(cal.cmp_msy_oxd(cal.eut,cal.cpx,cal.Si),cal.cmp_msy_oxd(cal.eut,cal.cpx,cal.Mg),100,cal.T0(4),'s','filled');
 xlabel(cal.oxdStr(cal.Si),FS{:},TX{:})
 ylabel(cal.oxdStr(cal.Mg),FS{:},TX{:})
 subplot(2,3,5);
 scatter(X(:,1)*100,X(:,6)*100,25,DATA.T,'filled'); colormap('copper'); hold on
 scatter(Xp(:,1)*100,Xp(:,6)*100,25,DATA.T);
-scatter(cal.mem_oxd(cal.mau,cal.Si),cal.mem_oxd(cal.mau,cal.Ca),100,[0.6 0.0 0.3]*1.3,'filled');
-scatter(cal.mem_oxd(cal.aug,cal.Si),cal.mem_oxd(cal.aug,cal.Ca),100,[0.6 0.0 0.3]*1.0,'filled');
-scatter(cal.mem_oxd(cal.fau,cal.Si),cal.mem_oxd(cal.fau,cal.Ca),100,[0.6 0.0 0.3]*0.7,'filled');
-scatter(cal.cmp_msy_oxd(cal.pxn,cal.cpx,cal.Si),cal.cmp_msy_oxd(cal.pxn,cal.cpx,cal.Ca),100,cal.T0(cal.pxn),'s','filled');
-scatter(cal.cmp_msy_oxd(cal.bas,cal.cpx,cal.Si),cal.cmp_msy_oxd(cal.bas,cal.cpx,cal.Ca),100,cal.T0(cal.bas),'s','filled');
-scatter(cal.cmp_msy_oxd(cal.eut,cal.cpx,cal.Si),cal.cmp_msy_oxd(cal.eut,cal.cpx,cal.Ca),100,cal.T0(cal.eut),'s','filled');
+scatter(cal.mem_oxd(cal.mau,cal.Si),cal.mem_oxd(cal.mau,cal.Ca),100,1090,'filled');
+scatter(cal.mem_oxd(cal.aug,cal.Si),cal.mem_oxd(cal.aug,cal.Ca),100,1090,'filled');
+scatter(cal.mem_oxd(cal.fau,cal.Si),cal.mem_oxd(cal.fau,cal.Ca),100, 950,'filled');
+scatter(cal.cmp_msy_oxd(cal.bas,cal.cpx,cal.Si),cal.cmp_msy_oxd(cal.bas,cal.cpx,cal.Ca),100,cal.T0(3),'s','filled');
+scatter(cal.cmp_msy_oxd(cal.eut,cal.cpx,cal.Si),cal.cmp_msy_oxd(cal.eut,cal.cpx,cal.Ca),100,cal.T0(4),'s','filled');
 xlabel(cal.oxdStr(cal.Si),FS{:},TX{:})
 ylabel(cal.oxdStr(cal.Ca),FS{:},TX{:})
 subplot(2,3,6);
 scatter(X(:,1)*100,X(:,7)*100,25,DATA.T,'filled'); colormap('copper'); hold on
 scatter(Xp(:,1)*100,Xp(:,7)*100,25,DATA.T);
-scatter(cal.mem_oxd(cal.mau,cal.Si),cal.mem_oxd(cal.mau,cal.Na),100,[0.6 0.0 0.3]*1.3,'filled');
-scatter(cal.mem_oxd(cal.aug,cal.Si),cal.mem_oxd(cal.aug,cal.Na),100,[0.6 0.0 0.3]*1.0,'filled');
-scatter(cal.mem_oxd(cal.fau,cal.Si),cal.mem_oxd(cal.fau,cal.Na),100,[0.6 0.0 0.3]*0.7,'filled');
-scatter(cal.cmp_msy_oxd(cal.pxn,cal.cpx,cal.Si),cal.cmp_msy_oxd(cal.pxn,cal.cpx,cal.Na),100,cal.T0(cal.pxn),'s','filled');
-scatter(cal.cmp_msy_oxd(cal.bas,cal.cpx,cal.Si),cal.cmp_msy_oxd(cal.bas,cal.cpx,cal.Na),100,cal.T0(cal.bas),'s','filled');
-scatter(cal.cmp_msy_oxd(cal.eut,cal.cpx,cal.Si),cal.cmp_msy_oxd(cal.eut,cal.cpx,cal.Na),100,cal.T0(cal.eut),'s','filled');
+scatter(cal.mem_oxd(cal.mau,cal.Si),cal.mem_oxd(cal.mau,cal.Na),100,1090,'filled');
+scatter(cal.mem_oxd(cal.aug,cal.Si),cal.mem_oxd(cal.aug,cal.Na),100,1090,'filled');
+scatter(cal.mem_oxd(cal.fau,cal.Si),cal.mem_oxd(cal.fau,cal.Na),100, 950,'filled');
+scatter(cal.cmp_msy_oxd(cal.bas,cal.cpx,cal.Si),cal.cmp_msy_oxd(cal.bas,cal.cpx,cal.Na),100,cal.T0(3),'s','filled');
+scatter(cal.cmp_msy_oxd(cal.eut,cal.cpx,cal.Si),cal.cmp_msy_oxd(cal.eut,cal.cpx,cal.Na),100,cal.T0(4),'s','filled');
 xlabel(cal.oxdStr(cal.Si),FS{:},TX{:})
 ylabel(cal.oxdStr(cal.Na),FS{:},TX{:})
 colorbar;
@@ -331,9 +331,9 @@ figure(2); clf;
 subplot(1,3,1);
 scatter(X(:,1)*100,X(:,2)*100,25,DATA.T,'filled'); colormap('copper'); hold on
 scatter(Xp(:,1)*100,Xp(:,2)*100,25,DATA.T);
-scatter(cal.mem_oxd(cal.ulv,cal.Fe),cal.mem_oxd(cal.ulv,cal.Ti),100,[0.4 0.4 0.4]*1.3,'filled');
-scatter(cal.mem_oxd(cal.mgt,cal.Fe),cal.mem_oxd(cal.mgt,cal.Ti),100,[0.4 0.4 0.4]*1.0,'filled');
-scatter(cal.mem_oxd(cal.tim,cal.Fe),cal.mem_oxd(cal.tim,cal.Ti),100,[0.4 0.4 0.4]*0.7,'filled');
+scatter(cal.mem_oxd(cal.ulv,cal.Fe),cal.mem_oxd(cal.ulv,cal.Ti),100,1150,'filled');
+scatter(cal.mem_oxd(cal.mgt,cal.Fe),cal.mem_oxd(cal.mgt,cal.Ti),100, 900,'filled');
+scatter(cal.mem_oxd(cal.ilm,cal.Fe),cal.mem_oxd(cal.ilm,cal.Ti),100, 700,'filled');
 scatter(cal.cmp_msy_oxd(cal.pxn,cal.oxs,cal.Fe),cal.cmp_msy_oxd(cal.pxn,cal.oxs,cal.Ti),100,cal.T0(cal.pxn),'s','filled');
 scatter(cal.cmp_msy_oxd(cal.bas,cal.oxs,cal.Fe),cal.cmp_msy_oxd(cal.bas,cal.oxs,cal.Ti),100,cal.T0(cal.bas),'s','filled');
 scatter(cal.cmp_msy_oxd(cal.eut,cal.oxs,cal.Fe),cal.cmp_msy_oxd(cal.eut,cal.oxs,cal.Ti),100,cal.T0(cal.eut),'s','filled');
@@ -342,9 +342,9 @@ ylabel(cal.oxdStr(cal.Ti),FS{:},TX{:})
 subplot(1,3,2);
 scatter(X(:,1)*100,X(:,3)*100,25,DATA.T,'filled'); colormap('copper'); hold on
 scatter(Xp(:,1)*100,Xp(:,3)*100,25,DATA.T);
-scatter(cal.mem_oxd(cal.ulv,cal.Fe),cal.mem_oxd(cal.ulv,cal.Al),100,[0.4 0.4 0.4]*1.3,'filled');
-scatter(cal.mem_oxd(cal.mgt,cal.Fe),cal.mem_oxd(cal.mgt,cal.Al),100,[0.4 0.4 0.4]*1.0,'filled');
-scatter(cal.mem_oxd(cal.tim,cal.Fe),cal.mem_oxd(cal.tim,cal.Al),100,[0.4 0.4 0.4]*0.7,'filled');
+scatter(cal.mem_oxd(cal.ulv,cal.Fe),cal.mem_oxd(cal.ulv,cal.Al),100,1150,'filled');
+scatter(cal.mem_oxd(cal.mgt,cal.Fe),cal.mem_oxd(cal.mgt,cal.Al),100, 900,'filled');
+scatter(cal.mem_oxd(cal.ilm,cal.Fe),cal.mem_oxd(cal.ilm,cal.Al),100, 700,'filled');
 scatter(cal.cmp_msy_oxd(cal.pxn,cal.oxs,cal.Fe),cal.cmp_msy_oxd(cal.pxn,cal.oxs,cal.Al),100,cal.T0(cal.pxn),'s','filled');
 scatter(cal.cmp_msy_oxd(cal.bas,cal.oxs,cal.Fe),cal.cmp_msy_oxd(cal.bas,cal.oxs,cal.Al),100,cal.T0(cal.bas),'s','filled');
 scatter(cal.cmp_msy_oxd(cal.eut,cal.oxs,cal.Fe),cal.cmp_msy_oxd(cal.eut,cal.oxs,cal.Al),100,cal.T0(cal.eut),'s','filled');
@@ -353,9 +353,9 @@ ylabel(cal.oxdStr(cal.Al),FS{:},TX{:})
 subplot(1,3,3);
 scatter(X(:,1)*100,X(:,4)*100,25,DATA.T,'filled'); colormap('copper'); hold on
 scatter(Xp(:,1)*100,Xp(:,4)*100,25,DATA.T);
-scatter(cal.mem_oxd(cal.ulv,cal.Fe),cal.mem_oxd(cal.ulv,cal.Mg),100,[0.4 0.4 0.4]*1.3,'filled');
-scatter(cal.mem_oxd(cal.mgt,cal.Fe),cal.mem_oxd(cal.mgt,cal.Mg),100,[0.4 0.4 0.4]*1.0,'filled');
-scatter(cal.mem_oxd(cal.tim,cal.Fe),cal.mem_oxd(cal.tim,cal.Mg),100,[0.4 0.4 0.4]*0.7,'filled');
+scatter(cal.mem_oxd(cal.ulv,cal.Fe),cal.mem_oxd(cal.ulv,cal.Mg),100,1150,'filled');
+scatter(cal.mem_oxd(cal.mgt,cal.Fe),cal.mem_oxd(cal.mgt,cal.Mg),100, 900,'filled');
+scatter(cal.mem_oxd(cal.ilm,cal.Fe),cal.mem_oxd(cal.ilm,cal.Mg),100, 700,'filled');
 scatter(cal.cmp_msy_oxd(cal.pxn,cal.oxs,cal.Fe),cal.cmp_msy_oxd(cal.pxn,cal.oxs,cal.Mg),100,cal.T0(cal.pxn),'s','filled');
 scatter(cal.cmp_msy_oxd(cal.bas,cal.oxs,cal.Fe),cal.cmp_msy_oxd(cal.bas,cal.oxs,cal.Mg),100,cal.T0(cal.bas),'s','filled');
 scatter(cal.cmp_msy_oxd(cal.eut,cal.oxs,cal.Fe),cal.cmp_msy_oxd(cal.eut,cal.oxs,cal.Mg),100,cal.T0(cal.eut),'s','filled');
@@ -387,45 +387,37 @@ figure(5); clf;
 subplot(2,2,1);
 scatter(X(:,1)*100,X(:,2)*100,25,DATA.T,'filled'); colormap('copper'); hold on
 scatter(Xp(:,1)*100,Xp(:,2)*100,25,DATA.T);
-scatter(cal.mem_oxd(cal.ant,cal.Si),cal.mem_oxd(cal.ant,cal.Al),100,[0.2 0.1 0.5]*1.3,'filled');
-scatter(cal.mem_oxd(cal.alb,cal.Si),cal.mem_oxd(cal.alb,cal.Al),100,[0.2 0.1 0.5]*1.0,'filled');
-scatter(cal.mem_oxd(cal.san,cal.Si),cal.mem_oxd(cal.san,cal.Al),100,[0.2 0.1 0.5]*0.7,'filled');
-scatter(cal.cmp_msy_oxd(cal.pxn,cal.fsp,cal.Si),cal.cmp_msy_oxd(cal.pxn,cal.fsp,cal.Al),100,cal.T0(cal.pxn),'s','filled');
-scatter(cal.cmp_msy_oxd(cal.bas,cal.fsp,cal.Si),cal.cmp_msy_oxd(cal.bas,cal.fsp,cal.Al),100,cal.T0(cal.bas),'s','filled');
-scatter(cal.cmp_msy_oxd(cal.eut,cal.fsp,cal.Si),cal.cmp_msy_oxd(cal.eut,cal.fsp,cal.Al),100,cal.T0(cal.eut),'s','filled');
+scatter(cal.mem_oxd(cal.ant,cal.Si),cal.mem_oxd(cal.ant,cal.Al),100,1150,'filled');
+scatter(cal.mem_oxd(cal.alb,cal.Si),cal.mem_oxd(cal.alb,cal.Al),100,950,'filled');
+scatter(cal.cmp_msy_oxd(cal.bas,cal.fsp,cal.Si),cal.cmp_msy_oxd(cal.bas,cal.fsp,cal.Al),100,cal.T0(3),'s','filled');
+scatter(cal.cmp_msy_oxd(cal.eut,cal.fsp,cal.Si),cal.cmp_msy_oxd(cal.eut,cal.fsp,cal.Al),100,cal.T0(4),'s','filled');
 xlabel(cal.oxdStr(cal.Si),FS{:},TX{:})
 ylabel(cal.oxdStr(cal.Al),FS{:},TX{:})
 subplot(2,2,2);
 scatter(X(:,1)*100,X(:,3)*100,25,DATA.T,'filled'); colormap('copper'); hold on
 scatter(Xp(:,1)*100,Xp(:,3)*100,25,DATA.T);
-scatter(cal.mem_oxd(cal.ant,cal.Si),cal.mem_oxd(cal.ant,cal.Ca),100,[0.2 0.1 0.5]*1.3,'filled');
-scatter(cal.mem_oxd(cal.alb,cal.Si),cal.mem_oxd(cal.alb,cal.Ca),100,[0.2 0.1 0.5]*1.0,'filled');
-scatter(cal.mem_oxd(cal.san,cal.Si),cal.mem_oxd(cal.san,cal.Ca),100,[0.2 0.1 0.5]*0.7,'filled');
-scatter(cal.cmp_msy_oxd(cal.pxn,cal.fsp,cal.Si),cal.cmp_msy_oxd(cal.pxn,cal.fsp,cal.Ca),100,cal.T0(cal.pxn),'s','filled');
-scatter(cal.cmp_msy_oxd(cal.bas,cal.fsp,cal.Si),cal.cmp_msy_oxd(cal.bas,cal.fsp,cal.Ca),100,cal.T0(cal.bas),'s','filled');
-scatter(cal.cmp_msy_oxd(cal.eut,cal.fsp,cal.Si),cal.cmp_msy_oxd(cal.eut,cal.fsp,cal.Ca),100,cal.T0(cal.eut),'s','filled');
+scatter(cal.mem_oxd(cal.ant,cal.Si),cal.mem_oxd(cal.ant,cal.Ca),100,1150,'filled');
+scatter(cal.mem_oxd(cal.alb,cal.Si),cal.mem_oxd(cal.alb,cal.Ca),100,950,'filled');
+scatter(cal.cmp_msy_oxd(cal.bas,cal.fsp,cal.Si),cal.cmp_msy_oxd(cal.bas,cal.fsp,cal.Ca),100,cal.T0(3),'s','filled');
+scatter(cal.cmp_msy_oxd(cal.eut,cal.fsp,cal.Si),cal.cmp_msy_oxd(cal.eut,cal.fsp,cal.Ca),100,cal.T0(4),'s','filled');
 xlabel(cal.oxdStr(cal.Si),FS{:},TX{:})
 ylabel(cal.oxdStr(cal.Ca),FS{:},TX{:})
 subplot(2,2,3);
 scatter(X(:,1)*100,X(:,4)*100,25,DATA.T,'filled'); colormap('copper'); hold on
 scatter(Xp(:,1)*100,Xp(:,4)*100,25,DATA.T);
-scatter(cal.mem_oxd(cal.ant,cal.Si),cal.mem_oxd(cal.ant,cal.Na),100,[0.2 0.1 0.5]*1.3,'filled');
-scatter(cal.mem_oxd(cal.alb,cal.Si),cal.mem_oxd(cal.alb,cal.Na),100,[0.2 0.1 0.5]*1.0,'filled');
-scatter(cal.mem_oxd(cal.san,cal.Si),cal.mem_oxd(cal.san,cal.Na),100,[0.2 0.1 0.5]*0.7,'filled');
-scatter(cal.cmp_msy_oxd(cal.pxn,cal.fsp,cal.Si),cal.cmp_msy_oxd(cal.pxn,cal.fsp,cal.Na),100,cal.T0(cal.pxn),'s','filled');
-scatter(cal.cmp_msy_oxd(cal.bas,cal.fsp,cal.Si),cal.cmp_msy_oxd(cal.bas,cal.fsp,cal.Na),100,cal.T0(cal.bas),'s','filled');
-scatter(cal.cmp_msy_oxd(cal.eut,cal.fsp,cal.Si),cal.cmp_msy_oxd(cal.eut,cal.fsp,cal.Na),100,cal.T0(cal.eut),'s','filled');
+scatter(cal.mem_oxd(cal.ant,cal.Si),cal.mem_oxd(cal.ant,cal.Na),100,1150,'filled');
+scatter(cal.mem_oxd(cal.alb,cal.Si),cal.mem_oxd(cal.alb,cal.Na),100,950,'filled');
+scatter(cal.cmp_msy_oxd(cal.bas,cal.fsp,cal.Si),cal.cmp_msy_oxd(cal.bas,cal.fsp,cal.Na),100,cal.T0(3),'s','filled');
+scatter(cal.cmp_msy_oxd(cal.eut,cal.fsp,cal.Si),cal.cmp_msy_oxd(cal.eut,cal.fsp,cal.Na),100,cal.T0(4),'s','filled');
 xlabel(cal.oxdStr(cal.Si),FS{:},TX{:})
 ylabel(cal.oxdStr(cal.Na),FS{:},TX{:})
 subplot(2,2,4);
 scatter(X(:,1)*100,X(:,5)*100,25,DATA.T,'filled'); colormap('copper'); hold on
 scatter(Xp(:,1)*100,Xp(:,5)*100,25,DATA.T);
-scatter(cal.mem_oxd(cal.ant,cal.Si),cal.mem_oxd(cal.ant,cal.K),100,[0.2 0.1 0.5]*1.3,'filled');
-scatter(cal.mem_oxd(cal.alb,cal.Si),cal.mem_oxd(cal.alb,cal.K),100,[0.2 0.1 0.5]*1.0,'filled');
-scatter(cal.mem_oxd(cal.san,cal.Si),cal.mem_oxd(cal.san,cal.K),100,[0.2 0.1 0.5]*0.7,'filled');
-scatter(cal.cmp_msy_oxd(cal.pxn,cal.fsp,cal.Si),cal.cmp_msy_oxd(cal.pxn,cal.fsp,cal.K),100,cal.T0(cal.pxn),'s','filled');
-scatter(cal.cmp_msy_oxd(cal.bas,cal.fsp,cal.Si),cal.cmp_msy_oxd(cal.bas,cal.fsp,cal.K),100,cal.T0(cal.bas),'s','filled');
-scatter(cal.cmp_msy_oxd(cal.eut,cal.fsp,cal.Si),cal.cmp_msy_oxd(cal.eut,cal.fsp,cal.K),100,cal.T0(cal.eut),'s','filled');
+scatter(cal.mem_oxd(cal.ant,cal.Si),cal.mem_oxd(cal.ant,cal.K),100,1150,'filled');
+scatter(cal.mem_oxd(cal.alb,cal.Si),cal.mem_oxd(cal.alb,cal.K),100,950,'filled');
+scatter(cal.cmp_msy_oxd(cal.bas,cal.fsp,cal.Si),cal.cmp_msy_oxd(cal.bas,cal.fsp,cal.K),100,cal.T0(3),'s','filled');
+scatter(cal.cmp_msy_oxd(cal.eut,cal.fsp,cal.Si),cal.cmp_msy_oxd(cal.eut,cal.fsp,cal.K),100,cal.T0(4),'s','filled');
 xlabel(cal.oxdStr(cal.Si),FS{:},TX{:})
 ylabel(cal.oxdStr(cal.Na),FS{:},TX{:})
 colorbar;
@@ -437,13 +429,13 @@ cal_MORB; Fe = 4; % load melt model calibration
 figure(6); clf;
 for ic = nc
     if isfield(MAG(ic).OUT.PhaseProps,'cpx')
-    hasmlt = MAG(ic).OUT.PhaseFractions.liq_wt>=0.001 & MAG(ic).OUT.PhaseFractions.sol_wt>=0.001 & MAG(ic).OUT.T>=950;
+    hasmlt = MAG(ic).OUT.PhaseFractions.liq_wt>=0.001 & MAG(ic).OUT.PhaseFractions.sol_wt>=0.001;
     subplot(2,4,1);
     scatter(MAG(ic).OUT.OxideFract.liq(hasmlt,Si).*100,MAG(ic).OUT.OxideFract.liq(hasmlt,Ti).*100,25,MAG(ic).OUT.T(hasmlt),'o'); colormap('copper'); axis tight; hold on
     scatter(MAG(ic).OUT.OxideFract.sol(hasmlt,Si).*100,MAG(ic).OUT.OxideFract.sol(hasmlt,Ti).*100,25,MAG(ic).OUT.T(hasmlt),'s'); colormap('copper');
     scatter(MAG(ic).OUT.OxideFract.SYS(hasmlt,Si).*100,MAG(ic).OUT.OxideFract.SYS(hasmlt,Ti).*100,25,MAG(ic).OUT.T(hasmlt),'d'); colormap('copper');
-    scatter(cal.cmp_oxd(cal.dun,cal.Si),cal.cmp_oxd(cal.dun,cal.Ti),140,cal.T0(cal.dun),'filled','o');
-    scatter(cal.cmp_oxd(cal.pxn,cal.Si),cal.cmp_oxd(cal.pxn,cal.Ti),140,cal.T0(cal.pxn),'filled','o');
+    scatter(cal.cmp_oxd(cal.dun,cal.Si),cal.cmp_oxd(cal.dun,cal.Ti),140,cal.T0(1),'filled','o');
+    scatter(cal.cmp_oxd(cal.pxn,cal.Si),cal.cmp_oxd(cal.pxn,cal.Ti),140,cal.T0(2),'filled','o');
     scatter(cal.cmp_oxd(cal.bas,cal.Si),cal.cmp_oxd(cal.bas,cal.Ti),140,cal.T0(3),'filled','o');
     scatter(cal.cmp_oxd(cal.eut,cal.Si),cal.cmp_oxd(cal.eut,cal.Ti),140,cal.T0(4),'filled','o');
     xlabel(cal.oxdStr(cal.Si),FS{:},TX{:})
@@ -452,60 +444,60 @@ for ic = nc
     scatter(MAG(ic).OUT.OxideFract.liq(hasmlt,Si).*100,MAG(ic).OUT.OxideFract.liq(hasmlt,Al).*100,25,MAG(ic).OUT.T(hasmlt),'o'); colormap('copper'); axis tight; hold on
     scatter(MAG(ic).OUT.OxideFract.sol(hasmlt,Si).*100,MAG(ic).OUT.OxideFract.sol(hasmlt,Al).*100,25,MAG(ic).OUT.T(hasmlt),'s'); colormap('copper');
     scatter(MAG(ic).OUT.OxideFract.SYS(hasmlt,Si).*100,MAG(ic).OUT.OxideFract.SYS(hasmlt,Al).*100,25,MAG(ic).OUT.T(hasmlt),'d'); colormap('copper');
-    scatter(cal.cmp_oxd(cal.dun,cal.Si),cal.cmp_oxd(cal.dun,cal.Al),140,cal.T0(cal.dun),'filled','o');
-    scatter(cal.cmp_oxd(cal.pxn,cal.Si),cal.cmp_oxd(cal.pxn,cal.Al),140,cal.T0(cal.pxn),'filled','o');
-    scatter(cal.cmp_oxd(cal.bas,cal.Si),cal.cmp_oxd(cal.bas,cal.Al),140,cal.T0(cal.bas),'filled','o');
-    scatter(cal.cmp_oxd(cal.eut,cal.Si),cal.cmp_oxd(cal.eut,cal.Al),140,cal.T0(cal.eut),'filled','o');
+    scatter(cal.cmp_oxd(cal.dun,cal.Si),cal.cmp_oxd(cal.dun,cal.Al),140,cal.T0(1),'filled','o');
+    scatter(cal.cmp_oxd(cal.pxn,cal.Si),cal.cmp_oxd(cal.pxn,cal.Al),140,cal.T0(2),'filled','o');
+    scatter(cal.cmp_oxd(cal.bas,cal.Si),cal.cmp_oxd(cal.bas,cal.Al),140,cal.T0(3),'filled','o');
+    scatter(cal.cmp_oxd(cal.eut,cal.Si),cal.cmp_oxd(cal.eut,cal.Al),140,cal.T0(4),'filled','o');
     xlabel(cal.oxdStr(cal.Si),FS{:},TX{:})
     ylabel(cal.oxdStr(cal.Al),FS{:},TX{:})
     subplot(2,4,3);
     scatter(MAG(ic).OUT.OxideFract.liq(hasmlt,Si).*100,MAG(ic).OUT.OxideFract.liq(hasmlt,Fe).*100,25,MAG(ic).OUT.T(hasmlt),'o'); colormap('copper'); axis tight; hold on
     scatter(MAG(ic).OUT.OxideFract.sol(hasmlt,Si).*100,MAG(ic).OUT.OxideFract.sol(hasmlt,Fe).*100,25,MAG(ic).OUT.T(hasmlt),'s'); colormap('copper');
     scatter(MAG(ic).OUT.OxideFract.SYS(hasmlt,Si).*100,MAG(ic).OUT.OxideFract.SYS(hasmlt,Fe).*100,25,MAG(ic).OUT.T(hasmlt),'d'); colormap('copper');
-    scatter(cal.cmp_oxd(cal.dun,cal.Si),cal.cmp_oxd(cal.dun,cal.Fe),140,cal.T0(cal.dun),'filled','o');
-    scatter(cal.cmp_oxd(cal.pxn,cal.Si),cal.cmp_oxd(cal.pxn,cal.Fe),140,cal.T0(cal.pxn),'filled','o');
-    scatter(cal.cmp_oxd(cal.bas,cal.Si),cal.cmp_oxd(cal.bas,cal.Fe),140,cal.T0(cal.bas),'filled','o');
-    scatter(cal.cmp_oxd(cal.eut,cal.Si),cal.cmp_oxd(cal.eut,cal.Fe),140,cal.T0(cal.eut),'filled','o');
+    scatter(cal.cmp_oxd(cal.dun,cal.Si),cal.cmp_oxd(cal.dun,cal.Fe),140,cal.T0(1),'filled','o');
+    scatter(cal.cmp_oxd(cal.pxn,cal.Si),cal.cmp_oxd(cal.pxn,cal.Fe),140,cal.T0(2),'filled','o');
+    scatter(cal.cmp_oxd(cal.bas,cal.Si),cal.cmp_oxd(cal.bas,cal.Fe),140,cal.T0(3),'filled','o');
+    scatter(cal.cmp_oxd(cal.eut,cal.Si),cal.cmp_oxd(cal.eut,cal.Fe),140,cal.T0(4),'filled','o');
     xlabel(cal.oxdStr(cal.Si),FS{:},TX{:})
     ylabel(cal.oxdStr(cal.Fe),FS{:},TX{:})
     subplot(2,4,4);
     scatter(MAG(ic).OUT.OxideFract.liq(hasmlt,Si).*100,MAG(ic).OUT.OxideFract.liq(hasmlt,Mg).*100,25,MAG(ic).OUT.T(hasmlt),'o'); colormap('copper'); axis tight; hold on
     scatter(MAG(ic).OUT.OxideFract.sol(hasmlt,Si).*100,MAG(ic).OUT.OxideFract.sol(hasmlt,Mg).*100,25,MAG(ic).OUT.T(hasmlt),'s'); colormap('copper');
     scatter(MAG(ic).OUT.OxideFract.SYS(hasmlt,Si).*100,MAG(ic).OUT.OxideFract.SYS(hasmlt,Mg).*100,25,MAG(ic).OUT.T(hasmlt),'d'); colormap('copper');
-    scatter(cal.cmp_oxd(cal.dun,cal.Si),cal.cmp_oxd(cal.dun,cal.Mg),140,cal.T0(cal.dun),'filled','o');
-    scatter(cal.cmp_oxd(cal.pxn,cal.Si),cal.cmp_oxd(cal.pxn,cal.Mg),140,cal.T0(cal.pxn),'filled','o');
-    scatter(cal.cmp_oxd(cal.bas,cal.Si),cal.cmp_oxd(cal.bas,cal.Mg),140,cal.T0(cal.bas),'filled','o');
-    scatter(cal.cmp_oxd(cal.eut,cal.Si),cal.cmp_oxd(cal.eut,cal.Mg),140,cal.T0(cal.eut),'filled','o');
+    scatter(cal.cmp_oxd(cal.dun,cal.Si),cal.cmp_oxd(cal.dun,cal.Mg),140,cal.T0(1),'filled','o');
+    scatter(cal.cmp_oxd(cal.pxn,cal.Si),cal.cmp_oxd(cal.pxn,cal.Mg),140,cal.T0(2),'filled','o');
+    scatter(cal.cmp_oxd(cal.bas,cal.Si),cal.cmp_oxd(cal.bas,cal.Mg),140,cal.T0(3),'filled','o');
+    scatter(cal.cmp_oxd(cal.eut,cal.Si),cal.cmp_oxd(cal.eut,cal.Mg),140,cal.T0(4),'filled','o');
     xlabel(cal.oxdStr(cal.Si),FS{:},TX{:})
     ylabel(cal.oxdStr(cal.Mg),FS{:},TX{:})
     subplot(2,4,5);
     scatter(MAG(ic).OUT.OxideFract.liq(hasmlt,Si).*100,MAG(ic).OUT.OxideFract.liq(hasmlt,Ca).*100,25,MAG(ic).OUT.T(hasmlt),'o'); colormap('copper'); axis tight; hold on
     scatter(MAG(ic).OUT.OxideFract.sol(hasmlt,Si).*100,MAG(ic).OUT.OxideFract.sol(hasmlt,Ca).*100,25,MAG(ic).OUT.T(hasmlt),'s'); colormap('copper');
     scatter(MAG(ic).OUT.OxideFract.SYS(hasmlt,Si).*100,MAG(ic).OUT.OxideFract.SYS(hasmlt,Ca).*100,25,MAG(ic).OUT.T(hasmlt),'d'); colormap('copper');
-    scatter(cal.cmp_oxd(cal.dun,cal.Si),cal.cmp_oxd(cal.dun,cal.Ca),140,cal.T0(cal.dun),'filled','o');
-    scatter(cal.cmp_oxd(cal.pxn,cal.Si),cal.cmp_oxd(cal.pxn,cal.Ca),140,cal.T0(cal.pxn),'filled','o');
-    scatter(cal.cmp_oxd(cal.bas,cal.Si),cal.cmp_oxd(cal.bas,cal.Ca),140,cal.T0(cal.bas),'filled','o');
-    scatter(cal.cmp_oxd(cal.eut,cal.Si),cal.cmp_oxd(cal.eut,cal.Ca),140,cal.T0(cal.eut),'filled','o');
+    scatter(cal.cmp_oxd(cal.dun,cal.Si),cal.cmp_oxd(cal.dun,cal.Ca),140,cal.T0(1),'filled','o');
+    scatter(cal.cmp_oxd(cal.pxn,cal.Si),cal.cmp_oxd(cal.pxn,cal.Ca),140,cal.T0(2),'filled','o');
+    scatter(cal.cmp_oxd(cal.bas,cal.Si),cal.cmp_oxd(cal.bas,cal.Ca),140,cal.T0(3),'filled','o');
+    scatter(cal.cmp_oxd(cal.eut,cal.Si),cal.cmp_oxd(cal.eut,cal.Ca),140,cal.T0(4),'filled','o');
     xlabel(cal.oxdStr(cal.Si),FS{:},TX{:})
     ylabel(cal.oxdStr(cal.Ca),FS{:},TX{:})
     subplot(2,4,6);
     scatter(MAG(ic).OUT.OxideFract.liq(hasmlt,Si).*100,MAG(ic).OUT.OxideFract.liq(hasmlt,Na).*100,25,MAG(ic).OUT.T(hasmlt),'o'); colormap('copper'); axis tight; hold on
     scatter(MAG(ic).OUT.OxideFract.sol(hasmlt,Si).*100,MAG(ic).OUT.OxideFract.sol(hasmlt,Na).*100,25,MAG(ic).OUT.T(hasmlt),'s'); colormap('copper');
     scatter(MAG(ic).OUT.OxideFract.SYS(hasmlt,Si).*100,MAG(ic).OUT.OxideFract.SYS(hasmlt,Na).*100,25,MAG(ic).OUT.T(hasmlt),'d'); colormap('copper');
-    scatter(cal.cmp_oxd(cal.dun,cal.Si),cal.cmp_oxd(cal.dun,cal.Na),150,cal.T0(cal.dun),'filled','o');
-    scatter(cal.cmp_oxd(cal.pxn,cal.Si),cal.cmp_oxd(cal.pxn,cal.Na),150,cal.T0(cal.pxn),'filled','o');
-    scatter(cal.cmp_oxd(cal.bas,cal.Si),cal.cmp_oxd(cal.bas,cal.Na),150,cal.T0(cal.bas),'filled','o');
-    scatter(cal.cmp_oxd(cal.eut,cal.Si),cal.cmp_oxd(cal.eut,cal.Na),150,cal.T0(cal.eut),'filled','o');
+    scatter(cal.cmp_oxd(cal.dun,cal.Si),cal.cmp_oxd(cal.dun,cal.Na),150,cal.T0(1),'filled','o');
+    scatter(cal.cmp_oxd(cal.pxn,cal.Si),cal.cmp_oxd(cal.pxn,cal.Na),150,cal.T0(2),'filled','o');
+    scatter(cal.cmp_oxd(cal.bas,cal.Si),cal.cmp_oxd(cal.bas,cal.Na),150,cal.T0(3),'filled','o');
+    scatter(cal.cmp_oxd(cal.eut,cal.Si),cal.cmp_oxd(cal.eut,cal.Na),150,cal.T0(4),'filled','o');
     xlabel(cal.oxdStr(cal.Si),FS{:},TX{:})
     ylabel(cal.oxdStr(cal.Na),FS{:},TX{:})
     subplot(2,4,7);
     scatter(MAG(ic).OUT.OxideFract.liq(hasmlt,Si).*100,MAG(ic).OUT.OxideFract.liq(hasmlt,K).*100,25,MAG(ic).OUT.T(hasmlt),'o'); colormap('copper'); axis tight; hold on
     scatter(MAG(ic).OUT.OxideFract.sol(hasmlt,Si).*100,MAG(ic).OUT.OxideFract.sol(hasmlt,K).*100,25,MAG(ic).OUT.T(hasmlt),'s'); colormap('copper');
     scatter(MAG(ic).OUT.OxideFract.SYS(hasmlt,Si).*100,MAG(ic).OUT.OxideFract.SYS(hasmlt,K).*100,25,MAG(ic).OUT.T(hasmlt),'d'); colormap('copper');
-    scatter(cal.cmp_oxd(cal.dun,cal.Si),cal.cmp_oxd(cal.dun,cal.K),150,cal.T0(cal.dun),'filled','o');
-    scatter(cal.cmp_oxd(cal.pxn,cal.Si),cal.cmp_oxd(cal.pxn,cal.K),150,cal.T0(cal.pxn),'filled','o');
-    scatter(cal.cmp_oxd(cal.bas,cal.Si),cal.cmp_oxd(cal.bas,cal.K),150,cal.T0(cal.bas),'filled','o');
-    scatter(cal.cmp_oxd(cal.eut,cal.Si),cal.cmp_oxd(cal.eut,cal.K),150,cal.T0(cal.eut),'filled','o');
+    scatter(cal.cmp_oxd(cal.dun,cal.Si),cal.cmp_oxd(cal.dun,cal.K),150,cal.T0(1),'filled','o');
+    scatter(cal.cmp_oxd(cal.pxn,cal.Si),cal.cmp_oxd(cal.pxn,cal.K),150,cal.T0(2),'filled','o');
+    scatter(cal.cmp_oxd(cal.bas,cal.Si),cal.cmp_oxd(cal.bas,cal.K),150,cal.T0(3),'filled','o');
+    scatter(cal.cmp_oxd(cal.eut,cal.Si),cal.cmp_oxd(cal.eut,cal.K),150,cal.T0(4),'filled','o');
     xlabel(cal.oxdStr(cal.Si),FS{:},TX{:})
     ylabel(cal.oxdStr(cal.Na),FS{:},TX{:})
     colorbar;
@@ -513,65 +505,12 @@ for ic = nc
 end
 sgtitle('melt, solid, mixture',FS{:},TX{:})
 
-%% express melt as mixture of defined mineral end-members
-cal_MORB; Fe = 4; % load melt model calibration
-oxdSYS = [];
-oxdSOL = [];
-oxdLIQ = [];
-for ic = nc
-    hasmlt = MAG(ic).OUT.PhaseFractions.liq_wt>=0.001 & MAG(ic).OUT.PhaseFractions.sol_wt>=0.001;
-    oxdSYS      = [oxdSYS;MAG(1).OUT.OxideFract.SYS(hasmlt,:)./sum(MAG(1).OUT.OxideFract.SYS(hasmlt,1:end-1),2)*100];
-    oxdLIQ      = [oxdLIQ;MAG(1).OUT.OxideFract.liq(hasmlt,:)./sum(MAG(1).OUT.OxideFract.liq(hasmlt,1:end-1),2)*100];
-    oxdSOL      = [oxdSOL;MAG(1).OUT.OxideFract.sol(hasmlt,:)./sum(MAG(1).OUT.OxideFract.sol(hasmlt,1:end-1),2)*100];
-end
-oxd0 = oxdLIQ;  %[oxdSYS;oxdLIQ;oxdSOL];
-
-% A_mem = ones(size(oxd0,1),cal.nmem);
-A_mem = max(0.01,oxd0/cal.mem_oxd);
-A_mem(:,end) = 0;
-A_mem(:,1:end-1) = A_mem(:,1:end-1)./sum(A_mem(:,1:end-1),2);
-A_mem_best = A_mem;
-oxdfit = A_mem*cal.mem_oxd;
-misfit = norm((oxdfit-oxd0)./(oxd0+0.1))/sqrt(length(oxd0(:)));
-bestfit = misfit*1.01;
-dfit = misfit*0.01;
-
-figure(100); clf;
-
-tol = 1e-3; it = 1;
-while misfit>tol && dfit>1e-5 && it<1e6
-
-    A_mem(:,1:end-1) = max(1e-9,A_mem_best(:,1:end-1) .* (1 + randn(size(A_mem(:,1:end-1))).*min(1e-1,bestfit^0.25/100)));
-    A_mem(:,1:end-1) = A_mem(:,1:end-1)./sum(A_mem(:,1:end-1),2);
-    oxdfit = A_mem*cal.mem_oxd;
-
-    misfit = norm((oxdfit-oxd0)./(oxd0+0.1))/sqrt(length(oxd0(:)));
-
-    if misfit<1.0*bestfit
-        dfit = abs(bestfit-misfit)*0.1 + dfit*0.9;
-        bestfit = misfit;
-        A_mem_best = A_mem;
-        subplot(2,1,1); loglog(it,(bestfit),'k.'); hold on; axis tight; box on;
-        subplot(2,1,2); loglog(it,(dfit   ),'k.'); hold on; axis tight; box on;
-        drawnow;
-    end
-
-    it = it+1;
-end
-
-
 %% best fit cmp_mem
 cal_MORB; Fe = 4; % load melt model calibration
-oxdSYS = [];
-oxdSOL = [];
-oxdLIQ = [];
-for ic = nc
-    hasmlt = MAG(ic).OUT.PhaseFractions.liq_wt>=0.001 & MAG(ic).OUT.PhaseFractions.sol_wt>=0.001;
-    oxdSYS = [oxdSYS;MAG(ic).OUT.OxideFract.SYS(hasmlt,:)./sum(MAG(ic).OUT.OxideFract.SYS(hasmlt,1:end-1),2)*100];
-    oxdLIQ = [oxdLIQ;MAG(ic).OUT.OxideFract.liq(hasmlt,:)./sum(MAG(ic).OUT.OxideFract.liq(hasmlt,1:end-1),2)*100];
-    oxdSOL = [oxdSOL;MAG(ic).OUT.OxideFract.sol(hasmlt,:)./sum(MAG(ic).OUT.OxideFract.sol(hasmlt,1:end-1),2)*100];
-end
-oxd0 = oxdSYS;%[oxdSYS;oxdLIQ;oxdSOL];
+oxdSYS      = MAG(1).OUT.OxideFract.SYS(hasmlt,[Si Ti Al Fe Mg Ca Na K H])./sum(MAG(1).OUT.OxideFract.SYS(hasmlt,[Si Ti Al Fe Mg Ca Na K]),2)*100;
+oxdLIQ      = MAG(1).OUT.OxideFract.liq(hasmlt,[Si Ti Al Fe Mg Ca Na K H])./sum(MAG(1).OUT.OxideFract.liq(hasmlt,[Si Ti Al Fe Mg Ca Na K]),2)*100;
+oxdSOL      = MAG(1).OUT.OxideFract.sol(hasmlt,[Si Ti Al Fe Mg Ca Na K H])./sum(MAG(1).OUT.OxideFract.sol(hasmlt,[Si Ti Al Fe Mg Ca Na K]),2)*100;
+oxd0 = [oxdSYS];%;oxdLIQ;oxdSOL];
 
 % DATA.PRJCT  = 'BSE';
 % DATA.VNAMES = cal.oxdStr([cal.Si,cal.Ti,cal.Al,cal.Fe,cal.Mg,cal.Ca,cal.Na,cal.K]);
@@ -580,24 +519,18 @@ oxd0 = oxdSYS;%[oxdSYS;oxdLIQ;oxdSOL];
 % DATA.X      = DATA.X./sum(DATA.X,2);
 % unmix
 
+oxd0(:,7) = 0.0;
 cmp_mem = cal.cmp_mem;
 cmp_mem_best = cmp_mem;
 cmp_oxd = cal.cmp_oxd;
 
-cfit   = max(0.0,cmp_oxd.'\oxd0.').'; cfit(:,end) = 0; cfit = cfit./sum(cfit,2);
-oxdfit = cfit*cmp_oxd;
-
-misfit  = norm((oxdfit-oxd0)./(oxd0+0.1))/sqrt(length(oxd0(:)));
-bestfit = misfit*1.001;
-dfit    = misfit*0.001;
-
 figure(100); clf;
 
 ifit = [2,3,4];
-tol = 1e-3; it = 1;
+misfit = 13; bestfit = 13.1; dfit = 0.01; tol = 1e-3; it = 1;
 while misfit>tol && dfit>1e-5 && it<1e6
 
-    cmp_mem(ifit,1:end-1) = max(1e-6,cmp_mem_best(ifit,1:end-1) .* (1 + randn(size(cmp_mem(ifit,1:end-1))).*min(1e-1,bestfit^0.25/100)));
+    cmp_mem(ifit,1:end-1) = min(50,max(1e-6,cmp_mem_best(ifit,1:end-1) .* (1 + randn(size(cmp_mem(ifit,1:end-1)))).*min(1e-1,bestfit^0.25/20)));
     cmp_mem(ifit,:) = cmp_mem(ifit,:)./sum(cmp_mem(ifit,:),2)*100;
     cmp_oxd = cmp_mem*cal.mem_oxd./100;
 
@@ -606,7 +539,7 @@ while misfit>tol && dfit>1e-5 && it<1e6
 
     misfit = norm((oxdfit-oxd0)./(oxd0+0.1))/sqrt(length(oxd0(:)));
 
-    if misfit<1.0*bestfit
+    if misfit<1.001*bestfit
         dfit = abs(bestfit-misfit)*0.1 + dfit*0.9;
         bestfit = misfit;
         cmp_mem_best = cmp_mem;
