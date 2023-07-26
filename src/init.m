@@ -288,11 +288,18 @@ cx0_oxd = cx0*cal.cmp_oxd;
 rhof0 = cal.rhof0;
 rhox0 = mean(rhox(:));
 
-etam0 = Giordano08(cm0_oxd,T0);
-rhom0 = DensityX(cm0_oxd,T0,Ptop/1e8);
+cm0_oxd_all = zeros(1,9);
+cm0_oxd_all(:,cal.ioxd) = cm0_oxd;
+etam0 = Giordano08(cm0_oxd_all,T0);
+rhom0 = DensityX(cm0_oxd_all,T0,Ptop/1e8);
 
 cm1_oxd = (0.9.*cm0_mem + 0.1.*cal.cmp_mem(4,:))*cal.mem_oxd/100;
 cm2_oxd = (0.9.*cm0_mem - 0.1.*cal.cmp_mem(4,:))*cal.mem_oxd/100;
+
+cm1_oxd_all = zeros(1,9);
+cm1_oxd_all(:,cal.ioxd) = cm1_oxd;
+cm2_oxd_all = zeros(1,9);
+cm2_oxd_all(:,cal.ioxd) = cm2_oxd;
 
 rho0 = (x0./rhox0 + m0./rhom0).^-1;
 
@@ -302,8 +309,8 @@ fprintf('    initial H2O : %4.3f \n'  ,c0_oxd(end));
 fprintf('    initial x   : %4.3f \n'  ,x0);
 fprintf('    initial f   : %4.3f \n\n',f0);
 
-rhom1 = DensityX(cm1_oxd,T0,Ptop/1e8);
-rhom2 = DensityX(cm2_oxd,T0,Ptop/1e8);
+rhom1 = DensityX(cm1_oxd_all,T0,Ptop/1e8);
+rhom2 = DensityX(cm2_oxd_all,T0,Ptop/1e8);
 
 DrhoT = rhom0.*aT*max([abs(T0-Twall)/10,abs(T0-T1),T0/100]);
 Drhoc = abs(rhom1-rhom2);

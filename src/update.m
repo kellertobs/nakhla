@@ -20,8 +20,15 @@ for j = 1:cal.nmsy
     cx_msy_oxd(:,:,j,:) = reshape(reshape(cx_mem(:,:,cal.msy_mem(j,:)==1),Nz*Nx,sum(cal.msy_mem(j,:)==1))*cal.mem_oxd(cal.msy_mem(j,:)==1,:)./sum(reshape(cx_mem(:,:,cal.msy_mem(j,:)==1),Nz*Nx,sum(cal.msy_mem(j,:)==1))+1e-32,2),Nz,Nx,1,cal.noxd);
 end
 
+cm_oxd_all = zeros(size(c,1),size(c,2),9);
+cm_oxd_all(:,:,cal.ioxd) = cm_oxd;
+cx_oxd_all = zeros(size(c,1),size(c,2),9);
+cx_oxd_all(:,:,cal.ioxd) = cx_oxd;
+ c_oxd_all = zeros(size(c,1),size(c,2),9);
+ c_oxd_all(:,:,cal.ioxd) = c_oxd;
+
 % update phase densities
-rhom   = reshape(DensityX(reshape(cm_oxd,Nz*Nx,cal.noxd),T0,Ptop./1e8),Nz,Nx)    .* (1 - aT.*(T-T0-273.15) + bPm.*(Pt-Ptop));
+rhom   = reshape(DensityX(reshape(cm_oxd_all,Nz*Nx,9),T0,Ptop./1e8),Nz,Nx)    .* (1 - aT.*(T-T0-273.15) + bPm.*(Pt-Ptop));
 rhox   = reshape(sum(reshape(cx_mem/100,Nz*Nx,cal.nmem)./cal.rhox0,2).^-1,Nz,Nx) .* (1 - aT.*(T-T0-273.15) + bPx.*(Pt-Ptop));
 rhof   = cal.rhof0                                                               .* (1 - aT.*(T-T0-273.15) + bPf.*(Pt-Ptop));
 
@@ -41,7 +48,7 @@ if Nz==1; Pt = Ptop.*ones(size(Tp)); else
 end
 
 % update melt viscosity
-etam   = reshape(Giordano08(reshape(cm_oxd,Nz*Nx,cal.noxd),T(:)-273.15),Nz,Nx);
+etam   = reshape(Giordano08(reshape(cm_oxd_all,Nz*Nx,9),T(:)-273.15),Nz,Nx);
 
 % effective mixture shear viscosity (Costa et al., 2009)
 hh     = (1-cal.xi).*erf(sqrt(pi)./(2.*(1-cal.xi)).*(max(TINY^0.5,chi)./cal.chi_pck).*(1+(max(TINY^0.5,chi)./cal.chi_pck).^cal.gamma));

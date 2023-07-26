@@ -348,73 +348,68 @@ else % create 2D plots
 
     % plot pseudo-component composition in Fig. 5
     set(0,'CurrentFigure',fh5)
+    for i = 1:cal.ncmp-1
+        set(fh5,'CurrentAxes',ax(50+i));
+        imagesc(Xc,Zc,c(:,:,i).*100); axis ij equal tight; box on; cb = colorbar;
+        set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.cmpStr{i},' [wt\%]'],TX{:},FS{:});
+    end
     set(fh5,'CurrentAxes',ax(51));
-    imagesc(Xc,Zc,c(:,:,1).*100); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.cmpStr{1},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel('Depth [m]',TX{:},FS{:});
+    set(gca,'XTickLabel',[]); ylabel('Depth [m]',TX{:},FS{:});
     set(fh5,'CurrentAxes',ax(52));
-    imagesc(Xc,Zc,c(:,:,2).*100); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.cmpStr{2},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
+    set(gca,'XTickLabel',[],'YTickLabel',[]);
     text(-0.1,1.1,['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k','HorizontalAlignment','center','Units','normalized');
     set(fh5,'CurrentAxes',ax(53));
-    imagesc(Xc,Zc,c(:,:,3).*100); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.cmpStr{3},' [wt\%]'],TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:}); xlabel('Width [m]',TX{:},FS{:});
+    ylabel('Depth [m]',TX{:},FS{:}); xlabel('Width [m]',TX{:},FS{:});
     set(fh5,'CurrentAxes',ax(54));
-    imagesc(Xc,Zc,c(:,:,4).*100); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.cmpStr{4},' [wt\%]'],TX{:},FS{:}); set(gca,'YTickLabel',[]); xlabel('Width [m]',TX{:},FS{:});
+    set(gca,'YTickLabel',[]); xlabel('Width [m]',TX{:},FS{:});
 
     % plot major oxide composition in Fig. 6
     set(0,'CurrentFigure',fh6)
     sumanh = sum(c_oxd(:,:,1:end-1),3);
+    for i = 1:cal.noxd
+        set(fh6,'CurrentAxes',ax(60+i));
+        imagesc(Xc,Zc,c_oxd(:,:,i)./sumanh.*100); axis ij equal tight; box on; cb = colorbar;
+        set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.oxdStr{i},' [wt\%]'],TX{:},FS{:});
+    end
     set(fh6,'CurrentAxes',ax(61));
-    imagesc(Xc,Zc,c_oxd(:,:,1)./sumanh.*100); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.oxdStr{1},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[]);
+    set(gca,'XTickLabel',[]);
     set(fh6,'CurrentAxes',ax(62));
-    imagesc(Xc,Zc,c_oxd(:,:,2)./sumanh.*100); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.oxdStr{2},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
+    set(gca,'XTickLabel',[],'YTickLabel',[]);
     text(0.5,1.1,['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k','HorizontalAlignment','center','Units','normalized');
     set(fh6,'CurrentAxes',ax(63));
-    imagesc(Xc,Zc,c_oxd(:,:,3)./sumanh.*100); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.oxdStr{3},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
+    set(gca,'XTickLabel',[],'YTickLabel',[]);
     set(fh6,'CurrentAxes',ax(64));
-    imagesc(Xc,Zc,c_oxd(:,:,4)./sumanh.*100); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.oxdStr{4},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel('Depth [m]',TX{:},FS{:});
+    set(gca,'XTickLabel',[]); ylabel('Depth [m]',TX{:},FS{:});
     set(fh6,'CurrentAxes',ax(65));
-    imagesc(Xc,Zc,c_oxd(:,:,5)./sumanh.*100); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.oxdStr{5},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]); 
+    set(gca,'XTickLabel',[],'YTickLabel',[]); 
     set(fh6,'CurrentAxes',ax(66));
-    imagesc(Xc,Zc,c_oxd(:,:,6)./sumanh.*100); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.oxdStr{6},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
+    set(gca,'XTickLabel',[],'YTickLabel',[]);
     set(fh6,'CurrentAxes',ax(67));
-    imagesc(Xc,Zc,c_oxd(:,:,7)./sumanh.*100); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.oxdStr{7},' [wt\%]'],TX{:},FS{:});
     set(fh6,'CurrentAxes',ax(68));
-    imagesc(Xc,Zc,c_oxd(:,:,8)./sumanh.*100); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.oxdStr{8},' [wt\%]'],TX{:},FS{:}); set(gca,'YTickLabel',[]); xlabel('Width [m]',TX{:},FS{:});
+    set(gca,'YTickLabel',[]); xlabel('Width [m]',TX{:},FS{:});
     set(fh6,'CurrentAxes',ax(69));
-    imagesc(Xc,Zc,c_oxd(:,:,9)); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.oxdStr{9},' [wt\%]'],TX{:},FS{:}); set(gca,'YTickLabel',[]);
+    set(gca,'YTickLabel',[]);
 
     % plot mineral assemblage in Fig. 7
     set(0,'CurrentFigure',fh7)
+    for i = 1:cal.nmsy
+        set(fh7,'CurrentAxes',ax(70+i));
+        imagesc(Xc,Zc,cx_msy(:,:,i).*x); axis ij equal tight; box on; cb = colorbar;
+        set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.msyStr{i},' [wt\%]'],TX{:},FS{:});
+    end
     set(fh7,'CurrentAxes',ax(71));
-    imagesc(Xc,Zc,cx_msy(:,:,1).*x); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.msyStr{1},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel('Depth [m]',TX{:},FS{:}); 
+    set(gca,TL{:},TS{:}); set(gca,'XTickLabel',[]); ylabel('Depth [m]',TX{:},FS{:}); 
     set(fh7,'CurrentAxes',ax(72));
-    imagesc(Xc,Zc,cx_msy(:,:,2).*x); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.msyStr{2},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
+    set(gca,'XTickLabel',[],'YTickLabel',[]);
     text(0.5,1.1,['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k','HorizontalAlignment','center','Units','normalized');
     set(fh7,'CurrentAxes',ax(73));
-    imagesc(Xc,Zc,cx_msy(:,:,3).*x); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.msyStr{3},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
+    set(gca,'XTickLabel',[],'YTickLabel',[]);
     set(fh7,'CurrentAxes',ax(74));
-    imagesc(Xc,Zc,cx_msy(:,:,4).*x); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.msyStr{4},' [wt\%]'],TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:});
+    ylabel('Depth [m]',TX{:},FS{:});
     set(fh7,'CurrentAxes',ax(75));
-    imagesc(Xc,Zc,cx_msy(:,:,5).*x); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.msyStr{5},' [wt\%]'],TX{:},FS{:}); set(gca,'YTickLabel',[]); xlabel('Width [m]',TX{:},FS{:});
+    set(gca,'YTickLabel',[]); xlabel('Width [m]',TX{:},FS{:});
     set(fh7,'CurrentAxes',ax(76));
-    imagesc(Xc,Zc,cx_msy(:,:,6).*x); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.msyStr{6},' [wt\%]'],TX{:},FS{:}); set(gca,'YTickLabel',[]);
+    set(gca,'YTickLabel',[]);
 
     % plot geochemical variables in Fig. 7
     set(0,'CurrentFigure',fh8)
@@ -445,70 +440,20 @@ if ~exist('fh9','var'); fh9 = figure(VIS{:});
 else; set(0, 'CurrentFigure', fh9);
 end
 if Nz>1; clf; end
-
-subplot(3,3,1)
-plot( c_oxd(:,:,cal.Si)./sum( c_oxd(:,:,1:end-1),3),T-273.15,'k.','LineWidth',2,'MarkerSize',15); axis tight; box on; hold on;
-plot(cx_oxd(:,:,cal.Si)./sum(cx_oxd(:,:,1:end-1),3),T-273.15,'b.','LineWidth',2,'MarkerSize',15);
-plot(cm_oxd(:,:,cal.Si)./sum(cm_oxd(:,:,1:end-1),3),T-273.15,'r.','LineWidth',2,'MarkerSize',15);
-xlabel([cal.oxdStr{cal.Si},' [wt]'],'Interpreter','latex','FontSize',12)
+for i=1:cal.noxd
+subplot(3,3,i)
+plot( c_oxd(:,:,i)./sum( c_oxd(:,:,1:end-1),3),T-273.15,'k.','LineWidth',2,'MarkerSize',15); axis tight; box on; hold on;
+plot(cx_oxd(:,:,i)./sum(cx_oxd(:,:,1:end-1),3),T-273.15,'b.','LineWidth',2,'MarkerSize',15);
+plot(cm_oxd(:,:,i)./sum(cm_oxd(:,:,1:end-1),3),T-273.15,'r.','LineWidth',2,'MarkerSize',15);
+xlabel([cal.oxdStr{i},' [wt]'],'Interpreter','latex','FontSize',12)
 set(gca,'TickLabelInterpreter','latex','FontSize',10)
+end
 
 subplot(3,3,2)
-plot( c_oxd(:,:,cal.Ti)./sum( c_oxd(:,:,1:end-1),3),T-273.15,'k.','LineWidth',2,'MarkerSize',15); axis tight; box on; hold on;
-plot(cx_oxd(:,:,cal.Ti)./sum(cx_oxd(:,:,1:end-1),3),T-273.15,'b.','LineWidth',2,'MarkerSize',15);
-plot(cm_oxd(:,:,cal.Ti)./sum(cm_oxd(:,:,1:end-1),3),T-273.15,'r.','LineWidth',2,'MarkerSize',15);
-xlabel([cal.oxdStr{cal.Ti},' [wt]'],'Interpreter','latex','FontSize',12)
-set(gca,'TickLabelInterpreter','latex','FontSize',10)
-
-subplot(3,3,3)
-plot( c_oxd(:,:,cal.Al)./sum( c_oxd(:,:,1:end-1),3),T-273.15,'k.','LineWidth',2,'MarkerSize',15); axis tight; box on; hold on;
-plot(cx_oxd(:,:,cal.Al)./sum(cx_oxd(:,:,1:end-1),3),T-273.15,'b.','LineWidth',2,'MarkerSize',15);
-plot(cm_oxd(:,:,cal.Al)./sum(cm_oxd(:,:,1:end-1),3),T-273.15,'r.','LineWidth',2,'MarkerSize',15);
-xlabel([cal.oxdStr{cal.Al},' [wt]'],'Interpreter','latex','FontSize',12)
-set(gca,'TickLabelInterpreter','latex','FontSize',10)
+text(0.5,1.1,['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k','HorizontalAlignment','center','Units','normalized');
 
 subplot(3,3,4)
-plot( c_oxd(:,:,cal.Fe)./sum( c_oxd(:,:,1:end-1),3),T-273.15,'k.','LineWidth',2,'MarkerSize',15); axis tight; box on; hold on;
-plot(cx_oxd(:,:,cal.Fe)./sum(cx_oxd(:,:,1:end-1),3),T-273.15,'b.','LineWidth',2,'MarkerSize',15);
-plot(cm_oxd(:,:,cal.Fe)./sum(cm_oxd(:,:,1:end-1),3),T-273.15,'r.','LineWidth',2,'MarkerSize',15);
-xlabel([cal.oxdStr{cal.Fe},' [wt]'],'Interpreter','latex','FontSize',12)
 ylabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',15)
-set(gca,'TickLabelInterpreter','latex','FontSize',10)
-
-subplot(3,3,5)
-plot( c_oxd(:,:,cal.Mg)./sum( c_oxd(:,:,1:end-1),3),T-273.15,'k.','LineWidth',2,'MarkerSize',15); axis tight; box on; hold on;
-plot(cx_oxd(:,:,cal.Mg)./sum(cx_oxd(:,:,1:end-1),3),T-273.15,'b.','LineWidth',2,'MarkerSize',15);
-plot(cm_oxd(:,:,cal.Mg)./sum(cm_oxd(:,:,1:end-1),3),T-273.15,'r.','LineWidth',2,'MarkerSize',15);
-xlabel([cal.oxdStr{cal.Mg},' [wt]'],'Interpreter','latex','FontSize',12)
-set(gca,'TickLabelInterpreter','latex','FontSize',10)
-
-subplot(3,3,6)
-plot( c_oxd(:,:,cal.Ca)./sum( c_oxd(:,:,1:end-1),3),T-273.15,'k.','LineWidth',2,'MarkerSize',15); axis tight; box on; hold on;
-plot(cx_oxd(:,:,cal.Ca)./sum(cx_oxd(:,:,1:end-1),3),T-273.15,'b.','LineWidth',2,'MarkerSize',15);
-plot(cm_oxd(:,:,cal.Ca)./sum(cm_oxd(:,:,1:end-1),3),T-273.15,'r.','LineWidth',2,'MarkerSize',15);
-xlabel([cal.oxdStr{cal.Ca},' [wt]'],'Interpreter','latex','FontSize',12)
-set(gca,'TickLabelInterpreter','latex','FontSize',10)
-
-subplot(3,3,7)
-plot( c_oxd(:,:,cal.Na)./sum( c_oxd(:,:,1:end-1),3),T-273.15,'k.','LineWidth',2,'MarkerSize',15); axis tight; box on; hold on;
-plot(cx_oxd(:,:,cal.Na)./sum(cx_oxd(:,:,1:end-1),3),T-273.15,'b.','LineWidth',2,'MarkerSize',15);
-plot(cm_oxd(:,:,cal.Na)./sum(cm_oxd(:,:,1:end-1),3),T-273.15,'r.','LineWidth',2,'MarkerSize',15);
-xlabel([cal.oxdStr{cal.Na},' [wt]'],'Interpreter','latex','FontSize',12)
-set(gca,'TickLabelInterpreter','latex','FontSize',10)
-
-subplot(3,3,8)
-plot( c_oxd(:,:,cal.K)./sum( c_oxd(:,:,1:end-1),3),T-273.15,'k.','LineWidth',2,'MarkerSize',15); axis tight; box on; hold on;
-plot(cx_oxd(:,:,cal.K)./sum(cx_oxd(:,:,1:end-1),3),T-273.15,'b.','LineWidth',2,'MarkerSize',15);
-plot(cm_oxd(:,:,cal.K)./sum(cm_oxd(:,:,1:end-1),3),T-273.15,'r.','LineWidth',2,'MarkerSize',15);
-xlabel([cal.oxdStr{cal.K},' [wt]'],'Interpreter','latex','FontSize',12)
-set(gca,'TickLabelInterpreter','latex','FontSize',10)
-
-subplot(3,3,9)
-plot( c_oxd(:,:,cal.H),T-273.15,'k.','LineWidth',2,'MarkerSize',15); axis tight; box on; hold on;
-plot(cx_oxd(:,:,cal.H),T-273.15,'b.','LineWidth',2,'MarkerSize',15);
-plot(cm_oxd(:,:,cal.H),T-273.15,'r.','LineWidth',2,'MarkerSize',15);
-xlabel([cal.oxdStr{cal.H},' [wt]'],'Interpreter','latex','FontSize',12)
-set(gca,'TickLabelInterpreter','latex','FontSize',10)
 
 
 % plot composition on TAS, AFM diagrams
@@ -518,12 +463,12 @@ end
 if Nz>1 || step==0 || frst; clf;
 TAS; axis tight; box on; hold on;
 end
-cxSi = cx_oxd(:,:,cal.Si)./sum(cx_oxd(:,:,1:end-1),3).*100;
-cmSi = cm_oxd(:,:,cal.Si)./sum(cm_oxd(:,:,1:end-1),3).*100;
- cSi =  c_oxd(:,:,cal.Si)./sum( c_oxd(:,:,1:end-1),3).*100;
-cxNK = sum(cx_oxd(:,:,[cal.Na,cal.K]),3)./sum(cx_oxd(:,:,1:end-1),3).*100;
-cmNK = sum(cm_oxd(:,:,[cal.Na,cal.K]),3)./sum(cm_oxd(:,:,1:end-1),3).*100;
- cNK = sum( c_oxd(:,:,[cal.Na,cal.K]),3)./sum( c_oxd(:,:,1:end-1),3).*100;
+cxSi = cx_oxd_all(:,:,1)./sum(cx_oxd_all(:,:,1:end-1),3).*100;
+cmSi = cm_oxd_all(:,:,1)./sum(cm_oxd_all(:,:,1:end-1),3).*100;
+ cSi =  c_oxd_all(:,:,1)./sum( c_oxd_all(:,:,1:end-1),3).*100;
+cxNK = sum(cx_oxd_all(:,:,[7,8]),3)./sum(cx_oxd_all(:,:,1:end-1),3).*100;
+cmNK = sum(cm_oxd_all(:,:,[7,8]),3)./sum(cm_oxd_all(:,:,1:end-1),3).*100;
+ cNK = sum( c_oxd_all(:,:,[7,8]),3)./sum( c_oxd_all(:,:,1:end-1),3).*100;
 scatter(cxSi(:),cxNK(:),50,T(:)-273.15,'filled','^'); colormap(ocean); cb = colorbar;
 scatter(cmSi(:),cmNK(:),50,T(:)-273.15,'filled','o');
 scatter( cSi(:), cNK(:),80,T(:)-273.15,'filled','s');
@@ -535,17 +480,17 @@ end
 if Nz>1 || step==0 || frst; clf;
 AFM; axis tight; box on; hold on;
 end
-[A,B] = terncoords(cx_oxd(:,:, cal.Mg          )./sum(cx_oxd(:,:,[cal.Fe,cal.Mg,cal.Na,cal.K]),3), ...
-                   cx_oxd(:,:, cal.Fe          )./sum(cx_oxd(:,:,[cal.Fe,cal.Mg,cal.Na,cal.K]),3), ...
-               sum(cx_oxd(:,:,[cal.Na,cal.K]),3)./sum(cx_oxd(:,:,[cal.Fe,cal.Mg,cal.Na,cal.K]),3));
+[A,B] = terncoords(cx_oxd_all(:,:, 5      )./sum(cx_oxd_all(:,:,[5,4,7,8]),3), ...
+                   cx_oxd_all(:,:, 4      )./sum(cx_oxd_all(:,:,[5,4,7,8]),3), ...
+               sum(cx_oxd_all(:,:,[7,8]),3)./sum(cx_oxd_all(:,:,[5,4,7,8]),3));
 scatter(A(:),B(:),50,T(:)-273.15,'filled','^'); colormap(ocean); cb = colorbar;
-[A,B] = terncoords(cm_oxd(:,:, cal.Mg          )./sum(cm_oxd(:,:,[cal.Fe,cal.Mg,cal.Na,cal.K]),3), ...
-                   cm_oxd(:,:, cal.Fe          )./sum(cm_oxd(:,:,[cal.Fe,cal.Mg,cal.Na,cal.K]),3), ...
-               sum(cm_oxd(:,:,[cal.Na,cal.K]),3)./sum(cm_oxd(:,:,[cal.Fe,cal.Mg,cal.Na,cal.K]),3));
+[A,B] = terncoords(cm_oxd_all(:,:, 5      )./sum(cm_oxd_all(:,:,[5,4,7,8]),3), ...
+                   cm_oxd_all(:,:, 4      )./sum(cm_oxd_all(:,:,[5,4,7,8]),3), ...
+               sum(cm_oxd_all(:,:,[7,8]),3)./sum(cm_oxd_all(:,:,[5,4,7,8]),3));
 scatter(A(:),B(:),50,T(:)-273.15,'filled','o'); colormap(ocean);
-[A,B] = terncoords(c_oxd(:,:, cal.Mg          )./(sum(c_oxd(:,:,[cal.Fe,cal.Mg,cal.Na,cal.K]),3)), ...
-                   c_oxd(:,:, cal.Fe          )./(sum(c_oxd(:,:,[cal.Fe,cal.Mg,cal.Na,cal.K]),3)), ...
-               sum(c_oxd(:,:,[cal.Na,cal.K]),3)./(sum(c_oxd(:,:,[cal.Fe,cal.Mg,cal.Na,cal.K]),3)));
+[A,B] = terncoords(c_oxd_all(:,:, 5      )./(sum(c_oxd_all(:,:,[5,4,7,8]),3)), ...
+                   c_oxd_all(:,:, 4      )./(sum(c_oxd_all(:,:,[5,4,7,8]),3)), ...
+               sum(c_oxd_all(:,:,[7,8]),3)./(sum(c_oxd_all(:,:,[5,4,7,8]),3)));
 scatter(A(:),B(:),80,T(:)-273.15,'filled','s'); colormap(ocean);
 set(cb,TL{:},'FontSize',12); set(gca,TL{:},'FontSize',15); xlabel('SiO$_2$ [wt \%]',TX{:},'FontSize',15); ylabel('Na$_2$O + K$_2$O [wt \%]',TX{:},'FontSize',15);
 
