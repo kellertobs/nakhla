@@ -751,7 +751,7 @@ LikeFunc  = @(dhat,model) ProbFuncs('LikeFunc',dhat,data,sigma,model,cal);
 LkMdFunc  = @(model) ProbFuncs('LikeFuncModel', dhatFunc, model, data, sigma);
 
 % run MCMC algorithm
-Niter = 5e4;
+Niter = 1e5;
 
 % adjust step size to get reasonable acceptance ratio ~26%
 anneal.initstep = 0.2 * diff(mbnds,1,2);

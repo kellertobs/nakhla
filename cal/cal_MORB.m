@@ -51,9 +51,9 @@ cal.msy_mem = [1  1  0  0  0  0  0  0  0    % olivine (olv)
 % mineral end-member composition of melting model components
 %                    for       fay       mau       fau       mgt       ant       alb       qtz       wat
 cal.cmp_mem =   [      0         0         0         0         0  100.0000         0         0         0
-                  9.9202    6.4203   33.8790         0         0   39.6258   10.1547         0         0
-                       0   14.4405    8.0386   27.9426    8.9999    8.0098   32.5685         0         0
-                       0         0         0    5.1667    1.4421         0   49.4863   43.9049         0
+                 10.0281    6.3408   33.7580         0         0   39.9717    9.9013         0         0
+                       0   12.9861    7.4125   29.2336    9.9998    7.3042   33.0638         0         0
+                       0         0         0    5.2924    1.4526         0   49.4032   43.8517         0
                        0         0         0         0         0         0         0         0  100.0000];
 cal.cmp_mem = cal.cmp_mem./sum(cal.cmp_mem,2)*100;
 
