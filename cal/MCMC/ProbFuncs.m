@@ -63,17 +63,23 @@ models = models'; % the output size has to be Niter x Nvar
 end
 
 
-function L = LikeFunc (dhat, data, sigma, model, cal)
-% L = ProbFuncs('LikeFunc', dhat, data, sigma)
+function L = LikeFuncSimplex(dhat, data, sigma, model, cal)
+% L = ProbFuncs('LikeFunc', dhat, data, sigma, model, cal)
 % assumes normally-distributed errors. 
 % 
 cmp_mem = reshape(model,cal.ncmp,cal.nmem);
 cmp_oxd = cmp_mem*cal.mem_oxd./100;
-F = cmp_oxd(1:end-1,1:end-1).';
-V = sqrt(abs(det(F.'*F)));
-L = (sum(- 0.5*((data(:) - dhat(:))./sigma(:)).^2 ) - V/1000)./sqrt(length(dhat(:)));
+F = [cmp_oxd(1:end-1,1:end-1).';ones(1,cal.ncmp-1)];
+V = 1/factorial(8)*abs(det(F.'*F))^0.5;
+L = (sum(- 0.5*((data(:) - dhat(:))./sigma(:)).^2 ))./sqrt(length(dhat(:))) - V/2;
 end
 
+function L = LikeFunc(dhat, data, sigma, model)
+% L = ProbFuncs('LikeFunc', dhat, data, sigma)
+% assumes normally-distributed errors. 
+% 
+L = (sum(- 0.5*((data(:) - dhat(:))./sigma(:)).^2 ))./sqrt(length(dhat(:)));
+end
 
 function [L, dhat] = LikeFuncModel (dhatFunc, model, data, sigma)
 % calculates likelihood given input model parameters, basically combining

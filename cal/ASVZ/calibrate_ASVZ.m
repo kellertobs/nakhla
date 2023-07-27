@@ -21,8 +21,6 @@ dx       =  1e-3;                % crystal size [m]
 df       =  1e-3;                % bubble size [m]
 g0       =  10.;                 % gravity [m/s2]
 
-
-%% load MAGEMin results
 nc   = [1]; % number of compositions modelled
 frct = [5];
 hydr = [2];
@@ -30,6 +28,8 @@ MAG  = [];
 %       Si Ti Al Fe Mg Ca Na  K
 ioxd = [ 1  8  2  5  4  3  7  6]; % oxide indices from MAGEMin to standard
 Si = 1; Ti = 2; Al = 3; FeO = 4; Mg = 5; Ca = 6; Na = 7; K = 8; H = 9;
+
+%% load MAGEMin results
 for ic = nc
     filename = ['ASVZ_fract',int2str(frct(ic)),'_H',int2str(hydr(ic)),'_out.mat'];
     load(filename);
@@ -505,19 +505,20 @@ for ic = nc
 end
 
 %% project melt composition into space of defined mineral end-members
-for ic = nc
-    hasmlt = MAG(ic).OUT.PhaseFractions.liq_wt>=1e-4 & MAG(ic).OUT.PhaseFractions.sol_wt>=1e-4 & MAG(ic).OUT.PhaseProps.bi(:,1)==0;
-    oxdliq = MAG(ic).OUT.OxideFract.liq(hasmlt,:)*100;
-    oxdliq = oxdliq./sum(oxdliq,2)*100;
-
-    Xp = zeros(length(oxdliq),cal.nmem);
-    for ip = 1:length(oxdliq)
-        Xp(ip,:) = lsqnonneg(cal.mem_oxd.',oxdliq(ip,:).');
-    end
-
-    MAG(ic).OUT.OxideFract.liqp = zeros(size(MAG(ic).OUT.OxideFract.liq));
-    MAG(ic).OUT.OxideFract.liqp(hasmlt,:) = Xp*cal.mem_oxd./100;
-end
+% for ic = nc
+%     hasmlt = MAG(ic).OUT.PhaseFractions.liq_wt>=1e-4 & MAG(ic).OUT.PhaseFractions.sol_wt>=1e-4 & MAG(ic).OUT.PhaseProps.bi(:,1)==0;
+%     oxdliq = MAG(ic).OUT.OxideFract.liq(hasmlt,:)*100;
+%     oxdliq = oxdliq./sum(oxdliq,2)*100;
+% 
+%     Xp = zeros(length(oxdliq),cal.nmem);
+%     for ip = 1:length(oxdliq)
+%         Xp(ip,:) = lsqnonneg(cal.mem_oxd.',oxdliq(ip,:).');
+%     end
+% 
+%     MAG(ic).OUT.OxideFract.liqp = zeros(size(MAG(ic).OUT.OxideFract.liq));
+%     MAG(ic).OUT.OxideFract.liqp(hasmlt,:) = Xp*cal.mem_oxd./100;
+% end
+MAG(ic).OUT.OxideFract.liqp = MAG(ic).OUT.OxideFract.liq;
 
 %% reconstruct bulk composition based on projected solid and liquid compositions
 for ic = nc
@@ -617,31 +618,44 @@ cal_ASVZ;  % load melt model calibration
 oxdSYS = [];
 oxdSOL = [];
 oxdLIQ = [];
+phs    = [];
 T      = [];
 P      = [];
-m      = [];
-x      = [];
 for ic = nc
     oxdSYS = [oxdSYS;MAG(ic).OUT.OxideFract.SYSp(hasmlt,:)*100];
     oxdLIQ = [oxdLIQ;MAG(ic).OUT.OxideFract.liqp(hasmlt,:)*100];
     oxdSOL = [oxdSOL;MAG(ic).OUT.OxideFract.solp(hasmlt,:)*100];
+    phs    = [phs;[MAG(ic).OUT.PhaseFractions.liq_wt(hasmlt)*100, ...
+                   MAG(ic).OUT.PhaseProps.ol(  hasmlt,1)*100, ...
+                   MAG(ic).OUT.PhaseProps.opx( hasmlt,1)*100, ...
+                   MAG(ic).OUT.PhaseProps.cpx( hasmlt,1)*100, ...
+                   MAG(ic).OUT.PhaseProps.spn( hasmlt,1)*100, ...
+                   MAG(ic).OUT.PhaseProps.pl4T(hasmlt,1)*100, ...
+                   zeros(size(MAG(ic).OUT.PhaseProps.pl4T(hasmlt,1)))] ...
+                   ./(MAG(ic).OUT.PhaseFractions.sol_wt(hasmlt)+MAG(ic).OUT.PhaseFractions.liq_wt(hasmlt))];
          T = [T;MAG(ic).OUT.T(hasmlt)];
          P = [P;MAG(ic).OUT.P(hasmlt)*1e8];
-         m = [m;MAG(ic).OUT.PhaseFractions.liq_wt(hasmlt)];
-         x = [x;MAG(ic).OUT.PhaseFractions.sol_wt(hasmlt)];
 end
 
-data = [oxdLIQ;oxdSOL];
+data = [oxdLIQ(:);oxdSOL(:);phs(:)];
 
+
+%%
 ioxd = [cal.Si,cal.Ti,cal.Al,cal.Fe,cal.Mg,cal.Ca,cal.Na,cal.K];
 DATA.PRJCT  = 'ASVZ';
 DATA.VNAMES = cal.oxdStr(ioxd);
 DATA.SNAMES = {};
-DATA.X      = data(:,ioxd);
+DATA.X      = [oxdLIQ(:,ioxd);oxdSOL(:,ioxd)];
 DATA.X      = DATA.X./sum(DATA.X,2);
 
-%%
 unmix;
+
+indmem  = logical([0   0   0   0   0   0   0   0   0   0   1   0   0   0   0
+                   1   1   1   0   1   0   0   1   0   0   1   1   0   0   0
+                   0   1   1   1   1   1   0   1   1   0   1   1   1   0   0
+                   0   0   1   1   0   1   1   0   1   1   1   1   1   0   0
+                   0   0   0   1   0   0   1   0   0   1   0   1   1   1   0
+                   0   0   0   0   0   0   0   0   0   0   0   0   0   0   1]);
 
 cmp_oxd = max(0,Fi)*100;
 cmp_oxd = cmp_oxd./sum(cmp_oxd,2)*100;
@@ -649,21 +663,16 @@ cmp_oxd(cmp_oxd(:,cal.Al)==max(cmp_oxd(:,cal.Al)),:) = [];
 [~,iSi] = sort(cmp_oxd(:,1));
 cmp_oxd_FINT = cmp_oxd(iSi,:);
 
-indmem  = logical([1   1   1   0   1   0   0   1   0   0   1   1   0   0   0
-                   1   1   1   1   0   1   0   0   1   0   1   1   1   0   0
-                   0   0   0   1   0   0   1   0   0   1   0   1   1   1   0]);
-mem_oxd = cal.mem_oxd(:,ioxd);
-
 Xp = zeros(size(cmp_oxd,1),cal.nmem);
 for ip = 1:size(cmp_oxd,1)
-    Xp(ip,indmem(ip,:)) = lsqnonneg(cal.mem_oxd(indmem(ip,:),ioxd).',cmp_oxd_FINT(ip,:).');
+    Xp(ip,indmem(ip+1,:)) = lsqnonneg(cal.mem_oxd(indmem(ip+1,:),ioxd).',cmp_oxd_FINT(ip,:).');
 end
 cmp_mem = Xp./sum(Xp,2)*100;
 
 cmp_mem_FINT = zeros(cal.ncmp,cal.nmem);
-cmp_mem_FINT(cal.gbr:cal.rhy,:) = cmp_mem;
-cmp_mem_FINT(cal.ano,cal.ant) = 100;
-cmp_mem_FINT(cal.fld,cal.wat) = 100;
+cmp_mem_FINT(2:end-1,:) = cmp_mem;
+cmp_mem_FINT(1,cal.ant) = 100;
+cmp_mem_FINT(end,cal.wat) = 100;
 cmp_oxd_FINT = cmp_mem_FINT*cal.mem_oxd/100;
 
 cmp_oxd = max(0,Fe)*100;
@@ -672,11 +681,6 @@ cmp_oxd(cmp_oxd(:,cal.Al)==max(cmp_oxd(:,cal.Al)),:) = [];
 [~,iSi] = sort(cmp_oxd(:,1));
 cmp_oxd_FEXT = cmp_oxd(iSi,:);
 
-indmem  = logical([1   1   1   0   1   0   0   1   0   0   1   1   0   0   0
-                   1   1   1   1   0   1   0   0   1   0   1   1   1   0   0
-                   0   0   0   1   0   0   1   0   0   1   0   1   1   1   0]);
-mem_oxd = cal.mem_oxd(:,ioxd);
-
 Xp = zeros(size(cmp_oxd,1),cal.nmem);
 for ip = 1:size(cmp_oxd,1)
     Xp(ip,indmem(ip,:)) = lsqnonneg(cal.mem_oxd(indmem(ip,:),ioxd).',cmp_oxd_FEXT(ip,:).');
@@ -684,27 +688,15 @@ end
 cmp_mem = Xp./sum(Xp,2)*100;
 
 cmp_mem_FEXT = zeros(cal.ncmp,cal.nmem);
-cmp_mem_FEXT(cal.gbr:cal.rhy,:) = cmp_mem;
-cmp_mem_FEXT(cal.ano,cal.ant) = 100;
-cmp_mem_FEXT(cal.fld,cal.wat) = 100;
+cmp_mem_FEXT(2:end-1,:) = cmp_mem;
+cmp_mem_FEXT(1,cal.ant) = 100;
+cmp_mem_FEXT(end,cal.wat) = 100;
 cmp_oxd_FEXT = cmp_mem_FEXT*cal.mem_oxd/100;
 
+%%
+cal_ASVZ;  % load melt model calibration
 
-%%             for       fay       hyp       fsl       mau       fau       pig       mgt       ulv       ilm       ant       alb       san       qtz       wat
-% m0_lw   = [      0         0         0         0         0         0         0         0         0         0  100.0000         0         0         0         0
-%            10.0000    0.0000    2.0000         0   35.0000    0.0000    0.0000   10.0000    2.0000         0   12.0000    6.0000         0         0         0
-%             0.0000    0.0000    0.0000    0.0000    0.0000    1.0000    0.0000   12.0000   12.0000    2.0000   12.0000   40.0000    0.0000         0         0
-%                  0    0.0000    0.0000    0.0000    0.0000    0.0000    1.0000         0    0.0000    0.0000         0   55.0000   10.0000   25.0000         0
-%                  0         0         0         0         0         0         0         0         0         0         0         0         0         0  100.0000];
-% 
-% m0_up   = [      0         0         0         0         0         0         0         0         0         0  100.0000         0         0         0         0
-%            15.0000    4.0000    5.0000    1.0000   45.0000    2.0000    0.0000   14.0000    8.0000         0   18.0000   10.0000         0         0         0
-%             3.0000    4.0000    2.0000    2.0000    1.0000    5.0000    2.0000   16.0000   18.0000    6.0000   18.0000   50.0000    1.0000         0         0
-%                  0         0    1.0000    2.0000    0.0000    2.0000    4.0000         0    1.0000    2.0000         0   60.0000   15.0000   30.0000         0
-%                  0         0         0         0         0         0         0         0         0         0         0         0         0         0  100.0000];
-
-
-indmem = cal.cmp_mem>0 & cal.cmp_mem<100;
+% indmem = cal.cmp_mem>0 & cal.cmp_mem<100;
 m0     = cal.cmp_mem;
 m0_lw  = max(0,floor(m0 - max(1,0.10*m0)).*indmem);
 m0_up  = max(0, ceil(m0 + max(1,0.10*m0)).*indmem);
@@ -720,7 +712,6 @@ for j=1:cal.nmem
 end
 
 mbnds  = [m0_lw(:),m0_up(:)]; % model parameter bounds
-mbnds(m0==0,:)   = 0;
 mbnds(m0==100,:) = 100;
 
 sigma  = max(0.1,0.01.*data);
@@ -728,7 +719,7 @@ sigma  = max(0.1,0.01.*data);
 
 % function to calculate forward model
 % m --> dhat
-dhatFunc  = @(model) OxdFromCmpMem(model,data,[T;T;T],cal);
+dhatFunc  = @(model) OxdFromCmpMem(model,data,oxdSYS,cal);
 
 % function to apply further constraints to a proposed set of model param values
 % m --> m
@@ -744,7 +735,7 @@ PrSmpFunc = @(Niter) ProbFuncs('PriorSampFunc', Niter, mbnds, 'uniform');
 
 % function to calculate likelihood of dhat
 % dhat --> likelihood 
-LikeFunc  = @(dhat,model) ProbFuncs('LikeFunc',dhat,data,sigma,model,cal);
+LikeFunc  = @(dhat,model) ProbFuncs('LikeFuncSimplex',dhat,data,sigma,model,cal);
 
 % function to calculate likelihood from model parameter values
 % model --> dhat --> likelihood
@@ -754,7 +745,7 @@ LkMdFunc  = @(model) ProbFuncs('LikeFuncModel', dhatFunc, model, data, sigma);
 Niter = 1e5;
 
 % adjust step size to get reasonable acceptance ratio ~26%
-anneal.initstep = 0.2 * diff(mbnds,1,2);
+anneal.initstep = 0.18 * diff(mbnds,1,2);
 anneal.levels   = 3;
 anneal.burnin   = Niter/20;
 anneal.refine   = Niter/10;
@@ -763,25 +754,21 @@ tic;
 [models,prob,accept,bestfit] = mcmc(dhatFunc,PriorFunc,LikeFunc,ConstrFunc,m0,mbnds,anneal,Niter);
 RunTime(1) = toc;
 
-% Nsteps = 20; % number of tempering steps
-% 
-% cmt = tic;
-% [m_catmip, p_catmip, dhcm, rtcm, m_catmip_all] = catmip(PriorFunc, PrSmpFunc, LkMdFunc, ConstrFunc, 'Niter', Niter/Nsteps, 'Nsteps', Nsteps);
-% RunTime(3) = toc(cmt);
-
 % plot mcmc outputs
-xMAP = plotmcmc(models, prob, [], mbnds, accept, anneal.burnin, anneal.refine, mNames);
+xMAP = plotmcmc(models, prob, [], mbnds, anneal, mNames);
 
 cmp_mem_MAP = reshape(xMAP,cal.ncmp,cal.nmem);
 cmp_oxd_MAP = cmp_mem_MAP*cal.mem_oxd/100;
-oxdfit      = reshape(dhatFunc(cmp_mem_MAP(:)),[],cal.noxd);
-oxdLIQfit   = oxdfit(1:length(T),:);
-oxdSOLfit   = oxdfit(length(T)+1:end,:);
-oxdSYSfit   = (m.*oxdLIQfit + x.*oxdSOLfit)./(m+x);
+dhat        = dhatFunc(cmp_mem_MAP(:));
+oxdfit      = dhat(1:2*length(T)*cal.noxd);
+phsfit      = reshape(dhat(2*length(T)*cal.noxd+1:end),[],cal.nmsy+1);
+oxdLIQfit   = reshape(oxdfit(1:length(T)*cal.noxd,:),[],cal.noxd);
+oxdSOLfit   = reshape(oxdfit(length(T)*cal.noxd+1:end,:),[],cal.noxd);
+oxdSYSfit   = oxdSYS;
 
 % retrieve distributions
 Nbins = min(500,Niter/20);
-[ppd_mcmc.m, ppd_mcmc.prob] = CalcPDF(mbnds, m(anneal.burnin:end,:), Nbins);
+[ppd_mcmc.m, ppd_mcmc.prob] = CalcPDF(mbnds, models(anneal.burnin:end,:), Nbins);
 
 
 %% liquid, solid, mixture compositions
@@ -795,10 +782,9 @@ scatter(oxdSYS(:,Si),oxdSYS(:,Ti),25,T,'d');
 scatter(oxdLIQfit(:,Si),oxdLIQfit(:,Ti),25,T,'o','filled');
 scatter(oxdSOLfit(:,Si),oxdSOLfit(:,Ti),25,T,'s','filled');
 scatter(oxdSYSfit(:,Si),oxdSYSfit(:,Ti),25,T,'d','filled');
-scatter(cmp_oxd_MAP(cal.ano,cal.Si),cmp_oxd_MAP(cal.ano,cal.Ti),140,cal.T0(cal.ano),'filled','o');
-scatter(cmp_oxd_MAP(cal.gbr,cal.Si),cmp_oxd_MAP(cal.gbr,cal.Ti),140,cal.T0(cal.gbr),'filled','o');
-scatter(cmp_oxd_MAP(cal.bas,cal.Si),cmp_oxd_MAP(cal.bas,cal.Ti),140,cal.T0(cal.bas),'filled','o');
-scatter(cmp_oxd_MAP(cal.rhy,cal.Si),cmp_oxd_MAP(cal.rhy,cal.Ti),140,cal.T0(cal.rhy),'filled','o');
+for i=1:cal.ncmp-1
+    scatter(cmp_oxd_MAP(i,cal.Si),cmp_oxd_MAP(i,cal.Ti),140,cal.T0(i),'filled','o');
+end
 xlabel(cal.oxdStr(cal.Si),FS{:},TX{:})
 ylabel(cal.oxdStr(cal.Ti),FS{:},TX{:})
 subplot(2,4,2);
@@ -808,10 +794,9 @@ scatter(oxdSYS(:,Si),oxdSYS(:,Al),25,T,'d');
 scatter(oxdLIQfit(:,Si),oxdLIQfit(:,Al),25,T,'o','filled');
 scatter(oxdSOLfit(:,Si),oxdSOLfit(:,Al),25,T,'s','filled');
 scatter(oxdSYSfit(:,Si),oxdSYSfit(:,Al),25,T,'d','filled');
-scatter(cmp_oxd_MAP(cal.ano,cal.Si),cmp_oxd_MAP(cal.ano,cal.Al),140,cal.T0(cal.ano),'filled','o');
-scatter(cmp_oxd_MAP(cal.gbr,cal.Si),cmp_oxd_MAP(cal.gbr,cal.Al),140,cal.T0(cal.gbr),'filled','o');
-scatter(cmp_oxd_MAP(cal.bas,cal.Si),cmp_oxd_MAP(cal.bas,cal.Al),140,cal.T0(cal.bas),'filled','o');
-scatter(cmp_oxd_MAP(cal.rhy,cal.Si),cmp_oxd_MAP(cal.rhy,cal.Al),140,cal.T0(cal.rhy),'filled','o');
+for i=1:cal.ncmp-1
+    scatter(cmp_oxd_MAP(i,cal.Si),cmp_oxd_MAP(i,cal.Al),140,cal.T0(i),'filled','o');
+end
 xlabel(cal.oxdStr(cal.Si),FS{:},TX{:})
 ylabel(cal.oxdStr(cal.Al),FS{:},TX{:})
 subplot(2,4,3);
@@ -821,10 +806,9 @@ scatter(oxdSYS(:,Si),oxdSYS(:,FeO),25,T,'d');
 scatter(oxdLIQfit(:,Si),oxdLIQfit(:,FeO),25,T,'o','filled');
 scatter(oxdSOLfit(:,Si),oxdSOLfit(:,FeO),25,T,'s','filled');
 scatter(oxdSYSfit(:,Si),oxdSYSfit(:,FeO),25,T,'d','filled');
-scatter(cmp_oxd_MAP(cal.ano,cal.Si),cmp_oxd_MAP(cal.ano,cal.Fe),140,cal.T0(cal.ano),'filled','o');
-scatter(cmp_oxd_MAP(cal.gbr,cal.Si),cmp_oxd_MAP(cal.gbr,cal.Fe),140,cal.T0(cal.gbr),'filled','o');
-scatter(cmp_oxd_MAP(cal.bas,cal.Si),cmp_oxd_MAP(cal.bas,cal.Fe),140,cal.T0(cal.bas),'filled','o');
-scatter(cmp_oxd_MAP(cal.rhy,cal.Si),cmp_oxd_MAP(cal.rhy,cal.Fe),140,cal.T0(cal.rhy),'filled','o');
+for i=1:cal.ncmp-1
+    scatter(cmp_oxd_MAP(i,cal.Si),cmp_oxd_MAP(i,cal.Fe),140,cal.T0(i),'filled','o');
+end
 xlabel(cal.oxdStr(cal.Si),FS{:},TX{:})
 ylabel(cal.oxdStr(cal.Fe),FS{:},TX{:})
 subplot(2,4,4);
@@ -834,10 +818,9 @@ scatter(oxdSYS(:,Si),oxdSYS(:,Mg),25,T,'d');
 scatter(oxdLIQfit(:,Si),oxdLIQfit(:,Mg),25,T,'o','filled');
 scatter(oxdSOLfit(:,Si),oxdSOLfit(:,Mg),25,T,'s','filled');
 scatter(oxdSYSfit(:,Si),oxdSYSfit(:,Mg),25,T,'d','filled');
-scatter(cmp_oxd_MAP(cal.ano,cal.Si),cmp_oxd_MAP(cal.ano,cal.Mg),140,cal.T0(cal.ano),'filled','o');
-scatter(cmp_oxd_MAP(cal.gbr,cal.Si),cmp_oxd_MAP(cal.gbr,cal.Mg),140,cal.T0(cal.gbr),'filled','o');
-scatter(cmp_oxd_MAP(cal.bas,cal.Si),cmp_oxd_MAP(cal.bas,cal.Mg),140,cal.T0(cal.bas),'filled','o');
-scatter(cmp_oxd_MAP(cal.rhy,cal.Si),cmp_oxd_MAP(cal.rhy,cal.Mg),140,cal.T0(cal.rhy),'filled','o');
+for i=1:cal.ncmp-1
+    scatter(cmp_oxd_MAP(i,cal.Si),cmp_oxd_MAP(i,cal.Mg),140,cal.T0(i),'filled','o');
+end
 xlabel(cal.oxdStr(cal.Si),FS{:},TX{:})
 ylabel(cal.oxdStr(cal.Mg),FS{:},TX{:})
 subplot(2,4,5);
@@ -847,10 +830,9 @@ scatter(oxdSYS(:,Si),oxdSYS(:,Ca),25,T,'d');
 scatter(oxdLIQfit(:,Si),oxdLIQfit(:,Ca),25,T,'o','filled');
 scatter(oxdSOLfit(:,Si),oxdSOLfit(:,Ca),25,T,'s','filled');
 scatter(oxdSYSfit(:,Si),oxdSYSfit(:,Ca),25,T,'d','filled');
-scatter(cmp_oxd_MAP(cal.ano,cal.Si),cmp_oxd_MAP(cal.ano,cal.Ca),140,cal.T0(cal.ano),'filled','o');
-scatter(cmp_oxd_MAP(cal.gbr,cal.Si),cmp_oxd_MAP(cal.gbr,cal.Ca),140,cal.T0(cal.gbr),'filled','o');
-scatter(cmp_oxd_MAP(cal.bas,cal.Si),cmp_oxd_MAP(cal.bas,cal.Ca),140,cal.T0(cal.bas),'filled','o');
-scatter(cmp_oxd_MAP(cal.rhy,cal.Si),cmp_oxd_MAP(cal.rhy,cal.Ca),140,cal.T0(cal.rhy),'filled','o');
+for i=1:cal.ncmp-1
+    scatter(cmp_oxd_MAP(i,cal.Si),cmp_oxd_MAP(i,cal.Ca),140,cal.T0(i),'filled','o');
+end
 xlabel(cal.oxdStr(cal.Si),FS{:},TX{:})
 ylabel(cal.oxdStr(cal.Ca),FS{:},TX{:})
 subplot(2,4,6);
@@ -860,10 +842,9 @@ scatter(oxdSYS(:,Si),oxdSYS(:,Na),25,T,'d');
 scatter(oxdLIQfit(:,Si),oxdLIQfit(:,Na),25,T,'o','filled');
 scatter(oxdSOLfit(:,Si),oxdSOLfit(:,Na),25,T,'s','filled');
 scatter(oxdSYSfit(:,Si),oxdSYSfit(:,Na),25,T,'d','filled');
-scatter(cmp_oxd_MAP(cal.ano,cal.Si),cmp_oxd_MAP(cal.ano,cal.Na),150,cal.T0(cal.ano),'filled','o');
-scatter(cmp_oxd_MAP(cal.gbr,cal.Si),cmp_oxd_MAP(cal.gbr,cal.Na),150,cal.T0(cal.gbr),'filled','o');
-scatter(cmp_oxd_MAP(cal.bas,cal.Si),cmp_oxd_MAP(cal.bas,cal.Na),150,cal.T0(cal.bas),'filled','o');
-scatter(cmp_oxd_MAP(cal.rhy,cal.Si),cmp_oxd_MAP(cal.rhy,cal.Na),150,cal.T0(cal.rhy),'filled','o');
+for i=1:cal.ncmp-1
+    scatter(cmp_oxd_MAP(i,cal.Si),cmp_oxd_MAP(i,cal.Na),140,cal.T0(i),'filled','o');
+end
 xlabel(cal.oxdStr(cal.Si),FS{:},TX{:})
 ylabel(cal.oxdStr(cal.Na),FS{:},TX{:})
 subplot(2,4,7);
@@ -873,10 +854,9 @@ scatter(oxdSYS(:,Si),oxdSYS(:,K),25,T,'d');
 scatter(oxdLIQfit(:,Si),oxdLIQfit(:,K),25,T,'o','filled');
 scatter(oxdSOLfit(:,Si),oxdSOLfit(:,K),25,T,'s','filled');
 scatter(oxdSYSfit(:,Si),oxdSYSfit(:,K),25,T,'d','filled');
-scatter(cmp_oxd_MAP(cal.ano,cal.Si),cmp_oxd_MAP(cal.ano,cal.K),150,cal.T0(cal.ano),'filled','o');
-scatter(cmp_oxd_MAP(cal.gbr,cal.Si),cmp_oxd_MAP(cal.gbr,cal.K),150,cal.T0(cal.gbr),'filled','o');
-scatter(cmp_oxd_MAP(cal.bas,cal.Si),cmp_oxd_MAP(cal.bas,cal.K),150,cal.T0(cal.bas),'filled','o');
-scatter(cmp_oxd_MAP(cal.rhy,cal.Si),cmp_oxd_MAP(cal.rhy,cal.K),150,cal.T0(cal.rhy),'filled','o');
+for i=1:cal.ncmp-1
+    scatter(cmp_oxd_MAP(i,cal.Si),cmp_oxd_MAP(i,cal.K),140,cal.T0(i),'filled','o');
+end
 xlabel(cal.oxdStr(cal.Si),FS{:},TX{:})
 ylabel(cal.oxdStr(cal.K),FS{:},TX{:})
 colorbar;
@@ -887,10 +867,9 @@ scatter(oxdSYS(:,Si),oxdSYS(:,H),25,T,'d');
 scatter(oxdLIQfit(:,Si),oxdLIQfit(:,H),25,T,'o','filled');
 scatter(oxdSOLfit(:,Si),oxdSOLfit(:,H),25,T,'s','filled');
 scatter(oxdSYSfit(:,Si),oxdSYSfit(:,H),25,T,'d','filled');
-scatter(cmp_oxd_MAP(cal.ano,cal.Si),cmp_oxd_MAP(cal.ano,cal.H),150,cal.T0(cal.ano),'filled','o');
-scatter(cmp_oxd_MAP(cal.gbr,cal.Si),cmp_oxd_MAP(cal.gbr,cal.H),150,cal.T0(cal.gbr),'filled','o');
-scatter(cmp_oxd_MAP(cal.bas,cal.Si),cmp_oxd_MAP(cal.bas,cal.H),150,cal.T0(cal.bas),'filled','o');
-scatter(cmp_oxd_MAP(cal.rhy,cal.Si),cmp_oxd_MAP(cal.rhy,cal.H),150,cal.T0(cal.rhy),'filled','o');
+for i=1:cal.ncmp-1
+    scatter(cmp_oxd_MAP(i,cal.Si),cmp_oxd_MAP(i,cal.H),140,cal.T0(i),'filled','o');
+end
 xlabel(cal.oxdStr(cal.Si),FS{:},TX{:})
 ylabel(cal.oxdStr(cal.H),FS{:},TX{:})
 colorbar;
@@ -923,14 +902,10 @@ cm = Xp./sum(Xp,2);
 % equilibrium phase fractions and compositions
 
 data   = [oxdLIQfit(:);oxdSOLfit(:)];
-% data   = [cx(:);cm(:)]*100;
 
-% m0_lw  = [1553; 1100; 1000; 800; 75; 20; 15; 18];
-% m0_up  = [1553; 1150; 1050; 850; 85; 30; 25; 28];
-% m0     = (m0_lw+m0_up)/2;
 m0    = [cal.T0,cal.r].';
-m0_lw = max(0,m0 - ceil(0.05*m0));
-m0_up = max(0,m0 + ceil(0.05*m0));
+m0_lw  = max(0,floor(m0 - max(1,0.05*m0)));
+m0_up  = max(0, ceil(m0 + max(1,0.05*m0)));
 m0_lw(1) = m0(1);
 m0_up(1) = m0(1);
 
@@ -970,29 +945,28 @@ PrSmpFunc = @(Niter) ProbFuncs('PriorSampFunc', Niter, mbnds, 'uniform');
 
 % function to calculate likelihood of dhat
 % dhat --> likelihood 
-LikeFunc  = @(dhat) ProbFuncs('LikeFunc',dhat,data,sigma);
+LikeFunc  = @(dhat,model) ProbFuncs('LikeFunc',dhat,data,sigma,model);
 
 % function to calculate likelihood from model parameter values
 % model --> dhat --> likelihood
 LkMdFunc  = @(model) ProbFuncs('LikeFuncModel', dhatFunc, model, data, sigma);
 
 % run MCMC algorithm
-Niter = 5e4;
+Niter = 3e4;
 Nbins = min(500,Niter/20);
 
 % adjust step size to get reasonable acceptance ratio ~26%
-anneal.initstep = 0.005 * diff(mbnds,1,2);
+anneal.initstep = 0.02 * diff(mbnds,1,2);
 anneal.levels   = 3;
-anneal.burnin   = 1000;
-anneal.refine   = 1000;
+anneal.burnin   = Niter/20;
+anneal.refine   = Niter/10;
 
 tic;
-[m,prob,count] = mcmc(dhatFunc,PriorFunc,LikeFunc,ConstrFunc,m0,mbnds,anneal,Niter);
+[models,prob,accept,bestfit] = mcmc(dhatFunc,PriorFunc,LikeFunc,ConstrFunc,m0,mbnds,anneal,Niter);
 RunTime(1) = toc;
 
 % plot mcmc outputs
-xMAP = plotmcmc(m, prob, [], mbnds, count, anneal.burnin, anneal.refine, mNames);
-% plotcorner(m_mcmc, P_mcmc, m0, mbnds, count, BurnIn, mNames); drawnow;
+xMAP = plotmcmc(models, prob, [], mbnds, anneal, mNames);
 
 T0_MAP = xMAP(1:cal.ncmp-1);
 r_MAP  = xMAP(cal.ncmp:end);
@@ -1002,7 +976,7 @@ cx_oxd_MAP = reshape(dhat(length(dhat)/2+1:end),[],cal.noxd);%*cmp_oxd_MAP;
 c_oxd_MAP  = c*cmp_oxd_MAP;
 
 % retrieve distributions
-[ppd_mcmc.m, ppd_mcmc.prob] = CalcPDF(mbnds, m(anneal.burnin:end,:), Nbins);
+[ppd_mcmc.m, ppd_mcmc.prob] = CalcPDF(mbnds, models(anneal.burnin:end,:), Nbins);
 
 
 %% plot phase diagram

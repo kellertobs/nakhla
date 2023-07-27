@@ -1,9 +1,9 @@
-function [oxdfit] = OxdFromMeltTemp(mlttmp,T,P,c,cal)
+function [datafit] = OxdFromMeltTemp(model,T,P,c,cal)
 
-Nz = length(T); Nx = 1;
+np = length(T);
 
-cal.T0 = mlttmp(1:cal.ncmp-1).';
-cal.r  = mlttmp(cal.ncmp:end).';
+cal.T0 = model(1:cal.ncmp-1).';
+cal.r  = model(cal.ncmp:end).';
 cal.A  = (cal.T0+273.15)./300;
 
 var.m = 1.0; var.x = 0; var.f = 0;
@@ -16,9 +16,14 @@ var.H2O    = c(:,end);      % water concentration [wt]
 cal.H2Osat = fluidsat(var.T,var.P*1e9,0,cal);
 [var,cal]  = meltmodel(var,cal,'E');
 
-cm_oxd = var.cm*cal.cmp_oxd;
-cx_oxd = var.cx*cal.cmp_oxd;
+% get fitted phase oxide compositions
+oxdLIQfit = var.cm*cal.cmp_oxd;
+oxdSOLfit = var.cx*cal.cmp_oxd;
 
-oxdfit = [cm_oxd(:);cx_oxd(:)];
+% get fitted phase fractions
+phsfit = zeros(np,cal.nmsy+1);
+phsfit(:,1) = var.m*100;
+
+datafit = [oxdLIQfit(:);oxdSOLfit(:)];
 
 end
