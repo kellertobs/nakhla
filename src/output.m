@@ -71,7 +71,7 @@ if Nx <= 1 && Nz <= 1  % create 0D plots
     for i=1:cal.noxd
         plot(hist.time/hr,squeeze(hist.cx_oxd(:,2,i)),'-',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis xy tight; box on; hold on
     end
-    title('Xtal oxds [wt\%]',TX{:},FS{:});
+    title('Xtal oxds [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(3,1,3)
     for i=1:cal.nmsy
         plot(hist.time/hr,squeeze(hist.x(:,2).*hist.cx_msy(:,2,i)),'-',LW{:},'color',ocean(round((i-1)*213/cal.nmsy)+1,:)); axis xy tight; box on; hold on
@@ -94,7 +94,7 @@ elseif Nx <= 1  % create 1D plots
     for i=1:cal.ncmp
         plot(squeeze(c(:,:,i)).*100,Zc.',LW{:},'color',ocean(round((i-1)*213/cal.ncmp)+1,:)); axis ij tight; box on; hold on;
     end
-    title('Bulk cmps [wt\%]',TX{:},FS{:}); legend(cal.cmpStr,TX{:},FS{:},'Location','west'); ylabel('Depth [m]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+    title('Bulk cmps [wt\%]',TX{:},FS{:}); legend(cal.cmpStr,TX{:},FS{:},'Location','west'); set(gca,TL{:},TS{:});
     subplot(1,4,3)
     plot(mu *100.*(mu >1e-9),Zc.',CL{[1,3]},LW{:}); axis ij tight; box on; hold on;
     plot(chi*100.*(chi>1e-9),Zc.',CL{[1,4]},LW{:});
@@ -225,14 +225,16 @@ else % create 2D plots
     end 
     colormap(ocean);
     fh = axb + 2*axh + 1*avs + axt;
-    fw = axl + 2*axw + 1*ahs + axr;
+    fw = axl + 3*axw + 2*ahs + axr;
     set(fh5,UN{:},'Position',[9 9 fw fh]);
     set(fh5,'PaperUnits','Centimeters','PaperPosition',[0 0 fw fh],'PaperSize',[fw fh]);
     set(fh5,'Color','w','InvertHardcopy','off','Resize','off');
     ax(51) = axes(UN{:},'position',[axl+0*axw+0*ahs axb+1*axh+1*avs axw axh]);
     ax(52) = axes(UN{:},'position',[axl+1*axw+1*ahs axb+1*axh+1*avs axw axh]);
-    ax(53) = axes(UN{:},'position',[axl+0*axw+0*ahs axb+0*axh+0*avs axw axh]);
-    ax(54) = axes(UN{:},'position',[axl+1*axw+1*ahs axb+0*axh+0*avs axw axh]);
+    ax(53) = axes(UN{:},'position',[axl+2*axw+2*ahs axb+1*axh+1*avs axw axh]);
+    ax(54) = axes(UN{:},'position',[axl+0*axw+0*ahs axb+0*axh+0*avs axw axh]);
+    ax(55) = axes(UN{:},'position',[axl+1*axw+1*ahs axb+0*axh+0*avs axw axh]);
+    ax(56) = axes(UN{:},'position',[axl+2*axw+2*ahs axb+0*axh+0*avs axw axh]);
 
     if ~exist('fh6','var'); fh6 = figure(VIS{:});
     else; set(0, 'CurrentFigure', fh6); clf;
@@ -308,11 +310,11 @@ else % create 2D plots
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$T [^\circ$C]'],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel('Depth [m]',TX{:},FS{:}); 
     set(fh2,'CurrentAxes',ax(22));
     imagesc(Xc,Zc,squeeze(c_oxd(:,:,cal.Si)./sum(c_oxd(:,:,1:end-1),3).*100)); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\bar{c}$ [wt\% SiO$_2$]'],TX{:},FS{:}); set(gca,'YTickLabel',[]); xlabel('Width [m]',TX{:},FS{:});
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['SiO$_2$ [wt\%]'],TX{:},FS{:}); set(gca,'YTickLabel',[]); xlabel('Width [m]',TX{:},FS{:});
     text(0.5,1.1,['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k','HorizontalAlignment','center','Units','normalized');
     set(fh2,'CurrentAxes',ax(23));
     imagesc(Xc,Zc,squeeze(c_oxd(:,:,cal.H))); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\bar{v}$ [wt\% H$_2$O]'],TX{:},FS{:}); set(gca,'YTickLabel',[]);
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['H$_2$O [wt\%]'],TX{:},FS{:}); set(gca,'YTickLabel',[]);
 
     % plot phase fractions and reaction rates in Fig. 3
     set(0,'CurrentFigure',fh3)
@@ -348,20 +350,24 @@ else % create 2D plots
 
     % plot pseudo-component composition in Fig. 5
     set(0,'CurrentFigure',fh5)
-    for i = 1:cal.ncmp-1
+    for i = 1:cal.ncmp
         set(fh5,'CurrentAxes',ax(50+i));
         imagesc(Xc,Zc,c(:,:,i).*100); axis ij equal tight; box on; cb = colorbar;
         set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.cmpStr{i},' [wt\%]'],TX{:},FS{:});
     end
     set(fh5,'CurrentAxes',ax(51));
-    set(gca,'XTickLabel',[]); ylabel('Depth [m]',TX{:},FS{:});
+    set(gca,TL{:},TS{:}); set(gca,'XTickLabel',[]); ylabel('Depth [m]',TX{:},FS{:}); 
     set(fh5,'CurrentAxes',ax(52));
     set(gca,'XTickLabel',[],'YTickLabel',[]);
-    text(-0.1,1.1,['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k','HorizontalAlignment','center','Units','normalized');
+    text(0.5,1.1,['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k','HorizontalAlignment','center','Units','normalized');
     set(fh5,'CurrentAxes',ax(53));
-    ylabel('Depth [m]',TX{:},FS{:}); xlabel('Width [m]',TX{:},FS{:});
+    set(gca,'XTickLabel',[],'YTickLabel',[]);
     set(fh5,'CurrentAxes',ax(54));
+    ylabel('Depth [m]',TX{:},FS{:});
+    set(fh5,'CurrentAxes',ax(55));
     set(gca,'YTickLabel',[]); xlabel('Width [m]',TX{:},FS{:});
+    set(fh5,'CurrentAxes',ax(56));
+    set(gca,'YTickLabel',[]);
 
     % plot major oxide composition in Fig. 6
     set(0,'CurrentFigure',fh6)
@@ -442,16 +448,17 @@ end
 if Nz>1; clf; end
 for i=1:cal.noxd
 subplot(3,3,i)
-plot( c_oxd(:,:,i)./sum( c_oxd(:,:,1:end-1),3),T-273.15,'k.','LineWidth',2,'MarkerSize',15); axis tight; box on; hold on;
-plot(cx_oxd(:,:,i)./sum(cx_oxd(:,:,1:end-1),3),T-273.15,'b.','LineWidth',2,'MarkerSize',15);
-plot(cm_oxd(:,:,i)./sum(cm_oxd(:,:,1:end-1),3),T-273.15,'r.','LineWidth',2,'MarkerSize',15);
-xlabel([cal.oxdStr{i},' [wt]'],'Interpreter','latex','FontSize',12)
+plot( c_oxd(:,:,i)./sum( c_oxd(:,:,1:end-1),3)*100,T-273.15,'k.','LineWidth',2,'MarkerSize',15); axis tight; box on; hold on;
+plot(cx_oxd(:,:,i)./sum(cx_oxd(:,:,1:end-1),3)*100,T-273.15,'b.','LineWidth',2,'MarkerSize',15);
+plot(cm_oxd(:,:,i)./sum(cm_oxd(:,:,1:end-1),3)*100,T-273.15,'r.','LineWidth',2,'MarkerSize',15);
+xlabel([cal.oxdStr{i},' [wt \%]'],'Interpreter','latex','FontSize',12)
 set(gca,'TickLabelInterpreter','latex','FontSize',10)
 end
 
+if Nz>1
 subplot(3,3,2)
 text(0.5,1.1,['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k','HorizontalAlignment','center','Units','normalized');
-
+end
 subplot(3,3,4)
 ylabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',15)
 

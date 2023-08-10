@@ -9,7 +9,7 @@ advn_S = - advect(M.*sm,Um(2:end-1,:),Wm(:,2:end-1),h,{ADVN,''},[1,2],BCA) ...  
          - advect(X.*sx,Ux(2:end-1,:),Wx(:,2:end-1),h,{ADVN,''},[1,2],BCA) ...  % solid advection
          - advect(F.*sf,Uf(2:end-1,:),Wf(:,2:end-1),h,{ADVN,''},[1,2],BCA);     % fluid advection
 
-diff_S = diffus(T,ks,h,[1,2],BCD);
+diff_S = diffus(T,kT0./T,h,[1,2],BCD) + diffus(Tp,ks,h,[1,2],BCD);
 
 % heat dissipation
 diss_h = diss ./ T;
@@ -19,7 +19,7 @@ bnd_T = zeros(size(S));
 if ~isnan(Twall(1)); bnd_T = bnd_T + ((Twall(1)+273.15)-T)./tau_T .* topshape; end
 if ~isnan(Twall(2)); bnd_T = bnd_T + ((Twall(2)+273.15)-T)./tau_T .* botshape; end
 if ~isnan(Twall(3)); bnd_T = bnd_T + ((Twall(3)+273.15)-T)./tau_T .* sdsshape; end
-bnd_S = RHO.*cP.*bnd_T./T;
+bnd_S = RHO.*cP.*bnd_T ./ T;
 
 % total rate of change
 dSdt  = advn_S + diff_S + diss_h + bnd_S;
@@ -32,7 +32,8 @@ S     = S - alpha*res_S*dt/a1 + beta*upd_S;
 upd_S =   - alpha*res_S*dt/a1 + beta*upd_S;
 
 % convert entropy desnity to temperature
-T = (min(cal.T0)+273.15)*exp((S - X.*Dsx - F.*Dsf)./RHO./cP + Adbt./cP.*(Pt-Ptop));
+Tp = (min(cal.T0)+273.15)*exp((S - X.*Dsx - F.*Dsf)./RHO./cP);
+T  = (min(cal.T0)+273.15)*exp((S - X.*Dsx - F.*Dsf)./RHO./cP + Adbt./cP.*(Pt-Ptop));
 
 
 %***  update major component (SiO2) density
@@ -41,6 +42,9 @@ T = (min(cal.T0)+273.15)*exp((S - X.*Dsx - F.*Dsf)./RHO./cP + Adbt./cP.*(Pt-Ptop
 advn_C = - advect(M.*cm,Um(2:end-1,:),Wm(:,2:end-1),h,{ADVN,''},[1,2],BCA) ...  % melt  advection
          - advect(X.*cx,Ux(2:end-1,:),Wx(:,2:end-1),h,{ADVN,''},[1,2],BCA) ...  % solid advection
          - advect(F.*cf,Uf(2:end-1,:),Wf(:,2:end-1),h,{ADVN,''},[1,2],BCA);     % fluid advection
+
+% major component diffusion (regularisation)
+diff_C = diffus(c,kc,h,[1,2],BCD);
 
 % boundary layers
 bnd_C = zeros(size(C));
@@ -51,7 +55,7 @@ for i = 1:cal.ncmp
 end
 
 % total rate of change
-dCdt = advn_C + bnd_C;                                            
+dCdt = advn_C + diff_C + bnd_C;                                            
 
 % residual of major component evolution
 res_C = (a1*C-a2*Co-a3*Coo)/dt - (b1*dCdt + b2*dCdto + b3*dCdtoo);

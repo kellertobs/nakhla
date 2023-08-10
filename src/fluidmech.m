@@ -345,14 +345,23 @@ if ~bnchm
     [~,qfz,qfx] = diffus(phi,kf,h,[1,2],BCD);
     qmz  = -qxz-qfz;  qmx = -qxx-qfx;
 
-    wqf = qfz./max(TINY^0.5,(phi([1,1:end],[end,1:end,1])+phi([1:end,end],[end,1:end,1]))./2);
-    uqf = qfx./max(TINY^0.5,(phi([1,1:end,end],[end,1:end])+phi([1,1:end,end],[1:end,1]))./2);
+    phiz = (phi([1,1:end],[end,1:end,1])+phi([1:end,end],[end,1:end,1]))./2;
+    phix = (phi([1,1:end,end],[end,1:end])+phi([1,1:end,end],[1:end,1]))./2;
 
-    wqx = qxz./max(TINY^0.5,(chi([1,1:end],[end,1:end,1])+chi([1:end,end],[end,1:end,1]))./2);
-    uqx = qxx./max(TINY^0.5,(chi([1,1:end,end],[end,1:end])+chi([1,1:end,end],[1:end,1]))./2);
+    chiz = (chi([1,1:end],[end,1:end,1])+chi([1:end,end],[end,1:end,1]))./2;
+    chix = (chi([1,1:end,end],[end,1:end])+chi([1,1:end,end],[1:end,1]))./2;
 
-    wqm = qmz./max(TINY^0.5,(mu ([1,1:end],[end,1:end,1])+mu ([1:end,end],[end,1:end,1]))./2);
-    uqm = qmx./max(TINY^0.5,(mu ([1,1:end,end],[end,1:end])+mu ([1,1:end,end],[1:end,1]))./2);
+    muz  = (mu ([1,1:end],[end,1:end,1])+mu ([1:end,end],[end,1:end,1]))./2;
+    mux  = (mu ([1,1:end,end],[end,1:end])+mu ([1,1:end,end],[1:end,1]))./2;
+
+    wqf = qfz./max(TINY^0.5,phiz);
+    uqf = qfx./max(TINY^0.5,phix);
+
+    wqx = qxz./max(TINY^0.5,chiz);
+    uqx = qxx./max(TINY^0.5,chix);
+
+    wqm = qmz./max(TINY^0.5,muz);
+    uqm = qmx./max(TINY^0.5,mux);
 
     % update phase velocities
     Wf  = W + wf + wqf;  % mvp z-velocity
@@ -364,10 +373,10 @@ if ~bnchm
 
     
     %% update time step
-    dtk = (h/2)^2./max(kT(:)./rho(:)./cP)/2;                                      % diffusive time step size
-    dta = CFL*h/2/max(abs([Um(:).*any(m(:)>10*TINY);Wm(:).*any(m(:)>10*TINY); ... % advective time step size
-                           Ux(:).*any(x(:)>10*TINY);Wx(:).*any(x(:)>10*TINY); ...
-                           Uf(:).*any(f(:)>10*TINY);Wf(:).*any(f(:)>10*TINY)]+TINY));   
+    dtk = (h/2)^2./max([kc(:)./rho(:);(kT0+ks(:).*T(:))./rho(:)./cP])/2;          % diffusive time step size
+    dta = CFL*h/2/max(abs([Um(:).*(mux (:)>TINY^0.5);Wm(:).*(muz (:)>TINY^0.5); ... % advective time step size
+                           Ux(:).*(chix(:)>TINY^0.5);Wx(:).*(chiz(:)>TINY^0.5); ...
+                           Uf(:).*(phix(:)>TINY^0.5);Wf(:).*(phiz(:)>TINY^0.5)]+TINY));   
     dt  = min([1.05*dto,min(dtk,dta),dtmax]);                                      % time step size
 end
 

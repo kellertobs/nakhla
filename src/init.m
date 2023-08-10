@@ -365,6 +365,7 @@ fprintf('    thermal Rw: %1.3e \n'  ,RwT);
 fprintf('   chemical Rw: %1.3e \n\n',Rwc);
 
 % get bulk enthalpy, silica, volatile content densities
+Tp  = T+273.15;
 S   = rho.*(cP.*log(T/(min(cal.T0)+273.15)) + x.*Dsx + f.*Dsf - Adbt.*(Pt-Ptop));  So = S;  res_S = 0.*S;
 S0  = rho.*(cP.*log(min(cal.T0)+273.15) + x.*Dsx + f.*Dsf - Adbt.*Ptop);  
 C   = rho.*(m.*cm + x.*cx + f.*cf); Co = C;  res_C = 0.*C;

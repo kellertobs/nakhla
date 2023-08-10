@@ -28,7 +28,7 @@ cx_oxd_all(:,:,cal.ioxd) = cx_oxd;
  c_oxd_all(:,:,cal.ioxd) = c_oxd;
 
 % update phase densities
-rhom   = reshape(DensityX(reshape(cm_oxd_all,Nz*Nx,9),T0,Ptop./1e8),Nz,Nx)    .* (1 - aT.*(T-T0-273.15) + bPm.*(Pt-Ptop));
+rhom   = reshape(DensityX(reshape(cm_oxd_all,Nz*Nx,9),T0,Ptop./1e8)      ,Nz,Nx) .* (1 - aT.*(T-T0-273.15) + bPm.*(Pt-Ptop));
 rhox   = reshape(sum(reshape(cx_mem/100,Nz*Nx,cal.nmem)./cal.rhox0,2).^-1,Nz,Nx) .* (1 - aT.*(T-T0-273.15) + bPx.*(Pt-Ptop));
 rhof   = cal.rhof0                                                               .* (1 - aT.*(T-T0-273.15) + bPf.*(Pt-Ptop));
 
@@ -88,8 +88,8 @@ kwx = wx0*dx*10;                                                           % seg
 kwf = wf0*df*10;                                                           % segregation fluctuation diffusivity
 kx  = chi.*(kwx + kW/Prt);                                                 % solid fraction diffusion 
 kf  = phi.*(kwf + kW/Prt);                                                 % fluid fraction diffusion 
-kT  = kT0 + rho.*cP.*(phi.*kwf + chi.*kwx + kW/Prt);                       % heat diffusion
-ks  = kT./T;                                                               % entropy diffusion
+ks  = rho.*cP./T.*(phi.*kwf + chi.*kwx + kW/Prt);                          % regularised heat diffusion
+kc  = rho.*(phi.*kwf + chi.*kwx + kW/Prt);                                 % regularised component diffusion
 eta = eta + rho.*(phi.*kwf + chi.*kwx + kW);
 
 etamax = etacntr.*min(eta(:));
@@ -98,7 +98,7 @@ eta    = (etamax.^-0.5 + eta.^-0.5).^-2;
 etaco  = (eta([1,1:end],[end,1:end]).*eta([1:end,end],[end,1:end]) ...
        .* eta([1,1:end],[1:end,1  ]).*eta([1:end,end],[1:end,1  ])).^0.25;
 
-Ra  = Vel.*D/10./(kT./rho./cP);
+Ra  = Vel.*D/10./((kT0+ks.*T)./rho./cP);
 Re  = Vel.*rho.*D/10./eta;
 
 % update stresses
@@ -114,8 +114,10 @@ tII = (0.5.*(txx.^2 + tzz.^2 ...
 if Nz==1 && Nx==1
     diss = 0.*T;  % no dissipation in 0-D mode (no diffusion, no shear deformation, no segregation)
 else
-    [grdTx,grdTz] = gradient(T([1,1:end,end],[1,1:end,end]),h);
-    diss = ks.*(grdTz(2:end-1,2:end-1).^2 + grdTx(2:end-1,2:end-1).^2) ...
+    [grdTx ,grdTz ] = gradient(T ([1,1:end,end],[1,1:end,end]),h);
+    [grdTpx,grdTpz] = gradient(Tp([1,1:end,end],[1,1:end,end]),h);
+    diss = kT0./T.*(grdTz (2:end-1,2:end-1).^2 + grdTx (2:end-1,2:end-1).^2) ...
+         + ks    .*(grdTpz(2:end-1,2:end-1).^2 + grdTpx(2:end-1,2:end-1).^2) ...
          + exx.*txx + ezz.*tzz ...
          + 2.*(exz(1:end-1,1:end-1)+exz(2:end,1:end-1)+exz(1:end-1,2:end)+exz(2:end,2:end))./4 ...
             .*(txz(1:end-1,1:end-1)+txz(2:end,1:end-1)+txz(1:end-1,2:end)+txz(2:end,2:end))./4 ...
