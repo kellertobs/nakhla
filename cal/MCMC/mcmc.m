@@ -41,7 +41,7 @@ dhat  = dhatFunc(x1);
 Px1   = PriorFunc(x1); 
 Ld_x1 = LikeFunc(dhat,x1); 
 Px1_d = Px1 + Ld_x1; 
-Pbest = Px1_d;
+Pbest = Px1_d*10;
 ibest = anneal.burnin;
 
 %Initialize the vectors x_keep and L_keep to store the accepted models

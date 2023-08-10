@@ -17,16 +17,16 @@ plot_cv  =  0;                   % switch on to live plot iterative convergence
 D        =  1000e3;              % chamber depth [m]
 N        =  150;                 % number of grid points in z-direction (incl. 2 ghosts)
 h        =  D/N;                 % grid spacing (equal in both dimensions, do not set) [m]
-L        =  D/2;                 % chamber width [m]
+L        =  D/1.5;               % chamber width [m]
 
 % set model timing parameters
 Nt       =  1e5;                 % number of time steps to take
 tend     =  100*yr;              % end time for simulation [s]
-dt       =  10*hr;               % initial time step [s]
+dt       =  1*hr;                % initial time step [s]
 dtmax    =  1*yr;                % maximum time step [s]
 
 % set initial thermo-chemical state
-T0       =  1730;                % temperature top  layer [deg C]
+T0       =  1705;                % temperature top  layer [deg C]
 T1       =  T0;                  % temperature base layer [deg C]
 c0       =  [0.36,0.31,0.32,0.01,0.0];   % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
 c1       =  c0;                          % components (maj comp, H2O) bot layer [wt] (will be normalised to unit sum!)
@@ -37,7 +37,7 @@ zlay     =  2.0;                 % layer thickness (relative to domain depth D)
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
 bnd_w    =  h;                   % boundary layer width [m]
 tau_T    =  1*yr;                % wall cooling/assimilation time [s]
-Twall    =  [0,1950,nan];        % [top,bot,sds] wall rock temperature [degC] (nan = insulating)
+Twall    =  [0,1900,nan];        % [top,bot,sds] wall rock temperature [degC] (nan = insulating)
 Ptop     =  1e5;                 % top pressure [Pa]
 
 % set thermo-chemical material parameters
@@ -60,9 +60,9 @@ CFL      =  0.50;                % (physical) time stepping courant number (mult
 rtol     =  1e-6;                % outer its relative tolerance
 atol     =  1e-9;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its
-Delta    =  2*D/30;              % correlation length for eddy diffusivity
-Prt      =  100;                 % turbulent Prandtl number (ratio of momentum to heat diffusivity)
-mink     =  1e5;                 % minimum eddy diffusivity constant
+Delta    =  2*D/50;              % correlation length for eddy diffusivity
+Prt      =  1;                   % turbulent Prandtl number (ratio of momentum to heat diffusivity)
+mink     =  1e3;                 % minimum eddy diffusivity constant
 
 %*****  RUN NAKHLA MODEL  *************************************************
 run('../src/main')

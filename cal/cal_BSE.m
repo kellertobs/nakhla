@@ -5,15 +5,15 @@ clear cal;
 
 % number of oxides, mineral end-members, mineral systems, model components
 cal.noxd   = 7;
-cal.nmem   = 10;
-cal.nmsy   = 4;
+cal.nmem   = 12;
+cal.nmsy   = 6;
 cal.ncmp   = 6;
 
 % label strings for all compositional representations
 cal.oxdStr = {'SiO$_2$','Al$_2$O$_3$','FeO','MgO','CaO','Na$_2$O','H$_2$O'};
      elStr = {'Si','Al','Fe','Mg','Ca','Na','H'};
-cal.memStr = {'for','fay','ens','hyp','fsl','ant','alb','cpx','qtz','wat'};
-cal.msyStr = {'olv','opx','fsp','qtz'};
+cal.memStr = {'for','fay','ens','hyp','fsl','mau','fau','mgt','ant','alb','qtz','wat'};
+cal.msyStr = {'olv','opx','cpx','oxs','fsp','qtz'};
 cal.cmpStr = {'cmp1','cmp2','cmp3','cmp4','cmp5','fld'};
 
 for i = 1:cal.ncmp; cal.(cal.cmpStr{i}) = i; end
@@ -29,14 +29,17 @@ cal.ioxd = [   1          3   4   5   6    7       9]; % oxdie indices for visco
 cal.mem_oxd    = [  42.70    0.0     0.0    57.3     0.0     0.0     0.0     % forsterite (for)
                     29.50    0.0    70.5     0.0     0.0     0.0     0.0     % fayalite (fay)
 
-                    56.60    2.02    6.85   34.53    0.0     0.0     0.0     % enstatite (ens)
-                    52.16    3.85   17.71   25.05    1.25    0.0     0.0     % hypersthene (hyp)
-                    49.95    2.58   27.03   17.04    3.40    0.0     0.0     % ferrosilite (hyp)
+                    56.16    2.06    8.27   33.36    0.15    0.0     0.0     % enstatite (ens)
+                    52.10    3.78   17.85   24.79    1.48    0.0     0.0     % hypersthene (hyp)
+                    48.14    2.29   34.46   11.47    3.64    0.0     0.0     % ferrosilite (hyp)
+
+                    51.47    1.63   14.73   12.60   19.20    0.37    0.0     % Mg-augite (mau)
+                    49.54    0.78   32.01    3.02   13.31    1.34    0.0     % Fe-augite (fau)
+
+                     0.0     1.84   97.40    0.76    0.0     0.0     0.0     % magnetite (mgt)
 
                     44.4    35.8     0.0     0.0    19.5     0.3     0.0     % anorthite (ant)
                     68.0    20.0     0.0     0.0     0.5    11.5     0.0     % albite (alb)
-
-                    51.47    1.66   15.25   12.40   18.82    0.40    0.0     % (cpx)
 
                     100.0    0.0    0.0     0.0     0.0      0.0     0.0     % quartz (qtz)
 
@@ -44,19 +47,21 @@ cal.mem_oxd    = [  42.70    0.0     0.0    57.3     0.0     0.0     0.0     % f
 cal.mem_oxd = cal.mem_oxd./sum(cal.mem_oxd,2)*100;
 
 % mineral end-members in mineral systems
-cal.msy_mem = [1  1  0  0  0  0  0  0  0  0    % olivine (olv)
-               0  0  1  1  1  0  0  1  0  0    % orthopyroxene (opx)
-               0  0  0  0  0  1  1  0  0  0    % feldspar (fsp)
-               0  0  0  0  0  0  0  0  1  0];  % quartz (qtz)
+cal.msy_mem = [1  1  0  0  0  0  0  0  0  0  0  0    % olivine (olv)
+               0  0  1  1  1  0  0  0  0  0  0  0    % orthopyroxene (opx)
+               0  0  0  0  0  1  1  0  0  0  0  0    % clinopyroxene (cpx)
+               0  0  0  0  0  0  0  1  0  0  0  0    % oxides (oxs)
+               0  0  0  0  0  0  0  0  1  1  0  0    % feldspar (fsp)
+               0  0  0  0  0  0  0  0  0  0  1  0];  % quartz (qtz)
 
 % mineral end-member composition of melting model components
-%                    for       fay       ens       hyp       hyp       ant       alb       cpx       qtz       wat
-cal.cmp_mem =   [  100.0000         0         0         0         0         0         0         0         0         0
-         0   19.4693   80.5307         0         0         0         0         0         0         0
-         0         0         0  100.0000         0         0         0         0         0         0
-         0         0         0    2.4846   57.5938   35.3266    4.5950         0         0         0
-         0         0         0         0   22.2731   11.6773    2.2496   14.2657   49.5344         0
-         0         0         0         0         0         0         0         0         0  100.0000];
+%                    for       fay       ens       hyp       fsl       mau       fau       mgt       ant       alb       qtz       wat
+cal.cmp_mem =   [  100.0000         0         0         0         0         0         0         0         0         0         0         0
+   68.7993   31.2007         0         0         0         0         0         0         0         0         0         0
+         0   14.5954   38.5037         0         0         0         0         0   46.9009         0         0         0
+         0         0         0    2.0009         0   79.2930         0         0    6.9138   11.7924         0         0
+         0    0.5056         0         0    0.4245         0   27.1232    0.9959   14.4074    5.5379   51.0055         0
+         0         0         0         0         0         0         0         0         0         0         0  100.0000];
 cal.cmp_mem = cal.cmp_mem./sum(cal.cmp_mem,2)*100;
 
 % mineral systems composition of melting model components

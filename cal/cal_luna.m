@@ -27,14 +27,20 @@ cal.ioxd = [   1    2     3   4   5   6    7       9]; % oxdie indices for visco
 %                 SiO2   TiO2   Al2O3   FeO     MgO   CaO   Na2O   H2O
 cal.mem_oxd = [  42.7    0.05    0.0    0.0   57.25   0.0    0.0   0.0    % forsterite
                  30.0    0.20    0.0   69.0    0.0    0.8    0.0   0.0    % fayalite
+
                  56.0    0.08    4.49   4.33  33.92   1.11	 0.07  0.0    % enstatite
                  50.0    0.15    8.85  12.17  26.08   2.70   0.05  0.0    % hypersthene
+
                  51.0    0.08    7.16   2.88  22.25  16.43   0.20  0.0    % Mg-augite
                  47.6    1.68    2.05  33.27   5.19  10.08   0.13  0.0    % Fe-pigeonite
+
                  44.2    0.08   35.52   0.4    0.2   19.1    0.5   0.0    % anorthite
                  67.4    0.20   20.4    1.1    0.3    2.1    8.5   0.0    % albite
+
                  0.32   20.56    3.07  74.63   1.14   0.28   0.0   0.0    % ilmenite
+
                 99.95    0.05    0.0    0.0    0.0    0.0    0.0   0.0    % quartz
+                
                  0.0     0.0     0.0    0.0    0.0    0.0    0.0 100.0];  % water (wat)
 cal.mem_oxd = cal.mem_oxd./sum(cal.mem_oxd,2)*100;
 

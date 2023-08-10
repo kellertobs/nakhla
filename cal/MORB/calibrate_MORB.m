@@ -329,11 +329,11 @@ for ic = nc
     MAG(ic).OUT.OxideFract.solp(hascpx,:) = MAG(ic).OUT.OxideFract.solp(hascpx,:) + MAG(ic).OUT.OxideFract.cpxp(hascpx,:).*MAG(ic).OUT.PhaseProps.cpx(hascpx,1);
     wt(hascpx) = wt(hascpx) + MAG(ic).OUT.PhaseProps.cpx(hascpx,1);
 
-    MAG(ic).OUT.OxideFract.solp(hasfsp,:) = MAG(ic).OUT.OxideFract.solp(hasfsp,:) + MAG(ic).OUT.OxideFract.pl4Tp(hasfsp,:).*MAG(ic).OUT.PhaseProps.pl4T(hasfsp,1);
-    wt(hasfsp) = wt(hasfsp) + MAG(ic).OUT.PhaseProps.pl4T(hasfsp,1);
-
     MAG(ic).OUT.OxideFract.solp(hasoxs,:) = MAG(ic).OUT.OxideFract.solp(hasoxs,:) + MAG(ic).OUT.OxideFract.spnp(hasoxs,:).*MAG(ic).OUT.PhaseProps.spn(hasoxs,1);
     wt(hasoxs) = wt(hasoxs) + MAG(ic).OUT.PhaseProps.spn(hasoxs,1);
+
+    MAG(ic).OUT.OxideFract.solp(hasfsp,:) = MAG(ic).OUT.OxideFract.solp(hasfsp,:) + MAG(ic).OUT.OxideFract.pl4Tp(hasfsp,:).*MAG(ic).OUT.PhaseProps.pl4T(hasfsp,1);
+    wt(hasfsp) = wt(hasfsp) + MAG(ic).OUT.PhaseProps.pl4T(hasfsp,1);
 
     MAG(ic).OUT.OxideFract.solp = MAG(ic).OUT.OxideFract.solp./wt;
 end
@@ -448,6 +448,13 @@ end
 
 data = [oxdLIQ(:);oxdSOL(:);phs(:)];
 
+indmem  = logical([0   0   0   0   0   1   0   0   0
+                   1   1   1   1   0   1   1   0   0
+                   1   1   1   1   1   1   1   0   0
+                   1   1   1   1   1   1   1   0   0
+                   1   1   0   1   1   0   1   1   0
+                   0   0   0   0   0   0   0   0   1]);
+
 %%
 ioxd = [cal.Si,cal.Al,cal.Fe,cal.Mg,cal.Ca,cal.Na];
 DATA.PRJCT  = 'ASVZ';
@@ -458,18 +465,11 @@ DATA.X      = DATA.X./sum(DATA.X,2);
 
 unmix;
 
-indmem  = logical([0   0   0   0   0   1   0   0   0
-                   1   0   1   0   0   1   1   0   0
-                   1   1   1   1   1   1   1   0   0
-                   1   1   1   1   1   1   1   0   0
-                   0   1   0   1   1   0   1   1   0
-                   0   0   0   0   0   0   0   0   1]);
-
 cmp_oxd = max(0,Fi)*100;
 cmp_oxd = cmp_oxd./sum(cmp_oxd,2)*100;
 cmp_oxd(cmp_oxd(:,cal.Al)==max(cmp_oxd(:,cal.Al)),:) = [];
-[~,iSi] = sort(cmp_oxd(:,1));
-cmp_oxd_FINT = cmp_oxd(iSi,:);
+[~,iSi] = sort(cmp_oxd(:,Mg),'descend');
+cmp_oxd_FINT = cmp_oxd(iMg,:);
 
 Xp = zeros(size(cmp_oxd,1),cal.nmem);
 for ip = 1:size(cmp_oxd,1)
@@ -483,30 +483,12 @@ cmp_mem_FINT(1,cal.ant) = 100;
 cmp_mem_FINT(end,cal.wat) = 100;
 cmp_oxd_FINT = cmp_mem_FINT*cal.mem_oxd/100;
 
-cmp_oxd = max(0,Fe)*100;
-cmp_oxd = cmp_oxd./sum(cmp_oxd,2)*100;
-cmp_oxd(cmp_oxd(:,cal.Al)==max(cmp_oxd(:,cal.Al)),:) = [];
-[~,iSi] = sort(cmp_oxd(:,1));
-cmp_oxd_FEXT = cmp_oxd(iSi,:);
-
-Xp = zeros(size(cmp_oxd,1),cal.nmem);
-for ip = 1:size(cmp_oxd,1)
-    Xp(ip,indmem(ip,:)) = lsqnonneg(cal.mem_oxd(indmem(ip,:),ioxd).',cmp_oxd_FEXT(ip,:).');
-end
-cmp_mem = Xp./sum(Xp,2)*100;
-
-cmp_mem_FEXT = zeros(cal.ncmp,cal.nmem);
-cmp_mem_FEXT(2:end-1,:) = cmp_mem;
-cmp_mem_FEXT(1,cal.ant) = 100;
-cmp_mem_FEXT(end,cal.wat) = 100;
-cmp_oxd_FEXT = cmp_mem_FEXT*cal.mem_oxd/100;
-
 
 %%
 
 cal_MORB;  % load melt model calibration
 
-m0     = cal.cmp_mem;
+m0     = cal.cmp_mem.*indmem;
 m0_lw  = max(0,floor(m0 - max(1,0.10*m0)).*indmem);
 m0_up  = max(0, ceil(m0 + max(1,0.10*m0)).*indmem);
 m0     = m0(:);
@@ -554,7 +536,7 @@ LkMdFunc  = @(model) ProbFuncs('LikeFuncModel', dhatFunc, model, data, sigma);
 Niter = 1e5;
 
 % adjust step size to get reasonable acceptance ratio ~26%
-anneal.initstep = 0.2 * diff(mbnds,1,2);
+anneal.initstep = 0.175 * diff(mbnds,1,2);
 anneal.levels   = 3;
 anneal.burnin   = Niter/20;
 anneal.refine   = Niter/10;
@@ -573,7 +555,14 @@ oxdfit      = dhat(1:2*length(T)*cal.noxd);
 phsfit      = reshape(dhat(2*length(T)*cal.noxd+1:end),[],cal.nmsy+1);
 oxdLIQfit   = reshape(oxdfit(1:length(T)*cal.noxd,:),[],cal.noxd);
 oxdSOLfit   = reshape(oxdfit(length(T)*cal.noxd+1:end,:),[],cal.noxd);
-oxdSYSfit   = oxdSYS;
+oxdSYSfit   = oxdLIQfit.*phsfit(:,1)/100 + oxdSOLfit.*(1-phsfit(:,1)/100);
+
+OPTIONS.TolX = 1e-11;
+Xp = zeros(length(oxdSYSfit),cal.ncmp);
+for ip = 1:length(oxdSYSfit)
+    Xp(ip,:) = lsqnonneg(cmp_oxd_MAP.',oxdSYSfit(ip,:).',OPTIONS);
+end
+c = Xp./sum(Xp,2);
 
 % retrieve distributions
 Nbins = min(500,Niter/20);
@@ -658,30 +647,29 @@ xlabel(cal.oxdStr(cal.Si),FS{:},TX{:})
 ylabel(cal.oxdStr(cal.H),FS{:},TX{:})
 colorbar;
 sgtitle('melt, solid, mixture',FS{:},TX{:})
+
+figure(108); clf; cmap = colororder;
+plot(T,phs(:,1),'-',T,phsfit(:,1),'--','Color',cmap(2,:),'LineWidth',1.5); axis tight; hold on % melt
+plot(T,phs(:,2),'-',T,phsfit(:,2),'--','Color',cmap(5,:),'LineWidth',1.5); % olv
+plot(T,phs(:,3),'-',T,phsfit(:,3),'--','Color',cmap(3,:),'LineWidth',1.5); % cpx
+plot(T,phs(:,4),'-',T,phsfit(:,4),'--','Color',cmap(4,:),'LineWidth',1.5); % spn
+plot(T,phs(:,5),'-',T,phsfit(:,5),'--','Color',cmap(1,:),'LineWidth',1.5); % fsp
+xlabel('Temperature [$^\circ$C]',FS{:},TX{:})
+ylabel('Phase proportions [wt\%]',FS{:},TX{:})
+sgtitle('Phase stability',FS{:},TX{:})
 drawnow
 
 %% best fit melting temperatures
 clear cal var x m f cx cm
 cal_MORB;  % load melt model calibration
-cal.cmp_oxd = cmp_oxd_MAP;
+
+OPTIONS.TolX = 1e-16;
 
 Xp = zeros(length(oxdSYSfit),cal.ncmp);
 for ip = 1:length(oxdSYSfit)
-    Xp(ip,:) = lsqnonneg(cmp_oxd_MAP.',oxdSYSfit(ip,:).');
+    Xp(ip,:) = lsqnonneg(cal.cmp_oxd.',oxdSYSfit(ip,:).',OPTIONS);
 end
 c = Xp./sum(Xp,2);
-
-Xp = zeros(length(oxdSOLfit),cal.ncmp);
-for ip = 1:length(oxdSOLfit)
-    Xp(ip,:) = lsqnonneg(cmp_oxd_MAP.',oxdSOLfit(ip,:).');
-end
-cx = Xp./sum(Xp,2);
-
-Xp = zeros(length(oxdLIQfit),cal.ncmp);
-for ip = 1:length(oxdLIQfit)
-    Xp(ip,:) = lsqnonneg(cmp_oxd_MAP.',oxdLIQfit(ip,:).');
-end
-cm = Xp./sum(Xp,2);
 
 % equilibrium phase fractions and compositions
 
@@ -709,7 +697,7 @@ end
 mbnds  = [m0_lw,m0_up]; % model parameter bounds
 
 sigma  = max(0.1,0.01.*data);
-sigma(length(data)/2+1:end) = sigma(length(data)/2+1:end)*2;
+% sigma(length(data)/2+1:end) = sigma(length(data)/2+1:end)*2;
 
 % function to calculate forward model
 % m --> dhat
@@ -736,11 +724,11 @@ LikeFunc  = @(dhat,model) ProbFuncs('LikeFunc',dhat,data,sigma,model);
 LkMdFunc  = @(model) ProbFuncs('LikeFuncModel', dhatFunc, model, data, sigma);
 
 % run MCMC algorithm
-Niter = 1e4;
+Niter = 1e5;
 Nbins = min(500,Niter/20);
 
 % adjust step size to get reasonable acceptance ratio ~26%
-anneal.initstep = 0.05 * diff(mbnds,1,2);
+anneal.initstep = 0.03 * diff(mbnds,1,2);
 anneal.levels   = 3;
 anneal.burnin   = Niter/20;
 anneal.refine   = Niter/10;

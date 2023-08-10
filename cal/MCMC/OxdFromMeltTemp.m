@@ -20,10 +20,6 @@ cal.H2Osat = fluidsat(var.T,var.P*1e9,0,cal);
 oxdLIQfit = var.cm*cal.cmp_oxd;
 oxdSOLfit = var.cx*cal.cmp_oxd;
 
-% get fitted phase fractions
-phsfit = zeros(np,cal.nmsy+1);
-phsfit(:,1) = var.m*100;
-
 datafit = [oxdLIQfit(:);oxdSOLfit(:)];
 
 end
