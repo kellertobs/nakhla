@@ -26,7 +26,7 @@ dt       =  1*hr;                % initial time step [s]
 dtmax    =  1*yr;                % maximum time step [s]
 
 % set initial thermo-chemical state
-T0       =  1705;                % temperature top  layer [deg C]
+T0       =  1730;                % temperature top  layer [deg C]
 T1       =  T0;                  % temperature base layer [deg C]
 c0       =  [0.36,0.31,0.32,0.01,0.0];   % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
 c1       =  c0;                          % components (maj comp, H2O) bot layer [wt] (will be normalised to unit sum!)
@@ -60,9 +60,9 @@ CFL      =  0.50;                % (physical) time stepping courant number (mult
 rtol     =  1e-6;                % outer its relative tolerance
 atol     =  1e-9;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its
-Delta    =  2*D/50;              % correlation length for eddy diffusivity
+Delta    =  2*D/25;              % correlation length for eddy diffusivity
 Prt      =  1;                   % turbulent Prandtl number (ratio of momentum to heat diffusivity)
-mink     =  1e3;                 % minimum eddy diffusivity constant
+etamin   =  1e8;                 % minimum eddy diffusivity constant
 
 %*****  RUN NAKHLA MODEL  *************************************************
 run('../src/main')

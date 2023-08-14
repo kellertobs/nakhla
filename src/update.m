@@ -82,7 +82,7 @@ Re0 = W0.*rho.*D/10./eta;
 
 if Nx==1 && Nz==1; kW = 0;
 else              
-kW = (kW + (mink + 2.*eII.*(0.18*Delta).^2) .* (1-min(1,topshape+botshape+sdsshape)*0.9))/2;
+kW = (kW + 2.*eII.*(0.18*Delta).^2 .* (1-min(1,topshape+botshape+sdsshape)*0.9))/2;
 end
 kwx = wx0*dx*10;                                                           % segregation fluctuation diffusivity
 kwf = wf0*df*10;                                                           % segregation fluctuation diffusivity
@@ -92,8 +92,8 @@ ks  = rho.*cP./T.*(phi.*kwf + chi.*kwx + kW/Prt);                          % reg
 kc  = rho.*(phi.*kwf + chi.*kwx + kW/Prt);                                 % regularised component diffusion
 eta = eta + rho.*(phi.*kwf + chi.*kwx + kW);
 
-etamax = etacntr.*min(eta(:));
-eta    = (etamax.^-0.5 + eta.^-0.5).^-2;
+etamax = etacntr.*max(min(eta(:)),etamin);
+eta    = (etamax.^-0.5 + eta.^-0.5).^-2 + etamin;
 
 etaco  = (eta([1,1:end],[end,1:end]).*eta([1:end,end],[end,1:end]) ...
        .* eta([1,1:end],[1:end,1  ]).*eta([1:end,end],[1:end,1  ])).^0.25;
