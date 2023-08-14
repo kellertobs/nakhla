@@ -321,10 +321,6 @@ P   = full(reshape(SOL(MapP(:)+(NW+NU)),Nz+2,Nx+2)); % matrix dynamic pressure
 
 U   = U - mean(U(2:end-1,:),'all');
 
-% magma velocity magnitude
-Vel = sqrt(((W(1:end-1,2:end-1)+W(2:end,2:end-1))/2).^2 ...
-         + ((U(2:end-1,1:end-1)+U(2:end-1,2:end))/2).^2);
-
 if ~bnchm
 
     % phase segregation speeds

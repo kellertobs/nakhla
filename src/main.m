@@ -4,7 +4,7 @@ init;
 % physical time stepping loop
 while time <= tend && step <= Nt && any(m(:)>1e-6)
     
-    fprintf(1,'*****  step %d;  dt = %4.4e;  time = %4.4e [hr]\n\n',step,dt./3600,time./3600);
+    fprintf(1,'*****  step %d;  dt = %4.4e;  time = %4.4e [%s]\n\n',step,dt./TimeScale,time./TimeScale,TimeUnits);
     TTtime  = tic;
     EQtime  = 0;
     FMtime  = 0;
@@ -103,7 +103,7 @@ while time <= tend && step <= Nt && any(m(:)>1e-6)
 
     fprintf(1,'         min U   = %1.4f;    mean U   = %1.4f;    max U   = %1.4f;   [m/s]\n'  ,min(U(:)  ),mean(U(:)  ),max(U(:)  ));
     fprintf(1,'         min W   = %1.4f;    mean W   = %1.4f;    max W   = %1.4f;   [m/s]\n'  ,min(-W(:) ),mean(-W(:) ),max(-W(:) ));
-    fprintf(1,'         min P   = %2.4f;    mean P   = %2.4f;    max P   = %2.4f;  [kPa]\n\n',min(P(:)./1e3),mean(P(:)./1e3),max(P(:)./1e3));
+    fprintf(1,'         min P   = %2.4f;    mean P   = %2.4f;    max P   = %2.4f;  [Pa]\n\n',min(P(:)),mean(P(:)),max(P(:)));
 
     % plot results
     if ~mod(step,nop); output; end

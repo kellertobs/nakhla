@@ -61,6 +61,10 @@ Ksgr_m =                 dx^2/cal.bm./    etam .*max(TINY^0.5,mu -cal.cm).^(cal.
 
 if ~calibrt % skip the following if called from calibration script
 
+% update velocity magnitude
+Vel = sqrt(((W(1:end-1,2:end-1)+W(2:end,2:end-1))/2).^2 ...
+         + ((U(2:end-1,1:end-1)+U(2:end-1,2:end))/2).^2);
+
 % update velocity divergence
 Div_V = ddz(W(:,2:end-1),h) + ddx(U(2:end-1,:),h);                         % get velocity divergence
 
