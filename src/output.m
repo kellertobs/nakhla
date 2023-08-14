@@ -12,10 +12,10 @@ else
 end
 
 % adjust scales and units for intuitive visualisation
-if time < 72*hr
+if time < 1e3*hr
     TimeScale = hr;
     TimeUnits = 'hr';
-elseif time >= 72*hr && time < 1e2*yr
+elseif time >= 1e3*hr && time < 1e2*yr
     TimeScale = yr;
     TimeUnits = 'yr';
 elseif time >= 1e2*yr
@@ -337,8 +337,8 @@ else % create 2D plots
     % plot temperature and composition in Fig. 2
     set(0,'CurrentFigure',fh2)
     set(fh2,'CurrentAxes',ax(21));
-    imagesc(Xsc,Zsc,T-273.15); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$T [^\circ$C]'],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel(['Depth [',SpaceUnits,']'],TX{:},FS{:}); 
+    imagesc(Xsc,Zsc,Tp-273.15); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$T_p$ [$^\circ$C]'],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel(['Depth [',SpaceUnits,']'],TX{:},FS{:}); 
     set(fh2,'CurrentAxes',ax(22));
     imagesc(Xsc,Zsc,squeeze(c_oxd(:,:,cal.Si)./sum(c_oxd(:,:,1:end-1),3).*100)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['SiO$_2$ [wt\%]'],TX{:},FS{:}); set(gca,'YTickLabel',[]); xlabel(['Width [',SpaceUnits,']'],TX{:},FS{:});
@@ -366,8 +366,8 @@ else % create 2D plots
     % plot density, rheology, and segregation speeds in Fig. 4
     set(0,'CurrentFigure',fh4)
     set(fh4,'CurrentAxes',ax(41));
-    imagesc(Xsc,Zsc,      rho ); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\bar{\rho}$ [kg/m$^3$]'],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel(['Depth [',SpaceUnits,']'],TX{:},FS{:}); 
+    imagesc(Xsc,Zsc,rho-mean(rho,2)); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\Delta \bar{\rho}_h$ [kg/m$^3$]'],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel(['Depth [',SpaceUnits,']'],TX{:},FS{:}); 
     set(fh4,'CurrentAxes',ax(42));
     imagesc(Xsc,Zsc,log10(eta)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\bar{\eta}$ [log$_{10}$ Pas]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);

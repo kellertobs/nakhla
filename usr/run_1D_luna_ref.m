@@ -15,7 +15,7 @@ plot_cv  =  0;                   % switch on to live plot iterative convergence
 
 % set model domain parameters
 D        =  1000e3;              % chamber depth [m]
-N        =  2300;                 % number of grid points in z-direction (incl. 2 ghosts)
+N        =  300;                 % number of grid points in z-direction (incl. 2 ghosts)
 h        =  D/N;                 % grid spacing (equal in both dimensions, do not set) [m]
 L        =  h;                   % chamber width [m]
 

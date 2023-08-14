@@ -150,7 +150,7 @@ sf = sm + Dsf;
 % update major component phase composition
 Kx  = reshape(cal.Kx,Nz,Nx,cal.ncmp);
 Kf  = reshape(cal.Kf,Nz,Nx,cal.ncmp);
-rnorm = 1; tol  = 1e-16;
+rnorm = 1; tol  = 1e-14;
 it    = 1; mxit = 50;
 while rnorm>tol && it<mxit
     cm  =  c           ./(m + x.*Kx + f.*Kf + TINY);
@@ -160,10 +160,10 @@ while rnorm>tol && it<mxit
 
     drdK = ((1-f).*(c - cf.*f))./(m + Kx.*x).^2;
     
-    Kx = max(0,Kx - min(Kx/2,res./drdK/4));
+    Kx = max(0,min(TINY^-2,Kx - min(Kx/2,res./drdK/4)));
     Kx(:,:,end) = 0;
 
-    rnorm = norm(res,'fro')./norm(Kx,'fro');
+    rnorm = norm(res,'fro');
     it  = it+1;
 end
 
