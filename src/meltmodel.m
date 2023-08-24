@@ -48,9 +48,11 @@ var.T      = Tsol;
 
 %***  get fluid fraction and composition
 f  = var.H2O;
+cf = [zeros(1,cal.ncmp-1),1];
 
 %***  get residual for sum(ci_b/Kxi) = sum(ci_v)
-r  =  sum(var.c./((1-f).*cal.Kx + f.*cal.Kf + 1e-16),2)-1;
+cm = var.c./((1-f).*cal.Kx + f.*cal.Kf + 1e-16);
+r  = sum(cm,2)-1;
 
 rnorm      =  1;     % initialize residual norm for iterations
 n          =  0;     % initialize iteration count
@@ -66,15 +68,17 @@ while rnorm > rnorm_tol  % iterate down to full accuracy
     [var,cal]  = meltmodel(var,cal,'K');
     
     %***  get residual at T+eps_T/2
-    rp  =  sum(var.c./((1-f).*cal.Kx + f.*cal.Kf + 1e-16),2)-1;
+    cm = var.c./((1-f).*cal.Kx + f.*cal.Kf + 1e-16);
+    rp = sum(cm,2)-1;
     
     %***  compute partition coefficients Kxi at T-eps_T/2
     var.T      = Tsol-eps_T/2;
     [var,cal]  = meltmodel(var,cal,'K');
     
     %***  get residual at T-eps_T/2
-    rm  =  sum(var.c./((1-f).*cal.Kx + f.*cal.Kf + 1e-16),2)-1;
-    
+    cm = var.c./((1-f).*cal.Kx + f.*cal.Kf + 1e-16);
+    rm = sum(cm,2)-1;
+
     %***  finite difference drdT = (r(T+eps_T/2)-r(T-eps_T/2))/eps_T
     drdT  =  (rp - rm)/eps_T;
     
@@ -86,8 +90,9 @@ while rnorm > rnorm_tol  % iterate down to full accuracy
     [var,cal]  = meltmodel(var,cal,'K');
     
     %***  compute residual at Tsol
-    r  =  sum(var.c./((1-f).*cal.Kx + f.*cal.Kf + 1e-16),2)-1;
-    
+    cm = var.c./((1-f).*cal.Kx + f.*cal.Kf + 1e-16);
+    r  = sum(cm,2)-1;
+
     %***  compute Newton residual norm
     rnorm  =  norm(r(ii),2)./sqrt(length(r(ii)));
     
@@ -132,7 +137,8 @@ f  = (var.H2O-var.H2Om)./(1-var.H2Om);
 cf = [zeros(1,cal.ncmp-1),1];
 
 %***  get residual for sum(ci_b*Kxi) = sum(ci_v)
-r  =  sum((var.c-f.*cf).*cal.Kx./(1-f),2)-1;
+cx = var.c.*cal.Kx./(1-f);
+r  = sum(cx,2)-1;
 
 rnorm      =  1;     % initialize residual norm for iterations
 n          =  0;     % initialize iteration count
@@ -148,14 +154,16 @@ while rnorm > rnorm_tol  % iterate down to full accuracy
     [var,cal]  = meltmodel(var,cal,'K');
 
     %***  get residual at T+eps_T/2
-    rp  =  sum((var.c-f.*cf).*cal.Kx./(1-f),2)-1;
+    cx = var.c.*cal.Kx./(1-f);
+    rp = sum(cx,2)-1;
     
     %***  compute partition coefficients Kxi at T-eps_T/2
     var.T      = Tliq-eps_T/2;
     [var,cal]  = meltmodel(var,cal,'K');
 
     %***  get residual at T-eps_T/2
-    rm  =  sum((var.c-f.*cf).*cal.Kx./(1-f),2)-1;
+    cx = var.c.*cal.Kx./(1-f);
+    rm = sum(cx,2)-1;
     
     %***  compute difference drdT = (r(T+eps_T/2)-r(T-eps_T/2))/eps_T
     drdT  =  (rp - rm)./eps_T;
@@ -168,7 +176,8 @@ while rnorm > rnorm_tol  % iterate down to full accuracy
     [var,cal]  = meltmodel(var,cal,'K');
 
     %***  compute residual at Tliq
-    r  =  sum((var.c-f.*cf).*cal.Kx./(1-f),2)-1;
+    cx = var.c.*cal.Kx./(1-f);
+    r  = sum(cx,2)-1;
     
     %***  compute Newton residual norm
     rnorm  =  norm(r(ii),2)./sqrt(length(r(ii)));
@@ -193,8 +202,8 @@ function  [cal,var,flag]  =  equilibrium(var,cal)
 %       compositions at given bulk composition, pressure and temperature
 
 %***  get Tsol, Tliq at c
-var.H2Om   = max(0,min(cal.H2Osat, var.H2O./(var.m+1e-16) ));
-[var,cal,flag]  =  meltmodel(var,cal,'T');
+var.H2Om        = max(0,min(cal.H2Osat, var.H2O./(var.m+1e-16) ));
+[var,cal,flag]  = meltmodel(var,cal,'T');
 
 var.T = max(cal.Tsol,min(cal.Tliq,var.T));
 
@@ -221,9 +230,13 @@ mi        = var.m;
 while rnorm > rnorm_tol     % Newton iteration
     mii = mi; mi = var.m; 
 
+    % detect points at subsolidus or superliquidus conditions
+    subsol = (var.m<=1e-9 & var.T<=cal.Tsol);
+    supliq = (var.x<=1e-9 & var.T>=cal.Tliq);
+
     %***  compute residual of unity sum of components
     [r,var,cal] = resm(var.m,var,cal);
-    r((var.m==0 & var.T<=cal.Tsol) | (var.x==0 & var.T>=cal.Tliq)) = 0;
+    % r(subsol | supliq) = 0;
 
     %***  compute numerical derivative of residual dr/dm
     rp = resm(var.m+epsm/2,var,cal);
@@ -242,7 +255,7 @@ while rnorm > rnorm_tol     % Newton iteration
     var.x  = max(0,min(1, 1-var.m-var.f ));
     
     %***  get non-linear residual norm
-    rnorm  = norm(var.m-mi,2)/norm(var.m+1,2);
+    rnorm  = norm(var.m-mi,2)/sqrt(length(var.m(:)));
 
     n  =  n+1;  % update iteration count
     if (n==its_tol)
@@ -251,8 +264,8 @@ while rnorm > rnorm_tol     % Newton iteration
     end
 end
 
-var.cm = max(0,min(1,  var.c                       ./(var.m + var.x.*cal.Kx + var.f.*cal.Kf + 1e-16) ));
-var.cx = max(0,min(1, (var.c-var.f.*var.cf).*cal.Kx./(var.m + var.x.*cal.Kx                 + 1e-16) ));
+var.cm = max(0,min(1, var.c        ./(var.m + var.x.*cal.Kx + var.f.*cal.Kf + 1e-16) ));
+var.cx = max(0,min(1, var.c.*cal.Kx./(var.m + var.x.*cal.Kx + var.f.*cal.Kf + 1e-16) ));
 
 end
 
@@ -263,8 +276,8 @@ var.H2Om  = max(0,min(cal.H2Osat, var.H2O./(m+1e-16) ));
 [var,cal] = meltmodel(var,cal,'K');
 f         = max(0,min(var.H2O, var.H2O - m.*var.H2Om ));
 x         = 1-m-f;
-var.cm    =  var.c                   ./(m + x.*cal.Kx + f.*cal.Kf + 1e-16);
-var.cx    = (var.c-f.*var.cf).*cal.Kx./(m + x.*cal.Kx             + 1e-16);
+var.cm    = var.c        ./(m + x.*cal.Kx + f.*cal.Kf + 1e-16);
+var.cx    = var.c.*cal.Kx./(m + x.*cal.Kx + f.*cal.Kf + 1e-16);
 r         = sum(var.cm,2) - sum(var.cx,2);
 
 end

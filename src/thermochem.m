@@ -142,29 +142,30 @@ x = X./RHO;
 f = F./RHO;
 m = M./RHO;
 
+% update major component phase composition
+Kx     = reshape(cal.Kx,Nz,Nx,cal.ncmp);
+Kf     = reshape(cal.Kf,Nz,Nx,cal.ncmp);
+rnorm  = 1;  tol  = atol/10;
+it     = 1;  mxit = 100;
+while rnorm>tol && it<mxit
+    Kxi = Kx;  Kfi = Kf;
+
+    cm  = c    ./(m + x.*Kx + f.*Kf + TINY);
+    cx  = c.*Kx./(m + x.*Kx + f.*Kf + TINY);
+    
+    cm = cm./sum(cm,3);
+    cx = cx./sum(cx,3);
+
+    Kx = cx./(cm+TINY);
+    Kf = cf./(cm+TINY);
+
+    rnorm = norm(x.*cx + m.*cm + f.*cf - c,'fro')./sqrt(length(cx(:)));  
+    it  = it+1;
+end
+
 % update phase entropies
 sm = (S - X.*Dsx - F.*Dsf)./RHO;
 sx = sm + Dsx;
 sf = sm + Dsf;
-
-% update major component phase composition
-Kx  = reshape(cal.Kx,Nz,Nx,cal.ncmp);
-Kf  = reshape(cal.Kf,Nz,Nx,cal.ncmp);
-rnorm = 1; tol  = 1e-14;
-it    = 1; mxit = 50;
-while rnorm>tol && it<mxit
-    cm  =  c           ./(m + x.*Kx + f.*Kf + TINY);
-    cx  = (c-f.*cf).*Kx./(m + x.*Kx         + TINY);
-
-    res = sum(cx,3) - sum(cm,3);
-
-    drdK = ((1-f).*(c - cf.*f))./(m + Kx.*x).^2;
-    
-    Kx = max(0,min(TINY^-2,Kx - min(Kx/2,res./drdK/4)));
-    Kx(:,:,end) = 0;
-
-    rnorm = norm(res,'fro');
-    it  = it+1;
-end
 
 TCtime = TCtime + toc - eqtime;

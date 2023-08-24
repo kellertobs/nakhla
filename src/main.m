@@ -2,7 +2,7 @@
 init;
 
 % physical time stepping loop
-while time <= tend && step <= Nt && any(m(:)>1e-6)
+while time <= tend && step <= Nt && any(m(:)>1e-9)
     
     fprintf(1,'*****  step %d;  dt = %4.4e;  time = %4.4e [%s]\n\n',step,dt./TimeScale,time./TimeScale,TimeUnits);
     TTtime  = tic;
@@ -46,13 +46,6 @@ while time <= tend && step <= Nt && any(m(:)>1e-6)
     rhoWoo  = rhoWo; rhoWo = rhofz.*W(:,2:end-1);
     rhoUoo  = rhoUo; rhoUo = rhofx.*U(2:end-1,:);
     dto     = dt;
-    upd_S   = 0.*S;
-    upd_C   = 0.*C;
-    upd_X   = 0.*X;
-    upd_F   = 0.*F;
-    upd_M   = 0.*M;
-    upd_rho = 0.*rho;
-
     
     % reset residuals and iteration count
     resnorm  = 1;

@@ -32,6 +32,9 @@ rhom   = reshape(DensityX(reshape(cm_oxd_all,Nz*Nx,9),T0,Ptop./1e8)      ,Nz,Nx)
 rhox   = reshape(sum(reshape(cx_mem/100,Nz*Nx,cal.nmem)./cal.rhox0,2).^-1,Nz,Nx) .* (1 - aT.*(T-T0-273.15) + bPx.*(Pt-Ptop));
 rhof   = cal.rhof0                                                               .* (1 - aT.*(T-T0-273.15) + bPf.*(Pt-Ptop));
 
+rhofz  = (rho(icz(1:end-1),:)+rho(icz(2:end),:))/2;
+rhofx  = (rho(:,icx(1:end-1))+rho(:,icx(2:end)))/2;
+
 % convert weight to volume fraction, update bulk density
 rho    = 1./(m./rhom + x./rhox + f./rhof);
 
@@ -39,8 +42,7 @@ chi    = max(0,min(1, x.*rho./rhox ));
 phi    = max(0,min(1, f.*rho./rhof ));
 mu     = max(0,min(1, m.*rho./rhom ));
 
-rhofx  = (rho(:,[end,1:end])+rho(:,[1:end,1]))/2;
-rhofz  = (rho([1,1:end],:)+rho([1:end,end],:))/2;
+
 % update lithostatic pressure
 if Nz==1; Pt = Ptop.*ones(size(Tp)); else
     Pt(1,:)     = repmat(mean(rhofz(1,:),2).*g0.*h/2,1,Nx) + Ptop;
@@ -90,17 +92,17 @@ kW = (kW + 2.*eII.*(0.18*Delta).^2 .* (1-min(1,topshape+botshape+sdsshape)*0.9))
 end
 kwx = wx0*dx*10;                                                           % segregation fluctuation diffusivity
 kwf = wf0*df*10;                                                           % segregation fluctuation diffusivity
-kx  = chi.*(kwx + kW/Prt);                                                 % solid fraction diffusion 
-kf  = phi.*(kwf + kW/Prt);                                                 % fluid fraction diffusion 
-ks  = rho.*cP./T.*(phi.*kwf + chi.*kwx + kW/Prt);                          % regularised heat diffusion
-kc  = rho.*(phi.*kwf + chi.*kwx + kW/Prt);                                 % regularised component diffusion
-eta = eta + rho.*(phi.*kwf + chi.*kwx + kW);
+kx  = chi.*kwx + 0*kW/Prt;                                                   % solid fraction diffusion 
+kf  = phi.*kwf + 0*kW/Prt;                                                   % fluid fraction diffusion 
+ks  = rho.*cP./T.*kW/Prt;                                                  % regularised heat diffusion
+kc  = rho       .*kW/Prt;                                                  % regularised component diffusion
+eta = eta + rho.*kW;                                                       % regularised momentum diffusion
 
 etamax = etacntr.*max(min(eta(:)),etamin);
 eta    = (etamax.^-0.5 + eta.^-0.5).^-2 + etamin;
 
-etaco  = (eta([1,1:end],[end,1:end]).*eta([1:end,end],[end,1:end]) ...
-       .* eta([1,1:end],[1:end,1  ]).*eta([1:end,end],[1:end,1  ])).^0.25;
+etaco  = (eta(icz(1:end-1),icx(1:end-1)).*eta(icz(2:end),icx(1:end-1)) ...
+       .* eta(icz(1:end-1),icx(2:end  )).*eta(icz(2:end),icx(2:end  ))).^0.25;
 
 Ra  = Vel.*D/10./((kT0+ks.*T)./rho./cP);
 Re  = Vel.*rho.*D/10./eta;
@@ -118,10 +120,8 @@ tII = (0.5.*(txx.^2 + tzz.^2 ...
 if Nz==1 && Nx==1
     diss = 0.*T;  % no dissipation in 0-D mode (no diffusion, no shear deformation, no segregation)
 else
-    [grdTx ,grdTz ] = gradient(T ([1,1:end,end],[1,1:end,end]),h);
-    [grdTpx,grdTpz] = gradient(Tp([1,1:end,end],[1,1:end,end]),h);
+    [grdTx ,grdTz ] = gradient(T(icz,icx),h);
     diss = kT0./T.*(grdTz (2:end-1,2:end-1).^2 + grdTx (2:end-1,2:end-1).^2) ...
-         + ks    .*(grdTpz(2:end-1,2:end-1).^2 + grdTpx(2:end-1,2:end-1).^2) ...
          + exx.*txx + ezz.*tzz ...
          + 2.*(exz(1:end-1,1:end-1)+exz(2:end,1:end-1)+exz(1:end-1,2:end)+exz(2:end,2:end))./4 ...
             .*(txz(1:end-1,1:end-1)+txz(2:end,1:end-1)+txz(1:end-1,2:end)+txz(2:end,2:end))./4 ...

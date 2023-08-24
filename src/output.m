@@ -67,7 +67,7 @@ if Nx <= 1 && Nz <= 1  % create 0D plots
     plot(hist.time/TimeScale,hist.chi(:,2)*100.*(hist.chi(:,2)>1e-9),CL{[1,4]},LW{:});
     plot(hist.time/TimeScale,hist.phi(:,2)*100.*(hist.phi(:,2)>1e-9),CL{[1,5]},LW{:});
     title('$\mu$, $\chi$, $\phi$ [vol\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
-    xlabel('Time [',TimeUnits,']',TX{:},FS{:});
+    xlabel(['Time [',TimeUnits,']'],TX{:},FS{:});
 
     if ~exist('fh2','var'); fh2 = figure(VIS{:});
     else; set(0, 'CurrentFigure', fh2); clf;
@@ -82,13 +82,13 @@ if Nx <= 1 && Nz <= 1  % create 0D plots
     semilogy(hist.time/TimeScale,hist.etam(:,2),'r-',LW{:});
     title('$\eta^m,\bar{\eta}$ [Pas]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(4,1,3)
-    plot(hist.time/TimeScale,    hist.Gx(:,2)./hist.rho(:,2)*TimeScale*100.*(hist.chi(:,2)>1e-9),CL{[1,4]},LW{:}); axis xy tight; box on; hold on;
-    plot(hist.time/TimeScale,10.*hist.Gf(:,2)./hist.rho(:,2)*TimeScale*100.*(hist.phi(:,2)>1e-9),CL{[1,5]},LW{:});
-    title('$10 \times \Gamma_f/\bar{\rho}$, $\Gamma_x/\bar{\rho}$ [wt \%/',TimeUnits,']',TX{:},FS{:}); set(gca,TL{:},TS{:});
+    plot(hist.time/TimeScale,    hist.Gx(:,2)./hist.rho(:,2)*hr*100.*(hist.chi(:,2)>1e-9),CL{[1,4]},LW{:}); axis xy tight; box on; hold on;
+    plot(hist.time/TimeScale,10.*hist.Gf(:,2)./hist.rho(:,2)*hr*100.*(hist.phi(:,2)>1e-9),CL{[1,5]},LW{:});
+    title('$10 \times \Gamma_f/\bar{\rho}$, $\Gamma_x/\bar{\rho}$ [wt \%/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(4,1,4)
     plot(hist.time/TimeScale,hist.dV(:,2)*100*TimeScale,'k-',LW{:}); axis xy tight; box on;
-    title('$\dot{V}$ [\%/',TimeUnits,']',TX{:},FS{:}); set(gca,TL{:},TS{:});
-    xlabel('Time [',TimeUnits,']',TX{:},FS{:});
+    title(['$\dot{V}$ [\%/',TimeUnits,']'],TX{:},FS{:}); set(gca,TL{:},TS{:});
+    xlabel(['Time [',TimeUnits,']'],TX{:},FS{:});
 
     if ~exist('fh3','var'); fh3 = figure(VIS{:});
     else; set(0, 'CurrentFigure', fh3); clf;
@@ -108,7 +108,7 @@ if Nx <= 1 && Nz <= 1  % create 0D plots
         plot(hist.time/TimeScale,squeeze(hist.x(:,2).*hist.cx_msy(:,2,i)),'-',LW{:},'color',ocean(round((i-1)*213/cal.nmsy)+1,:)); axis xy tight; box on; hold on
     end
     title('Xtal msys [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:}); legend(cal.msyStr,TX{:},FS{1},8,'Location','northeast'); set(gca,TL{:},TS{:});
-    xlabel('Time [',TimeUnits,']',TX{:},FS{:});
+    xlabel(['Time [',TimeUnits,']'],TX{:},FS{:});
 
 elseif Nx <= 1  % create 1D plots
 

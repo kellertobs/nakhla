@@ -49,6 +49,7 @@ dirg     =  [0, 0];              % isotope ratios centred gaussian [delta]
 
 % set thermo-chemical boundary parameters
 Ptop     =  125e6;               % top pressure [Pa]
+periodic =  0;                   % set side boundaries to periodic
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
 bnd_w    =  h;                   % boundary layer width [m]
 bnd_h    =  [0,0,0];             % internal wall rock layer thickness [m]
@@ -91,8 +92,8 @@ CFL      =  0.50;                % (physical) time stepping courant number (mult
 rtol     =  1e-6;                % outer its relative tolerance
 atol     =  1e-9;                % outer its absolute tolerance
 maxit    =  50;                  % maximum outer its
-alpha    =  0.6;                 % iterative step size parameter
-beta     =  0.2;                 % iterative damping parameter
+alpha    =  0.50;                % iterative step size parameter
+beta     =  0.25;                % iterative damping parameter
 etacntr  =  1e+6;                % maximum viscosity contrast
 Delta    =  2*D/100;             % correlation length for eddy viscosity
 Prt      =  1;                   % turbulent Prandtl number (ratio of momentum to heat diffusivity)

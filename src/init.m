@@ -17,7 +17,7 @@ fprintf('\n   run ID: %s \n\n',runID);
 
 load ocean;                  % load custom colormap
 run(['../cal/cal_',calID]);  % load melt model calibration
-if bndmode < 4 % periodic sides
+if periodic % periodic sides
     BCA     =  {'','periodic'};  % boundary condition on advection (top/bot, sides)
     BCD     =  {'','periodic'};  % boundary condition on advection (top/bot, sides)
 else % closed sides
@@ -131,6 +131,19 @@ if bndmode>=2;               bot = +1;      % no slip bot for 'bot only(2)', 'to
 else;                        bot = -1; end  % free slip for other types
 if bndmode==5;               top = -1; bot = -1; end % free slip top/bot for 'only walls(5)'
 
+% set ghosted index arrays
+if periodic
+    icx = [Nx,1:Nx,1];
+    icz = [Nz,1:Nz,1];
+    ifx = [Nx,1:Nx+1,2];
+    ifz = [Nz,1:Nz+1,2];
+else
+    icx = [1,1:Nx,Nx];
+    icz = [1,1:Nz,Nz];
+    ifx = [1,1:Nx+1,Nx+1];
+    ifz = [1,1:Nz+1,Nz+1];
+end
+
 % initialise solution fields
 Tp  =  T0 + (T1-T0) .* (1+erf((ZZ/D-zlay+rp*h*dlay)/wlay_T))/2 + dTr.*rp + dTg.*gp;  % potential temperature [C]
 
@@ -198,10 +211,10 @@ Pt     = Ptop + mean(rhom,'all').*g0.*ZZ;
 rhox   = rhox.*(1+bPx.*(Pt-Ptop));
 rhom   = rhom.*(1+bPx.*(Pt-Ptop));
 rho    = rhom;
-rhofz  = (rho([1,1:end],:)+rho([1:end,end],:))/2;
-rhofx  = (rho(:,[end,1:end])+rho(:,[1:end,1]))/2;
-rhoWo  = rhofz.*W(:,2:end-1); rhoWoo = rhoWo;
-rhoUo  = rhofx.*U(2:end-1,:); rhoUoo = rhoUo;
+rhofz  = (rho(icz(1:end-1),:)+rho(icz(2:end),:))/2;
+rhofx  = (rho(:,icx(1:end-1))+rho(:,icx(2:end)))/2;
+rhoWo  = rhofz.*W(:,2:end-1); rhoWoo = rhoWo; advn_mz = 0.*rhoWo(2:end-1,:);
+rhoUo  = rhofx.*U(2:end-1,:); rhoUoo = rhoUo; advn_mx = 0.*rhoUo;
 rhoref = mean(rho,'all');
 T      =  (Tp+273.15).*exp(aT./rhoref./cP.*Pt);
 fq     = zeros(size(Tp));  mq = ones(size(Tp));  xq = 1-mq-fq; 
@@ -222,8 +235,8 @@ while res > tol
     
     rhoref = mean(rho,'all');
     Adbt   = aT./rhoref;
-    rhofz  = (rho([1,1:end],:)+rho([1:end,end],:))/2;
-    rhofx  = (rho(:,[end,1:end])+rho(:,[1:end,1]))/2;
+    rhofz  = (rho(icz(1:end-1),:)+rho(icz(2:end),:))/2;
+    rhofx  = (rho(:,icx(1:end-1))+rho(:,icx(2:end)))/2;
     if Nz==1; Pt = Ptop.*ones(size(Tp)); else
         Pt(1,:)     = repmat(mean(rhofz(1,:),2).*g0.*h/2,1,Nx) + Ptop;
         Pt(2:end,:) = Pt(1,:) + repmat(cumsum(mean(rhofz(2:end-1,:),2).*g0.*h),1,Nx);
@@ -419,8 +432,23 @@ dCdt   = 0.*c;  dCdto  = dCdt;
 dFdt   = 0.*f;  dFdto  = dFdt;
 dXdt   = 0.*x;  dXdto  = dXdt;
 dMdt   = 0.*m;  dMdto  = dMdt;
+bnd_TE = zeros(Nz,Nx,cal.nte);
+adv_TE = zeros(Nz,Nx,cal.nte);
+dff_TE = zeros(Nz,Nx,cal.nte);
+Kte    = zeros(Nz,Nx,cal.nte);
 dTEdt  = 0.*te; dTEdto = dTEdt;
+bnd_IR = zeros(Nz,Nx,cal.nir);
+adv_IR = zeros(Nz,Nx,cal.nir);
+dff_IR = zeros(Nz,Nx,cal.nir);
 dIRdt  = 0.*ir; dIRdto = dIRdt;
+upd_S  = 0.*S;
+upd_C  = 0.*C;
+upd_X  = 0.*X;
+upd_F  = 0.*F;
+upd_M  = 0.*M;
+upd_rho= 0.*rho;
+upd_TE = 0.*TE;
+upd_IR = 0.*IR;
 
 % initialise timing and iterative parameters
 frst    = 1;
@@ -447,7 +475,11 @@ if restart
 
         SOL = [W(:);U(:);P(:)];
         RHO = X+M+F;
-
+        Tp = (min(cal.T0)+273.15)*exp((S - X.*Dsx - F.*Dsf)./RHO./cP);
+        sm = (S - X.*Dsx - F.*Dsf)./RHO;
+        sx = sm + Dsx;
+        sf = sm + Dsf;
+        
         So = S;
         Co = C;
         Xo = X;
@@ -466,9 +498,7 @@ if restart
         dIRdto = dIRdt;
 
         update; output;
-        sm = (S - X.*Dsx - F.*Dsf)./RHO;
-        sx = sm + Dsx;
-        sf = sm + Dsf;
+
     else % continuation file does not exist, start from scratch
         fprintf('\n   !!! restart file does not exist !!! \n   => starting run from scratch %s \n\n',runID);
         fluidmech;

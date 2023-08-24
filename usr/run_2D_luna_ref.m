@@ -15,9 +15,9 @@ plot_cv  =  0;                   % switch on to live plot iterative convergence
 
 % set model domain parameters
 D        =  1000e3;              % chamber depth [m]
-N        =  150;                 % number of grid points in z-direction (incl. 2 ghosts)
+N        =  90;                  % number of grid points in z-direction (incl. 2 ghosts)
 h        =  D/N;                 % grid spacing (equal in both dimensions, do not set) [m]
-L        =  D/1.5;               % chamber width [m]
+L        =  D/1.5;                   % chamber width [m]
 
 % set model timing parameters
 Nt       =  1e5;                 % number of time steps to take
@@ -26,17 +26,18 @@ dt       =  1*hr;                % initial time step [s]
 dtmax    =  1*yr;                % maximum time step [s]
 
 % set initial thermo-chemical state
-T0       =  1740;                % temperature top  layer [deg C]
+T0       =  1730;                % temperature top  layer [deg C]
 T1       =  T0;                  % temperature base layer [deg C]
 c0       =  [0.36,0.31,0.32,0.01,0.0];   % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
 c1       =  c0;                          % components (maj comp, H2O) bot layer [wt] (will be normalised to unit sum!)
-dcr      =  [1/2,1/2,-1/2,-1/2,0]*1e-4;  % amplitude of random noise [wt]
+dcr      =  [1/2,1/2,-1/2,-1/2,0]*1e-5;  % amplitude of random noise [wt]
 zlay     =  2.0;                 % layer thickness (relative to domain depth D)
 
 % set thermo-chemical boundary parameters
+periodic =  0;
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
 bnd_w    =  h;                   % boundary layer width [m]
-tau_T    =  1*yr;                % wall cooling/assimilation time [s]
+tau_T    =  0.5*yr;              % wall cooling/assimilation time [s]
 Twall    =  [0,1900,nan];        % [top,bot,sds] wall rock temperature [degC] (nan = insulating)
 Ptop     =  1e5;                 % top pressure [Pa]
 
@@ -44,7 +45,7 @@ Ptop     =  1e5;                 % top pressure [Pa]
 calID    =  'luna';              % phase diagram calibration
 Dsx      = -300;                 % entropy change of crystallisation [J/kg]
 Dsf      =  400;                 % entropy change of exsolution [J/kg]
-aT       =  4e-5;                % thermal expansivity [1/K]
+aT       =  3.5e-5;              % thermal expansivity [1/K]
 cP       =  1100;                % heat capacity [J/kg/K]
 
 % set buoyancy parameters
@@ -60,9 +61,9 @@ CFL      =  0.75;                % (physical) time stepping courant number (mult
 rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-8;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its
-Delta    =  2*D/10;              % correlation length for eddy diffusivity
+Delta    =  2*D/40;              % correlation length for eddy diffusivity
 Prt      =  1;                   % turbulent Prandtl number (ratio of momentum to heat diffusivity)
-etamin   =  1e9;                 % minimum eddy diffusivity constant
+etamin   =  1e3;                 % minimum eddy diffusivity constant
 
 %*****  RUN NAKHLA MODEL  *************************************************
 run('../src/main')

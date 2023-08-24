@@ -3,13 +3,11 @@
 % *****  Trace Elements  **************************************************
 
 bnd_TE = zeros(Nz,Nx,cal.nte);
-adv_TE = zeros(Nz,Nx,cal.nte);
-dff_TE = zeros(Nz,Nx,cal.nte);
 Kte    = zeros(Nz,Nx,cal.nte);
 for i = 1:cal.nte
     
     % update bulk partitioning coefficients
-    for j=1:cal.nmem; Kte(:,:,i) = Kte(:,:,i) + cal.Kte_mem(i,j) .* c_mem(:,:,j)./100; end
+    for j=1:cal.nmem; Kte(:,:,i) = Kte(:,:,i) + cal.Kte_mem(i,j) .* cx_mem(:,:,j)./100; end
 
     % update trace element phase compositions
     tem(:,:,i) = te(:,:,i)./(m + x.*Kte(:,:,i));
@@ -34,8 +32,11 @@ dTEdt = adv_TE + dff_TE + bnd_TE;
 % residual of trace element evolution
 res_TE = (a1*TE-a2*TEo-a3*TEoo)/dt - (b1*dTEdt + b2*dTEdto + b3*dTEdtoo);
 
-% update trace element concentrations
-TE = (a2*TEo+a3*TEoo + (b1*dTEdt + b2*dTEdto + b3*dTEdtoo)*dt)/a1;
+% semi-implicit update of trace element density
+TEi = TE;
+TE  = TE - alpha*res_TE*dt/a1 + beta*upd_TE;
+TE  = max(0, TE );
+upd_TE = TE - TEi;
 
 % enforce min bound
 TE = max(0, TE );                                                          
@@ -44,8 +45,6 @@ TE = max(0, TE );
 % *****  Isotope Ratios  **************************************************
 
 bnd_IR = zeros(Nz,Nx,cal.nir);
-adv_IR = zeros(Nz,Nx,cal.nir);
-dff_IR = zeros(Nz,Nx,cal.nir);
 for i = 1:cal.nir
 
     % update trace element phase compositions
@@ -71,8 +70,11 @@ dIRdt = adv_IR + dff_IR + bnd_IR;
 % residual of isotope evolution
 res_IR = (a1*IR-a2*IRo-a3*IRoo)/dt - (b1*dIRdt + b2*dIRdto + b3*dIRdtoo);
 
-% update isotope ratio concentrations
-IR = (a2*IRo+a3*IRoo + (b1*dIRdt + b2*dIRdto + b3*dIRdtoo)*dt)/a1;
+% semi-implicit update of trace element density
+IRi = IR;
+IR  = IR - alpha*res_IR*dt/a1 + beta*upd_IR;
+IR  = max(0, IR );
+upd_IR = IR - IRi;
 
 
 % convert from densites to concentrations

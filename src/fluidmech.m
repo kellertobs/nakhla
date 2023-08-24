@@ -39,17 +39,25 @@ AAR = [];       % forcing entries for R
 % assemble coefficients of z-stress divergence
     
 % left boundary
-ii  = MapW(:,1); jj1 = ii; jj2 = MapW(:,end-1);
+if periodic
+    ii  = MapW(:,1); jj1 = ii; jj2 = MapW(:,end-1);
+else
+    ii  = MapW(:,1); jj1 = ii; jj2 = MapW(:,2);
+end
 aa  = zeros(size(ii));
 IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; aa(:)+1];
-IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL; aa(:)-1];
+IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL; aa(:)+sds];
 IIR = [IIR; ii(:)]; AAR = [AAR; aa(:)];
 
 % right boundary
-ii  = MapW(:,end); jj1 = ii; jj2 = MapW(:,2);
+if periodic
+    ii  = MapW(:,end); jj1 = ii; jj2 = MapW(:,2);
+else
+    ii  = MapW(:,end); jj1 = ii; jj2 = MapW(:,end-1);
+end
 aa  = zeros(size(ii));
 IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; aa(:)+1];
-IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL; aa(:)-1];
+IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL; aa(:)+sds];
 IIR = [IIR; ii(:)]; AAR = [AAR; aa(:)];
 
 % top boundary
@@ -76,19 +84,19 @@ EtaP1 =  eta  (1:end-1,:      );   EtaP2 =  eta  (2:end,:      );
 %             top          ||         bottom          ||           left            ||          right
 jj1 = MapW(1:end-2,2:end-1); jj2 = MapW(3:end,2:end-1); jj3 = MapW(2:end-1,1:end-2); jj4 = MapW(2:end-1,3:end);
 
-aa  = - a1.*rhofz(2:end-1,:)./dt;
+aa  = a1.*rhofz(2:end-1,:)./dt;
 IIL = [IIL; ii(:)]; JJL = [JJL;  ii(:)];   AAL = [AAL; aa(:)           ];      % inertial term
 
-aa  = - 1/2*(EtaP1+EtaP2)/h^2 - 1/2*(EtaC1+EtaC2)/h^2;
+aa  = 1/2*(EtaP1+EtaP2)/h^2 + 1/2*(EtaC1+EtaC2)/h^2;
 IIL = [IIL; ii(:)]; JJL = [JJL;  ii(:)];   AAL = [AAL; aa(:)           ];      % W on stencil centre
-IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; 1/2*EtaP1(:)/h^2];      % W one above
-IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL; 1/2*EtaP2(:)/h^2];      % W one below
-IIL = [IIL; ii(:)]; JJL = [JJL; jj3(:)];   AAL = [AAL; 1/2*EtaC1(:)/h^2];      % W one to the left
-IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL; 1/2*EtaC2(:)/h^2];      % W one to the right
+IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL;-1/2*EtaP1(:)/h^2];      % W one above
+IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL;-1/2*EtaP2(:)/h^2];      % W one below
+IIL = [IIL; ii(:)]; JJL = [JJL; jj3(:)];   AAL = [AAL;-1/2*EtaC1(:)/h^2];      % W one to the left
+IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL;-1/2*EtaC2(:)/h^2];      % W one to the right
 
 % what shall we do with the drunken sailor...
 if ~bnchm
-    aa  = -ddz(rho,h).*g0.*dt;
+    aa  = ddz(rho,h).*g0.*dt;
     IIL = [IIL; ii(:)]; JJL = [JJL;  ii(:)];   AAL = [AAL; aa(:)];
 end
 
@@ -96,14 +104,17 @@ end
 %         top left         ||        bottom left          ||       top right       ||       bottom right
 jj1 = MapU(2:end-2,1:end-1); jj2 = MapU(3:end-1,1:end-1); jj3 = MapU(2:end-2,2:end); jj4 = MapU(3:end-1,2:end);
 
-IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; (1/2*EtaC1(:)-1/2*EtaP1(:))/h^2];  % U one to the top and left
-IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL;-(1/2*EtaC1(:)-1/2*EtaP2(:))/h^2];  % U one to the bottom and left
-IIL = [IIL; ii(:)]; JJL = [JJL; jj3(:)];   AAL = [AAL;-(1/2*EtaC2(:)-1/2*EtaP1(:))/h^2];  % U one to the top and right
-IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL; (1/2*EtaC2(:)-1/2*EtaP2(:))/h^2];  % U one to the bottom and right
+IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL;-(1/2*EtaC1(:)-1/2*EtaP1(:))/h^2];  % U one to the top and left
+IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL;+(1/2*EtaC1(:)-1/2*EtaP2(:))/h^2];  % U one to the bottom and left
+IIL = [IIL; ii(:)]; JJL = [JJL; jj3(:)];   AAL = [AAL;+(1/2*EtaC2(:)-1/2*EtaP1(:))/h^2];  % U one to the top and right
+IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL;-(1/2*EtaC2(:)-1/2*EtaP2(:))/h^2];  % U one to the bottom and right
 
 
 % z-RHS vector
-rr  = - (rhofz(2:end-1,:) - mean(rhofz(2:end-1,:),2)) .* g0 - (a2.*rhoWo(2:end-1,:)+a3.*rhoWoo(2:end-1,:))/dt;
+advn_mz = advect(rhofz(2:end-1,:).*W(2:end-1,2:end-1),(U(2:end-2,:)+U(3:end-1,:))/2,(W(1:end-1,2:end-1)+W(2:end,2:end-1))/2,h,{ADVN,''},[1,2],BCA);
+rr  = + (rhofz(2:end-1,:) - mean(rhofz(2:end-1,:),2)) .* g0 ...
+      + (a2.*rhoWo(2:end-1,:)+a3.*rhoWoo(2:end-1,:))/dt ...
+      - advn_mz;
 if bnchm; rr = rr + src_W_mms(2:end-1,2:end-1); end
 
 IIR = [IIR; ii(:)];  AAR = [AAR; rr(:)];
@@ -125,43 +136,89 @@ IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; aa(:)+1];
 IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL; aa(:)+bot];
 IIR = [IIR; ii(:)]; AAR = [AAR; aa(:)];
 
+if ~periodic
+    % left boundary
+    ii  = MapU(:,1); jj = ii;
+    aa  = zeros(size(ii));
+    IIL = [IIL; ii(:)]; JJL = [JJL; jj(:)];   AAL = [AAL; aa(:)+1];
+    aa  = zeros(size(ii));
+    IIR = [IIR; ii(:)]; AAR = [AAR; aa(:)];
+
+    % right boundary
+    ii  = MapU(:,end); jj = ii;
+    aa  = zeros(size(ii));
+    IIL = [IIL; ii(:)]; JJL = [JJL; jj(:)];   AAL = [AAL; aa(:)+1];
+    aa  = zeros(size(ii));
+    IIR = [IIR; ii(:)]; AAR = [AAR; aa(:)];
+end
+
 % internal points
-ii    = MapU(2:end-1,:);
-EtaC1 = etaco(1:end-1,:    );  EtaC2 = etaco(2:end,:    );
-EtaP1 = eta  (:,[end,1:end]);  EtaP2 = eta  (:,[1:end,1]);
+if periodic
+    ii    = MapU(2:end-1,:);
+    EtaC1 = etaco(1:end-1,:    );  EtaC2 = etaco(2:end,:    );
+    EtaP1 = eta  (:,icx(1:end-1));  EtaP2 = eta  (:,icx(2:end));
+else
+    ii    = MapU(2:end-1,2:end-1);
+    EtaC1 = etaco(1:end-1,2:end-1);  EtaC2 = etaco(2:end,2:end-1);
+    EtaP1 = eta  (:      ,1:end-1);  EtaP2 = eta  (:      ,2:end);
+end
 
 % coefficients multiplying x-velocities U
 %            left          ||          right          ||           top             ||          bottom
-jj1 = MapU(2:end-1,[end-1,1:end-1]); jj2 = MapU(2:end-1,[2:end,2]); jj3 = MapU(1:end-2,:); jj4 = MapU(3:end,:);
-
-aa  = - a1.*rhofx./dt;
+if periodic
+    jj1 = MapU(2:end-1,ifx(1:end-2)); jj2 = MapU(2:end-1,ifx(3:end)); jj3 = MapU(1:end-2,ifx(2:end-1)); jj4 = MapU(3:end,ifx(2:end-1));
+else
+    jj1 = MapU(2:end-1,1:end-2); jj2 = MapU(2:end-1,3:end); jj3 = MapU(1:end-2,2:end-1); jj4 = MapU(3:end,2:end-1);
+end
+if periodic
+    aa  = a1.*rhofx./dt;
+else
+    aa  = a1.*rhofx(:,2:end-1)./dt;
+end
 IIL = [IIL; ii(:)]; JJL = [JJL;  ii(:)];   AAL = [AAL; aa(:)           ];      % inertial term
 
-aa  = - 1/2*(EtaP1+EtaP2)/h^2 - 1/2*(EtaC1+EtaC2)/h^2;
+aa  = 1/2*(EtaP1+EtaP2)/h^2 + 1/2*(EtaC1+EtaC2)/h^2;
 IIL = [IIL; ii(:)]; JJL = [JJL;  ii(:)];   AAL = [AAL; aa(:)           ];      % U on stencil centre
-IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; 1/2*EtaP1(:)/h^2];      % U one to the left
-IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL; 1/2*EtaP2(:)/h^2];      % U one to the right
-IIL = [IIL; ii(:)]; JJL = [JJL; jj3(:)];   AAL = [AAL; 1/2*EtaC1(:)/h^2];      % U one above
-IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL; 1/2*EtaC2(:)/h^2];      % U one below
+IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL;-1/2*EtaP1(:)/h^2];      % U one to the left
+IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL;-1/2*EtaP2(:)/h^2];      % U one to the right
+IIL = [IIL; ii(:)]; JJL = [JJL; jj3(:)];   AAL = [AAL;-1/2*EtaC1(:)/h^2];      % U one above
+IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL;-1/2*EtaC2(:)/h^2];      % U one below
 
 % what shall we do with the drunken sailor...
 if ~bnchm
-    aa  = -ddx(rho(:,[end,1:end,1]),h).*g0.*dt;
+    if periodic
+        aa  = ddx(rho(:,icx),h).*g0.*dt;
+    else
+        aa  = ddx(rho,h).*g0.*dt;
+    end
     IIL = [IIL; ii(:)]; JJL = [JJL;  ii(:)];   AAL = [AAL; aa(:)];
 end
 
 % coefficients multiplying z-velocities W
 %         top left         ||        top right          ||       bottom left       ||       bottom right
-jj1 = MapW(1:end-1,1:end-1); jj2 = MapW(1:end-1,2:end); jj3 = MapW(2:end,1:end-1); jj4 = MapW(2:end,2:end);
-
-IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; (1/2*EtaC1(:)-1/2*EtaP1(:))/h^2];  % W one to the top and left
-IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL;-(1/2*EtaC1(:)-1/2*EtaP2(:))/h^2];  % W one to the top and right
-IIL = [IIL; ii(:)]; JJL = [JJL; jj3(:)];   AAL = [AAL;-(1/2*EtaC2(:)-1/2*EtaP1(:))/h^2];  % W one to the bottom and left
-IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL; (1/2*EtaC2(:)-1/2*EtaP2(:))/h^2];  % W one to the bottom and right
+if periodic
+    jj1 = MapW(1:end-1,1:end-1); jj2 = MapW(1:end-1,2:end); jj3 = MapW(2:end,1:end-1); jj4 = MapW(2:end,2:end);
+else
+    jj1 = MapW(1:end-1,2:end-2); jj2 = MapW(1:end-1,3:end-1); jj3 = MapW(2:end,2:end-2); jj4 = MapW(2:end,3:end-1);
+end
+IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL;-(1/2*EtaC1(:)-1/2*EtaP1(:))/h^2];  % W one to the top and left
+IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL;+(1/2*EtaC1(:)-1/2*EtaP2(:))/h^2];  % W one to the top and right
+IIL = [IIL; ii(:)]; JJL = [JJL; jj3(:)];   AAL = [AAL;+(1/2*EtaC2(:)-1/2*EtaP1(:))/h^2];  % W one to the bottom and left
+IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL;-(1/2*EtaC2(:)-1/2*EtaP2(:))/h^2];  % W one to the bottom and right
 
 
 % x-RHS vector
-rr  = - (a2.*rhoUo+a3.*rhoUoo)/dt;
+if periodic
+    advn_mx = advect(rhofx.*U(2:end-1,:),(U(2:end-1,ifx(1:end-1))+U(2:end-1,ifx(2:end)))/2,(W(:,1:end-1)+W(:,2:end))/2,h,{ADVN,''},[1,2],BCA);
+    advn_mx(:,[1 end]) = repmat((advn_mx(:,1)+advn_mx(:,end))/2,1,2);
+    rr  = + (a2.*rhoUo+a3.*rhoUoo)/dt ...
+          - advn_mx ...
+          - mean(rhofx.*U(2:end-1,:),'all')/dt;
+else
+    advn_mx = advect(rhofx(:,2:end-1).*U(2:end-1,2:end-1),(U(2:end-1,1:end-1)+U(2:end-1,2:end))/2,(W(:,2:end-2)+W(:,3:end-1))/2,h,{ADVN,''},[1,2],BCA);
+    rr  = + (a2.*rhoUo(:,2:end-1)+a3.*rhoUoo(:,2:end-1))/dt ...
+          - advn_mx;
+end
 if bnchm; rr = rr + src_U_mms(2:end-1,:); end
 
 IIR = [IIR; ii(:)];  AAR = [AAR; rr(:)];
@@ -192,11 +249,18 @@ if ~exist('GG','var') || bnchm
     
     
     % coefficients for x-gradient
-    ii  = MapU(2:end-1,:);
+    if periodic
+        ii  = MapU(2:end-1,:);
+    else
+        ii  = MapU(2:end-1,2:end-1);
+    end
     
     %         left             ||           right
-    jj1 = MapP(2:end-1,1:end-1); jj2 = MapP(2:end-1,2:end);
-    
+    if periodic
+        jj1 = MapP(2:end-1,1:end-1); jj2 = MapP(2:end-1,2:end);
+    else
+        jj1 = MapP(2:end-1,2:end-2); jj2 = MapP(2:end-1,3:end-1);
+    end
     aa  = zeros(size(ii));
     IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; aa(:)-1/h];     % one to the left
     IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL; aa(:)+1/h];     % one to the right
@@ -220,7 +284,7 @@ if ~exist('DD','var') || bnchm
     % coefficients multiplying velocities U, W
     %          left U          ||           right U       ||           top W           ||          bottom W
     jj1 = MapU(2:end-1,1:end-1); jj2 = MapU(2:end-1,2:end); jj3 = MapW(1:end-1,2:end-1); jj4 = MapW(2:end,2:end-1);
-    
+
     aa  = zeros(size(ii));
     IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; aa(:)-1/h];  % U one to the left
     IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL; aa(:)+1/h];  % U one to the right
@@ -250,7 +314,7 @@ if ~exist('KP','var') || bnchm
     
     ii  = [MapP(:,1    ); MapP(:,end)]; % left & right
     jj1 = ii;
-    if bndmode < 4
+    if periodic
         jj2 = [MapP(:,end-1); MapP(:,2    )];
     else
         jj2 = [MapP(:,2    ); MapP(:,end-1)];
@@ -277,7 +341,7 @@ AAR = [];       % forcing entries for R
 
 ii  = MapP(2:end-1,2:end-1);
 
-rr  = - VolSrc;
+rr  = VolSrc;
 if bnchm; rr = rr + src_P_mms(2:end-1,2:end-1); end
 
 IIR = [IIR; ii(:)]; AAR = [AAR; rr(:)];
@@ -298,8 +362,8 @@ if bnchm; RP(MapP(nzp,nxp),:) = P_mms(nzp,nxp); end
 
 %% assemble and scale global coefficient matrix and right-hand side vector
 
-LL  = [ KV  -GG  ; ...
-       -DD   KP ];
+LL  = [ KV   GG  ; ...
+        DD   KP ];
 
 RR  = [RV; RP];
 
@@ -319,36 +383,46 @@ W   = full(reshape(SOL(MapW(:))        ,Nz+1,Nx+2)); % matrix z-velocity
 U   = full(reshape(SOL(MapU(:))        ,Nz+2,Nx+1)); % matrix x-velocity
 P   = full(reshape(SOL(MapP(:)+(NW+NU)),Nz+2,Nx+2)); % matrix dynamic pressure
 
-U   = U - mean(U(2:end-1,:),'all');
-
 if ~bnchm
 
     % phase segregation speeds
     wm(2:end-1,2:end-1) = ((rhom(1:end-1,:)+rhom(2:end,:))/2-mean(rhofz(2:end-1,:),2)).*g0.*(Ksgr_m(1:end-1,:).*Ksgr_m(2:end,:)).^0.5; % melt segregation speed
     wm([1,end],:) = min(1,1-[top;bot]).*wm([2,end-1],:);
-    wm(:,[1 end]) = wm(:,[end-1 2]);
+    if periodic
+        wm(:,[1 end]) = wm(:,[end-1 2]);
+    else
+        wm(:,[1 end]) = wm(:,[2 end-1]);
+    end
 
     wx(2:end-1,2:end-1) = ((rhox(1:end-1,:)+rhox(2:end,:))/2-mean(rhofz(2:end-1,:),2)).*g0.*(Ksgr_x(1:end-1,:).*Ksgr_x(2:end,:)).^0.5; % solid segregation speed
     wx([1,end],:) = min(1,1-[top;bot]).*wx([2,end-1],:);
-    wx(:,[1 end]) = wx(:,[end-1 2]);
+    if periodic
+        wx(:,[1 end]) = wx(:,[end-1 2]);
+    else
+        wx(:,[1 end]) = wx(:,[2 end-1]);
+    end
 
     wf(2:end-1,2:end-1) = ((rhof(1:end-1,:)+rhof(2:end,:))/2-mean(rhofz(2:end-1,:),2)).*g0.*(Ksgr_f(1:end-1,:).*Ksgr_f(2:end,:)).^0.5; % fluid segregation speed
     wf([1,end],:) = min(1,1-[top-fout;bot-fin]).*wf([2,end-1],:);
-    wf(:,[1 end]) = wf(:,[end-1 2]);
+    if periodic
+        wf(:,[1 end]) = wf(:,[end-1 2]);
+    else
+        wf(:,[1 end]) = wf(:,[2 end-1]);
+    end
 
     % phase diffusion fluxes and speeds
     [~,qxz,qxx] = diffus(chi,kx,h,[1,2],BCD);
     [~,qfz,qfx] = diffus(phi,kf,h,[1,2],BCD);
     qmz  = -qxz-qfz;  qmx = -qxx-qfx;
 
-    phiz = (phi([1,1:end],[end,1:end,1])+phi([1:end,end],[end,1:end,1]))./2;
-    phix = (phi([1,1:end,end],[end,1:end])+phi([1,1:end,end],[1:end,1]))./2;
+    phiz = (phi(icz(1:end-1),icx)+phi(icz(2:end),icx))./2;
+    phix = (phi(icz,icx(1:end-1))+phi(icz,icx(2:end)))./2;
 
-    chiz = (chi([1,1:end],[end,1:end,1])+chi([1:end,end],[end,1:end,1]))./2;
-    chix = (chi([1,1:end,end],[end,1:end])+chi([1,1:end,end],[1:end,1]))./2;
+    chiz = (chi(icz(1:end-1),icx)+chi(icz(2:end),icx))./2;
+    chix = (chi(icz,icx(1:end-1))+chi(icz,icx(2:end)))./2;
 
-    muz  = (mu ([1,1:end],[end,1:end,1])+mu ([1:end,end],[end,1:end,1]))./2;
-    mux  = (mu ([1,1:end,end],[end,1:end])+mu ([1,1:end,end],[1:end,1]))./2;
+    muz  = (mu (icz(1:end-1),icx)+mu (icz(2:end),icx))./2;
+    mux  = (mu (icz,icx(1:end-1))+mu (icz,icx(2:end)))./2;
 
     wqf = qfz./max(TINY^0.5,phiz);
     uqf = qfx./max(TINY^0.5,phix);
