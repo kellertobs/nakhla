@@ -306,8 +306,8 @@ cm0_oxd_all(:,cal.ioxd) = cm0_oxd;
 etam0 = Giordano08(cm0_oxd_all,T0);
 rhom0 = DensityX(cm0_oxd_all,T0,Ptop/1e8);
 
-cm1_oxd = (0.9.*cm0_mem + 0.1.*cal.cmp_mem(4,:))*cal.mem_oxd/100;
-cm2_oxd = (0.9.*cm0_mem - 0.1.*cal.cmp_mem(4,:))*cal.mem_oxd/100;
+cm1_oxd = (0.99.*cm0_mem(1,:) + 0.01.*cal.cmp_mem(end-1,:))*cal.mem_oxd/100;
+cm2_oxd = (0.99.*cm0_mem(1,:) - 0.01.*cal.cmp_mem(end-1,:))*cal.mem_oxd/100;
 
 cm1_oxd_all = zeros(1,9);
 cm1_oxd_all(:,cal.ioxd) = cm1_oxd;
@@ -325,10 +325,10 @@ fprintf('    initial f   : %4.3f \n\n',f0);
 rhom1 = DensityX(cm1_oxd_all,T0,Ptop/1e8);
 rhom2 = DensityX(cm2_oxd_all,T0,Ptop/1e8);
 
-DrhoT = rhom0.*aT*max([abs(T0-Twall)/10,abs(T0-T1),T0/100]);
+DrhoT = rhom0.*aT*max([abs(T0-Twall)/100,abs(T0-T1),T0/100]);
 Drhoc = abs(rhom1-rhom2);
-Drhox = 0.1*abs(rhox0-rhom0);
-Drhof = 0.1*abs(cal.rhof0-rhom0) * (max([c0(end),c1(end),max(cwall(:,end))])>TINY);
+Drhox = 0.01*abs(rhox0-rhom0);
+Drhof = 0.01*abs(cal.rhof0-rhom0) * (max([c0(end),c1(end),max(cwall(:,end))])>TINY);
 Drho0 = DrhoT + Drhoc + Drhox + Drhof;
 
 uT    = DrhoT*g0*(D/10)^2/etam0;
@@ -378,7 +378,7 @@ fprintf('    thermal Rw: %1.3e \n'  ,RwT);
 fprintf('   chemical Rw: %1.3e \n\n',Rwc);
 
 % get bulk enthalpy, silica, volatile content densities
-Tp  = T+273.15;
+Tp  = Tp+273.15;
 S   = rho.*(cP.*log(T/(min(cal.T0)+273.15)) + x.*Dsx + f.*Dsf - Adbt.*(Pt-Ptop));  So = S;  res_S = 0.*S;
 S0  = rho.*(cP.*log(min(cal.T0)+273.15) + x.*Dsx + f.*Dsf - Adbt.*Ptop);  
 C   = rho.*(m.*cm + x.*cx + f.*cf); Co = C;  res_C = 0.*C;
@@ -386,6 +386,7 @@ X   = rho.*x; Xo = X;  res_X = 0.*X;
 F   = rho.*f; Fo = F;  res_F = 0.*F;
 M   = rho.*m; Mo = M;  res_M = 0.*M;
 RHO = X+M+F;
+Tp = (min(cal.T0)+273.15)*exp((S - X.*Dsx - F.*Dsf)./RHO./cP);
 
 % get phase entropies
 sm = S./rho - x.*Dsx - f.*Dsf;
