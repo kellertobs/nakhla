@@ -5,7 +5,7 @@ clear; close all;
 run('./par_default')
 
 % set run parameters
-runID    =  '2D_luna_ref';       % run identifier
+runID    =  '2D_luna_x10';       % run identifier
 opdir    =  '../out';            % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  100;                 % output frame plotted/saved every 'nop' time steps
@@ -20,13 +20,13 @@ h        =  D/N;                 % grid spacing (equal in both dimensions, do no
 L        =  D/1.5;                   % chamber width [m]
 
 % set model timing parameters
-Nt       =  1e5;                 % number of time steps to take
+Nt       =  1e6;                 % number of time steps to take
 tend     =  100*yr;              % end time for simulation [s]
 dt       =  1*hr;                % initial time step [s]
 dtmax    =  1*yr;                % maximum time step [s]
 
 % set initial thermo-chemical state
-T0       =  1730;                % temperature top  layer [deg C]
+T0       =  1700;                % temperature top  layer [deg C]
 T1       =  T0;                  % temperature base layer [deg C]
 c0       =  [0.36,0.31,0.32,0.01,0.0];   % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
 c1       =  c0;                          % components (maj comp, H2O) bot layer [wt] (will be normalised to unit sum!)
@@ -37,7 +37,7 @@ zlay     =  2.0;                 % layer thickness (relative to domain depth D)
 periodic =  0;
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
 bnd_w    =  h;                   % boundary layer width [m]
-tau_T    =  0.5*yr;              % wall cooling/assimilation time [s]
+tau_T    =  1*yr;                % wall cooling/assimilation time [s]
 Twall    =  [0,1900,nan];        % [top,bot,sds] wall rock temperature [degC] (nan = insulating)
 Ptop     =  1e5;                 % top pressure [Pa]
 

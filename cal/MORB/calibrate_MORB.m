@@ -541,16 +541,17 @@ anneal.levels   = 3;
 anneal.burnin   = Niter/20;
 anneal.refine   = Niter/10;
 
-tic;
-[models,prob,accept,bestfit] = mcmc(dhatFunc,PriorFunc,LikeFunc,ConstrFunc,m0,mbnds,anneal,Niter);
-RunTime(1) = toc;
+% tic;
+% [models,prob,accept,bestfit] = mcmc(dhatFunc,PriorFunc,LikeFunc,ConstrFunc,m0,mbnds,anneal,Niter);
+% RunTime(1) = toc;
+% 
+% % plot mcmc outputs
+% xMAP = plotmcmc(models, prob, [], mbnds, anneal, mNames);
 
-% plot mcmc outputs
-xMAP = plotmcmc(models, prob, [], mbnds, anneal, mNames);
-
+xMAP        = cal.cmp_mem(:);
 cmp_mem_MAP = reshape(xMAP,cal.ncmp,cal.nmem);
 cmp_oxd_MAP = cmp_mem_MAP*cal.mem_oxd/100;
-dhat        = dhatFunc(cmp_mem_MAP(:));
+dhat        = dhatFunc(xMAP);
 oxdfit      = dhat(1:2*length(T)*cal.noxd);
 phsfit      = reshape(dhat(2*length(T)*cal.noxd+1:end),[],cal.nmsy+1);
 oxdLIQfit   = reshape(oxdfit(1:length(T)*cal.noxd,:),[],cal.noxd);
@@ -565,8 +566,8 @@ end
 c = Xp./sum(Xp,2);
 
 % retrieve distributions
-Nbins = min(500,Niter/20);
-[ppd_mcmc.m, ppd_mcmc.prob] = CalcPDF(mbnds, models(anneal.burnin:end,:), Nbins);
+% Nbins = min(500,Niter/20);
+% [ppd_mcmc.m, ppd_mcmc.prob] = CalcPDF(mbnds, models(anneal.burnin:end,:), Nbins);
 
 
 %% liquid, solid, mixture compositions
@@ -676,8 +677,8 @@ c = Xp./sum(Xp,2);
 data   = [oxdLIQfit(:);oxdSOLfit(:)];
 
 m0    = [cal.T0,cal.r].';
-m0_lw  = max(0,floor(m0 - max(1,0.05*m0)));
-m0_up  = max(0, ceil(m0 + max(1,0.05*m0)));
+m0_lw  = max(5,floor(m0 - max(1,0.05*m0)));
+m0_up  = max(5, ceil(m0 + max(1,0.05*m0)));
 m0_lw(1) = m0(1);
 m0_up(1) = m0(1);
 
@@ -848,7 +849,7 @@ plot(cx_oxd_MAP(:,cal.H)./sum(cx_oxd_MAP(:,1:end-1),2),T,'b.','LineWidth',2,'Mar
 plot(cm_oxd_MAP(:,cal.H)./sum(cm_oxd_MAP(:,1:end-1),2),T,'r.','LineWidth',2,'MarkerSize',15);
 xlabel([cal.oxdStr{cal.H},' [wt]'],'Interpreter','latex','FontSize',15)
 
-
+PlotPhaseDiagrams
 
 %% update material closures
 Nz = length(T); Nx = 1; Ptop = min(P); Pt = P; etareg = 1; calibrt = 1; T = T+273.15;

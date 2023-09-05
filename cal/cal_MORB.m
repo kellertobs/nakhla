@@ -12,9 +12,9 @@ cal.ncmp   = 6;
 % label strings for all compositional representations
 cal.oxdStr = {'SiO$_2$','Al$_2$O$_3$','FeO','MgO','CaO','Na$_2$O','H$_2$O'};
      elStr = {'Si','Al','Fe','Mg','Ca','Na','H'};
-cal.memStr = {'for','fay','mau','fau','mgt','ant','alb','qtz','wat'};
+cal.memStr = {'for','fay','dps','aug','mgt','ant','alb','qtz','wat'};
 cal.msyStr = {'olv','cpx','oxs','fsp','qtz'};
-cal.cmpStr = {'ano','ogb','fbs','bta','rhy','vol'};
+cal.cmpStr = {'dun','ogb','fbs','dac','rhy','vol'};
 
 for i = 1:cal.ncmp; cal.(cal.cmpStr{i}) = i; end
 for i = 1:cal.nmsy; cal.(cal.msyStr{i}) = i; end
@@ -26,16 +26,16 @@ cal.ioxd = [   1          3   4   5   6    7       9]; % oxdie indices for visco
 
 % oxide composition of mineral end-members
 %                   SiO2   Al2O3     FeO     MgO     CaO    Na2O     H2O
-cal.mem_oxd    = [  42.70    0.0     0.0    57.3     0.0     0.0     0.0     % forsterite (for)
-                    29.50    0.0    70.5     0.0     0.0     0.0     0.0     % fayalite (fay)
+cal.mem_oxd    = [  42.71    0.0     0.0    57.29    0.00    0.0     0.0     % forsterite (for)
+                    29.49    0.0    70.51    0.0     0.00    0.0     0.0     % fayalite (fay)
 
-                    53.49    2.01    6.76   18.25   19.17    0.32    0.0     % Mg-augite (mau)
-                    50.70    0.89   26.61    3.92   15.53    2.35    0.0     % Fe-augite (fau)
+                    54.73    1.72    4.48   20.30   18.31    0.46    0.0     % diopside (dps)
+                    49.99    0.88   30.75    1.45   14.57    2.36    0.0     % augite (aug)
 
-                     0.0     1.96   97.29    0.75    0.0     0.0     0.0     % magnetite (mgt)
+                     0.0     1.55   98.04    0.41    0.0     0.0     0.0     % magnetite (mgt)
 
-                    44.4    35.8     0.0     0.0    19.3     0.5     0.0     % anorthite (ant)
-                    68.0    20.0     0.0     0.0     0.5    11.5     0.0     % albite (alb)
+                    44.00   36.10    0.0     0.0    19.52    0.38    0.0     % anorthite (ant)
+                    66.63   20.99    0.0     0.0     1.77   10.61    0.0     % albite (alb)
 
                    100.0     0.0     0.0     0.0     0.0     0.0     0.0     % quartz (qtz)
                      0.0     0.0     0.0     0.0     0.0     0.0   100.0];   % water (wat)
@@ -49,13 +49,13 @@ cal.msy_mem = [1  1  0  0  0  0  0  0  0    % olivine (olv)
                0  0  0  0  0  0  0  1  0];  % quartz (qtz)
 
 % mineral end-member composition of melting model components
-%                    for       fay       mau       fau       mgt       ant       alb       qtz       wat
-cal.cmp_mem =   [      0         0         0         0         0  100.0000         0         0         0
-                 12.2844    1.4871   32.7641    2.3688         0   41.7945    9.3012         0         0
-                  3.1518   16.1085    6.0686   34.5188    5.4126   11.6348   23.1050         0         0
-                       0   14.6904    0.0996   21.5408         0   11.3618   52.3073         0         0
-                       0.2762    0.3447         0    3.7458    1.2367         0   43.9258   50.4707         0
-                       0         0         0         0         0         0         0         0  100.0000];
+%                    for       fay       dps       aug       mgt       ant       alb       qtz       wat
+cal.cmp_mem =   [   81.3484   18.6516         0         0         0         0         0         0         0
+   12.0019    1.8816   27.3737         0         0   41.1869   17.5558         0         0
+    0.0107    2.3401    0.2122   45.1515   10.6537    9.5873   32.0444         0         0
+         0    1.8042    0.2264   18.7293    2.8218    4.4565   12.2755   59.6864         0
+         0    0.0142         0         0    0.6394         0   41.1559   58.1904         0
+         0         0         0         0         0         0         0         0  100.0000];
 cal.cmp_mem = cal.cmp_mem./sum(cal.cmp_mem,2)*100;
 
 % mineral systems composition of melting model components
@@ -72,7 +72,7 @@ for i=1:cal.ncmp
 end
 
 % set pure component melting points T_m^i at P=0
-cal.T0  = [1553.0  1139.5  1069.8  970.1  826.4];
+cal.T0  = [1553.0  1139.5 1100.0 820.5 700.0];
 
 % set first coeff. for P-dependence of T_m^i [GPa]
 cal.A   = (cal.T0+273.15)./300;
@@ -84,11 +84,11 @@ cal.B   = 0*cal.A + 1;
 cal.dS  = 350;
 
 % set coeff. for T-dependence of partition coefficients K^i [1/K]
-cal.r  = [23.32  10.50  8.78  4.94  14.68];
+cal.r  = [23.33  10.55  8.78  15.79 10.0];
 
 % specify melting point dependence on H2O
-cal.dTH2O   = 1500;                 % solidus shift from water content [degC/wt^pH2O]
-cal.pH2O    = 0.75;                 % solidus shift from water content [degC/wt^pH2O]
+cal.dTH2O   = 1500;                 % solidus shift from water content [K/wt^pH2O]
+cal.pH2O    = 0.75;                 % solidus shift from water content [K/wt^pH2O]
 
 % specify geochemical model parameters
 cal.nte     = 4;                    % number of trace elements

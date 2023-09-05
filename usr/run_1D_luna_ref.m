@@ -26,7 +26,7 @@ dt       =  1*hr;                % initial time step [s]
 dtmax    =  1*yr;                % maximum time step [s]
 
 % set initial thermo-chemical state
-T0       =  1740;                % temperature top  layer [deg C]
+T0       =  1752;                % temperature top  layer [deg C]
 T1       =  T0;                  % temperature base layer [deg C]
 c0       =  [0.36,0.31,0.32,0.01,0.0];   % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
 c1       =  c0;                          % components (maj comp, H2O) bot layer [wt] (will be normalised to unit sum!)
@@ -44,7 +44,7 @@ Ptop     =  1e5;                 % top pressure [Pa]
 calID    =  'luna';              % phase diagram calibration
 Dsx      = -300;                 % entropy change of crystallisation [J/kg]
 Dsf      =  400;                 % entropy change of exsolution [J/kg]
-aT       =  4e-5;                % thermal expansivity [1/K]
+aT       =  3.5e-5;                % thermal expansivity [1/K]
 cP       =  1100;                % heat capacity [J/kg/K]
 
 % set buoyancy parameters

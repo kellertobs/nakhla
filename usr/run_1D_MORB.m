@@ -14,7 +14,7 @@ plot_cv  =  0;                   % switch on to live plot iterative convergence
 
 % set model domain parameters
 D        =  10;                  % chamber depth [m]
-N        =  400;                 % number of grid points in z-direction
+N        =  300;                 % number of grid points in z-direction
 h        =  D/N;                 % grid spacing (equal in both dimensions, do not set) [m]
 L        =  h;                   % chamber width (equal to h for 1-D mode) [m]
 
@@ -24,7 +24,7 @@ tend     =  1*yr;                % end time for simulation [s]
 dt       =  36;                  % initial time step [s]
 
 % set initial thermo-chemical state
-T0       =  1145;                % temperature top  layer [deg C]
+T0       =  1140;                % temperature top  layer [deg C]
 T1       =  T0;                  % temperature base layer [deg C]
 c0       =  [0.033 0.528 0.189 0.194 0.056 0.005];  % components (maj comp, H2O) top  layer [wt] (will be normalised to unit sum!)
 c1       =  c0;                  % components (maj comp, H2O) base layer [wt] (will be normalised to unit sum!)
@@ -52,9 +52,9 @@ dx       = 0.002;
 % set numerical model parameters
 TINT     =  'bd2im';             % time integration scheme ('be1im','bd2im','cn2si','bd2si')
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
-CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
+CFL      =  0.25;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 rtol     =  1e-4;                % outer its relative tolerance
-atol     =  1e-8;                % outer its absolute tolerance
+atol     =  1e-9;                % outer its absolute tolerance
 maxit    =  30;                  % maximum outer its
 
 

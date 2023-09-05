@@ -6,8 +6,8 @@ run('./par_default')
 
 % set run parameters
 runID    =  '2D_ASVZ';           % run identifier
-restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
-nop      =  500;                 % output frame plotted/saved every 'nop' time steps
+restart  =  18;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
+nop      =  100;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot results
 save_op  =  1;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
@@ -24,7 +24,7 @@ tend     =  1*yr;                % end time for simulation [s]
 dt       =  36;                  % initial time step [s]
 
 % set initial thermo-chemical state
-T0       =  1125;                % temperature top  layer [deg C]
+T0       =  1120;                % temperature top  layer [deg C]
 T1       =  T0;                  % temperature base layer [deg C]
 c0       =  [0.122 0.142 0.408 0.244 0.084 0.02];  % components (maj comp, H2O) top  layer [wt] (will be normalised to unit sum!)
 c1       =  c0;                  % components (maj comp, H2O) base layer [wt] (will be normalised to unit sum!)

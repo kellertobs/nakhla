@@ -5,18 +5,18 @@ clear; close all;
 run('./par_default')
 
 % set run parameters
-runID    =  '2D_MORB';           % run identifier
+runID    =  '2D_MORB_test';           % run identifier
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
-nop      =  100;                 % output frame plotted/saved every 'nop' time steps
+nop      =  5;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot results
-save_op  =  1;                   % switch on to save output to file
+save_op  =  0;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
 
 % set model domain parameters
-D        =  10;                  % chamber depth [m]
-N        =  150;                 % number of grid points in z-direction
+D        =  1000;                  % chamber depth [m]
+N        =  60;                 % number of grid points in z-direction
 h        =  D/N;                 % grid spacing (equal in both dimensions, do not set) [m]
-L        =  D/1.5;               % chamber width (equal to h for 1-D mode) [m]
+L        =  D/2;               % chamber width (equal to h for 1-D mode) [m]
 
 % set model timing parameters
 Nt       =  5e5;                 % number of time steps to take
@@ -32,6 +32,7 @@ dcr      =  [1,1,1,-1,-1,-1].*1e-5;
 dcg      =  [0,0,0,0,0,0];
 
 % set thermo-chemical boundary parameters
+periodic =  1;
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
 bnd_w    =  h;                   % boundary layer width [m]
 tau_T    =  12*hr;               % wall cooling/assimilation time [s]
@@ -56,6 +57,7 @@ CFL      =  0.75;                % (physical) time stepping courant number (mult
 rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-8;                % outer its absolute tolerance
 maxit    =  30;                  % maximum outer its
+Delta    =  2*h;             % correlation length for eddy viscosity
 
 
 %*****  RUN NAKHLA MODEL  *************************************************
