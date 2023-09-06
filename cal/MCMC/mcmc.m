@@ -83,7 +83,7 @@ for i=1:Niter
         x2 = x1 + xstep.*(2*rand(Nvar,1)-1);
 
         %Apply specified constraints (e.g., sum constraints, etc.)
-        x2 = ConstrFunc(x2).';
+        x2 = ConstrFunc(x2);
 
         %Check that the proposed model falls within the bounds.  If it falls
         %outside the bounds, go back to the beginning of the while loop to

@@ -7,12 +7,12 @@ end
 
 function [model] = SumConstr(model, nc, ne, scale)
 
-model = reshape(max(0,model).',nc,ne,[]);
-model = model./sum(model,2)*scale;
-model = reshape(model,nc*ne,[]).';
+wk = reshape(max(0,model(1:nc*ne)).',nc,ne,[]);
+wk = wk./sum(wk,2)*scale;
+model(1:nc*ne) = reshape(wk,nc*ne,[]).';
 
 end
 
 function [model] = NoConstr(model)
-model = model.'; % for internal consistency
+model = model;
 end
