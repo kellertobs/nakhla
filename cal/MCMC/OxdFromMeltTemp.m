@@ -1,4 +1,4 @@
-function [datafit] = OxdFromMeltTemp(model,T,P,H2Osat,c,cal)
+function [datafit,var] = OxdFromMeltTemp(model,T,P,H2Osat,c,cal)
 
 cal.T0 = model(1:cal.ncmp-1).';
 cal.r  = model(cal.ncmp:end).';
@@ -18,6 +18,6 @@ cal.H2Osat = H2Osat/100;
 MLTfit = var.cm*cal.cmp_oxd;
 SOLfit = var.cx*cal.cmp_oxd;
 
-datafit = [MLTfit(:);SOLfit(:)];
+datafit = [var.m*100];%[MLTfit(:);SOLfit(:)];
 
 end

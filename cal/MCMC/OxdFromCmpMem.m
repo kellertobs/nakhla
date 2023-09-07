@@ -1,7 +1,7 @@
-function [datafit] = OxdFromCmpMem(model,MLT,SOL,SYS,cal)
+function [datafit] = OxdFromCmpMem(model,MLT,SOL,M,cal)
 
 % get number of data points
-np = length(SYS);
+np = length(MLT);
 T  = (1:np).';
 
 % reshape component mineral endmember compositions to ncmp x nmem
@@ -29,7 +29,7 @@ MLTfit = cmpMLT*cmp_oxd;
 SOLfit = cmpSOL*cmp_oxd;
 
 % get fitted melt fraction by non-negative least-squares
-PHSfit = zeros(np,cal.nmsy+1);
+% PHSfit = zeros(np,cal.nmsy+1);
 % for ip = 1:np
 %     PHSfit(ip,1) = max(0,min(100,lsqnonneg((MLTfit(ip,:)-SOLfit(ip,:)).',(SYS(ip,:)-SOLfit(ip,:)).')*100));
 % end
@@ -38,6 +38,9 @@ PHSfit = zeros(np,cal.nmsy+1);
 % memSOL          = cmpSOL*cmp_mem;
 % PHSfit(:,2:end) = memSOL*cal.msy_mem.'.*(1-PHSfit(:,1)/100);
 
-datafit = [MLTfit(:);SOLfit(:);PHSfit(:)];
+cmpSYS = cmpMLT.*M/100 + cmpSOL.*(1-M/100);
+SYSfit = cmpSYS*cmp_oxd;
+
+datafit = SYSfit;%[MLTfit(:);SOLfit(:)];%;PHSfit(:)];
 
 end

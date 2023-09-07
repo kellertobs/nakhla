@@ -29,8 +29,8 @@ cal.ioxd = [   1          3   4   5   6    7       9]; % oxdie indices for visco
 cal.mem_oxd    = [  42.71    0.0     0.0    57.29    0.00    0.0     0.0     % forsterite (for)
                     29.49    0.0    70.51    0.0     0.00    0.0     0.0     % fayalite (fay)
 
-                    54.73    1.72    4.48   20.30   18.31    0.46    0.0     % diopside (dps)
-                    49.99    0.88   30.75    1.45   14.57    2.36    0.0     % augite (aug)
+                    55.02    1.77    2.84   21.48   18.55    0.34    0.0     % diopside (dps)
+                    49.68    0.83   32.40    0.27   14.34    2.48    0.0     % augite (aug)
 
                      0.0     1.55   98.04    0.41    0.0     0.0     0.0     % magnetite (mgt)
 
@@ -50,12 +50,12 @@ cal.msy_mem = [1  1  0  0  0  0  0  0  0    % olivine (olv)
 
 % mineral end-member composition of melting model components
 %                    for       fay       dps       aug       mgt       ant       alb       qtz       wat
-cal.cmp_mem =   [   81.3484   18.6516         0         0         0         0         0         0         0
-   12.0019    1.8816   27.3737         0         0   41.1869   17.5558         0         0
-    0.0107    2.3401    0.2122   45.1515   10.6537    9.5873   32.0444         0         0
-         0    1.8042    0.2264   18.7293    2.8218    4.4565   12.2755   59.6864         0
-         0    0.0142         0         0    0.6394         0   41.1559   58.1904         0
-         0         0         0         0         0         0         0         0  100.0000];
+cal.cmp_mem =   [81.3484   18.6516         0         0         0         0         0         0         0
+                 12.0019    1.8816   27.3737         0         0   41.1869   17.5558         0         0
+                  0.0107    2.3401    0.2122   45.1515   10.6537    9.5873   32.0444         0         0
+                       0    1.8042    0.2264   18.7293    2.8218    4.4565   12.2755   59.6864         0
+                       0    0.0142         0         0    0.6394         0   41.1559   58.1904         0
+                       0         0         0         0         0         0         0         0  100.0000];
 cal.cmp_mem = cal.cmp_mem./sum(cal.cmp_mem,2)*100;
 
 % mineral systems composition of melting model components
@@ -72,7 +72,7 @@ for i=1:cal.ncmp
 end
 
 % set pure component melting points T_m^i at P=0
-cal.T0  = [1553.0  1139.5 1100.0 820.5 700.0];
+cal.T0  = [1850.0  1140.0 1030.0 900.0 830.0];
 
 % set first coeff. for P-dependence of T_m^i [GPa]
 cal.A   = (cal.T0+273.15)./300;
@@ -84,10 +84,10 @@ cal.B   = 0*cal.A + 1;
 cal.dS  = 350;
 
 % set coeff. for T-dependence of partition coefficients K^i [1/K]
-cal.r  = [23.33  10.55  8.78  15.79 10.0];
+cal.r  = [20.0  5.0  10.0  10.0  10.0];
 
 % specify melting point dependence on H2O
-cal.dTH2O   = 1500;                 % solidus shift from water content [K/wt^pH2O]
+cal.dTH2O   = 1400;                 % solidus shift from water content [K/wt^pH2O]
 cal.pH2O    = 0.75;                 % solidus shift from water content [K/wt^pH2O]
 
 % specify geochemical model parameters

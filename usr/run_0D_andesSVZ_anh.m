@@ -5,7 +5,7 @@ clear; close all;
 run('./par_default')
 
 % set run parameters
-runID    =  '0D_andesSVZ_anh';   % run identifier
+runID    =  '0D_MORB_anh';   % run identifier
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  50;                  % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot results
@@ -25,9 +25,9 @@ dt       =  36;                  % initial time step [s]
 dtmax    =  36;                  % maximum time step [s]
 
 % set initial thermo-chemical state
-T0       =  1325;                % temperature top  layer [deg C]
+T0       =  1320;                % temperature top  layer [deg C]
 T1       =  T0;                  % temperature base layer [deg C]
-c0       =  [0.14,0.49,0.28,0.09,0.00];  % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
+c0       =  [0.09,0.57,0.24,0.10,0.00];  % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
 c1       =  c0;                          % components (maj comp, H2O) bot layer [wt] (will be normalised to unit sum!)
 
 % set thermo-chemical boundary parameters
@@ -38,12 +38,12 @@ Twall    =  [300,300,nan];       % [top,bot,sds] wall rock temperature [degC] (n
 cwall    =  [nan,nan,nan,nan,nan; ...
              nan,nan,nan,nan,nan; ...
              nan,nan,nan,nan,nan];
-Ptop     =  1.25e8;              % top pressure [Pa]
+Ptop     =  2e8;                 % top pressure [Pa]
 fin      =  0;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
 fout     =  0;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
 
 % set thermo-chemical material parameters
-calID    =  'andesSVZ';          % phase diagram calibration
+calID    =  'MORB';          % phase diagram calibration
 Dsx      = -300;                 % entropy change of crystallisation [J/kg]
 Dsf      =  400;                 % entropy change of exsolution [J/kg]
 
