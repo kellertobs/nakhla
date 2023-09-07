@@ -482,7 +482,7 @@ scatter(SOLp(:,Si),SOLp(:,Al),25,OUT.T(hasMLT),'s','filled');
 scatter(SYS(:,Si),SYS(:,Al),25,OUT.T(hasMLT),'d');
 scatter(SYSp(:,Si),SYSp(:,Al),25,OUT.T(hasMLT),'d','filled');
 scatter(EMInt(:,Si),EMInt(:,Al),200,'kh','filled');
-scatter(EMInt(:,Si),EMExt(:,Al),200,'kh');
+scatter(EMExt(:,Si),EMExt(:,Al),200,'kh');
 xlabel(cal.oxdStr(cal.Si),FS{:},TX{:})
 ylabel(cal.oxdStr(cal.Al),FS{:},TX{:})
 subplot(2,3,2);
@@ -493,7 +493,7 @@ scatter(SOLp(:,Si),SOLp(:,FeO),25,OUT.T(hasMLT),'s','filled');
 scatter(SYS(:,Si),SYS(:,FeO),25,OUT.T(hasMLT),'d');
 scatter(SYSp(:,Si),SYSp(:,FeO),25,OUT.T(hasMLT),'d','filled');
 scatter(EMInt(:,Si),EMInt(:,FeO),200,'kh','filled');
-scatter(EMInt(:,Si),EMExt(:,FeO),200,'kh');
+scatter(EMExt(:,Si),EMExt(:,FeO),200,'kh');
 xlabel(cal.oxdStr(cal.Si),FS{:},TX{:})
 ylabel(cal.oxdStr(cal.Fe),FS{:},TX{:})
 subplot(2,3,3);
@@ -504,7 +504,7 @@ scatter(SOLp(:,Si),SOLp(:,Mg),25,OUT.T(hasMLT),'s','filled');
 scatter(SYS(:,Si),SYS(:,Mg),25,OUT.T(hasMLT),'d');
 scatter(SYSp(:,Si),SYSp(:,Mg),25,OUT.T(hasMLT),'d','filled');
 scatter(EMInt(:,Si),EMInt(:,Mg),200,'kh','filled');
-scatter(EMInt(:,Si),EMExt(:,Mg),200,'kh');
+scatter(EMExt(:,Si),EMExt(:,Mg),200,'kh');
 xlabel(cal.oxdStr(cal.Si),FS{:},TX{:})
 ylabel(cal.oxdStr(cal.Mg),FS{:},TX{:})
 subplot(2,3,4);
@@ -515,7 +515,7 @@ scatter(SOLp(:,Si),SOLp(:,Ca),25,OUT.T(hasMLT),'s','filled');
 scatter(SYS(:,Si),SYS(:,Ca),25,OUT.T(hasMLT),'d');
 scatter(SYSp(:,Si),SYSp(:,Ca),25,OUT.T(hasMLT),'d','filled');
 scatter(EMInt(:,Si),EMInt(:,Ca),200,'kh','filled');
-scatter(EMInt(:,Si),EMExt(:,Ca),200,'kh');
+scatter(EMExt(:,Si),EMExt(:,Ca),200,'kh');
 xlabel(cal.oxdStr(cal.Si),FS{:},TX{:})
 ylabel(cal.oxdStr(cal.Ca),FS{:},TX{:})
 subplot(2,3,5);
@@ -526,7 +526,7 @@ scatter(SOLp(:,Si),SOLp(:,Na),25,OUT.T(hasMLT),'s','filled');
 scatter(SYS(:,Si),SYS(:,Na),25,OUT.T(hasMLT),'d');
 scatter(SYSp(:,Si),SYSp(:,Na),25,OUT.T(hasMLT),'d','filled');
 scatter(EMInt(:,Si),EMInt(:,Na),200,'kh','filled');
-scatter(EMInt(:,Si),EMExt(:,Na),200,'kh');
+scatter(EMExt(:,Si),EMExt(:,Na),200,'kh');
 xlabel(cal.oxdStr(cal.Si),FS{:},TX{:})
 ylabel(cal.oxdStr(cal.Na),FS{:},TX{:})
 subplot(2,3,6);
@@ -558,7 +558,7 @@ indmem  = logical([1   1   0   0   0   0   0   0   0
 
 %% convert factor analysis end-member to mineral end-member proportions
 
-cmp_oxd = MLT_PCA.EMInt;%(MLT_PCA.EMInt+MLT_PCA.EMExt)/2;%(MLT_PCA.EMInt+MLT_PCA.EMExt)/2;
+cmp_oxd = (MLT_PCA.EMInt+MLT_PCA.EMExt)/2;%(MLT_PCA.EMInt+MLT_PCA.EMExt)/2;
 cmp_oxd = cmp_oxd./sum(cmp_oxd,2)*100;
 
 Xp = zeros(size(cmp_oxd,1),cal.nmem);
@@ -628,10 +628,10 @@ PriorFunc = @(model) ProbFuncs('PriorFunc', model, mbnds, 'uniform');
 LikeFunc  = @(dhat,model) ProbFuncs('LikeFuncSimplex',dhat,data,sigma,1/10,model,cal);
 
 % run MCMC algorithm
-Niter = 1e4;
+Niter = 1e5;
 
 % adjust step size to get reasonable acceptance ratio ~26%
-anneal.initstep = 0.05 * diff(mbnds,1,2);
+anneal.initstep = 0.045 * diff(mbnds,1,2);
 anneal.levels   = 3;
 anneal.burnin   = Niter/10;
 anneal.refine   = Niter/10;
