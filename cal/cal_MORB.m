@@ -29,10 +29,10 @@ cal.ioxd = [   1          3   4   5   6    7       9]; % oxdie indices for visco
 cal.mem_oxd    = [  42.71    0.0     0.0    57.29    0.00    0.0     0.0     % forsterite (for)
                     29.49    0.0    70.51    0.0     0.00    0.0     0.0     % fayalite (fay)
 
-                    55.02    1.77    2.84   21.48   18.55    0.34    0.0     % diopside (dps)
-                    49.68    0.83   32.40    0.27   14.34    2.48    0.0     % augite (aug)
+                    54.88    1.78    3.21   20.69   19.07    0.37    0.0     % diopside (dps)
+                    49.90    0.79   31.73    2.25   12.99    2.34    0.0     % augite (aug)
 
-                     0.0     1.55   98.04    0.41    0.0     0.0     0.0     % magnetite (mgt)
+                     0.0     2.29   97.09    0.62    0.0     0.0     0.0     % magnetite (mgt)
 
                     44.00   36.10    0.0     0.0    19.52    0.38    0.0     % anorthite (ant)
                     66.63   20.99    0.0     0.0     1.77   10.61    0.0     % albite (alb)
@@ -52,9 +52,9 @@ cal.msy_mem = [1  1  0  0  0  0  0  0  0    % olivine (olv)
 %                    for       fay       dps       aug       mgt       ant       alb       qtz       wat
 cal.cmp_mem =   [86.8723   13.1277         0         0         0         0         0         0         0
                  10.9989    1.8362   23.9987    1.8634         0   42.0631   19.2398         0         0
+                 10.9989    1.8362   23.9987    1.8634         0   42.0631   19.2398         0         0
                   0.6896    3.1695    0.3115   47.4086    7.2173   10.0401   31.1634         0         0
                        0    3.8230         0   17.4050    3.0290    2.9107   16.5200   56.3123         0
-                       0         0         0    0.0001    0.5914    2.6952   38.1884   58.5249         0
                        0         0         0         0         0         0         0         0  100.0000];
 cal.cmp_mem = cal.cmp_mem./sum(cal.cmp_mem,2)*100;
 
@@ -72,7 +72,7 @@ for i=1:cal.ncmp
 end
 
 % set pure component melting points T_m^i at P=0
-cal.T0  = [1850.0  1140.0 1030.0 900.0 830.0];
+cal.T0  = [1850.0  1140.0 1100 1030.0  900.0];
 
 % set first coeff. for P-dependence of T_m^i [GPa]
 cal.A   = (cal.T0+273.15)./300;
@@ -84,7 +84,7 @@ cal.B   = 0*cal.A + 1;
 cal.dS  = 350;
 
 % set coeff. for T-dependence of partition coefficients K^i [1/K]
-cal.r  = [20.0  5.0  10.0  10.0  10.0];
+cal.r  = [20.0  5.0  10  10.0  10.0];
 
 % specify melting point dependence on H2O
 cal.dTH2O   = 1400;                 % solidus shift from water content [K/wt^pH2O]

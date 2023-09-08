@@ -92,7 +92,7 @@ end
 %% collate and reduce mineral and melt oxide compositions
 
 % detect where phases are stable
-hasMLT = OUT.PhaseProps.liq (:,1)>=1e-4 & OUT.PhaseFractions.sol_wt>=1e-4 & OUT.PhaseProps.bi(:,1)<=1e-4;
+hasMLT = OUT.PhaseProps.liq (:,1)>=1e-4 & OUT.PhaseFractions.sol_wt>=1e-4 & OUT.PhaseProps.q(:,1)<=1e-4;
 hasOLV = OUT.PhaseProps.ol  (:,1)>=1e-4 & hasMLT;
 % hasOPX = OUT.PhaseProps.opx (:,1)>=1e-4 & hasMLT;
 hasCPX = OUT.PhaseProps.cpx (:,1)>=1e-4 & hasMLT;
@@ -125,13 +125,12 @@ T   = OUT.T(hasMLT);
 P   = OUT.P(hasMLT)*1e8;
 H2O = OUT.OxideFract.liq(hasMLT,H)*100;
 
-PHS    = [OUT.PhaseFractions.liq_wt(hasMLT)*100, ...
-                OUT.PhaseProps.ol(  hasMLT,1)*100, ...
-                OUT.PhaseProps.cpx( hasMLT,1)*100, ...
-                OUT.PhaseProps.spn( hasMLT,1)*100, ...
-                OUT.PhaseProps.pl4T(hasMLT,1)*100, ...
-                OUT.PhaseProps.q(   hasMLT,1)*100] ...
-                ./(OUT.PhaseFractions.sol_wt(hasMLT)+OUT.PhaseFractions.liq_wt(hasMLT));
+PHS    = [OUT.PhaseFractions.liq_wt(hasMLT  )./(OUT.PhaseFractions.sol_wt(hasMLT)+OUT.PhaseFractions.liq_wt(hasMLT))*100, ...
+          OUT.PhaseProps.ol(        hasMLT,1)./(OUT.PhaseFractions.sol_wt(hasMLT)+OUT.PhaseFractions.liq_wt(hasMLT))*100, ...
+          OUT.PhaseProps.cpx(       hasMLT,1)./(OUT.PhaseFractions.sol_wt(hasMLT)+OUT.PhaseFractions.liq_wt(hasMLT))*100, ...
+          OUT.PhaseProps.spn(       hasMLT,1)./(OUT.PhaseFractions.sol_wt(hasMLT)+OUT.PhaseFractions.liq_wt(hasMLT))*100, ...
+          OUT.PhaseProps.pl4T(      hasMLT,1)./(OUT.PhaseFractions.sol_wt(hasMLT)+OUT.PhaseFractions.liq_wt(hasMLT))*100, ...
+          OUT.PhaseProps.q(         hasMLT,1)./(OUT.PhaseFractions.sol_wt(hasMLT)+OUT.PhaseFractions.liq_wt(hasMLT))*100,];
 
 
 %% olivine system
@@ -549,16 +548,16 @@ load('MAGEMin_processed');
 cal_MORB;  % load melt model calibration
 
 indmem  = logical([1   1   0   0   0   0   0   0   0
+                   1   1   0   0   0   1   1   0   0
                    1   1   1   1   0   1   1   0   0
                    1   1   1   1   1   1   1   0   0
-                   1   1   1   1   1   1   1   1   0
-                   0   0   1   1   1   1   1   1   0
+                   0   1   0   1   1   0   1   1   0
                    0   0   0   0   0   0   0   0   1]);
 
 
 %% convert factor analysis end-member to mineral end-member proportions
 
-cmp_oxd = (MLT_PCA.EMInt+MLT_PCA.EMExt)/2;%(MLT_PCA.EMInt+MLT_PCA.EMExt)/2;
+cmp_oxd = (MLT_PCA.EMInt+MLT_PCA.EMExt)/2;
 cmp_oxd = cmp_oxd./sum(cmp_oxd,2)*100;
 
 Xp = zeros(size(cmp_oxd,1),cal.nmem);
@@ -574,20 +573,31 @@ cmp_oxd_FINT = cmp_mem_FINT*cal.mem_oxd/100;
 
 cmp_mem_MAP = cmp_mem_FINT;
 
+% cmp_mem_MAP = [85      15         0         0         0         0         0         0         0
+%                30       8         0         0         0        55         7         0         0
+%                 5      12        42         7         0        12        22         0         0
+%                 1       3        20        25         1         2        48         0         0
+%               0.1     1.9         1         7         1         1        30        58         0
+%                 0       0       0.1       0.9         0         1        48        50         0
+%                 0       0         0         0         0         0         0         0  100.0000];
+
+T0_MAP = [1850.0  1150.0  1050  950.0  800.0];
+r_MAP  = [20.0  15.0  10.0  10.0  5.0];
 
 %%
 cal_MORB;  % load melt model calibration
 
-data  = SYSp;%[MLTp(:);SOLp(:)];%;0*PHS(:)];
+data  = [MLTp(:);SOLp(:);PHS(:)];
 % data  = [memMLT(:);memSOL(:);PHS(:)];
 
 % cmp_mem_MAP(1,1:2) = [90 10];
-m0     = cmp_mem_MAP(:).*indmem(:);%;T0_MAP;r_MAP];
-m0_lw  = max(0,floor(m0 - max(2,0.2*m0)).*indmem(:));
-m0_up  = max(0, ceil(m0 + max(2,0.2*m0)).*indmem(:));
+m0     = [cmp_mem_MAP(:).*indmem(:);T0_MAP.';r_MAP.'];
+m0_lw  = max(0,floor(m0 - [max(1,0.1*cmp_mem_MAP(:)).*indmem(:);0.025*T0_MAP.';0.1*r_MAP.']));
+m0_up  = max(0, ceil(m0 + [max(1,0.1*cmp_mem_MAP(:)).*indmem(:);0.025*T0_MAP.';0.1*r_MAP.']));
 mbnds  = [m0_lw(:),m0_up(:)]; % model parameter bounds
 % mbnds(1,:) = [90 90]; mbnds(cal.ncmp+1,:) = [10 10];
-mbnds(m0==100,:) = 100;
+mbnds(m0==100 ,:) = 100;
+mbnds(m0==1850,:) = 1850;
 % mbnds(cal.ncmp*cal.nmem+1,:) = m0(cal.ncmp*cal.nmem+1);
 
 mNames = cell(cal.ncmp*cal.nmem,1);
@@ -606,14 +616,24 @@ for j=1:cal.ncmp-1
     mNames{k} = ['r:',cal.cmpStr{j}];
     k = k+1;
 end
+for j=1:2
+    for i=1:cal.ncmp-1
+        if j==1
+            mNames{k} = [cal.cmpStr{i},':T0'];
+        else
+            mNames{k} = [cal.cmpStr{i},':r'];
+        end
+        k = k+1;
+    end
+end
 
 % set data uncertainties
 sigma  = max(0.01,0.01*data);
 
 % function to calculate forward model
 % m --> dhat
-dhatFunc  = @(model) OxdFromCmpMem(model,MLTp,SOLp,PHS(:,1),cal);
-% dhatFunc  = @(model) MemFromCmpMem(model,memMLT,memSOL,memSYS,cal);
+% dhatFunc  = @(model) OxdFromCmpMem(model,MLTp,SOLp,PHS(:,1),cal);
+dhatFunc  = @(model) ModelFit(model,T,P,MLTp,SOLp,SYSp,cal);
 
 % function to apply further constraints to a proposed set of model param values
 % m --> m
@@ -625,55 +645,31 @@ PriorFunc = @(model) ProbFuncs('PriorFunc', model, mbnds, 'uniform');
 
 % function to calculate likelihood of dhat
 % dhat --> likelihood 
-LikeFunc  = @(dhat,model) ProbFuncs('LikeFuncSimplex',dhat,data,sigma,1/10,model,cal);
+LikeFunc  = @(dhat,model) ProbFuncs('LikeFuncSimplex',dhat,data,sigma,10,model,cal);
 
 % run MCMC algorithm
-Niter = 1e5;
+Niter = 1e4;
 
 % adjust step size to get reasonable acceptance ratio ~26%
-anneal.initstep = 0.045 * diff(mbnds,1,2);
-anneal.levels   = 3;
+anneal.initstep = 0.005 * diff(mbnds,1,2);
+anneal.levels   = 1;
 anneal.burnin   = Niter/10;
 anneal.refine   = Niter/10;
 
 tic;
-[models,prob,accept,bestfit] = mcmc(dhatFunc,PriorFunc,LikeFunc,ConstrFunc,m0,mbnds,anneal,Niter);
+[models,prob,accept,bestfit] = mcmc(dhatFunc,PriorFunc,LikeFunc,ConstrFunc,1:cal.ncmp*cal.nmem,m0,mbnds,anneal,Niter);
 RunTime(1) = toc;
 
 % plot mcmc outputs
 plotmcmc(models, prob, [], mbnds, anneal, mNames);
 
-
 cmp_mem_MAP  = reshape(bestfit(1:cal.ncmp*cal.nmem),cal.ncmp,cal.nmem);
 cmp_oxd_MAP  = cmp_mem_MAP*cal.mem_oxd/100;
-dhat         = dhatFunc(cmp_mem_MAP(:));
-[Lbest,Vsimplex] = LikeFunc(dhat,cmp_mem_MAP(:));
+T0_MAP       = bestfit(cal.ncmp*cal.nmem+           (1:cal.ncmp-1)).';
+r_MAP        = bestfit(cal.ncmp*cal.nmem+cal.ncmp-1+(1:cal.ncmp-1)).';
 
-np = length(T);
-
-cmpMLT = zeros(np,cal.ncmp);
-for ip = 1:np
-    cmpMLT(ip,:) = lsqnonneg(cmp_oxd_MAP.',MLTp(ip,:).');
-end
-cmpMLT = cmpMLT./sum(cmpMLT,2);
-
-cmpSOL = zeros(np,cal.ncmp);
-for ip = 1:np
-    cmpSOL(ip,:) = lsqnonneg(cmp_oxd_MAP.',SOLp(ip,:).');
-end
-cmpSOL = cmpSOL./sum(cmpSOL,2);
-
-cmpSYS = cmpMLT.*PHS(:,1)/100 + cmpSOL.*(1-PHS(:,1)/100);
-
-MLTfit = cmpMLT*cmp_oxd_MAP;
-SOLfit = cmpSOL*cmp_oxd_MAP;
-
-SYSfit = reshape(dhat,np,cal.noxd);
-
-% get phase proportions
-PHSfit          = PHS;
-memSOL          = cmpSOL*cmp_mem_MAP;
-PHSfit(:,2:end) = memSOL*cal.msy_mem.'.*(1-PHS(:,1)/100);
+[dhat,MLTfit,SOLfit,SYSfit,PHSfit] = dhatFunc(bestfit);
+[Lbest,Vsimplex] = LikeFunc(dhat,bestfit);
 
 % retrieve distributions
 % Nbins = min(500,Niter/20);
@@ -765,104 +761,104 @@ ylabel('Phase proportions [wt\%]',FS{:},TX{:})
 sgtitle('Phase stability',FS{:},TX{:})
 drawnow
 
-%% best fit melting temperatures
-clear cal var x m f cx cm
-cal_MORB;  % load melt model calibration
-
-% T0_MAP = [1850.0  1130.0  1030.0  900.0  840.0];
-% r_MAP  = [20.0  5.0  10.0  5.0  5.0];
-
-OPTIONS.TolX = 1e-16;
-
-% MLTfitH = MLTfit;
-% SYSfitH = SYSfit;
-% MLTfitH(:,H) = H2O                 ; MLTfitH(:,1:end-1) = MLTfitH(:,1:end-1)./sum(MLTfitH(:,1:end-1),2).*(100-MLTfitH(:,end));
-% SYSfitH(:,H) = H2O.*phsfit(:,1)/100; SYSfitH(:,1:end-1) = SYSfitH(:,1:end-1)./sum(SYSfitH(:,1:end-1),2).*(100-SYSfitH(:,end));
-
-% equilibrium phase fractions and compositions
-
-data   = PHS(:,1);%[MLTfit(:);SOLfit(:)];
-
-m0     = [T0_MAP.'; r_MAP.'];
-m0_lw  = max(3,floor(m0 - max(0.5,[repmat(0.05,5,1);repmat(0.2,5,1)].*m0)));
-m0_up  = max(3, ceil(m0 + max(0.5,[repmat(0.05,5,1);repmat(0.2,5,1)].*m0)));
-m0_lw(1) = m0(1);
-m0_up(1) = m0(1);
-
-mNames = cell((cal.ncmp-1)*2,1);
-k = 1;
-for j=1:2
-    for i=1:cal.ncmp-1
-        if j==1
-            mNames{k} = [cal.cmpStr{i},':T0'];
-        else
-            mNames{k} = [cal.cmpStr{i},':r'];
-        end
-        k = k+1;
-    end
-end
-
-mbnds  = [m0_lw,m0_up]; % model parameter bounds
-
-sigma  = max(0.01,0.01*data);
-% sigma(length(data)/2+1:end) = sigma(length(data)/2+1:end)*2;
-
-% function to calculate forward model
-% m --> dhat
-dhatFunc  = @(model) OxdFromMeltTemp(model,T,P,MLTfit(:,H),cmpSYS,cal);
-
-% function to apply further constraints to a proposed set of model param values
-% m --> prior prob
-ConstrFunc = @(model) ConstrFuncs('NoConstr', model);
-
-% function to calculate prior probability given a set of model param values
-% m --> prior prob
-PriorFunc = @(model) ProbFuncs('PriorFunc', model, mbnds, 'uniform');
-
-% function to sample from the prior probability distributionn
-% [] --> set of model parameter values [Niter x Nm]
-PrSmpFunc = @(Niter) ProbFuncs('PriorSampFunc', Niter, mbnds, 'uniform');
-
-% function to calculate likelihood of dhat
-% dhat --> likelihood 
-LikeFunc  = @(dhat,model) ProbFuncs('LikeFunc',dhat,data,sigma,model);
-
-% function to calculate likelihood from model parameter values
-% model --> dhat --> likelihood
-LkMdFunc  = @(model) ProbFuncs('LikeFuncModel', dhatFunc, model, data, sigma);
-
-% run MCMC algorithm
-Niter = 5e3;
-Nbins = min(500,Niter/20);
-
-% adjust step size to get reasonable acceptance ratio ~26%
-anneal.initstep = 0.03 * diff(mbnds,1,2);
-anneal.levels   = 3;
-anneal.burnin   = Niter/10;
-anneal.refine   = Niter/10;
-
-tic;
-[models,prob,accept,bestfit] = mcmc(dhatFunc,PriorFunc,LikeFunc,ConstrFunc,m0,mbnds,anneal,Niter);
-RunTime(1) = toc;
-
-% plot mcmc outputs
-xMAP = plotmcmc(models, prob, [], mbnds, anneal, mNames);
-
-T0_MAP = bestfit(1:cal.ncmp-1).';
-r_MAP  = bestfit(cal.ncmp:end).';
-[dhat,var] = dhatFunc([T0_MAP,r_MAP].');
-cm_oxd_MAP = var.cm*cal.cmp_oxd;
-cx_oxd_MAP = var.cx*cal.cmp_oxd;
-c_oxd_MAP  = cmpSYS*cmp_oxd_MAP;
-% cm_oxd_MAP = reshape(dhat(1:length(dhat)/2),[],cal.noxd);%*cmp_oxd_MAP;
-% cx_oxd_MAP = reshape(dhat(length(dhat)/2+1:end),[],cal.noxd);%*cmp_oxd_MAP;
+% %% best fit melting temperatures
+% clear cal var x m f cx cm
+% cal_MORB;  % load melt model calibration
+% 
+% % T0_MAP = [1850.0  1130.0  1030.0  900.0  840.0];
+% % r_MAP  = [20.0  5.0  10.0  5.0  5.0];
+% 
+% OPTIONS.TolX = 1e-16;
+% 
+% % MLTfitH = MLTfit;
+% % SYSfitH = SYSfit;
+% % MLTfitH(:,H) = H2O                 ; MLTfitH(:,1:end-1) = MLTfitH(:,1:end-1)./sum(MLTfitH(:,1:end-1),2).*(100-MLTfitH(:,end));
+% % SYSfitH(:,H) = H2O.*phsfit(:,1)/100; SYSfitH(:,1:end-1) = SYSfitH(:,1:end-1)./sum(SYSfitH(:,1:end-1),2).*(100-SYSfitH(:,end));
+% 
+% % equilibrium phase fractions and compositions
+% 
+% data   = PHS(:,1);%[MLTfit(:);SOLfit(:)];
+% 
+% m0     = [T0_MAP.'; r_MAP.'];
+% m0_lw  = max(3,floor(m0 - max(0.5,[repmat(0.05,5,1);repmat(0.2,5,1)].*m0)));
+% m0_up  = max(3, ceil(m0 + max(0.5,[repmat(0.05,5,1);repmat(0.2,5,1)].*m0)));
+% m0_lw(1) = m0(1);
+% m0_up(1) = m0(1);
+% 
+% mNames = cell((cal.ncmp-1)*2,1);
+% k = 1;
+% for j=1:2
+%     for i=1:cal.ncmp-1
+%         if j==1
+%             mNames{k} = [cal.cmpStr{i},':T0'];
+%         else
+%             mNames{k} = [cal.cmpStr{i},':r'];
+%         end
+%         k = k+1;
+%     end
+% end
+% 
+% mbnds  = [m0_lw,m0_up]; % model parameter bounds
+% 
+% sigma  = max(0.01,0.01*data);
+% % sigma(length(data)/2+1:end) = sigma(length(data)/2+1:end)*2;
+% 
+% % function to calculate forward model
+% % m --> dhat
+% dhatFunc  = @(model) OxdFromMeltTemp(model,T,P,MLTfit(:,H),cmpSYS,cal);
+% 
+% % function to apply further constraints to a proposed set of model param values
+% % m --> prior prob
+% ConstrFunc = @(model) ConstrFuncs('NoConstr', model);
+% 
+% % function to calculate prior probability given a set of model param values
+% % m --> prior prob
+% PriorFunc = @(model) ProbFuncs('PriorFunc', model, mbnds, 'uniform');
+% 
+% % function to sample from the prior probability distributionn
+% % [] --> set of model parameter values [Niter x Nm]
+% PrSmpFunc = @(Niter) ProbFuncs('PriorSampFunc', Niter, mbnds, 'uniform');
+% 
+% % function to calculate likelihood of dhat
+% % dhat --> likelihood 
+% LikeFunc  = @(dhat,model) ProbFuncs('LikeFunc',dhat,data,sigma,model);
+% 
+% % function to calculate likelihood from model parameter values
+% % model --> dhat --> likelihood
+% LkMdFunc  = @(model) ProbFuncs('LikeFuncModel', dhatFunc, model, data, sigma);
+% 
+% % run MCMC algorithm
+% Niter = 5e3;
+% Nbins = min(500,Niter/20);
+% 
+% % adjust step size to get reasonable acceptance ratio ~26%
+% anneal.initstep = 0.025 * diff(mbnds,1,2);
+% anneal.levels   = 3;
+% anneal.burnin   = Niter/10;
+% anneal.refine   = Niter/10;
+% 
+% tic;
+% [models,prob,accept,bestfit] = mcmc(dhatFunc,PriorFunc,LikeFunc,ConstrFunc,m0,mbnds,anneal,Niter);
+% RunTime(1) = toc;
+% 
+% % plot mcmc outputs
+% xMAP = plotmcmc(models, prob, [], mbnds, anneal, mNames);
+% 
+% T0_MAP = bestfit(1:cal.ncmp-1).';
+% r_MAP  = bestfit(cal.ncmp:end).';
+% [dhat,var] = dhatFunc([T0_MAP,r_MAP].');
+% cm_oxd_MAP = var.cm*cal.cmp_oxd;
+% cx_oxd_MAP = var.cx*cal.cmp_oxd;
 % c_oxd_MAP  = cmpSYS*cmp_oxd_MAP;
-
-% retrieve distributions
-% [ppd_mcmc.m, ppd_mcmc.prob] = CalcPDF(mbnds, models(anneal.burnin:end,:), Nbins);
-
-
-%% plot phase diagram
+% % cm_oxd_MAP = reshape(dhat(1:length(dhat)/2),[],cal.noxd);%*cmp_oxd_MAP;
+% % cx_oxd_MAP = reshape(dhat(length(dhat)/2+1:end),[],cal.noxd);%*cmp_oxd_MAP;
+% % c_oxd_MAP  = cmpSYS*cmp_oxd_MAP;
+% 
+% % retrieve distributions
+% % [ppd_mcmc.m, ppd_mcmc.prob] = CalcPDF(mbnds, models(anneal.burnin:end,:), Nbins);
+% 
+% 
+% %% plot phase diagram
 figure(6); clf;
 subplot(3,3,1)
 plot(MLTp(:,Si)./sum(MLTp(:,1:end-1),2)*100,T,'o','Color',[0.7 0.7 0.7]); axis tight; hold on; box on;
@@ -873,9 +869,8 @@ plot(MLTfit(:,Si)./sum(MLTfit(:,1:end-1),2)*100,T,'ro'); axis tight; hold on; bo
 plot(SOLfit(:,Si)./sum(SOLfit(:,1:end-1),2)*100,T,'bs');
 plot(SYSfit(:,Si)./sum(SYSfit(:,1:end-1),2)*100,T,'kd');
 
-plot(c_oxd_MAP (:,Si)./sum(c_oxd_MAP (:,1:end-1),2)*100,T,'kd','LineWidth',2);
-plot(cx_oxd_MAP(:,Si)./sum(cx_oxd_MAP(:,1:end-1),2)*100,T,'bs','LineWidth',2);
-plot(cm_oxd_MAP(:,Si)./sum(cm_oxd_MAP(:,1:end-1),2)*100,T,'ro','LineWidth',2);
+% plot(cx_oxd_MAP(:,Si)./sum(cx_oxd_MAP(:,1:end-1),2)*100,T,'bs','LineWidth',2);
+% plot(cm_oxd_MAP(:,Si)./sum(cm_oxd_MAP(:,1:end-1),2)*100,T,'ro','LineWidth',2);
 xlabel([cal.oxdStr{Si},' [wt]'],'Interpreter','latex','FontSize',15)
 
 subplot(3,3,2)
@@ -887,9 +882,8 @@ plot(MLTfit(:,Al)./sum(MLTfit(:,1:end-1),2)*100,T,'ro'); axis tight; hold on; bo
 plot(SOLfit(:,Al)./sum(SOLfit(:,1:end-1),2)*100,T,'bs');
 plot(SYSfit(:,Al)./sum(SYSfit(:,1:end-1),2)*100,T,'kd');
 
-plot(c_oxd_MAP (:,Al)./sum(c_oxd_MAP (:,1:end-1),2)*100,T,'kd','LineWidth',2);
-plot(cx_oxd_MAP(:,Al)./sum(cx_oxd_MAP(:,1:end-1),2)*100,T,'bs','LineWidth',2);
-plot(cm_oxd_MAP(:,Al)./sum(cm_oxd_MAP(:,1:end-1),2)*100,T,'ro','LineWidth',2);
+% plot(cx_oxd_MAP(:,Al)./sum(cx_oxd_MAP(:,1:end-1),2)*100,T,'bs','LineWidth',2);
+% plot(cm_oxd_MAP(:,Al)./sum(cm_oxd_MAP(:,1:end-1),2)*100,T,'ro','LineWidth',2);
 xlabel([cal.oxdStr{Al},' [wt]'],'Interpreter','latex','FontSize',15)
 
 subplot(3,3,3)
@@ -901,9 +895,8 @@ plot(MLTfit(:,FeO)./sum(MLTfit(:,1:end-1),2)*100,T,'ro'); axis tight; hold on; b
 plot(SOLfit(:,FeO)./sum(SOLfit(:,1:end-1),2)*100,T,'bs');
 plot(SYSfit(:,FeO)./sum(SYSfit(:,1:end-1),2)*100,T,'kd');
 
-plot(c_oxd_MAP (:,FeO)./sum(c_oxd_MAP (:,1:end-1),2)*100,T,'kd','LineWidth',2);
-plot(cx_oxd_MAP(:,FeO)./sum(cx_oxd_MAP(:,1:end-1),2)*100,T,'bs','LineWidth',2);
-plot(cm_oxd_MAP(:,FeO)./sum(cm_oxd_MAP(:,1:end-1),2)*100,T,'ro','LineWidth',2);
+% plot(cx_oxd_MAP(:,FeO)./sum(cx_oxd_MAP(:,1:end-1),2)*100,T,'bs','LineWidth',2);
+% plot(cm_oxd_MAP(:,FeO)./sum(cm_oxd_MAP(:,1:end-1),2)*100,T,'ro','LineWidth',2);
 xlabel([cal.oxdStr{FeO},' [wt]'],'Interpreter','latex','FontSize',15)
 ylabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',15)
 
@@ -916,9 +909,8 @@ plot(MLTfit(:,Mg)./sum(MLTfit(:,1:end-1),2)*100,T,'ro'); axis tight; hold on; bo
 plot(SOLfit(:,Mg)./sum(SOLfit(:,1:end-1),2)*100,T,'bs');
 plot(SYSfit(:,Mg)./sum(SYSfit(:,1:end-1),2)*100,T,'kd');
 
-plot(c_oxd_MAP (:,Mg)./sum(c_oxd_MAP (:,1:end-1),2)*100,T,'kd','LineWidth',2);
-plot(cx_oxd_MAP(:,Mg)./sum(cx_oxd_MAP(:,1:end-1),2)*100,T,'bs','LineWidth',2);
-plot(cm_oxd_MAP(:,Mg)./sum(cm_oxd_MAP(:,1:end-1),2)*100,T,'ro','LineWidth',2);
+% plot(cx_oxd_MAP(:,Mg)./sum(cx_oxd_MAP(:,1:end-1),2)*100,T,'bs','LineWidth',2);
+% plot(cm_oxd_MAP(:,Mg)./sum(cm_oxd_MAP(:,1:end-1),2)*100,T,'ro','LineWidth',2);
 xlabel([cal.oxdStr{Mg},' [wt]'],'Interpreter','latex','FontSize',15)
 
 subplot(3,3,5)
@@ -930,9 +922,8 @@ plot(MLTfit(:,Ca)./sum(MLTfit(:,1:end-1),2)*100,T,'ro'); axis tight; hold on; bo
 plot(SOLfit(:,Ca)./sum(SOLfit(:,1:end-1),2)*100,T,'bs');
 plot(SYSfit(:,Ca)./sum(SYSfit(:,1:end-1),2)*100,T,'kd');
 
-plot(c_oxd_MAP (:,Ca)./sum(c_oxd_MAP (:,1:end-1),2)*100,T,'kd','LineWidth',2);
-plot(cx_oxd_MAP(:,Ca)./sum(cx_oxd_MAP(:,1:end-1),2)*100,T,'bs','LineWidth',2);
-plot(cm_oxd_MAP(:,Ca)./sum(cm_oxd_MAP(:,1:end-1),2)*100,T,'ro','LineWidth',2);
+% plot(cx_oxd_MAP(:,Ca)./sum(cx_oxd_MAP(:,1:end-1),2)*100,T,'bs','LineWidth',2);
+% plot(cm_oxd_MAP(:,Ca)./sum(cm_oxd_MAP(:,1:end-1),2)*100,T,'ro','LineWidth',2);
 xlabel([cal.oxdStr{Ca},' [wt]'],'Interpreter','latex','FontSize',15)
 
 subplot(3,3,6)
@@ -944,9 +935,8 @@ plot(MLTfit(:,Na)./sum(MLTfit(:,1:end-1),2)*100,T,'ro'); axis tight; hold on; bo
 plot(SOLfit(:,Na)./sum(SOLfit(:,1:end-1),2)*100,T,'bs');
 plot(SYSfit(:,Na)./sum(SYSfit(:,1:end-1),2)*100,T,'kd');
 
-plot(c_oxd_MAP (:,Na)./sum(c_oxd_MAP (:,1:end-1),2)*100,T,'kd','LineWidth',2);
-plot(cx_oxd_MAP(:,Na)./sum(cx_oxd_MAP(:,1:end-1),2)*100,T,'bs','LineWidth',2);
-plot(cm_oxd_MAP(:,Na)./sum(cm_oxd_MAP(:,1:end-1),2)*100,T,'ro','LineWidth',2);
+% plot(cx_oxd_MAP(:,Na)./sum(cx_oxd_MAP(:,1:end-1),2)*100,T,'bs','LineWidth',2);
+% plot(cm_oxd_MAP(:,Na)./sum(cm_oxd_MAP(:,1:end-1),2)*100,T,'ro','LineWidth',2);
 xlabel([cal.oxdStr{Na},' [wt]'],'Interpreter','latex','FontSize',15)
 
 subplot(3,3,7)
@@ -958,12 +948,11 @@ plot(MLTfit(:,H),T,'ro'); axis tight; hold on; box on;
 plot(SOLfit(:,H),T,'bs');
 plot(SYSfit(:,H),T,'kd');
 
-plot(c_oxd_MAP (:,H),T,'kd','LineWidth',2);
-plot(cx_oxd_MAP(:,H),T,'bs','LineWidth',2);
-plot(cm_oxd_MAP(:,H),T,'ro','LineWidth',2);
+% plot(cx_oxd_MAP(:,H),T,'bs','LineWidth',2);
+% plot(cm_oxd_MAP(:,H),T,'ro','LineWidth',2);
 xlabel([cal.oxdStr{H},' [wt]'],'Interpreter','latex','FontSize',15)
 
-PlotPhaseDiagrams;
+% PlotPhaseDiagrams;
 
 
 %% update material closures
