@@ -5,7 +5,7 @@ clear; close all;
 run('./par_default')
 
 % set run parameters
-runID    =  '2D_luna_x10';       % run identifier
+runID    =  '2D_luna_T1530';       % run identifier
 opdir    =  '../out';            % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  100;                 % output frame plotted/saved every 'nop' time steps
@@ -26,8 +26,9 @@ dt       =  1*hr;                % initial time step [s]
 dtmax    =  1*yr;                % maximum time step [s]
 
 % set initial thermo-chemical state
-T0       =  1700;                % temperature top  layer [deg C]
-T1       =  T0;                  % temperature base layer [deg C]
+Tinit    = 'linear';             % T initial condition mode ('layer' or 'linear')
+T0       =  1495;                % temperature top  layer [deg C]
+T1       =  1595;                % temperature base layer [deg C]
 c0       =  [0.36,0.31,0.32,0.01,0.0];   % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
 c1       =  c0;                          % components (maj comp, H2O) bot layer [wt] (will be normalised to unit sum!)
 dcr      =  [1/2,1/2,-1/2,-1/2,0]*1e-5;  % amplitude of random noise [wt]
@@ -63,7 +64,8 @@ atol     =  1e-8;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its
 Delta    =  2*D/40;              % correlation length for eddy diffusivity
 Prt      =  1;                   % turbulent Prandtl number (ratio of momentum to heat diffusivity)
-etamin   =  1e3;                 % minimum eddy diffusivity constant
+etamin   =  1e0;                 % minimum viscosity
+etacntr  =  1e+8;                % maximum viscosity contrast between min/max values
 
 %*****  RUN NAKHLA MODEL  *************************************************
 run('../src/main')

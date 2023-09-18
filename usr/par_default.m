@@ -22,6 +22,7 @@ dt       =  10;                  % initial time step [s]
 dtmax    =  1e3;                 % maximum time step [s]
 
 % set initial thermo-chemical state
+Tinit    = 'layer';              % T initial condition mode ('layer' or 'linear')
 seed     =  15;                  % random perturbation seed
 smth     =  10;                  % regularisation of initial random perturbation
 zlay     =  2.0;                 % layer thickness (relative to domain depth D)
