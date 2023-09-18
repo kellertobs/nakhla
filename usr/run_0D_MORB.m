@@ -19,15 +19,15 @@ N        =  1;                   % number of grid points in z-direction
 h        =  D/N;                 % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
-Nt       =  1400;                % number of time steps to take
-tend     =  14*hr;               % end time for simulation [s]
+Nt       =  1600;                % number of time steps to take
+tend     =  16*hr;               % end time for simulation [s]
 dt       =  36;                  % initial time step [s]
 dtmax    =  36;                  % maximum time step [s]
 
 % set initial thermo-chemical state
-T0       =  1180;                % temperature top  layer [deg C]
+T0       =  1305;                % temperature top  layer [deg C]
 T1       =  T0;                  % temperature base layer [deg C]
-c0       =  [0.033 0.528 0.189 0.194 0.056 0.005];  % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
+c0       =  [0.08 0.24 0.41 0.24 0.03 0.005];  % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
 c1       =  c0;                  % components (maj comp, H2O) bot layer [wt] (will be normalised to unit sum!)
 dcr      =  [0,0,0,0,0,0];
 dcg      =  [0,0,0,0,0,0];
@@ -40,7 +40,7 @@ Twall    =  [300,300,nan];       % [top,bot,sds] wall rock temperature [degC] (n
 cwall    =  [nan,nan,nan,nan,nan,nan; ...
              nan,nan,nan,nan,nan,nan; ...
              nan,nan,nan,nan,nan,nan];
-Ptop     =  1.5e8;               % top pressure [Pa]
+Ptop     =  2.0e8;               % top pressure [Pa]
 fin      =  0;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
 fout     =  0;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
 

@@ -1,4 +1,4 @@
-function [x_keep,P_keep,count,xbest] = mcmc(dhatFunc,PriorFunc,LikeFunc,ConstrFunc,x0,xbnds,anneal,Niter)
+function [x_keep,P_keep,count,xbest] = mcmc(dhatFunc,PriorFunc,LikeFunc,ConstrFunc,ConstrInd,x0,xbnds,anneal,Niter)
 % 
 % [x_keep,P_keep,count] = mcmc(dhatFunc,PriorFunc,LikeFunc,x0,xstep,xbnds,Niter)
 % 
@@ -83,7 +83,7 @@ for i=1:Niter
         x2 = x1 + xstep.*(2*rand(Nvar,1)-1);
 
         %Apply specified constraints (e.g., sum constraints, etc.)
-        x2 = ConstrFunc(x2);
+        x2(ConstrInd) = ConstrFunc(x2(ConstrInd));
 
         %Check that the proposed model falls within the bounds.  If it falls
         %outside the bounds, go back to the beginning of the while loop to

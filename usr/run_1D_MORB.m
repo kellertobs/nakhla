@@ -7,7 +7,7 @@ run('./par_default')
 % set run parameters
 runID    =  '1D_MORB';           % run identifier
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
-nop      =  500;                 % output frame plotted/saved every 'nop' time steps
+nop      =  200;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot results
 save_op  =  1;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
@@ -24,9 +24,9 @@ tend     =  1*yr;                % end time for simulation [s]
 dt       =  36;                  % initial time step [s]
 
 % set initial thermo-chemical state
-T0       =  1140;                % temperature top  layer [deg C]
+T0       =  1200;                % temperature top  layer [deg C]
 T1       =  T0;                  % temperature base layer [deg C]
-c0       =  [0.033 0.528 0.189 0.194 0.056 0.005];  % components (maj comp, H2O) top  layer [wt] (will be normalised to unit sum!)
+c0       =  [0.08 0.24 0.41 0.24 0.03 0.005];  % components (maj comp, H2O) top  layer [wt] (will be normalised to unit sum!)
 c1       =  c0;                  % components (maj comp, H2O) base layer [wt] (will be normalised to unit sum!)
 dcr      =  [0,0,0,0,0,0];
 dcg      =  [0,0,0,0,0,0];
@@ -39,7 +39,7 @@ Twall    =  [300,300,nan];       % [top,bot,sds] wall rock temperature [degC] (n
 cwall    =  [nan,nan,nan,nan,nan,nan; ...
              nan,nan,nan,nan,nan,nan; ...
              nan,nan,nan,nan,nan,nan];
-Ptop     =  1.5e8;               % top pressure [Pa]
+Ptop     =  2.0e8;               % top pressure [Pa]
 fin      =  0;
 fout     =  1;
 
@@ -47,7 +47,7 @@ fout     =  1;
 calID    =  'MORB';              % phase diagram calibration
 Dsx      = -350;                 % entropy change of crystallisation [J/kg]
 Dsf      =  450;                 % entropy change of exsolution [J/kg]
-dx       = 0.002;
+dx       = 0.001;
 
 % set numerical model parameters
 TINT     =  'bd2im';             % time integration scheme ('be1im','bd2im','cn2si','bd2si')

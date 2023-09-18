@@ -5,7 +5,7 @@ clear; close all;
 run('./par_default')
 
 % set run parameters
-runID    =  '2D_luna_x10';       % run identifier
+runID    =  '2D_luna_x20';       % run identifier
 opdir    =  '../out';            % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  100;                 % output frame plotted/saved every 'nop' time steps
@@ -26,7 +26,7 @@ dt       =  1*hr;                % initial time step [s]
 dtmax    =  1*yr;                % maximum time step [s]
 
 % set initial thermo-chemical state
-T0       =  1700;                % temperature top  layer [deg C]
+T0       =  1650;                % temperature top  layer [deg C]
 T1       =  T0;                  % temperature base layer [deg C]
 c0       =  [0.36,0.31,0.32,0.01,0.0];   % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
 c1       =  c0;                          % components (maj comp, H2O) bot layer [wt] (will be normalised to unit sum!)

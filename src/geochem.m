@@ -73,7 +73,6 @@ res_IR = (a1*IR-a2*IRo-a3*IRoo)/dt - (b1*dIRdt + b2*dIRdto + b3*dIRdtoo);
 % semi-implicit update of trace element density
 IRi = IR;
 IR  = IR - alpha*res_IR*dt/a1 + beta*upd_IR;
-IR  = max(0, IR );
 upd_IR = IR - IRi;
 
 

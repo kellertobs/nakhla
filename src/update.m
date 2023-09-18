@@ -105,7 +105,8 @@ etaco  = (eta(icz(1:end-1),icx(1:end-1)).*eta(icz(2:end),icx(1:end-1)) ...
        .* eta(icz(1:end-1),icx(2:end  )).*eta(icz(2:end),icx(2:end  ))).^0.25;
 
 Ra  = Vel.*D/10./((kT0+ks.*T)./rho./cP);
-Re  = Vel.*rho.*D/10./eta;
+Re  = Vel.*D/10./( eta       ./rho    );
+Ru  = abs(wx(1:end-1,2:end-1)+wx(2:end,2:end-1))/2./Vel;
 
 % update stresses
 txx = eta   .* exx;                                                        % x-normal stress
