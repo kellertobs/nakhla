@@ -119,7 +119,7 @@ cal.Bchi    = 2.0;                  % Einstein-Roscoe powerlaw coefficient cryst
 cal.chi_pck = 0.60;                 % rheologically critical crystal fraction
 cal.gamma   = 2.50;                 % step-function steepness coefficient
 cal.delta   = 27;                   % solid viscosity melt-weakening slope
-cal.xi      = 4.5e-4;               % solid viscosity level
+cal.xi      = 3e-7;                 % solid viscosity level
 cal.etaf0   = 0.1;                  % fluid viscosity constant
 
 % specify segregation coefficient parameters
