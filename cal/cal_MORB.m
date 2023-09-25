@@ -12,7 +12,7 @@ cal.ncmp   = 6;
 % label strings for all compositional representations
 cal.oxdStr = {'SiO$_2$','Al$_2$O$_3$','FeO','MgO','CaO','Na$_2$O','H$_2$O'};
      elStr = {'Si','Al','Fe','Mg','Ca','Na','H'};
-cal.memStr = {'for','fay','dps','aug','ams','mgt','ant','alb','qtz','wat'};
+cal.memStr = {'for','fay','dps','aug','amt','mgt','ant','alb','qtz','wat'};
 cal.msyStr = {'olv','cpx','oxs','fsp','qtz'};
 cal.cmpStr = {'dun','tro','gbr','fbs','rhy','vol'};
 
@@ -32,7 +32,7 @@ cal.mem_oxd    = [  42.71    0.0     0.0    57.29    0.00    0.0     0.0     % f
                     54.88    1.80    3.04   20.79   19.09    0.40    0.0     % diopside (dps)
                     49.91    0.79   31.74    2.38   12.85    2.33    0.0     % augite (aug)
 
-                     0.0     3.64   94.66    1.70    0.0     0.0     0.0     % magnetite (mgt)
+                     0.0     3.64   94.66    1.70    0.0     0.0     0.0     % Al-Mg-bearing magnetite (amt)
                      0.0     1.49   98.47    0.04    0.0     0.0     0.0     % magnetite (mgt)
 
                     43.84   36.21    0.0     0.0    19.64    0.31    0.0     % anorthite (ant)
@@ -50,12 +50,12 @@ cal.msy_mem = [1  1  0  0  0  0  0  0  0  0    % olivine (olv)
                0  0  0  0  0  0  0  0  1  0];  % quartz (qtz)
 
 % mineral end-member composition of melting model components
-%                  for     fay     dps     aug     ams     ant     alb     qtz     wat
-cal.cmp_mem =   [82.98   17.02       0       0       0       0       0       0       0       0
-                 19.63    4.38       0       0       0       0   51.93   24.06       0       0
-                  1.16    2.00   42.21    7.06       0       0   24.89   22.67       0       0
-                  1.61   11.56    1.91   36.55    3.55    0.12    8.79   35.92       0       0
-                     0    0.36    2.23   14.53    0.31    2.06    1.16   24.05   55.29       0
+%                  for     fay     dps     aug     amt     mgt     ant     alb     qtz     wat
+cal.cmp_mem =   [83.29   16.71       0       0       0       0       0       0       0       0
+                  7.42    1.22       0       0       0       0   65.00   26.36       0       0
+                  0.07    6.17   33.80   12.94       0       0   20.56   26.46       0       0
+                  0.93   12.35    3.91   35.23    4.01       0    9.42   34.16       0       0
+                     0    0.29    2.22   13.22    2.49    0.61    0.83   25.98   54.36       0
                      0       0       0       0       0       0       0       0       0  100.00];
 cal.cmp_mem = cal.cmp_mem./sum(cal.cmp_mem,2)*100;
 
@@ -73,7 +73,7 @@ for i=1:cal.ncmp
 end
 
 % set pure component melting points T_m^i at P=0
-cal.T0  = [1850  1152  1081  1015  829];
+cal.T0  = [1850  1152  1076  1010  856];
 
 % set first coeff. for P-dependence of T_m^i [GPa]
 cal.A   = (cal.T0+273.15)./300;
@@ -85,7 +85,7 @@ cal.B   = 0*cal.A + 1;
 cal.dS  = 350;
 
 % set coeff. for T-dependence of partition coefficients K^i [1/K]
-cal.r  = [36.9  2.0  5.7  14.1  5.3];
+cal.r  = [45.7  2.0  6.2  12.7  3.9];
 
 % specify melting point dependence on H2O
 cal.dTH2O   = 1400;                 % solidus shift from water content [K/wt^pH2O]
@@ -101,21 +101,37 @@ cal.Kte_mem = [0.01;0.10;3.00;10.0].*ones(cal.nte,cal.nmem);
 cal.rhox0   = [3270,4390,3220,3520,4850,4950,2680,2570,2650,1000]; % mineral end-member reference densities [kg/m3]
 cal.rhof0   = 1000;                 % fluid reference density [kg/m3]
 
-% specify mixture viscosity parameters (Costa et al., 2009)
-cal.Bphi    = 2.0;                  % Einstein-Roscoe powerlaw coefficient bubbles
-cal.Bchi    = 2.0;                  % Einstein-Roscoe powerlaw coefficient crystals
-cal.chi_pck = 0.60;                 % rheologically critical crystal fraction
-cal.gamma   = 2.50;                 % step-function steepness coefficient
-cal.delta   = 27;                   % solid viscosity melt-weakening slope
-cal.xi      = 4.5e-4;               % solid viscosity level
-cal.etaf0   = 0.1;                  % fluid viscosity constant
+% specify three-phase coefficient model parameters
+cal.etax0 = 1e18;                   % solid reference viscosity [Pas]
+cal.etaf0 = 1e-1;                   % vapour reference viscosity [Pas]
+cal.Eax   = 300e3;                  % solid viscosity activation energy [J/mol]
+cal.AA  =  [ 0.65, 0.25, 0.35; ...  % permission slopes
+             0.20, 0.20, 0.20; ...  % generally numbers between 0 and 1
+             0.20, 0.20, 0.20; ];   % increases permission slopes away from step function 
 
-% specify segregation coefficient parameters
-cal.bm      = 50;                   % melt permeability geometric factor (k0 = dx^2/bm)
-cal.cm      = 0.001;                % melt percolation threshold
-cal.nm      = 3;                    % melt permeability powerlaw (k0*(mu-cm)^nm*(1-mu)^mm)
-cal.mm      = 2;                    % melt permeability powerlaw (k0*(mu-cm)^nm*(1-mu)^mm)
-cal.bf      = 50;                   % fluid permeability geometric factor (k0 = dx^2/bm)
-cal.cf      = 0.05;                 % fluid percolation threshold
-cal.nf      = 4;                    % fluid permeability powerlaw (k0*(phi-cf)^nf*(1-phi)^mf)
-cal.mf      = 2;                    % fluid permeability powerlaw (k0*(phi-cf)^nf*(1-phi)^mf)
+cal.BB  =  [ 0.55, 0.18, 0.27; ...  % permission step locations
+             0.64,0.012,0.348; ...  % each row sums to 1
+             0.80, 0.12, 0.08; ];   % sets midpoint of step functions
+
+cal.CC  =  [[0.30, 0.30, 0.40]*0.7; ... % permission step widths
+            [0.52, 0.40, 0.08]*1.1; ... % square brackets sum to 1, sets angle of step functions
+            [0.15, 0.25, 0.60]*0.7; ];  % factor increases width of step functions
+
+% % specify mixture viscosity parameters (Costa et al., 2009)
+% cal.Bphi    = 2.0;                  % Einstein-Roscoe powerlaw coefficient bubbles
+% cal.Bchi    = 2.0;                  % Einstein-Roscoe powerlaw coefficient crystals
+% cal.chi_pck = 0.60;                 % rheologically critical crystal fraction
+% cal.gamma   = 2.50;                 % step-function steepness coefficient
+% cal.delta   = 27;                   % solid viscosity melt-weakening slope
+% cal.xi      = 4.5e-4;               % solid viscosity level
+% cal.etaf0   = 0.1;                  % fluid viscosity constant
+% 
+% % specify segregation coefficient parameters
+% cal.bm      = 50;                   % melt permeability geometric factor (k0 = dx^2/bm)
+% cal.cm      = 0.001;                % melt percolation threshold
+% cal.nm      = 3;                    % melt permeability powerlaw (k0*(mu-cm)^nm*(1-mu)^mm)
+% cal.mm      = 2;                    % melt permeability powerlaw (k0*(mu-cm)^nm*(1-mu)^mm)
+% cal.bf      = 50;                   % fluid permeability geometric factor (k0 = dx^2/bm)
+% cal.cf      = 0.05;                 % fluid percolation threshold
+% cal.nf      = 4;                    % fluid permeability powerlaw (k0*(phi-cf)^nf*(1-phi)^mf)
+% cal.mf      = 2;                    % fluid permeability powerlaw (k0*(phi-cf)^nf*(1-phi)^mf)

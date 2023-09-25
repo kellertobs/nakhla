@@ -324,14 +324,14 @@ figure(104); clf;
 subplot(1,2,1);
 scatter(OXS (:,cal.Fe),OXS (:,cal.Al),25,T(hasOXS(hasMLT))); colormap('copper'); hold on
 scatter(OXSp(:,cal.Fe),OXSp(:,cal.Al),25,T(hasOXS(hasMLT)),'filled');
-scatter(cal.mem_oxd(cal.ams,cal.Fe),cal.mem_oxd(cal.ams,cal.Al),200,'kh','filled');
+scatter(cal.mem_oxd(cal.amt,cal.Fe),cal.mem_oxd(cal.amt,cal.Al),200,'kh','filled');
 scatter(cal.mem_oxd(cal.mgt,cal.Fe),cal.mem_oxd(cal.mgt,cal.Al),200,'kh','filled');
 xlabel(cal.oxdStr(cal.Fe),FS{:},TX{:})
 ylabel(cal.oxdStr(cal.Al),FS{:},TX{:})
 subplot(1,2,2);
 scatter(OXS (:,cal.Fe),OXS (:,cal.Mg),25,T(hasOXS(hasMLT))); colormap('copper'); hold on
 scatter(OXSp(:,cal.Fe),OXSp(:,cal.Mg),25,T(hasOXS(hasMLT)),'filled');
-scatter(cal.mem_oxd(cal.ams,cal.Fe),cal.mem_oxd(cal.ams,cal.Mg),200,'kh','filled');
+scatter(cal.mem_oxd(cal.amt,cal.Fe),cal.mem_oxd(cal.amt,cal.Mg),200,'kh','filled');
 scatter(cal.mem_oxd(cal.mgt,cal.Fe),cal.mem_oxd(cal.mgt,cal.Mg),200,'kh','filled');
 xlabel(cal.oxdStr(cal.Fe),FS{:},TX{:})
 ylabel(cal.oxdStr(cal.Mg),FS{:},TX{:})
@@ -544,12 +544,12 @@ drawnow
 %% load projected data and prepare for fitting routines
 load('MAGEMin_processed');
 cal_MORB;  % load melt model calibration
-
+               % for fay dps aug amt mgt ant alb qtz wat
 indmem  = logical([1   1   0   0   0   0   0   0   0   0
                    1   1   0   0   0   0   1   1   0   0
-                   1   1   1   1   0   0   1   1   0   0
-                   1   1   1   1   1   1   1   1   0   0
-                   0   1   1   1   1   1   1   1   1   0
+                   0   1   1   0   0   0   1   1   0   0
+                   0   1   1   1   1   0   1   1   0   0
+                   0   1   0   1   0   1   0   1   1   0
                    0   0   0   0   0   0   0   0   0   1]);
 
 
@@ -579,8 +579,15 @@ cmp_mem_MAP = cmp_mem_FINT;
 %                 0       0       0.1       0.9         0         1        48        50         0
 %                 0       0         0         0         0         0         0         0  100.0000];
 
-T0_MAP = [1850.0  1160.0  1070.0  1030.0  825.0];
-r_MAP  = [35.0  5.0  10.0  15.0  5.0];
+T0_MAP = [1850.0  1160.0  1090.0  1020.0  825.0];
+r_MAP  = [40.0  3.0  5.0  15.0  5.0];
+
+indmem  = logical([1   1   0   0   0   0   0   0   0   0
+                   1   1   0   0   0   0   1   1   0   0
+                   1   1   1   1   0   0   1   1   0   0
+                   1   1   1   1   1   1   1   1   0   0
+                   0   1   1   1   1   1   1   1   1   0
+                   0   0   0   0   0   0   0   0   0   1]);
 
 %%
 cal_MORB;  % load melt model calibration
@@ -589,12 +596,13 @@ data  = [MLTp(:);SOLp(:);PHS(:)];%repmat(PHS(:,1),6,1)];
 % data  = [memMLT(:);memSOL(:);PHS(:)];
 
 m0     = [cmp_mem_MAP(:).*indmem(:);T0_MAP.';r_MAP.'];
-m0_lw  = max(0,floor(m0 - [max(1,0.1*cmp_mem_MAP(:)).*indmem(:);0.02*T0_MAP.';0.05*r_MAP.']*1/2));
-m0_up  = max(0, ceil(m0 + [max(1,0.1*cmp_mem_MAP(:)).*indmem(:);0.02*T0_MAP.';0.05*r_MAP.']*1/2));
+m0_lw  = m0 - [max(2,0.2*cmp_mem_MAP(:)).*indmem(:);max(20,0.05*T0_MAP.');max(1,0.1*r_MAP.')];
+m0_up  = m0 + [max(2,0.2*cmp_mem_MAP(:)).*indmem(:);max(20,0.05*T0_MAP.');max(1,0.1*r_MAP.')];
 mbnds  = [m0_lw(:),m0_up(:)]; % model parameter bounds
 mbnds(m0==100 ,:) = 100;
 mbnds(m0==1850,:) = 1850;
 % mbnds(cal.ncmp*cal.nmem+           (1:cal.ncmp-1),:) = repmat(m0   (cal.ncmp*cal.nmem+           (1:cal.ncmp-1)),1,2);
+mbnds(1:cal.ncmp*cal.nmem,:) = max(0,min(100,mbnds(1:cal.ncmp*cal.nmem,:)));
 mbnds(cal.ncmp*cal.nmem+cal.ncmp-1+(1:cal.ncmp-1),:) = max(2, mbnds(cal.ncmp*cal.nmem+cal.ncmp-1+(1:cal.ncmp-1),:));
 
 mNames = cell(cal.ncmp*cal.nmem,1);
@@ -642,15 +650,15 @@ PriorFunc = @(model) ProbFuncs('PriorFunc', model, mbnds, 'uniform');
 
 % function to calculate likelihood of dhat
 % dhat --> likelihood 
-LikeFunc  = @(dhat,model) ProbFuncs('LikeFuncSimplex',dhat,data,sigma,3,model,cal);
+LikeFunc  = @(dhat,model) ProbFuncs('LikeFuncSimplex',dhat,data,sigma,1,model,cal);
 
 % run MCMC algorithm
-Niter = 1e4;
+Niter = 1e5;
 
 % adjust step size to get reasonable acceptance ratio ~26%
-anneal.initstep = 0.01 * diff(mbnds,1,2);
+anneal.initstep = 0.004 * diff(mbnds,1,2);
 anneal.levels   = 3;
-anneal.burnin   = Niter/10;
+anneal.burnin   = Niter/20;
 anneal.refine   = Niter/10;
 
 tic;
@@ -853,6 +861,9 @@ plot(SYSfit(:,H),T,'kd');
 xlabel([cal.oxdStr{H},' [wt]'],'Interpreter','latex','FontSize',15)
 
 % PlotPhaseDiagrams;
+
+%%
+save('MORB_calibration');
 
 
 %% update material closures

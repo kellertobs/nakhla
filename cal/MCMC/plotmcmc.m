@@ -42,7 +42,7 @@ for mi = 1:Nvar
     for i=1:anneal.levels
         histogram(x(anneal.ilvl(i):anneal.ilvl(i+1),ivar(mi)), 100, 'FaceColor',(1-(i-1)/(anneal.levels+1))*[0.15 0.05 0.9], 'EdgeColor', 'none','Normalization','count'); axis tight; box on; hold on;
     end
-    histogram(x(end-anneal.refine:end,ivar(mi)), 100, 'FaceColor', [0.6 0.0 0.1], 'EdgeColor', 'none','Normalization','count');
+    % histogram(x(end-anneal.refine:end,ivar(mi)), 100, 'FaceColor', [0.6 0.0 0.1], 'EdgeColor', 'none','Normalization','count');
 
     % bounds
     plot(xbnds(ivar(mi),1)*ones(1,2), ylim, 'r-');
