@@ -73,18 +73,22 @@ irwall   =  [nan,nan; ...
 calID    =  'andesSVZ';          % phase diagram calibration
 kT0      =  4;                   % thermal conductivity [W/m/K]
 cP       =  1200;                % heat capacity [J/kg/K]
-Dsx      = -300;                 % entropy change of crystallisation [J/kg]
-Dsf      =  400;                 % entropy change of exsolution [J/kg]
 tau_r    =  0;                   % reaction time scale (set to zero for quasi-equilibrium mode)
 
-% set model buoyancy parameters
+% set model buoyancy and pressure parameters
 aT       =  4e-5;                % thermal expansivity [1/K]
-bPx      =  1e-11;               % fluid compressibility [1/Pa]
-bPm      =  3e-11;               % fluid compressibility [1/Pa]
-bPf      =  1e-8;                % fluid compressibility [1/Pa]
-dx       =  1e-3;                % crystal size [m]
-df       =  1e-3;                % bubble size [m]
+bPx      =  1e-11;               % solid compressibility [1/Pa]
+bPm      =  3e-11;               % melt  compressibility [1/Pa]
+bPf      =  1e-9;                % fluid compressibility [1/Pa]
+dm0      =  1e-3;                % melt film size [m]
+dx0      =  1e-3;                % crystal size [m]
+df0      =  1e-3;                % bubble size [m]
 g0       =  10.;                 % gravity [m/s2]
+
+% set chamber pressure parameters
+Pchmb0   =  0;                   % initial chamber pressure [Pa]
+eta_wall =  1e15;                % wall rock viscosity [Pas]
+mod_wall =  1e10;                % wall rock elastic modulus [Pa]
 
 % set numerical model parameters
 TINT     =  'bd2im';             % time integration scheme ('be1im','bd2im','cn2si','bd2si')
@@ -95,7 +99,7 @@ atol     =  1e-9;                % outer its absolute tolerance
 maxit    =  50;                  % maximum outer its
 alpha    =  0.50;                % iterative step size parameter
 beta     =  0.25;                % iterative damping parameter
-etacntr  =  1e+6;                % maximum viscosity contrast
+etacntr  =  1e+9;                % maximum viscosity contrast
 Delta    =  2*D/100;             % correlation length for eddy viscosity
 Prt      =  1;                   % turbulent Prandtl number (ratio of momentum to heat diffusivity)
 etamin   =  1e-2;                % minimum viscosity

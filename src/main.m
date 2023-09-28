@@ -45,6 +45,8 @@ while time <= tend && step <= Nt && any(m(:)>1e-9)
     Div_Vo  = Div_V;
     rhoWoo  = rhoWo; rhoWo = rhofz.*W(:,2:end-1);
     rhoUoo  = rhoUo; rhoUo = rhofx.*U(2:end-1,:);
+    Pchmboo = Pchmbo; Pchmbo = Pchmb;
+    dPchmbdtoo = dPchmbdto; dPchmbdto = dPchmbdt;
     dto     = dt;
     
     % reset residuals and iteration count
@@ -96,7 +98,7 @@ while time <= tend && step <= Nt && any(m(:)>1e-9)
 
     fprintf(1,'         min U   = %1.4f;    mean U   = %1.4f;    max U   = %1.4f;   [m/s]\n'  ,min(U(:)  ),mean(U(:)  ),max(U(:)  ));
     fprintf(1,'         min W   = %1.4f;    mean W   = %1.4f;    max W   = %1.4f;   [m/s]\n'  ,min(-W(:) ),mean(-W(:) ),max(-W(:) ));
-    fprintf(1,'         min P   = %2.4f;    mean P   = %2.4f;    max P   = %2.4f;  [Pa]\n\n',min(P(:)),mean(P(:)),max(P(:)));
+    fprintf(1,'         min P   = %1.2e;  mean P   = %1.2e;  max P   = %1.2e;  [Pa]\n\n',min(P(:)),mean(P(:)),max(P(:)));
 
     % plot results
     if ~mod(step,nop); output; end

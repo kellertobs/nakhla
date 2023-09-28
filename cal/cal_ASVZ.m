@@ -106,7 +106,7 @@ cal.Kte_mem = [0.01;0.10;3.00;10.0].*ones(cal.nte,cal.nmem);
 % specify density parameters
 %              for  fay  hyp  fsl  dps  may  fay  ulv  mgt  ilm  ant  alb  san  qtz  wat
 cal.rhox0   = [3270,4390,3270,3600,3250,3320,3450,4550,4980,4930,2690,2570,2520,2650,1000]; % mineral end-member reference densities [kg/m3]
-cal.rhof0   = 1000;                 % fluid reference density [kg/m3]
+cal.rhof0   = 500;                  % fluid reference density [kg/m3]
 
 % specify three-phase coefficient model parameters
 cal.etax0 = 1e18;                   % solid reference viscosity [Pas]

@@ -15,6 +15,12 @@ upd_rho =       - alpha*res_rho./rho + beta*upd_rho;
 UBG     = - 0*mean(VolSrc,'all')./2 .* (L/2-XXu);
 WBG     = - 2*mean(VolSrc,'all')./2 .* (D/2-ZZw);
 
+dPchmbdt  = mod_wall*mean(VolSrc,'all') - mod_wall/eta_wall*Pchmb;
+res_Pchmb = (a1*Pchmb-a2*Pchmbo-a3*Pchmboo)/dt - (b1*dPchmbdt + b2*dPchmbdto + b3*dPchmbdtoo);
+
+Pchmb     = Pchmb - alpha*res_Pchmb*dt/a1/3 + beta*upd_Pchmb;
+upd_Pchmb =       - alpha*res_Pchmb*dt/a1/3 + beta*upd_Pchmb;
+
 end
 
 %% 0-D run does not require fluidmech solve
@@ -22,7 +28,7 @@ if Nz==1 && Nx==1
     W  = WBG; Wm = W;  Wx = W;  Wf = W;
     U  = UBG; Um = U;  Ux = U;  Uf = U;
     P  = zeros(Nz+2,Nx+2);
-    Pt = Ptop.*ones(Nz,Nx);
+    Pt = Ptop + Pchmb + P(2:end-1,2:end-1);
     resnorm_VP = 0;
 else
 

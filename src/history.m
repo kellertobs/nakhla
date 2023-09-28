@@ -58,6 +58,8 @@ hist.P(stp,1) = min(min(P(2:end-1,2:end-1)));
 hist.P(stp,2) = mean(mean(abs(P(2:end-1,2:end-1))));
 hist.P(stp,3) = max(max(P(2:end-1,2:end-1)));
 
+hist.Pchmb(stp,1) = Pchmb;
+
 hist.x(stp,1) = min(min(x));
 hist.x(stp,2) = mean(mean(x));
 hist.x(stp,3) = max(max(x));

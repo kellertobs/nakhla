@@ -381,9 +381,14 @@ else % create 2D plots
 
     % plot pseudo-component composition in Fig. 5
     set(0,'CurrentFigure',fh5)
+    sumanh = sum(c(:,:,1:end-1),3);
     for i = 1:cal.ncmp
         set(fh5,'CurrentAxes',ax(50+i));
-        imagesc(Xsc,Zsc,c(:,:,i).*100); axis ij equal tight; box on; cb = colorbar;
+        if i<cal.ncmp
+            imagesc(Xsc,Zsc,c(:,:,i)./sumanh.*100); axis ij equal tight; box on; cb = colorbar;
+        else
+            imagesc(Xsc,Zsc,c(:,:,i).*100); axis ij equal tight; box on; cb = colorbar;
+        end
         set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.cmpStr{i},' [wt\%]'],TX{:},FS{:});
     end
     set(fh5,'CurrentAxes',ax(51));
@@ -405,7 +410,11 @@ else % create 2D plots
     sumanh = sum(c_oxd(:,:,1:end-1),3);
     for i = 1:cal.noxd
         set(fh6,'CurrentAxes',ax(60+i));
-        imagesc(Xsc,Zsc,c_oxd(:,:,i)./sumanh.*100); axis ij equal tight; box on; cb = colorbar;
+        if i<cal.noxd
+            imagesc(Xsc,Zsc,c_oxd(:,:,i)./sumanh.*100); axis ij equal tight; box on; cb = colorbar;
+        else
+            imagesc(Xsc,Zsc,c_oxd(:,:,i)); axis ij equal tight; box on; cb = colorbar;
+        end
         set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.oxdStr{i},' [wt\%]'],TX{:},FS{:});
     end
     set(fh6,'CurrentAxes',ax(61));

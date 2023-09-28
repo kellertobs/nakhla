@@ -28,9 +28,9 @@ cx_oxd_all(:,:,cal.ioxd) = cx_oxd;
  c_oxd_all(:,:,cal.ioxd) = c_oxd;
 
 % update phase densities
-rhom   = reshape(DensityX(reshape(cm_oxd_all,Nz*Nx,9),T0,Ptop./1e8)      ,Nz,Nx) .* (1 - aT.*(T-T0-273.15) + bPm.*(Pt-Ptop));
-rhox   = reshape(sum(reshape(cx_mem/100,Nz*Nx,cal.nmem)./cal.rhox0,2).^-1,Nz,Nx) .* (1 - aT.*(T-T0-273.15) + bPx.*(Pt-Ptop));
-rhof   = cal.rhof0                                                               .* (1 - aT.*(T-T0-273.15) + bPf.*(Pt-Ptop));
+rhom   = reshape(DensityX(reshape(cm_oxd_all,Nz*Nx,9),Tref,Pref./1e8)    ,Nz,Nx) .* (1 - aT.*(T-Tref) + bPm.*(Pt-Pref));
+rhox   = reshape(sum(reshape(cx_mem/100,Nz*Nx,cal.nmem)./cal.rhox0,2).^-1,Nz,Nx) .* (1 - aT.*(T-Tref) + bPx.*(Pt-Pref));
+rhof   = cal.rhof0                                                               .* (1 - aT.*(T-Tref) + bPf.*(Pt-Pref));
 
 rhofz  = (rho(icz(1:end-1),:)+rho(icz(2:end),:))/2;
 rhofx  = (rho(:,icx(1:end-1))+rho(:,icx(2:end)))/2;
@@ -44,22 +44,55 @@ mu     = max(0,min(1, m.*rho./rhom ));
 
 
 % update lithostatic pressure
-if Nz==1; Pt = Ptop.*ones(size(Tp)); else
-    Pt(1,:)     = repmat(mean(rhofz(1,:),2).*g0.*h/2,1,Nx) + Ptop;
-    Pt(2:end,:) = Pt(1,:) + repmat(cumsum(mean(rhofz(2:end-1,:),2).*g0.*h),1,Nx);
+if Nz==1; Pt = (Pt + Ptop.*ones(size(Tp)) + Pchmb + P(2:end-1,2:end-1))/2; else
+    Pl(1,:)     = repmat(mean(rhofz(1,:),2).*g0.*h/2,1,Nx) + Ptop;
+    Pl(2:end,:) = Pl(1,:) + repmat(cumsum(mean(rhofz(2:end-1,:),2).*g0.*h),1,Nx);
+    Pt          = (Pt + Pl + Pchmb + P(2:end-1,2:end-1))/2;
 end
 
-% update melt viscosity
+% update effective constituent sizes
+dx = dx0.*(1-chi);
+dm = dm0.*(1-mu );
+df = df0.*(1-phi);
+
+% update pure phase viscosities
 etam   = reshape(Giordano08(reshape(cm_oxd_all,Nz*Nx,9),T(:)-273.15),Nz,Nx);
+etax   = cal.etax0 .* ones(size(chi)) .* exp(cal.Eax./(8.3145.*T)-cal.Eax./(8.3145.*(T0+273.15)));
+etaf   = cal.etaf0 .* ones(size(phi));
 
-% effective mixture shear viscosity (Costa et al., 2009)
-hh     = (1-cal.xi).*erf(sqrt(pi)./(2.*(1-cal.xi)).*(max(TINY^0.5,chi)./cal.chi_pck).*(1+(max(TINY^0.5,chi)./cal.chi_pck).^cal.gamma));
-eta    = etam .* (1+(max(TINY^0.5,chi)./cal.chi_pck).^cal.delta) .* (1-hh).^-cal.Bchi .* max(TINY^0.5,1-phi).^-cal.Bphi;
+% get permission weights
+kv = permute(cat(3,etax,etam,etaf),[3,1,2]);
+Mv = permute(repmat(kv,1,1,1,3),[4,1,2,3])./permute(repmat(kv,1,1,1,3),[1,4,2,3]);
 
-% phase segregation coefficients
-Ksgr_x = 2/9*dx^2./eta                                                                      ;
-Ksgr_f = 2/9*df^2./eta + dx^2/cal.bf./cal.etaf0.*max(TINY^0.5,phi-cal.cf).^(cal.nf-1).*max(TINY^0.5,1-phi).^cal.mf;
-Ksgr_m =                 dx^2/cal.bm./    etam .*max(TINY^0.5,mu -cal.cm).^(cal.nm-1).*max(TINY^0.5,1-mu ).^cal.mm;
+dd = max(1e-6,min(1-1e-6,permute(cat(3,dx ,dm ,df ),[3,1,2])));
+ff = max(1e-6,min(1-1e-6,permute(cat(3,chi,mu ,phi),[3,1,2])));
+FF = permute(repmat(ff,1,1,1,3),[4,1,2,3]);
+Sf = (FF./cal.BB).^(1./cal.CC);  Sf = Sf./sum(Sf,2);
+Xf = sum(cal.AA.*Sf,2).*FF + (1-sum(cal.AA.*Sf,2)).*Sf;
+
+% get momentum flux and coefficients
+thtv = squeeze(prod(Mv.^Xf,2));
+Kv   = ff.*kv.*thtv;
+Cv   = ff.*(1-ff)./dd.^2.*kv.*thtv;
+
+% get effective viscosity
+eta  = squeeze(sum(Kv,1)); if Nx==1; eta = eta.'; end
+
+% get segregation cofficients
+Ksgr   = ff./Cv;
+
+Ksgr_x = squeeze(Ksgr(1,:,:)) + TINY^2; if Nx==1; Ksgr_x = Ksgr_x.'; end
+Ksgr_m = squeeze(Ksgr(2,:,:)) + TINY^2; if Nx==1; Ksgr_m = Ksgr_m.'; end
+Ksgr_f = squeeze(Ksgr(3,:,:)) + TINY^2; if Nx==1; Ksgr_f = Ksgr_f.'; end
+
+% % effective mixture shear viscosity (Costa et al., 2009)
+% hh     = (1-cal.xi).*erf(sqrt(pi)./(2.*(1-cal.xi)).*(max(TINY^0.5,chi)./cal.chi_pck).*(1+(max(TINY^0.5,chi)./cal.chi_pck).^cal.gamma));
+% eta    = etam .* (1+(max(TINY^0.5,chi)./cal.chi_pck).^cal.delta) .* (1-hh).^-cal.Bchi .* max(TINY^0.5,1-phi).^-cal.Bphi;
+% 
+% % phase segregation coefficients
+% Ksgr_x = 2/9*dx^2./eta                                                                      ;
+% Ksgr_f = 2/9*df^2./eta + dx^2/cal.bf./cal.etaf0.*max(TINY^0.5,phi-cal.cf).^(cal.nf-1).*max(TINY^0.5,1-phi).^cal.mf;
+% Ksgr_m =                 dx^2/cal.bm./    etam .*max(TINY^0.5,mu -cal.cm).^(cal.nm-1).*max(TINY^0.5,1-mu ).^cal.mm;
 
 if ~calibrt % skip the following if called from calibration script
 
@@ -90,10 +123,10 @@ if Nx==1 && Nz==1; kW = 0;
 else              
 kW = (kW + 2.*eII.*(0.18*Delta).^2 .* (1-min(1,topshape+botshape+sdsshape)*0.9))/2;
 end
-kwx = wx0*dx*10;                                                           % segregation fluctuation diffusivity
-kwf = wf0*df*10;                                                           % segregation fluctuation diffusivity
-kx  = chi.*kwx;                                                            % solid fraction diffusion 
-kf  = phi.*kwf;                                                            % fluid fraction diffusion 
+kwx = wx0.*dx*10;                                                          % segregation fluctuation diffusivity
+kwf = wf0.*df*10;                                                          % segregation fluctuation diffusivity
+kx  = chi.*(kwx + kW/Prt);                                                 % solid fraction diffusion 
+kf  = phi.*(kwf + kW/Prt);                                                 % fluid fraction diffusion 
 ks  = rho.*cP./T.*kW/Prt;                                                  % regularised heat diffusion
 kc  = rho       .*kW/Prt;                                                  % regularised component diffusion
 eta = eta + rho.*kW;                                                       % regularised momentum diffusion

@@ -32,8 +32,8 @@ S     = S - alpha*res_S*dt/a1 + beta*upd_S;
 upd_S =   - alpha*res_S*dt/a1 + beta*upd_S;
 
 % convert entropy desnity to temperature
-Tp = (min(cal.T0)+273.15)*exp((S - X.*Dsx - F.*Dsf)./RHO./cP);
-T  = (min(cal.T0)+273.15)*exp((S - X.*Dsx - F.*Dsf)./RHO./cP + Adbt./cP.*(Pt-Ptop));
+Tp = Tref*exp((S - X.*Dsx - F.*Dsf)./RHO./cP);
+T  = Tref*exp((S - X.*Dsx - F.*Dsf)./RHO./cP + Adbt./cP.*(Pt-Pref));
 
 
 %***  update major component (SiO2) density

@@ -13,8 +13,8 @@ save_op  =  1;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
 
 % set model domain parameters
-D        =  1;                   % chamber depth [m]
-L        =  1;                   % chamber width [m]
+D        =  0.1;                 % chamber depth [m]
+L        =  0.1;                 % chamber width [m]
 N        =  1;                   % number of grid points in z-direction
 h        =  D/N;                 % grid spacing (equal in both dimensions, do not set) [m]
 
@@ -27,7 +27,7 @@ dtmax    =  36;                  % maximum time step [s]
 % set initial thermo-chemical state
 T0       =  1305;                % temperature top  layer [deg C]
 T1       =  T0;                  % temperature base layer [deg C]
-c0       =  [0.08 0.24 0.41 0.24 0.03 0.005];  % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
+c0       =  [0.13  0.20  0.53  0.11  0.03  0.005];  % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
 c1       =  c0;                  % components (maj comp, H2O) bot layer [wt] (will be normalised to unit sum!)
 dcr      =  [0,0,0,0,0,0];
 dcg      =  [0,0,0,0,0,0];
@@ -46,8 +46,11 @@ fout     =  0;                   % outgassing factor (0 = no outgassing; 1 = fre
 
 % set thermo-chemical material parameters
 calID    =  'MORB';              % phase diagram calibration
-Dsx      = -350;                 % entropy change of crystallisation [J/kg]
-Dsf      =  450;                 % entropy change of exsolution [J/kg]
+
+% set chamber pressure parameters
+Pchmb0   =  0;                  % initial chamber pressure [Pa]
+eta_wall =  1;                  % wall rock viscosity [Pas]
+mod_wall =  0;                  % wall rock elastic modulus [Pa]
 
 % set numerical model parameters
 TINT     =  'bd2im';             % time integration scheme ('be1im','bd2im','cn2si','bd2si')

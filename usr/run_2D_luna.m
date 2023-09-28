@@ -5,7 +5,7 @@ clear; close all;
 run('./par_default')
 
 % set run parameters
-runID    =  '2D_luna_ref';       % run identifier
+runID    =  '2D_luna';           % run identifier
 opdir    =  '../out';            % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  100;                 % output frame plotted/saved every 'nop' time steps
@@ -15,9 +15,9 @@ plot_cv  =  0;                   % switch on to live plot iterative convergence
 
 % set model domain parameters
 D        =  1000e3;              % chamber depth [m]
-N        =  90;                  % number of grid points in z-direction (incl. 2 ghosts)
+N        =  100;                 % number of grid points in z-direction (incl. 2 ghosts)
 h        =  D/N;                 % grid spacing (equal in both dimensions, do not set) [m]
-L        =  D/1.5;                   % chamber width [m]
+L        =  D;                   % chamber width [m]
 
 % set model timing parameters
 Nt       =  1e6;                 % number of time steps to take
@@ -27,11 +27,11 @@ dtmax    =  1*yr;                % maximum time step [s]
 
 % set initial thermo-chemical state
 Tinit    = 'linear';             % T initial condition mode ('layer' or 'linear')
-T0       =  1495;                % temperature top  layer [deg C]
-T1       =  1595;                % temperature base layer [deg C]
+T0       =  1755;                % temperature top  layer [deg C]
+T1       =  1755;                % temperature base layer [deg C]
 c0       =  [0.36,0.31,0.32,0.01,0.0];   % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
 c1       =  c0;                          % components (maj comp, H2O) bot layer [wt] (will be normalised to unit sum!)
-dcr      =  [1/2,1/2,-1/2,-1/2,0]*1e-5;  % amplitude of random noise [wt]
+dcr      =  [1/2,1/2,-1/2,-1/2,0]*1e-6;  % amplitude of random noise [wt]
 zlay     =  2.0;                 % layer thickness (relative to domain depth D)
 
 % set thermo-chemical boundary parameters
@@ -44,16 +44,19 @@ Ptop     =  1e5;                 % top pressure [Pa]
 
 % set thermo-chemical material parameters
 calID    =  'luna';              % phase diagram calibration
-Dsx      = -300;                 % entropy change of crystallisation [J/kg]
-Dsf      =  400;                 % entropy change of exsolution [J/kg]
 aT       =  3.5e-5;              % thermal expansivity [1/K]
 cP       =  1100;                % heat capacity [J/kg/K]
 
 % set buoyancy parameters
 g0       =  1.62;                % gravity [m/s2]
-dx       =  1e-3;                % crystal size [m]
+dx0      =  1e-3;                % crystal size [m]
 bPx      =  1e-11;               % solid compressibility [1/Pa]
 bPm      =  3e-11;               % melt compressibility [1/Pa]
+
+% switch off chamber pressure parameters
+Pchmb0   =  0;                   % initial chamber pressure [Pa]
+eta_wall =  1;                   % wall rock viscosity [Pas]
+mod_wall =  0;                   % wall rock elastic modulus [Pa]
 
 % set numerical model parameters
 TINT     =  'bd2im';             % time integration scheme ('be1im','bd2im','cn2si','bd2si')
@@ -62,10 +65,7 @@ CFL      =  0.75;                % (physical) time stepping courant number (mult
 rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-8;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its
-Delta    =  2*D/40;              % correlation length for eddy diffusivity
-Prt      =  1;                   % turbulent Prandtl number (ratio of momentum to heat diffusivity)
-etamin   =  1e0;                 % minimum viscosity
-etacntr  =  1e+8;                % maximum viscosity contrast between min/max values
+Delta    =  2*D/50;              % correlation length for eddy diffusivity
 
 %*****  RUN NAKHLA MODEL  *************************************************
 run('../src/main')

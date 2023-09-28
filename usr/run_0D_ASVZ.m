@@ -5,7 +5,7 @@ clear; close all;
 run('./par_default')
 
 % set run parameters
-runID    =  '0D_ASVZ';           % run identifier
+runID    =  '0D_ASVZ_Pchmb';           % run identifier
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  50;                  % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot results
@@ -25,9 +25,9 @@ dt       =  36;                  % initial time step [s]
 dtmax    =  36;                  % maximum time step [s]
 
 % set initial thermo-chemical state
-T0       =  1190;                % temperature top  layer [deg C]
+T0       =  1180;                % temperature top  layer [deg C]
 T1       =  T0;                  % temperature base layer [deg C]
-c0       =  [0.213  0.179  0.308  0.197  0.103  0.030];  % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
+c0       =  [0.29  0.13  0.30  0.15  0.13  0.030];  % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
 c1       =  c0;                  % components (maj comp, H2O) bot layer [wt] (will be normalised to unit sum!)
 dcr      =  [0,0,0,0,0,0];
 dcg      =  [0,0,0,0,0,0];
@@ -46,8 +46,11 @@ fout     =  0;                   % outgassing factor (0 = no outgassing; 1 = fre
 
 % set thermo-chemical material parameters
 calID    =  'ASVZ';              % phase diagram calibration
-Dsx      = -350;                 % entropy change of crystallisation [J/kg]
-Dsf      =  450;                 % entropy change of exsolution [J/kg]
+
+% set chamber pressure parameters
+Pchmb0   =  0;                  % initial chamber pressure [Pa]
+eta_wall =  1;                  % wall rock viscosity [Pas]
+mod_wall =  0;                  % wall rock elastic modulus [Pa]
 
 % set numerical model parameters
 TINT     =  'bd2im';             % time integration scheme ('be1im','bd2im','cn2si','bd2si')

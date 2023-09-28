@@ -99,39 +99,39 @@ cal.Kte_mem = [0.01;0.10;3.00;10.0].*ones(cal.nte,cal.nmem);
 % specify density parameters
 %              for  fay  dps  aug  mgt  ant  alb  qtz  wat
 cal.rhox0   = [3270,4390,3220,3520,4850,4950,2680,2570,2650,1000]; % mineral end-member reference densities [kg/m3]
-cal.rhof0   = 1000;                 % fluid reference density [kg/m3]
+cal.rhof0   = 500;                  % fluid reference density [kg/m3]
 
 % specify three-phase coefficient model parameters
 cal.etax0 = 1e18;                   % solid reference viscosity [Pas]
 cal.etaf0 = 1e-1;                   % vapour reference viscosity [Pas]
 cal.Eax   = 300e3;                  % solid viscosity activation energy [J/mol]
-cal.AA  =  [ 0.65, 0.25, 0.35; ...  % permission slopes
+cal.AA    =[ 0.65, 0.25, 0.35; ...  % permission slopes
              0.20, 0.20, 0.20; ...  % generally numbers between 0 and 1
              0.20, 0.20, 0.20; ];   % increases permission slopes away from step function 
 
-cal.BB  =  [ 0.55, 0.18, 0.27; ...  % permission step locations
+cal.BB    =[ 0.55, 0.18, 0.27; ...  % permission step locations
              0.64,0.012,0.348; ...  % each row sums to 1
              0.80, 0.12, 0.08; ];   % sets midpoint of step functions
 
-cal.CC  =  [[0.30, 0.30, 0.40]*0.7; ... % permission step widths
+cal.CC    =[[0.30, 0.30, 0.40]*0.7; ... % permission step widths
             [0.52, 0.40, 0.08]*1.1; ... % square brackets sum to 1, sets angle of step functions
             [0.15, 0.25, 0.60]*0.7; ];  % factor increases width of step functions
 
-% % specify mixture viscosity parameters (Costa et al., 2009)
-% cal.Bphi    = 2.0;                  % Einstein-Roscoe powerlaw coefficient bubbles
-% cal.Bchi    = 2.0;                  % Einstein-Roscoe powerlaw coefficient crystals
-% cal.chi_pck = 0.60;                 % rheologically critical crystal fraction
-% cal.gamma   = 2.50;                 % step-function steepness coefficient
-% cal.delta   = 27;                   % solid viscosity melt-weakening slope
-% cal.xi      = 4.5e-4;               % solid viscosity level
-% cal.etaf0   = 0.1;                  % fluid viscosity constant
-% 
-% % specify segregation coefficient parameters
-% cal.bm      = 50;                   % melt permeability geometric factor (k0 = dx^2/bm)
-% cal.cm      = 0.001;                % melt percolation threshold
-% cal.nm      = 3;                    % melt permeability powerlaw (k0*(mu-cm)^nm*(1-mu)^mm)
-% cal.mm      = 2;                    % melt permeability powerlaw (k0*(mu-cm)^nm*(1-mu)^mm)
-% cal.bf      = 50;                   % fluid permeability geometric factor (k0 = dx^2/bm)
-% cal.cf      = 0.05;                 % fluid percolation threshold
-% cal.nf      = 4;                    % fluid permeability powerlaw (k0*(phi-cf)^nf*(1-phi)^mf)
-% cal.mf      = 2;                    % fluid permeability powerlaw (k0*(phi-cf)^nf*(1-phi)^mf)
+% specify mixture viscosity parameters (Costa et al., 2009)
+cal.Bphi    = 2.0;                  % Einstein-Roscoe powerlaw coefficient bubbles
+cal.Bchi    = 2.0;                  % Einstein-Roscoe powerlaw coefficient crystals
+cal.chi_pck = 0.60;                 % rheologically critical crystal fraction
+cal.gamma   = 2.50;                 % step-function steepness coefficient
+cal.delta   = 27;                   % solid viscosity melt-weakening slope
+cal.xi      = 4.5e-4;               % solid viscosity level
+cal.etaf0   = 0.1;                  % fluid viscosity constant
+
+% specify segregation coefficient parameters
+cal.bm      = 50;                   % melt permeability geometric factor (k0 = dx^2/bm)
+cal.cm      = 0.001;                % melt percolation threshold
+cal.nm      = 3;                    % melt permeability powerlaw (k0*(mu-cm)^nm*(1-mu)^mm)
+cal.mm      = 2;                    % melt permeability powerlaw (k0*(mu-cm)^nm*(1-mu)^mm)
+cal.bf      = 50;                   % fluid permeability geometric factor (k0 = dx^2/bm)
+cal.cf      = 0.05;                 % fluid percolation threshold
+cal.nf      = 4;                    % fluid permeability powerlaw (k0*(phi-cf)^nf*(1-phi)^mf)
+cal.mf      = 2;                    % fluid permeability powerlaw (k0*(phi-cf)^nf*(1-phi)^mf)

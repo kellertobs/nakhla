@@ -25,6 +25,9 @@ else % closed sides
     BCD     =  {'',''};  % boundary condition on advection (top/bot, sides) 
 end
 
+Dsx = -cal.dS;
+Dsf = cal.dS+100;
+
 % normalise major components to anhydrous unit sum, rescale to hydrous
 c0(1:end-1) = c0(1:end-1)./sum(c0(1:end-1)).*(1-c0(end));
 c1(1:end-1) = c1(1:end-1)./sum(c1(1:end-1)).*(1-c1(end));
@@ -208,23 +211,26 @@ exx    = 0.*Tp;  ezz = 0.*Tp;  exz = zeros(Nz-1,Nx-1);  eII = 0.*Tp;
 txx    = 0.*Tp;  tzz = 0.*Tp;  txz = zeros(Nz-1,Nx-1);  tII = 0.*Tp; 
 VolSrc = 0.*Tp; 
 kW     = 0.*Tp;
+Tref   = min(cal.T0)+273.15;
+Pref   = 1e5;
 rhom   = mean(cal.rhox0-500).*ones(size(Tp)); 
 rhox   = mean(cal.rhox0).*ones(size(Tp));
 rhof   = cal.rhof0.*ones(size(Tp));
-Pt     = Ptop + mean(rhom,'all').*g0.*ZZ;
-rhox   = rhox.*(1+bPx.*(Pt-Ptop));
-rhom   = rhom.*(1+bPx.*(Pt-Ptop));
+Pchmb  = Pchmb0;  Pchmbo = Pchmb;  Pchmboo = Pchmbo;  dPchmbdt = Pchmb;  dPchmbdto = dPchmbdt; dPchmbdtoo = dPchmbdto;  upd_Pchmb = dPchmbdt;
+Pt     = Ptop + Pchmb + mean(rhom,'all').*g0.*ZZ;  Pl = Pt;
+rhof   = rhof.*(1+bPf.*(Pt-Pref));
+rhox   = rhox.*(1+bPx.*(Pt-Pref));
+rhom   = rhom.*(1+bPm.*(Pt-Pref));
 rho    = rhom;
 rhofz  = (rho(icz(1:end-1),:)+rho(icz(2:end),:))/2;
 rhofx  = (rho(:,icx(1:end-1))+rho(:,icx(2:end)))/2;
 rhoWo  = rhofz.*W(:,2:end-1); rhoWoo = rhoWo; advn_mz = 0.*rhoWo(2:end-1,:);
 rhoUo  = rhofx.*U(2:end-1,:); rhoUoo = rhoUo; advn_mx = 0.*rhoUo;
 rhoref = mean(rho,'all');
-T      =  (Tp+273.15).*exp(aT./rhoref./cP.*Pt);
+T      =  (Tp+273.15).*exp(aT./rhoref./cP.*(Pt-Pref));
 fq     = zeros(size(Tp));  mq = ones(size(Tp));  xq = 1-mq-fq; 
 cmq    = c; cxq = c;  cfq = 0.*c;  cfq(:,:,end) = 1;  cf = cfq;
 cm_oxd = reshape(reshape(cmq,Nz*Nx,cal.ncmp)*cal.cmp_oxd,Nz,Nx,cal.noxd);
-
 
 % get volume fractions and bulk density
 step    = 0;
@@ -241,12 +247,13 @@ while res > tol
     Adbt   = aT./rhoref;
     rhofz  = (rho(icz(1:end-1),:)+rho(icz(2:end),:))/2;
     rhofx  = (rho(:,icx(1:end-1))+rho(:,icx(2:end)))/2;
-    if Nz==1; Pt = Ptop.*ones(size(Tp)); else
-        Pt(1,:)     = repmat(mean(rhofz(1,:),2).*g0.*h/2,1,Nx) + Ptop;
-        Pt(2:end,:) = Pt(1,:) + repmat(cumsum(mean(rhofz(2:end-1,:),2).*g0.*h),1,Nx);
+    if Nz==1; Pt = Ptop.*ones(size(Tp)) + Pchmb; else
+        Pl(1,:)     = repmat(mean(rhofz(1,:),2).*g0.*h/2,1,Nx) + Ptop;
+        Pl(2:end,:) = Pl(1,:) + repmat(cumsum(mean(rhofz(2:end-1,:),2).*g0.*h),1,Nx);
+        Pt          = Pl + Pchmb;
     end
     
-    T  =  (Tp+273.15).*exp(Adbt./cP.*Pt);
+    T  =  (Tp+273.15).*exp(Adbt./cP.*(Pt-Pref));
 
     eqtime = tic;
 
@@ -308,7 +315,7 @@ rhox0 = mean(rhox(:));
 cm0_oxd_all = zeros(1,9);
 cm0_oxd_all(:,cal.ioxd) = cm0_oxd;
 etam0 = Giordano08(cm0_oxd_all,T0);
-rhom0 = DensityX(cm0_oxd_all,T0,Ptop/1e8);
+rhom0 = DensityX(cm0_oxd_all,T0,Ptop);
 
 cm1_oxd = (0.99.*cm0_mem(1,:) + 0.01.*cal.cmp_mem(end-1,:))*cal.mem_oxd/100;
 cm2_oxd = (0.99.*cm0_mem(1,:) - 0.01.*cal.cmp_mem(end-1,:))*cal.mem_oxd/100;
@@ -326,71 +333,70 @@ fprintf('    initial H2O : %4.3f \n'  ,c0_oxd(end));
 fprintf('    initial x   : %4.3f \n'  ,x0);
 fprintf('    initial f   : %4.3f \n\n',f0);
 
-rhom1 = DensityX(cm1_oxd_all,T0,Ptop/1e8);
-rhom2 = DensityX(cm2_oxd_all,T0,Ptop/1e8);
-
-DrhoT = rhom0.*aT*max([abs(T0-Twall)/100,abs(T0-T1),T0/100]);
-Drhoc = abs(rhom1-rhom2);
-Drhox = 0.01*abs(rhox0-rhom0);
-Drhof = 0.01*abs(cal.rhof0-rhom0) * (max([c0(end),c1(end),max(cwall(:,end))])>TINY);
-Drho0 = DrhoT + Drhoc + Drhox + Drhof;
-
-uT    = DrhoT*g0*(D/10)^2/etam0;
-uc    = Drhoc*g0*(D/10)^2/etam0;
-ux    = Drhox*g0*(D/10)^2/etam0;
-uf    = Drhof*g0*(D/10)^2/etam0 * (max([c0(end),c1(end),max(cwall(:,end))])>TINY);
-u0    = Drho0*g0*(D/10)^2/etam0;
-
-wx0   = abs(rhox0-rhom0)*g0*dx^2/etam0;
-wf0   = abs(rhof0-rhom0)*g0*df^2/etam0 * (max([c0(end),c1(end),max(cwall(:,end))])>TINY);
-
-ud0   = kT0/rhom0/cP/(D/10);
-
-uwT   = bnd_w/tau_T; 
-uwc   = bnd_w/tau_a; 
-
-RaT   = uT/ud0;
-Rac   = uc/ud0;
-Rax   = ux/ud0;
-Raf   = uf/ud0;
-Ra    = u0/ud0;
-
-Rux   = wx0/u0;
-Ruf   = wf0/u0;
-
-RwT   = uwT/u0;
-Rwc   = uwc/u0;
-
-Re    = u0*rhom0*(D/10)/etam0;
-Rex   = wx0*rhom0*dx/etam0;
-Ref   = wf0*rhom0*df/etam0;
-
-fprintf('    crystal Re: %1.3e \n'  ,Rex);
-fprintf('     bubble Re: %1.3e \n'  ,Ref);
-fprintf('     system Re: %1.3e \n\n',Re );
-
-fprintf('    thermal Ra: %1.3e \n'  ,RaT);
-fprintf('   chemical Ra: %1.3e \n'  ,Rac);
-fprintf('    crystal Ra: %1.3e \n'  ,Rax);
-fprintf('     bubble Ra: %1.3e \n'  ,Raf);
-fprintf('   combined Ra: %1.3e \n\n',Ra );
-
-fprintf('    crystal Ru: %1.3e \n'  ,Rux);
-fprintf('     bubble Ru: %1.3e \n\n',Ruf);
-
-fprintf('    thermal Rw: %1.3e \n'  ,RwT);
-fprintf('   chemical Rw: %1.3e \n\n',Rwc);
+% rhom1 = DensityX(cm1_oxd_all,T0,Ptop/1e8);
+% rhom2 = DensityX(cm2_oxd_all,T0,Ptop/1e8);
+% 
+% DrhoT = rhom0.*aT*max([abs(T0-Twall)/100,abs(T0-T1),T0/100]);
+% Drhoc = abs(rhom1-rhom2);
+% Drhox = 0.01*abs(rhox0-rhom0);
+% Drhof = 0.01*abs(cal.rhof0-rhom0) * (max([c0(end),c1(end),max(cwall(:,end))])>TINY);
+% Drho0 = DrhoT + Drhoc + Drhox + Drhof;
+% 
+% uT    = DrhoT*g0*(D/10)^2/etam0;
+% uc    = Drhoc*g0*(D/10)^2/etam0;
+% ux    = Drhox*g0*(D/10)^2/etam0;
+% uf    = Drhof*g0*(D/10)^2/etam0 * (max([c0(end),c1(end),max(cwall(:,end))])>TINY);
+% u0    = Drho0*g0*(D/10)^2/etam0;
+% 
+% wx0   = abs(rhox0-rhom0)*g0*dx0^2/etam0;
+% wf0   = abs(rhof0-rhom0)*g0*df0^2/etam0 * (max([c0(end),c1(end),max(cwall(:,end))])>TINY);
+% 
+% ud0   = kT0/rhom0/cP/(D/10);
+% 
+% uwT   = bnd_w/tau_T; 
+% uwc   = bnd_w/tau_a; 
+% 
+% RaT   = uT/ud0;
+% Rac   = uc/ud0;
+% Rax   = ux/ud0;
+% Raf   = uf/ud0;
+% Ra    = u0/ud0;
+% 
+% Rux   = wx0/u0;
+% Ruf   = wf0/u0;
+% 
+% RwT   = uwT/u0;
+% Rwc   = uwc/u0;
+% 
+% Re    = u0*rhom0*(D/10)/etam0;
+% Rex   = wx0*rhom0*dx0/etam0;
+% Ref   = wf0*rhom0*df0/etam0;
+% 
+% fprintf('    crystal Re: %1.3e \n'  ,Rex);
+% fprintf('     bubble Re: %1.3e \n'  ,Ref);
+% fprintf('     system Re: %1.3e \n\n',Re );
+% 
+% fprintf('    thermal Ra: %1.3e \n'  ,RaT);
+% fprintf('   chemical Ra: %1.3e \n'  ,Rac);
+% fprintf('    crystal Ra: %1.3e \n'  ,Rax);
+% fprintf('     bubble Ra: %1.3e \n'  ,Raf);
+% fprintf('   combined Ra: %1.3e \n\n',Ra );
+% 
+% fprintf('    crystal Ru: %1.3e \n'  ,Rux);
+% fprintf('     bubble Ru: %1.3e \n\n',Ruf);
+% 
+% fprintf('    thermal Rw: %1.3e \n'  ,RwT);
+% fprintf('   chemical Rw: %1.3e \n\n',Rwc);
 
 % get bulk enthalpy, silica, volatile content densities
-Tp  = Tp+273.15;
-S   = rho.*(cP.*log(T/(min(cal.T0)+273.15)) + x.*Dsx + f.*Dsf - Adbt.*(Pt-Ptop));  So = S;  res_S = 0.*S;
-S0  = rho.*(cP.*log(min(cal.T0)+273.15) + x.*Dsx + f.*Dsf - Adbt.*Ptop);  
-C   = rho.*(m.*cm + x.*cx + f.*cf); Co = C;  res_C = 0.*C;
-X   = rho.*x; Xo = X;  res_X = 0.*X;
-F   = rho.*f; Fo = F;  res_F = 0.*F;
-M   = rho.*m; Mo = M;  res_M = 0.*M;
-RHO = X+M+F;
-Tp = (min(cal.T0)+273.15)*exp((S - X.*Dsx - F.*Dsf)./RHO./cP);
+Tp   = Tp+273.15;
+S    = rho.*(cP.*log(T/Tref) + x.*Dsx + f.*Dsf - Adbt.*(Pt-Pref));  So = S;  res_S = 0.*S;
+S0   = rho.*(cP.*log(  Tref) + x.*Dsx + f.*Dsf - Adbt.*    Pref );  
+C    = rho.*(m.*cm + x.*cx + f.*cf); Co = C;  res_C = 0.*C;
+X    = rho.*x; Xo = X;  res_X = 0.*X;
+F    = rho.*f; Fo = F;  res_F = 0.*F;
+M    = rho.*m; Mo = M;  res_M = 0.*M;
+RHO  = X+M+F;
 
 % get phase entropies
 sm = S./rho - x.*Dsx - f.*Dsf;
@@ -480,7 +486,7 @@ if restart
 
         SOL = [W(:);U(:);P(:)];
         RHO = X+M+F;
-        Tp = (min(cal.T0)+273.15)*exp((S - X.*Dsx - F.*Dsf)./RHO./cP);
+        Tp = Tref*exp((S - X.*Dsx - F.*Dsf)./RHO./cP);
         sm = (S - X.*Dsx - F.*Dsf)./RHO;
         sx = sm + Dsx;
         sf = sm + Dsf;
