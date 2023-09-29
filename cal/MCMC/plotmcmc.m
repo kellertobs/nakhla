@@ -38,9 +38,9 @@ for mi = 1:Nvar
     subplot(Nrow,Ncol,mi);
     
     % plot the distribution
-    histogram(x(1:anneal.burnin,ivar(mi)), 100, 'FaceColor', [0.8 0.8 0.8], 'EdgeColor', 'none','Normalization','count'); axis tight; box on; hold on;
+    histogram(x(1:anneal.burnin,ivar(mi)), 100, 'FaceColor', [0.8 0.8 0.8], 'EdgeColor', 'none','Normalization','count'); hold on;
     for i=1:anneal.levels
-        histogram(x(anneal.ilvl(i):anneal.ilvl(i+1),ivar(mi)), 100, 'FaceColor',(1-(i-1)/(anneal.levels+1))*[0.15 0.05 0.9], 'EdgeColor', 'none','Normalization','count'); axis tight; box on; hold on;
+        histogram(x(anneal.ilvl(i):anneal.ilvl(i+1),ivar(mi)), 100, 'FaceColor',(1-(i-1)/(anneal.levels+1))*[0.15 0.05 0.9], 'EdgeColor', 'none','Normalization','count');
     end
     % histogram(x(end-anneal.refine:end,ivar(mi)), 100, 'FaceColor', [0.6 0.0 0.1], 'EdgeColor', 'none','Normalization','count');
 
@@ -52,8 +52,8 @@ for mi = 1:Nvar
     plot(x0(ivar(mi))*ones(1,2), ylim, 'k:');
     
     % maximum a posteriori model
-    plot(xMAP(ivar(mi))*ones(1,2), ylim, ':','Color',[0.6 0.0 0.1]);
-    hold off;
+    plot(xMAP(ivar(mi))*ones(1,2), ylim, ':','Color',[0.6 0.0 0.1]); 
+    axis tight; box on; hold off;
     
     title(VarNames{ivar(mi)});
 end

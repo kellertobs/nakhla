@@ -421,7 +421,7 @@ MLT_PCA = DGN;
 
 MLTp = MLT;
 MLTp(:,1:end-1) = max(0,Xp(0   +(1:nMLT),:))./sum(max(0,Xp(0   +(1:nMLT),:)),2)*100; MLTp(:,1:end-1) = MLTp(:,1:end-1)./sum(MLTp(:,1:end-1),2).*(100-MLT(:,end));
-SOLp(:,1:end-1) = max(0,Xp(nMLT+(1:nMLT),:))./sum(max(0,Xp(nMLT+(1:nMLT),:)),2)*100; SOLp = SOLp./sum(SOLp,2)*100;
+% SOLp(:,1:end-1) = max(0,Xp(nMLT+(1:nMLT),:))./sum(max(0,Xp(nMLT+(1:nMLT),:)),2)*100; SOLp = SOLp./sum(SOLp,2)*100;
 
 memMLT = zeros(np,cal.nmem);
 for ip = 1:np
@@ -535,9 +535,9 @@ drawnow
 cal_LUNA;  % load melt model calibration
                 % for fay ens hyp dps pig ant alb ulv qtz wat
 indmem  = logical([1   0   0   0   0   0   0   0   0   0   0
-                   1   1   1   1   0   0   0   0   0   0   0
-                   1   1   1   1   1   1   1   1   0   0   0
-                   0   0   0   0   1   1   1   1   1   1   0
+                   1   1   1   0   0   0   0   0   0   0   0
+                   1   1   0   1   1   0   1   1   0   0   0
+                   0   0   0   0   0   1   1   1   1   1   0
                    0   0   0   0   0   0   0   0   0   0   1]);
 
 
@@ -559,15 +559,15 @@ cmp_oxd_FINT = cmp_mem_FINT*cal.mem_oxd/100;
 
 cmp_mem_MAP = cmp_mem_FINT;
 
-T0_MAP = [1890    1480    1190   1090];
+T0_MAP = [1890    1500    1200   1100];
 A_MAP  = [6.1  4.9  2.9  2.7];
 B_MAP  = [9.7  3.8  2.7  2.6];
 r_MAP  = [35.00  30.0  12.00  6.00];
 
                 % for fay ens hyp dps pig ant alb ulv qtz wat
 indmem  = logical([1   0   0   0   0   0   0   0   0   0   0
-                   1   1   1   1   0   0   0   0   0   0   0
-                   1   1   0   1   1   1   1   1   0   0   0
+                   1   1   1   0   0   0   0   0   0   0   0
+                   1   1   0   1   1   0   1   1   0   0   0
                    0   0   0   0   0   1   1   1   1   1   0
                    0   0   0   0   0   0   0   0   0   0   1]);
 
@@ -613,7 +613,7 @@ end
 
 % set data uncertainties
 sigma_wtpct  = 0.05*ones(size([MLTp(:);SOLp(:);PHS(:)]));
-sigma_Tsllq  = 4*ones(size([Tsol(:);Tliq(:)]));
+sigma_Tsllq  = 3*ones(size([Tsol(:);Tliq(:)]));
 sigma = [sigma_wtpct;sigma_Tsllq];
 
 % function to calculate forward model
