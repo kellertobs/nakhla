@@ -41,7 +41,7 @@ dcg      =  [0,0,0,0,0];         % amplitude of centred gaussian [wt SiO2]
 % set model trace and isotope geochemistry parameters (must match # trace elements and isotope ratios in calibration!)
 trc0     =  [1,1,1,1,1,1];       % trace elements top layer [wt ppm]
 trc1     =  [1,1,1,1,1,1];       % trace elements base layer [wt ppm]
-dr_trc   =  [0,0,0,0,1/2,-1/2];  % trace elements random noise [wt ppm]
+dr_trc   =  [0,0,1/2,0,0,-1/2];  % trace elements random noise [wt ppm]
 dg_trc   =  [0,0,0,0,0,0];       % trace elements centred gaussian [wt ppm]
 
 % set thermo-chemical boundary parameters
