@@ -32,16 +32,14 @@ while time <= tend && step <= Nt && any(m(:)>1e-9)
     Foo = Fo; Fo = F;
     Moo = Mo; Mo = M;
     rhooo = rhoo; rhoo = rho;
-    TEoo = TEo; TEo = TE;
-    IRoo = IRo; IRo = IR;
+    TRCoo = TRCo; TRCo = TRC;
     dSdtoo = dSdto; dSdto = dSdt;
     dCdtoo = dCdto; dCdto = dCdt;
     dXdtoo = dXdto; dXdto = dXdt;
     dFdtoo = dFdto; dFdto = dFdt;
     dMdtoo = dMdto; dMdto = dMdt;
     drhodtoo = drhodto; drhodto = drhodt;
-    dTEdtoo = dTEdto; dTEdto = dTEdt;
-    dIRdtoo = dIRdto; dIRdto = dIRdt;
+    dTRCdtoo = dTRCdto; dTRCdto = dTRCdt;
     Div_Vo  = Div_V;
     rhoWoo  = rhoWo; rhoWo = rhofz.*W(:,2:end-1);
     rhoUoo  = rhoUo; rhoUo = rhofx.*U(2:end-1,:);

@@ -39,14 +39,10 @@ dcr      =  [0,0,0,0,0];         % amplitude of random noise [wt SiO2]
 dcg      =  [0,0,0,0,0];         % amplitude of centred gaussian [wt SiO2]
 
 % set model trace and isotope geochemistry parameters (must match # trace elements and isotope ratios in calibration!)
-te0      =  [1,1,1,1];           % trace elements top layer [wt ppm]
-te1      =  [1,1,1,1];           % trace elements base layer [wt ppm]
-dter     =  [0,0,0,0];           % trace elements random noise [wt ppm]
-dteg     =  [0,0,0,0];           % trace elements centred gaussian [wt ppm]
-ir0      =  [1, 1];              % isotope ratios top layer [delta]
-ir1      =  [1, 1];              % isotope ratios base layer [delta]
-dirr     =  [0, 0];              % isotope ratios random noise [delta]
-dirg     =  [0, 0];              % isotope ratios centred gaussian [delta]
+trc0     =  [1,1,1,1,1,1];       % trace elements top layer [wt ppm]
+trc1     =  [1,1,1,1,1,1];       % trace elements base layer [wt ppm]
+dr_trc   =  [0,0,0,0,1/2,-1/2];  % trace elements random noise [wt ppm]
+dg_trc   =  [0,0,0,0,0,0];       % trace elements centred gaussian [wt ppm]
 
 % set thermo-chemical boundary parameters
 Ptop     =  125e6;               % top pressure [Pa]
@@ -62,12 +58,9 @@ Twall    =  [300,300,nan];       % [top,bot,sds] wall rock temperature [degC] (n
 cwall    =  [nan,nan,nan,nan,nan; ...
              nan,nan,nan,nan,nan; ...
              nan,nan,nan,nan,nan]; % [top,bot,sds] wall rock major component [wt SiO2] (nan = no assimilation)
-tewall   =  [nan,nan,nan,nan; ...
-             nan,nan,nan,nan; ...
-             nan,nan,nan,nan];   % [top,bot,sds] wall rock trace elements [wt ppm] (nan = no assimilation)
-irwall   =  [nan,nan; ...
-             nan,nan; ...
-             nan,nan];           % [top,bot,sds] wall rock isotope ratios [delta] (nan = no assimilation)
+trcwall  =  [nan,nan,nan,nan,nan,nan; ...
+             nan,nan,nan,nan,nan,nan; ...
+             nan,nan,nan,nan,nan,nan]; % [top,bot,sds] wall rock trace elements [wt ppm] (nan = no assimilation)
 
 % set thermo-chemical material parameters
 calID    =  'andesSVZ';          % phase diagram calibration
