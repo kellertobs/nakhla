@@ -306,17 +306,20 @@ else % create 2D plots
     else; set(0, 'CurrentFigure', fh8); clf;
     end 
     colormap(ocean);
-    fh = axb + 2*axh + 1*avs + axt;
+    fh = axb + 3*axh + 2*avs + axt;
     fw = axl + 3*axw + 2*ahs + axr;
-    set(fh8,UN{:},'Position',[15 15 fw fh]);
+    set(fh8,UN{:},'Position',[11 11 fw fh]);
     set(fh8,'PaperUnits','Centimeters','PaperPosition',[0 0 fw fh],'PaperSize',[fw fh]);
     set(fh8,'Color','w','InvertHardcopy','off','Resize','off');
-    ax(81) = axes(UN{:},'position',[axl+0*axw+0*ahs axb+1*axh+1*avs axw axh]);
-    ax(82) = axes(UN{:},'position',[axl+1*axw+1*ahs axb+1*axh+1*avs axw axh]);
-    ax(83) = axes(UN{:},'position',[axl+2*axw+2*ahs axb+1*axh+1*avs axw axh]);
-    ax(84) = axes(UN{:},'position',[axl+0*axw+0*ahs axb+0*axh+0*avs axw axh]);
-    ax(85) = axes(UN{:},'position',[axl+1*axw+1*ahs axb+0*axh+0*avs axw axh]);
-    ax(86) = axes(UN{:},'position',[axl+2*axw+2*ahs axb+0*axh+0*avs axw axh]);
+    ax(81) = axes(UN{:},'position',[axl+0*axw+0*ahs axb+2*axh+2*avs axw axh]);
+    ax(82) = axes(UN{:},'position',[axl+1*axw+1*ahs axb+2*axh+2*avs axw axh]);
+    ax(83) = axes(UN{:},'position',[axl+2*axw+2*ahs axb+2*axh+2*avs axw axh]);
+    ax(84) = axes(UN{:},'position',[axl+0*axw+0*ahs axb+1*axh+1*avs axw axh]);
+    ax(85) = axes(UN{:},'position',[axl+1*axw+1*ahs axb+1*axh+1*avs axw axh]);
+    ax(86) = axes(UN{:},'position',[axl+2*axw+2*ahs axb+1*axh+1*avs axw axh]);
+    ax(87) = axes(UN{:},'position',[axl+0*axw+0*ahs axb+0*axh+0*avs axw axh]);
+    ax(88) = axes(UN{:},'position',[axl+1*axw+1*ahs axb+0*axh+0*avs axw axh]);
+    ax(89) = axes(UN{:},'position',[axl+2*axw+2*ahs axb+0*axh+0*avs axw axh]);
 
     % plot velocity-pressure solution in Fig. 1
     set(0,'CurrentFigure',fh1)
@@ -459,25 +462,29 @@ else % create 2D plots
 
     % plot geochemical variables in Fig. 7
     set(0,'CurrentFigure',fh8)
+    for i = 1:cal.ntrc
+        set(fh8,'CurrentAxes',ax(80+i));
+        imagesc(Xsc,Zsc,trc(:,:,i)); axis ij equal tight; box on; cb = colorbar;
+        set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.trcStr{i},' [1]'],TX{:},FS{:});
+    end
     set(fh8,'CurrentAxes',ax(81));
-    imagesc(Xsc,Zsc,te(:,:,1)); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['trace element 1'],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel(['Depth [',SpaceUnits,']'],TX{:},FS{:}); 
+    set(gca,'XTickLabel',[]);
     set(fh8,'CurrentAxes',ax(82));
-    imagesc(Xsc,Zsc,te(:,:,2)); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['trace element 2'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
+    set(gca,'XTickLabel',[],'YTickLabel',[]);
     text(0.5,1.1,['time = ',num2str(time/TimeScale,3),' [',TimeUnits,']'],TX{:},FS{:},'Color','k','HorizontalAlignment','center','Units','normalized');
     set(fh8,'CurrentAxes',ax(83));
-    imagesc(Xsc,Zsc,ir(:,:,1)); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['isotope ratio 1'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
+    set(gca,'XTickLabel',[],'YTickLabel',[]);
     set(fh8,'CurrentAxes',ax(84));
-    imagesc(Xsc,Zsc,te(:,:,3)); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['trace element 3'],TX{:},FS{:}); ylabel(['Depth [',SpaceUnits,']'],TX{:},FS{:});
+    set(gca,'XTickLabel',[]); ylabel(['Depth [',SpaceUnits,']'],TX{:},FS{:});
     set(fh8,'CurrentAxes',ax(85));
-    imagesc(Xsc,Zsc,te(:,:,4)); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['trace element 4'],TX{:},FS{:}); set(gca,'YTickLabel',[]); xlabel(['Width [',SpaceUnits,']'],TX{:},FS{:});
+    set(gca,'XTickLabel',[],'YTickLabel',[]); 
     set(fh8,'CurrentAxes',ax(86));
-    imagesc(Xsc,Zsc,ir(:,:,2)); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['isotope ratio 2'],TX{:},FS{:}); set(gca,'YTickLabel',[]);
+    set(gca,'XTickLabel',[],'YTickLabel',[]);
+    set(fh8,'CurrentAxes',ax(87));
+    set(fh8,'CurrentAxes',ax(88));
+    set(gca,'YTickLabel',[]); xlabel(['Width [',SpaceUnits,']'],TX{:},FS{:});
+    set(fh8,'CurrentAxes',ax(89));
+    set(gca,'YTickLabel',[]);
 
 end
 
@@ -628,9 +635,9 @@ if save_op && ~restart
     end
 
     name = [opdir,'/',runID,'/',runID,'_',num2str(floor(step/nop))];
-    save(name,'U','W','P','Pt','f','x','m','fq','xq','mq','phi','chi','mu','X','F','M','S','C','T','c','cm','cx','cf','TE','IR','te','ir','dSdt','dCdt','dFdt','dXdt','dMdt','drhodt','dTEdt','dIRdt','Gf','Gx','Gm','rho','eta','eII','tII','dt','time','step','VolSrc','wf','wx','wm','cal');
+    save(name,'U','W','P','Pt','f','x','m','fq','xq','mq','phi','chi','mu','X','F','M','S','C','T','c','cm','cx','cf','TRC','trc','dSdt','dCdt','dFdt','dXdt','dMdt','drhodt','dTRCdt','Gf','Gx','Gm','rho','eta','eII','tII','dt','time','step','VolSrc','wf','wx','wm','cal');
     name = [opdir,'/',runID,'/',runID,'_cont'];
-    save(name,'U','W','P','Pt','f','x','m','fq','xq','mq','phi','chi','mu','X','F','M','S','C','T','c','cm','cx','cf','TE','IR','te','ir','dSdt','dCdt','dFdt','dXdt','dMdt','drhodt','dTEdt','dIRdt','Gf','Gx','Gm','rho','eta','eII','tII','dt','time','step','VolSrc','wf','wx','wm','cal');
+    save(name,'U','W','P','Pt','f','x','m','fq','xq','mq','phi','chi','mu','X','F','M','S','C','T','c','cm','cx','cf','TRC','trc','dSdt','dCdt','dFdt','dXdt','dMdt','drhodt','dTRCdt','Gf','Gx','Gm','rho','eta','eII','tII','dt','time','step','VolSrc','wf','wx','wm','cal');
     name = [opdir,'/',runID,'/',runID,'_hist'];
     save(name,'hist');
 

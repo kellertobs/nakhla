@@ -159,13 +159,9 @@ for i = 1:cal.ncmp
     c(:,:,i)  =  c0(i) + (c1(i)-c0(i)) .* (1+erf((ZZ/D-zlay+rp*h*dlay)/wlay_c))/2 + dcr(i).*rp + dcg(i).*gp;  % trace elements
 end
 
-te = zeros(Nz,Nx,cal.nte);
-for i = 1:cal.nte
-    te(:,:,i)  =  te0(i) + (te1(i)-te0(i)) .* (1+erf((ZZ/D-zlay+rp*h*dlay)/wlay_c))/2 + dter(i).*rp + dteg(i).*gp;  % trace elements
-end
-ir = zeros(Nz,Nx,cal.nir);
-for i = 1:cal.nir
-    ir(:,:,i)  =  ir0(i) + (ir1(i)-ir0(i)) .* (1+erf((ZZ/D-zlay+rp*h*dlay)/wlay_c))/2 + dirr(i).*rp + dirg(i).*gp;  % isotope ratios  
+trc = zeros(Nz,Nx,cal.ntrc);
+for i = 1:cal.ntrc
+    trc(:,:,i)  =  trc0(i) + (trc1(i)-trc0(i)) .* (1+erf((ZZ/D-zlay+rp*h*dlay)/wlay_c))/2 + dr_trc(i).*rp + dg_trc(i).*gp;  % trace elements
 end
 
 % apply initial boundary layers
@@ -181,19 +177,12 @@ for i = 1:cal.ncmp
 end
 cin = c;
 
-for i = 1:cal.nte
-    if any(topinit(:)) && ~isnan(tewall(1,i)); te(:,:,i) = te(:,:,i) + (tewall(1,i)-te(:,:,i)).*topinit; end
-    if any(botinit(:)) && ~isnan(tewall(2,i)); te(:,:,i) = te(:,:,i) + (tewall(2,i)-te(:,:,i)).*botinit; end
-    if any(sdsinit(:)) && ~isnan(tewall(3,i)); te(:,:,i) = te(:,:,i) + (tewall(3,i)-te(:,:,i)).*sdsinit; end
+for i = 1:cal.ntrc
+    if any(topinit(:)) && ~isnan(trcwall(1,i)); trc(:,:,i) = trc(:,:,i) + (trcwall(1,i)-trc(:,:,i)).*topinit; end
+    if any(botinit(:)) && ~isnan(trcwall(2,i)); trc(:,:,i) = trc(:,:,i) + (trcwall(2,i)-trc(:,:,i)).*botinit; end
+    if any(sdsinit(:)) && ~isnan(trcwall(3,i)); trc(:,:,i) = trc(:,:,i) + (trcwall(3,i)-trc(:,:,i)).*sdsinit; end
 end
-tein = te; 
-
-for i = 1:cal.nir
-    if any(topinit(:)) && ~isnan(irwall(1,i)); ir(:,:,i) = ir(:,:,i) + (irwall(1,i)-ir(:,:,i)).*topinit; end
-    if any(botinit(:)) && ~isnan(irwall(2,i)); ir(:,:,i) = ir(:,:,i) + (irwall(2,i)-ir(:,:,i)).*botinit; end
-    if any(sdsinit(:)) && ~isnan(irwall(3,i)); ir(:,:,i) = ir(:,:,i) + (irwall(3,i)-ir(:,:,i)).*sdsinit; end
-end
-irin = ir;
+tein = trc;
 
 U   =  zeros(Nz+2,Nx+1);  UBG = U; Ui = U;
 W   =  zeros(Nz+1,Nx+2);  WBG = W; Wi = W; wf = 0.*W; wx = 0.*W; wm = 0.*W;
@@ -404,35 +393,22 @@ sx = sm + Dsx;
 sf = sm + Dsf;
 
 % get trace element phase compositions
-Kte = zeros(Nz,Nx,cal.nte);
-tem = zeros(Nz,Nx,cal.nte);
-tex = zeros(Nz,Nx,cal.nte);
-for i = 1:cal.nte
-    for j=1:cal.nmem; Kte(:,:,i) = Kte(:,:,i) + cal.Kte_mem(i,j) .* c_mem(:,:,j)./100; end
+Ktrc = zeros(Nz,Nx,cal.ntrc);
+trcm = zeros(Nz,Nx,cal.ntrc);
+trcx = zeros(Nz,Nx,cal.ntrc);
+for i = 1:cal.ntrc
+    for j=1:cal.nmem; Ktrc(:,:,i) = Ktrc(:,:,i) + cal.Ktrc_mem(i,j) .* c_mem(:,:,j)./100; end
 
-    tem(:,:,i)  = te(:,:,i)./(m + x.*Kte(:,:,i));
-    tex(:,:,i)  = te(:,:,i)./(m./Kte(:,:,i) + x);
-end
-
-irm = zeros(Nz,Nx,cal.nir);
-irx = zeros(Nz,Nx,cal.nir);
-for i = 1:cal.nir
-    irm(:,:,i)  = ir(:,:,i)./(1-f);
-    irx(:,:,i)  = ir(:,:,i)./(1-f);
+    trcm(:,:,i)  = trc(:,:,i)./(m + x.*Ktrc(:,:,i));
+    trcx(:,:,i)  = trc(:,:,i)./(m./Ktrc(:,:,i) + x);
 end
 
 % get geochemical component densities
-TE = zeros(Nz,Nx,cal.nte);
-for i = 1:cal.nte
-    TE(:,:,i)  = rho.*(m.*tem(:,:,i) + x.*tex(:,:,i));
+TRC = zeros(Nz,Nx,cal.ntrc);
+for i = 1:cal.ntrc
+    TRC(:,:,i)  = rho.*(m.*trcm(:,:,i) + x.*trcx(:,:,i));
 end
-TEo = TE;  TEi = TE;
-
-IR = zeros(Nz,Nx,cal.nir);
-for i = 1:cal.nir
-    IR(:,:,i)  = rho.*(m.*irm(:,:,i) + x.*irx(:,:,i));
-end
-IRo = IR;  IRi = IR;
+TRCo = TRC;
 
 % initialise phase change rates
 Gx  = 0.*x;  Gf  = 0.*f;  Gm  = 0.*m;
@@ -443,23 +419,23 @@ dCdt   = 0.*c;  dCdto  = dCdt;
 dFdt   = 0.*f;  dFdto  = dFdt;
 dXdt   = 0.*x;  dXdto  = dXdt;
 dMdt   = 0.*m;  dMdto  = dMdt;
-bnd_TE = zeros(Nz,Nx,cal.nte);
-adv_TE = zeros(Nz,Nx,cal.nte);
-dff_TE = zeros(Nz,Nx,cal.nte);
-Kte    = zeros(Nz,Nx,cal.nte);
-dTEdt  = 0.*te; dTEdto = dTEdt;
-bnd_IR = zeros(Nz,Nx,cal.nir);
-adv_IR = zeros(Nz,Nx,cal.nir);
-dff_IR = zeros(Nz,Nx,cal.nir);
-dIRdt  = 0.*ir; dIRdto = dIRdt;
+bnd_TRC = zeros(Nz,Nx,cal.ntrc);
+adv_TRC = zeros(Nz,Nx,cal.ntrc);
+dff_TRC = zeros(Nz,Nx,cal.ntrc);
+K_trc     = zeros(Nz,Nx,cal.ntrc);
+dTRCdt  = 0.*trc; dTRCdto = dTRCdt;
+% bnd_IR = zeros(Nz,Nx,cal.nir);
+% adv_IR = zeros(Nz,Nx,cal.nir);
+% dff_IR = zeros(Nz,Nx,cal.nir);
+% dIRdt  = 0.*ir; dIRdto = dIRdt;
 upd_S  = 0.*S;
 upd_C  = 0.*C;
 upd_X  = 0.*X;
 upd_F  = 0.*F;
 upd_M  = 0.*M;
 upd_rho= 0.*rho;
-upd_TE = 0.*TE;
-upd_IR = 0.*IR;
+upd_TRC = 0.*TRC;
+% upd_IR = 0.*IR;
 
 % initialise timing and iterative parameters
 frst    = 1;
@@ -480,7 +456,7 @@ if restart
     end
     if exist(name,'file')
         fprintf('\n   restart from %s \n\n',name);
-        load(name,'U','W','P','Pt','f','x','m','fq','xq','mq','phi','chi','mu','X','F','M','S','C','T','c','cm','cx','cf','TE','IR','te','ir','dSdt','dCdt','dFdt','dXdt','dMdt','drhodt','dTEdt','dIRdt','Gf','Gx','Gm','rho','eta','eII','tII','dt','time','step','VolSrc','wf','wx','wm','cal');
+        load(name,'U','W','P','Pt','f','x','m','fq','xq','mq','phi','chi','mu','X','F','M','S','C','T','c','cm','cx','cf','TRC','trc','dSdt','dCdt','dFdt','dXdt','dMdt','drhodt','dTRCdt','Gf','Gx','Gm','rho','eta','eII','tII','dt','time','step','VolSrc','wf','wx','wm','cal');
         name = [opdir,'/',runID,'/',runID,'_hist'];
         load(name,'hist');
 
@@ -497,7 +473,7 @@ if restart
         Fo = F;
         Mo = M;
         rhoo = rho;
-        TEo = TE;
+        TEo = TRC;
         IRo = IR;
         dSdto = dSdt;
         dCdto = dCdt;

@@ -30,8 +30,6 @@ c0       =  [0.13  0.20  0.53  0.11  0.03  0.005];  % components (maj comp, H2O)
 c1       =  c0;                  % components (maj comp, H2O) base layer [wt] (will be normalised to unit sum!)
 dcr      =  [-1,-1,-1,1,1,1]*1e-6;
 dcg      =  [0,0,0,0,0,0];
-ir0      =  [0, 0];              % isotope ratios random noise [delta]
-dirr     =  [-1, 1];             % isotope ratios random noise [delta]
 
 % set thermo-chemical boundary parameters
 periodic =  1;

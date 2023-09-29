@@ -200,16 +200,7 @@ hist.wf(stp,1) = min(min(-(phi([1,1:end],:)+phi([1:end,end],:))/2.*wf(:,2:end-1)
 hist.wf(stp,2) = mean(mean(abs((phi([1,1:end],:)+phi([1:end,end],:))/2.*wf(:,2:end-1))));
 hist.wf(stp,3) = max(max(-(phi([1,1:end],:)+phi([1:end,end],:))/2.*wf(:,2:end-1)));
 
-for k = 1:length(te0)
-    hist.te(stp,k,1) = min(min(te(:,:,k)));
-    hist.te(stp,k,2) = mean(mean(te(:,:,k)));
-    hist.te(stp,k,3) = max(max(te(:,:,k)));
-end
-for k = 1:length(ir0)
-    hist.ir(stp,k,1) = min(min(ir(:,:,k)));
-    hist.ir(stp,k,2) = mean(mean(ir(:,:,k)));
-    hist.ir(stp,k,3) = max(max(ir(:,:,k)));
-end
+
 
 % % fraction, composition, and temperature of eruptible magma suspension (mu>0.55)
 % indmagma = max(0,min(1,(1+erf((mu-0.55)./0.05))/2));
