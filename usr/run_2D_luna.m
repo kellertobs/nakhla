@@ -27,9 +27,9 @@ dtmax    =  1*yr;                % maximum time step [s]
 
 % set initial thermo-chemical state
 Tinit    = 'linear';             % T initial condition mode ('layer' or 'linear')
-T0       =  1755;                % temperature top  layer [deg C]
-T1       =  1755;                % temperature base layer [deg C]
-c0       =  [0.36,0.31,0.32,0.01,0.0];   % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
+T0       =  1740;                % temperature top  layer [deg C]
+T1       =  1740;                % temperature base layer [deg C]
+c0       =  [0.41  0.24  0.20  0.15  0.0];   % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
 c1       =  c0;                          % components (maj comp, H2O) bot layer [wt] (will be normalised to unit sum!)
 dcr      =  [1/2,1/2,-1/2,-1/2,0]*1e-6;  % amplitude of random noise [wt]
 zlay     =  2.0;                 % layer thickness (relative to domain depth D)
@@ -38,13 +38,13 @@ zlay     =  2.0;                 % layer thickness (relative to domain depth D)
 periodic =  0;
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
 bnd_w    =  h;                   % boundary layer width [m]
-tau_T    =  1*yr;                % wall cooling/assimilation time [s]
+tau_T    =  0.3*yr;              % wall cooling/assimilation time [s]
 Twall    =  [0,1900,nan];        % [top,bot,sds] wall rock temperature [degC] (nan = insulating)
 Ptop     =  1e5;                 % top pressure [Pa]
 
 % set thermo-chemical material parameters
-calID    =  'luna';              % phase diagram calibration
-aT       =  3.5e-5;              % thermal expansivity [1/K]
+calID    =  'LUNA';              % phase diagram calibration
+aT       =  4.5e-5;              % thermal expansivity [1/K]
 cP       =  1100;                % heat capacity [J/kg/K]
 
 % set buoyancy parameters
