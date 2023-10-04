@@ -29,12 +29,12 @@ cal.ioxd = [   1   2    3    4   5   6    7   8   9]; % oxdie indices for viscos
 cal.mem_oxd    = [ 42.71    0.0     0.0     0.0    57.29    0.00    0.0     0.0    0.0     % forsterite (for)
                    29.49    0.0     0.0    70.51    0.0     0.00    0.0     0.0    0.0     % fayalite (fay)
 
-                   51.37    0.0     3.42   20.47   21.89    2.85    0.0     0.0    0.0     % hypersthene (hyp)
-                   48.90    0.0     0.11   41.55    8.60    0.84    0.0     0.0    0.0     % ferrosillite (fsl)
+                   51.22    0.0     3.24   21.65   21.15    2.74    0.0     0.0    0.0     % hypersthene (hyp)
+                   49.04    0.0     0.30   40.38    9.33    0.95    0.0     0.0    0.0     % ferrosillite (fsl)
 
-                   52.44    0.22    2.21    8.98   15.33   20.35    0.41    0.06   0.0     % diopside (dps)
-                   52.57    0.05    0.81   16.15   11.30   18.01    1.08    0.03   0.0     % Mg-augite (mau)
-                   51.71    0.94    0.80   24.09    3.95   14.96    3.23    0.32   0.0     % Fe-augite (fau)
+                   52.44    0.24    2.17    9.40   15.00   20.20    0.49    0.06   0.0     % diopside (dps)
+                   52.62    0.0     0.72   16.22   11.39   18.01    1.02    0.01   0.0     % Mg-augite (mau)
+                   51.76    0.90    0.89   23.06    4.73   15.33    3.03    0.30   0.0     % Fe-augite (fau)
 
                     0.0    36.63    2.50   44.14   16.74    0.0     0.0     0.0    0.0     % ulvospinel (msp)
                     0.0     0.80    0.56   98.64    0.0     0.0     0.0     0.0    0.0     % magnetite (mgt)
@@ -42,7 +42,7 @@ cal.mem_oxd    = [ 42.71    0.0     0.0     0.0    57.29    0.00    0.0     0.0 
 
                    44.00    0.0    36.10    0.0     0.0    19.52    0.38    0.0    0.0     % anorthite (ant)
                    66.93    0.0    20.69    0.0     0.0     1.72   10.61    0.05   0.0     % albite (alb)
-                   68.11    0.0    18.19    0.0     0.0     0.0     5.52    8.18   0.0     % sanidine (san)
+                   68.91    0.0    17.79    0.0     0.0     0.0     6.12    7.18   0.0     % sanidine (san)
 
                   100.0     0.0     0.0     0.0     0.0     0.0     0.0     0.0    0.0     % quartz (qtz)
                     0.0     0.0     0.0     0.0     0.0     0.0     0.0     0.0  100.0];   % water (wat)
@@ -58,11 +58,11 @@ cal.msy_mem = [1  1  0  0  0  0  0  0  0  0  0  0  0  0  0    % olivine (olv)
 
 % mineral end-member composition of melting model components
 %                  for     fay     hyp     fsl     dps     mau     fau     ulv     mgt     ilm     ant     alb     san     qtz     wat
-cal.cmp_mem =   [    0       0       0       0       0       0       0       0       0       0   89.77   10.23       0       0       0
-                 23.36   26.89       0       0       0       0       0   13.98       0       0   35.40    0.37       0       0       0
-                  2.20   10.53   17.39    1.09   27.94    0.93       0    3.11    3.61       0   11.13   22.08       0       0       0
-                     0    0.79       0    6.10       0       0    7.29       0    0.21    0.76       0   74.95    9.90       0       0
-                     0       0       0    0.34       0    2.85    1.01       0    0.17    0.15    0.36    1.15   51.63   42.35       0
+cal.cmp_mem =   [    0       0       0       0       0       0       0       0       0       0   90.85    9.15       0       0       0
+                 22.76   14.60       0       0       0       0       0    8.58       0       0   50.98    3.09       0       0       0
+                  0.05   12.00   19.12    0.05   25.87    1.91    1.00    3.09    1.80       0   21.39   13.72       0       0       0
+                     0    0.44    1.38    3.79    1.48    1.93    0.97    1.05    1.97    0.50    0.70   72.63   13.16       0       0
+                     0       0       0       0       0    4.14    1.59       0       0       0       0    0.13   55.22   38.92       0
                      0       0       0       0       0       0       0       0       0       0       0       0       0       0  100.00];
 cal.cmp_mem = cal.cmp_mem./sum(cal.cmp_mem,2)*100;
 
@@ -80,19 +80,19 @@ for i=1:cal.ncmp
 end
 
 % set pure component melting points T_m^i at P=0
-cal.T0 =  [1530  1118  1069  945  767];
+cal.T0 =  [1530  1143  1109  978  741];
 
 % set first coeff. for P-dependence of T_m^i [GPa]
-cal.A  =  (cal.T0+273.15)./300;
+cal.A   = (cal.T0+273.15)./350;
 
 % set second coeff. for P-dependence of T_m^i [1]
-cal.B  =  0*cal.A + 1;
+cal.B   = [8 4.5 4 3 2.5];
 
 % set entropy gain of fusion DeltaS [J/K]
 cal.dS =  350;
 
 % set coeff. for T-dependence of partition coefficients K^i [1/K]
-cal.r  =  [46.0  2.0  8.6  11.6  10.0];
+cal.r  =  [27.8  2.0  8.3  13.2  16.9];
 
 % specify melting point dependence on H2O
 cal.dTH2O   = 1400;                 % solidus shift from water content [K/wt^pH2O]

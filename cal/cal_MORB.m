@@ -51,11 +51,11 @@ cal.msy_mem = [1  1  0  0  0  0  0  0  0  0    % olivine (olv)
 
 % mineral end-member composition of melting model components
 %                  for     fay     dps     aug     amt     mgt     ant     alb     qtz     wat
-cal.cmp_mem =   [83.29   16.71       0       0       0       0       0       0       0       0
-                  7.42    1.22       0       0       0       0   65.00   26.36       0       0
-                  0.07    6.17   33.80   12.94       0       0   20.56   26.46       0       0
-                  0.93   12.35    3.91   35.23    4.01       0    9.42   34.16       0       0
-                     0    0.29    2.22   13.22    2.49    0.61    0.83   25.98   54.36       0
+cal.cmp_mem =   [83.78   16.22       0       0       0       0       0       0       0       0
+                 27.10    7.42       0       0       0       0   52.55   12.93       0       0
+                  2.83    2.73   40.34    3.56       0       0   24.78   25.77       0       0
+                  2.80    9.48    0.58   40.86    3.92    0.36   10.15   31.86       0       0
+                     0    1.38    3.39   12.44    2.41    0.13    3.26   24.48   52.52       0
                      0       0       0       0       0       0       0       0       0  100.00];
 cal.cmp_mem = cal.cmp_mem./sum(cal.cmp_mem,2)*100;
 
@@ -73,19 +73,19 @@ for i=1:cal.ncmp
 end
 
 % set pure component melting points T_m^i at P=0
-cal.T0  = [1850  1152  1076  1010  856];
+cal.T0  = [1850  1200  1140  1051  799];
 
 % set first coeff. for P-dependence of T_m^i [GPa]
-cal.A   = (cal.T0+273.15)./300;
+cal.A   = (cal.T0+273.15)./350;
 
 % set second coeff. for P-dependence of T_m^i [1]
-cal.B   = 0*cal.A + 1;
+cal.B   = [9 5 4 3 2.5];
 
 % set entropy gain of fusion DeltaS [J/K]
 cal.dS  = 350;
 
 % set coeff. for T-dependence of partition coefficients K^i [1/K]
-cal.r  = [45.7  2.0  6.2  12.7  3.9];
+cal.r  = [26.2  2.0  5.9  12.9  5.4];
 
 % specify melting point dependence on H2O
 cal.dTH2O   = 1400;                 % solidus shift from water content [K/wt^pH2O]

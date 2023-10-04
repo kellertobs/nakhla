@@ -613,7 +613,7 @@ end
 
 % set data uncertainties
 sigma_wtpct  = 0.05*ones(size([MLTp(:);SOLp(:);PHS(:)]));
-sigma_Tsllq  = 3*ones(size([Tsol(:);Tliq(:)]));
+sigma_Tsllq  = 2*ones(size([Tsol(:);Tliq(:)]));
 sigma = [sigma_wtpct;sigma_Tsllq];
 
 % function to calculate forward model
@@ -634,12 +634,12 @@ PriorFunc = @(model) ProbFuncs('PriorFunc', model, mbnds, 'uniform');
 LikeFunc  = @(dhat,model) ProbFuncs('LikeFuncSimplex',dhat,data,sigma,1,model,cal);
 
 % run MCMC algorithm
-Niter = 2e3;
+Niter = 1e4;
 
 % adjust step size to get reasonable acceptance ratio ~26%
-anneal.initstep = 0.01 * diff(mbnds,1,2);
-anneal.levels   = 1;
-anneal.burnin   = Niter/100;
+anneal.initstep = 0.015 * diff(mbnds,1,2);
+anneal.levels   = 3;
+anneal.burnin   = Niter/20;
 anneal.refine   = 0*Niter/10;
 
 tic;

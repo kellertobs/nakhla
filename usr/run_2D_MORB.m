@@ -26,7 +26,7 @@ dt       =  36;                  % initial time step [s]
 % set initial thermo-chemical state
 T0       =  1215;                % temperature top  layer [deg C]
 T1       =  T0;                  % temperature base layer [deg C]
-c0       =  [0.13  0.20  0.53  0.11  0.03  0.005];  % components (maj comp, H2O) top  layer [wt] (will be normalised to unit sum!)
+c0       =  [0.05  0.24  0.42  0.24  0.05  0.005];  % components (maj comp, H2O) top  layer [wt] (will be normalised to unit sum!)
 c1       =  c0;                  % components (maj comp, H2O) base layer [wt] (will be normalised to unit sum!)
 dcr      =  [-1,-1,-1,1,1,1]*1e-6;
 dcg      =  [0,0,0,0,0,0];
