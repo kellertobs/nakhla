@@ -16,21 +16,11 @@ rng(15);    % for reproducibility
 % set phase diagram parameters
 cal_LUNA;  % load melt model calibration
 
-%       Si Ti Al Fe Mg Ca Na K
-% ioxd = [1  8  2  5  4  3  7  6]; % oxide indices from MAGEMin to standard
-% Si = 1; Ti = 2; Al = 3; FeO = 4; Mg = 5; Ca = 6; Na = 7; K = 8; H = 9;
-
 
 %% set up data for calibration
 
 % load experimental data from Schmidt & Kraettli (2020), Table 3
 Load_SKTable3;
-
-% remove stages
-% phs(11,:) = [];  oxd(11,:,:) = [];
-% phs( 7,:) = [];  oxd( 7,:,:) = [];
-% phs( 9,:) = [];  oxd( 9,:,:) = [];
-% phs( 5,:) = [];  oxd( 5,:,:) = [];  Tmp(5) = [];  Prs(5) = [];
 
 nphs = 7; olv=1; opx=2; cpx=3; fsp=4; spn=5; qtz=6; mlt=7; blk=8;
 ncmp = 11; Si=1; Ti=2; Al=3; Cr=4; FeO=5; Mn=6; Mg=7; Ca=8; Na=9; K=10; P=11;
@@ -536,8 +526,8 @@ cal_LUNA;  % load melt model calibration
                 % for fay ens hyp dps pig ant alb ulv qtz wat
 indmem  = logical([1   0   0   0   0   0   0   0   0   0   0
                    1   1   1   0   0   0   0   0   0   0   0
-                   1   1   0   1   1   0   1   1   0   0   0
-                   0   0   0   0   0   1   1   1   1   1   0
+                   0   1   0   1   1   0   1   0   0   0   0
+                   0   0   0   0   0   1   0   1   1   1   0
                    0   0   0   0   0   0   0   0   0   0   1]);
 
 
@@ -559,16 +549,16 @@ cmp_oxd_FINT = cmp_mem_FINT*cal.mem_oxd/100;
 
 cmp_mem_MAP = cmp_mem_FINT;
 
-T0_MAP = [1890    1500    1200   1100];
-A_MAP  = [6.1  4.9  2.9  2.7];
+T0_MAP = [1890    1500    1200   1080];
+A_MAP  = [6.1  4.9  2.9  2.6];
 B_MAP  = [9.7  3.8  2.7  2.6];
-r_MAP  = [35.00  30.0  12.00  6.00];
+r_MAP  = [35.00  30.0  16.00  6.00];
 
                 % for fay ens hyp dps pig ant alb ulv qtz wat
 indmem  = logical([1   0   0   0   0   0   0   0   0   0   0
                    1   1   1   0   0   0   0   0   0   0   0
-                   1   1   0   1   1   0   1   1   0   0   0
-                   0   0   0   0   0   1   1   1   1   1   0
+                   0   1   0   1   1   0   1   0   0   0   0
+                   0   0   0   0   0   1   0   1   1   1   0
                    0   0   0   0   0   0   0   0   0   0   1]);
 
 %%
@@ -578,11 +568,11 @@ data  = [MLTp(:);SOLp(:);0*PHS(:);Tsol(:);Tliq(:)];
 % data  = [memMLT(:);memSOL(:);PHS(:)];
 
 m0     = [cmp_mem_MAP(:).*indmem(:);T0_MAP.';A_MAP.';B_MAP.';r_MAP.'];
-m0_lw  = m0 - [max(2,0.2*cmp_mem_MAP(:)).*indmem(:);max(5,0.01*T0_MAP.');max(0.1,0.025*A_MAP.');max(0.1,0.025*B_MAP.');max(1,0.2*r_MAP.')];
-m0_up  = m0 + [max(2,0.2*cmp_mem_MAP(:)).*indmem(:);max(5,0.01*T0_MAP.');max(0.1,0.025*A_MAP.');max(0.1,0.025*B_MAP.');max(1,0.2*r_MAP.')];
+m0_lw  = m0 - [max(2,0.25*cmp_mem_MAP(:)).*indmem(:);max(5,0.01*T0_MAP.');max(0.1,0.01*A_MAP.');max(0.1,0.01*B_MAP.');max(1,0.1*r_MAP.')];
+m0_up  = m0 + [max(2,0.25*cmp_mem_MAP(:)).*indmem(:);max(5,0.01*T0_MAP.');max(0.1,0.01*A_MAP.');max(0.1,0.01*B_MAP.');max(1,0.1*r_MAP.')];
 mbnds  = [m0_lw(:),m0_up(:)]; % model parameter bounds
 mbnds(m0==100 ,:) = 100;
-mbnds(m0==1890,:) = 1890;
+% mbnds(m0==1890,:) = 1890;
 % mbnds(cal.ncmp*cal.nmem+           (1:cal.ncmp-1),:) = repmat(m0   (cal.ncmp*cal.nmem+           (1:cal.ncmp-1)),1,2);
 mbnds(1:cal.ncmp*cal.nmem    ,:) = max(0,min(100,mbnds(1:cal.ncmp*cal.nmem    ,:)));
 mbnds(  cal.ncmp*cal.nmem:end,:) = max(2,min(1890,mbnds(  cal.ncmp*cal.nmem:end,:)));
@@ -613,7 +603,7 @@ end
 
 % set data uncertainties
 sigma_wtpct  = 0.05*ones(size([MLTp(:);SOLp(:);PHS(:)]));
-sigma_Tsllq  = 2*ones(size([Tsol(:);Tliq(:)]));
+sigma_Tsllq  = 1*ones(size([Tsol(:);Tliq(:)]));
 sigma = [sigma_wtpct;sigma_Tsllq];
 
 % function to calculate forward model
@@ -634,20 +624,19 @@ PriorFunc = @(model) ProbFuncs('PriorFunc', model, mbnds, 'uniform');
 LikeFunc  = @(dhat,model) ProbFuncs('LikeFuncSimplex',dhat,data,sigma,1,model,cal);
 
 % run MCMC algorithm
-Niter = 1e4;
+Niter = 1e3;
 
 % adjust step size to get reasonable acceptance ratio ~26%
-anneal.initstep = 0.015 * diff(mbnds,1,2);
-anneal.levels   = 3;
-anneal.burnin   = Niter/20;
+anneal.initstep = 0.02 * diff(mbnds,1,2);
+anneal.levels   = 1;
+anneal.burnin   = Niter/200;
 anneal.refine   = 0*Niter/10;
+bestfit = m0;
 
 tic;
-bestfit = m0;
 [models,prob,accept,bestfit] = mcmc(dhatFunc,PriorFunc,LikeFunc,ConstrFunc,1:cal.ncmp*cal.nmem,m0,mbnds,anneal,Niter);
 RunTime(1) = toc;
 
-% plot mcmc outputs
 plotmcmc(models, prob, [], mbnds, anneal, mNames); 
 
 cmp_mem_MAP  = reshape(bestfit(1:cal.ncmp*cal.nmem),cal.ncmp,cal.nmem);

@@ -24,9 +24,9 @@ tend     =  1*yr;                % end time for simulation [s]
 dt       =  36;                  % initial time step [s]
 
 % set initial thermo-chemical state
-T0       =  1175;                % temperature top  layer [deg C]
+T0       =  1150;                % temperature top  layer [deg C]
 T1       =  T0;                  % temperature base layer [deg C]
-c0       =  [0.19  0.18  0.31  0.21  0.11  0.030];  % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
+c0       =  [0.29  0.13  0.30  0.15  0.13  0.030];  % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
 c1       =  c0;                  % components (maj comp, H2O) base layer [wt] (will be normalised to unit sum!)
 dcr      =  [-1,-1,-1,1,1,1]*1e-6;
 dcg      =  [0,0,0,0,0,0];
@@ -35,7 +35,7 @@ dcg      =  [0,0,0,0,0,0];
 periodic =  1;
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
 bnd_w    =  h;                   % boundary layer width [m]
-tau_T    =  12*hr;               % wall cooling/assimilation time [s]
+tau_T    =  10*hr;               % wall cooling/assimilation time [s]
 Twall    =  [300,300,nan];       % [top,bot,sds] wall rock temperature [degC] (nan = insulating)
 cwall    =  [nan,nan,nan,nan,nan,nan; ...
              nan,nan,nan,nan,nan,nan; ...

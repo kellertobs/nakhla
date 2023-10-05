@@ -1,4 +1,4 @@
-function [datafit,MLTfit,SOLfit,SYSfit,PHSfit,cmpSYS] = ModelFit(model,T,P,MLT,SOL,SYS,cal)
+function [datafit,MLTfit,SOLfit,SYSfit,PHSfit,cmpSYS] = ModelFit(model,T,P,MLT,SOL,M,cal)
 
 % get number of data points
 np = length(T);
@@ -9,29 +9,29 @@ nn      = cal.ncmp*cal.nmem;
 cal.cmp_oxd = cmp_mem*cal.mem_oxd./100;
 cal.T0      = model(nn+           (1:cal.ncmp-1)).';
 cal.r       = model(nn+cal.ncmp-1+(1:cal.ncmp-1)).';
-cal.A       = (cal.T0+273.15)./300;
+cal.A       = (cal.T0+273.15)./350;
 
 % find phase component compositions by non-negative least-squares
-% cmpMLT = zeros(np,cal.ncmp);
-% for ip = 1:np
-%     cmpMLT(ip,:) = lsqnonneg(cal.cmp_oxd.',MLT(ip,:).');
-% end
-% cmpMLT = cmpMLT./sum(cmpMLT,2);
-% 
-% cmpSOL = zeros(np,cal.ncmp);
-% for ip = 1:np
-%     cmpSOL(ip,:) = lsqnonneg(cal.cmp_oxd.',SOL(ip,:).');
-% end
-% cmpSOL = cmpSOL./sum(cmpSOL,2);
-% 
-% cmpSYS = M/100.*cmpMLT + (1-M/100).*cmpSOL;
-
-% get system composition in component fractions
-cmpSYS = zeros(np,cal.ncmp);
+cmpMLT = zeros(np,cal.ncmp);
 for ip = 1:np
-    cmpSYS(ip,:) = lsqnonneg(cal.cmp_oxd.',SYS(ip,:).');
+    cmpMLT(ip,:) = lsqnonneg(cal.cmp_oxd.',MLT(ip,:).');
 end
-cmpSYS = cmpSYS./sum(cmpSYS,2);
+cmpMLT = cmpMLT./sum(cmpMLT,2);
+
+cmpSOL = zeros(np,cal.ncmp);
+for ip = 1:np
+    cmpSOL(ip,:) = lsqnonneg(cal.cmp_oxd.',SOL(ip,:).');
+end
+cmpSOL = cmpSOL./sum(cmpSOL,2);
+
+cmpSYS = M/100.*cmpMLT + (1-M/100).*cmpSOL;
+
+% % get system composition in component fractions
+% cmpSYS = zeros(np,cal.ncmp);
+% for ip = 1:np
+%     cmpSYS(ip,:) = lsqnonneg(cal.cmp_oxd.',SYS(ip,:).');
+% end
+% cmpSYS = cmpSYS./sum(cmpSYS,2);
 
 % get fitted phase oxide compositions
 SYSfit = cmpSYS*cal.cmp_oxd;
@@ -55,8 +55,8 @@ SOLfit = var.cx*cal.cmp_oxd;
 % get fitted phase fractions
 PHSfit = zeros(np,cal.nmsy+1);
 PHSfit(:,1) = var.m*100;
-PHSfit(:,2:end) = (var.cx*cmp_mem)*cal.msy_mem.'.*(1-PHSfit(:,1)/100);
+PHSfit(:,2:end) = (var.cx*cmp_mem)*cal.msy_mem.';%.*(1-PHSfit(:,1)/100);
 
-datafit = [MLTfit(:);SOLfit(:);PHSfit(:)];%repmat(PHSfit(:,1),6,1)];
+datafit = [MLTfit(:);SOLfit(:);0*PHSfit(:)];%repmat(PHSfit(:,1),6,1)];
 
 end

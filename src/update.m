@@ -128,7 +128,7 @@ kwf = wf0.*df*10;                                                          % seg
 kx  = chi.*(kwx + kW/Prt);                                                 % solid fraction diffusion 
 kf  = phi.*(kwf + kW/Prt);                                                 % fluid fraction diffusion 
 ks  = rho.*cP./T.*kW/Prt;                                                  % regularised heat diffusion
-kc  = rho       .*kW/Prt;                                                  % regularised component diffusion
+kc  =             kW/Prt;                                                  % regularised component diffusion
 eta = eta + rho.*kW;                                                       % regularised momentum diffusion
 
 etamax = etacntr.*max(min(eta(:)),etamin);

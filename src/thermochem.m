@@ -44,7 +44,7 @@ advn_C = - advect(M.*cm,Um(2:end-1,:),Wm(:,2:end-1),h,{ADVN,''},[1,2],BCA) ...  
          - advect(F.*cf,Uf(2:end-1,:),Wf(:,2:end-1),h,{ADVN,''},[1,2],BCA);     % fluid advection
 
 % major component diffusion (regularisation)
-diff_C = diffus(c,kc,h,[1,2],BCD);
+diff_C = diffus(cm,M.*kc,h,[1,2],BCD) + diffus(cx,X.*kc,h,[1,2],BCD);
 
 % boundary layers
 bnd_C = zeros(size(C));

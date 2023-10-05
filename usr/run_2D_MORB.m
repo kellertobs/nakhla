@@ -5,7 +5,7 @@ clear; close all;
 run('./par_default')
 
 % set run parameters
-runID    =  '2D_MORB';           % run identifier
+runID    =  '2D_MORB_test2';           % run identifier
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  100;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot results
@@ -16,7 +16,7 @@ plot_cv  =  0;                   % switch on to live plot iterative convergence
 D        =  10;                  % chamber depth [m]
 N        =  100;                 % number of grid points in z-direction
 h        =  D/N;                 % grid spacing (equal in both dimensions, do not set) [m]
-L        =  D;                   % chamber width (equal to h for 1-D mode) [m]
+L        =  D/8;                   % chamber width (equal to h for 1-D mode) [m]
 
 % set model timing parameters
 Nt       =  5e5;                 % number of time steps to take
@@ -26,16 +26,16 @@ dt       =  36;                  % initial time step [s]
 % set initial thermo-chemical state
 T0       =  1215;                % temperature top  layer [deg C]
 T1       =  T0;                  % temperature base layer [deg C]
-c0       =  [0.05  0.24  0.42  0.24  0.05  0.005];  % components (maj comp, H2O) top  layer [wt] (will be normalised to unit sum!)
+c0       =  [0.13  0.20  0.53  0.11  0.03  0.005];  % components (maj comp, H2O) top  layer [wt] (will be normalised to unit sum!)
 c1       =  c0;                  % components (maj comp, H2O) base layer [wt] (will be normalised to unit sum!)
 dcr      =  [-1,-1,-1,1,1,1]*1e-6;
 dcg      =  [0,0,0,0,0,0];
 
 % set thermo-chemical boundary parameters
-periodic =  1;
+periodic =  0;
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
 bnd_w    =  h;                   % boundary layer width [m]
-tau_T    =  12*hr;               % wall cooling/assimilation time [s]
+tau_T    =  10*hr;               % wall cooling/assimilation time [s]
 Twall    =  [300,300,nan];       % [top,bot,sds] wall rock temperature [degC] (nan = insulating)
 cwall    =  [nan,nan,nan,nan,nan,nan; ...
              nan,nan,nan,nan,nan,nan; ...

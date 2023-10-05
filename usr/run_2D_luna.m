@@ -65,7 +65,7 @@ CFL      =  0.75;                % (physical) time stepping courant number (mult
 rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-8;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its
-Delta    =  2*D/50;              % correlation length for eddy diffusivity
+Delta    =  2*D/100;             % correlation length for eddy diffusivity
 
 %*****  RUN NAKHLA MODEL  *************************************************
 run('../src/main')
