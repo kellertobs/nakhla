@@ -549,10 +549,10 @@ cmp_oxd_FINT = cmp_mem_FINT*cal.mem_oxd/100;
 
 cmp_mem_MAP = cmp_mem_FINT;
 
-T0_MAP = [1890    1500    1200   1080];
+T0_MAP = [1890    1500    1180   1080];
 A_MAP  = [6.1  4.9  2.9  2.6];
 B_MAP  = [9.7  3.8  2.7  2.6];
-r_MAP  = [35.00  30.0  16.00  6.00];
+r_MAP  = [35.00  30.0  20.00  6.00];
 
                 % for fay ens hyp dps pig ant alb ulv qtz wat
 indmem  = logical([1   0   0   0   0   0   0   0   0   0   0
@@ -568,8 +568,8 @@ data  = [MLTp(:);SOLp(:);0*PHS(:);Tsol(:);Tliq(:)];
 % data  = [memMLT(:);memSOL(:);PHS(:)];
 
 m0     = [cmp_mem_MAP(:).*indmem(:);T0_MAP.';A_MAP.';B_MAP.';r_MAP.'];
-m0_lw  = m0 - [max(2,0.25*cmp_mem_MAP(:)).*indmem(:);max(5,0.01*T0_MAP.');max(0.1,0.01*A_MAP.');max(0.1,0.01*B_MAP.');max(1,0.1*r_MAP.')];
-m0_up  = m0 + [max(2,0.25*cmp_mem_MAP(:)).*indmem(:);max(5,0.01*T0_MAP.');max(0.1,0.01*A_MAP.');max(0.1,0.01*B_MAP.');max(1,0.1*r_MAP.')];
+m0_lw  = m0 - [max(2,0.25*cmp_mem_MAP(:)).*indmem(:);max(5,0.01*T0_MAP.');0*max(0.1,0.01*A_MAP.');0*max(0.1,0.01*B_MAP.');max(1,0.1*r_MAP.')];
+m0_up  = m0 + [max(2,0.25*cmp_mem_MAP(:)).*indmem(:);max(5,0.01*T0_MAP.');0*max(0.1,0.01*A_MAP.');0*max(0.1,0.01*B_MAP.');max(1,0.1*r_MAP.')];
 mbnds  = [m0_lw(:),m0_up(:)]; % model parameter bounds
 mbnds(m0==100 ,:) = 100;
 % mbnds(m0==1890,:) = 1890;
@@ -602,7 +602,7 @@ for j=1:4
 end
 
 % set data uncertainties
-sigma_wtpct  = 0.05*ones(size([MLTp(:);SOLp(:);PHS(:)]));
+sigma_wtpct  = 0.1*ones(size([MLTp(:);SOLp(:);PHS(:)]));
 sigma_Tsllq  = 1*ones(size([Tsol(:);Tliq(:)]));
 sigma = [sigma_wtpct;sigma_Tsllq];
 
@@ -627,7 +627,7 @@ LikeFunc  = @(dhat,model) ProbFuncs('LikeFuncSimplex',dhat,data,sigma,1,model,ca
 Niter = 1e3;
 
 % adjust step size to get reasonable acceptance ratio ~26%
-anneal.initstep = 0.02 * diff(mbnds,1,2);
+anneal.initstep = 0.03 * diff(mbnds,1,2);
 anneal.levels   = 1;
 anneal.burnin   = Niter/200;
 anneal.refine   = 0*Niter/10;
