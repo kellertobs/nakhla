@@ -16,7 +16,7 @@ plot_cv  =  0;                   % switch on to live plot iterative convergence
 D        =  10;                  % chamber depth [m]
 N        =  100;                 % number of grid points in z-direction
 h        =  D/N;                 % grid spacing (equal in both dimensions, do not set) [m]
-L        =  D;                   % chamber width (equal to h for 1-D mode) [m]
+L        =  D/2;                   % chamber width (equal to h for 1-D mode) [m]
 
 % set model timing parameters
 Nt       =  5e5;                 % number of time steps to take
@@ -24,9 +24,9 @@ tend     =  1*yr;                % end time for simulation [s]
 dt       =  36;                  % initial time step [s]
 
 % set initial thermo-chemical state
-T0       =  1150;                % temperature top  layer [deg C]
+T0       =  1175;                % temperature top  layer [deg C]
 T1       =  T0;                  % temperature base layer [deg C]
-c0       =  [0.29  0.13  0.30  0.15  0.13  0.030];  % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
+c0       =  [0.19  0.18  0.31  0.21  0.11  0.030];  % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
 c1       =  c0;                  % components (maj comp, H2O) base layer [wt] (will be normalised to unit sum!)
 dcr      =  [-1,-1,-1,1,1,1]*1e-6;
 dcg      =  [0,0,0,0,0,0];
