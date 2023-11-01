@@ -492,6 +492,9 @@ if restart
 
         output;
 
+        time    = time+dt;
+        step    = step+1;
+
     else % continuation file does not exist, start from scratch
         fprintf('\n   !!! restart file does not exist !!! \n   => starting run from scratch %s \n\n',runID);
         fluidmech;
@@ -508,5 +511,4 @@ else
 end
 
 restart = 0;
-time    = time+dt;
 step    = step+1;

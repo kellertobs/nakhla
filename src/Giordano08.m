@@ -73,7 +73,7 @@ BT    =  sum(bb.*bcf,2);
 CT    =  sum(cc.*ccf,2);
 
 % Convert temperature to [K]
-TK    =  T + 273.15;
+TK    =  max(600,T) + 273.15;
 
 % Calculate melt viscosity in [Pas]
 eta   =  10.^(min(12,max(-6,AT + BT./(TK(:)-CT))));

@@ -57,7 +57,7 @@ df = df0.*(1-phi);
 
 % update pure phase viscosities
 etam   = reshape(Giordano08(reshape(cm_oxd_all,Nz*Nx,9),T(:)-273.15),Nz,Nx);
-etax   = cal.etax0 .* ones(size(chi)) .* exp(cal.Eax./(8.3145.*T)-cal.Eax./(8.3145.*(T0+273.15)));
+etax   = cal.etax0 .* ones(size(chi)) .* exp(cal.Eax./(8.3145.*T)-cal.Eax./(8.3145.*(Tref+273.15)));
 etaf   = cal.etaf0 .* ones(size(phi));
 
 % get permission weights
