@@ -12,12 +12,18 @@ switch model
         % Earth and Planetary Science Letters, 556, 116721. 
         % https://doi.org/10.1016/j.epsl.2020.116721
 
-        load("fitsolliq/solliq_johnson2021.mat", 'cfit_liq', 'cfit_sol', 'simonlaw');
+        load("fitsolliq/solliq_johnson2021.mat", 'cfit_liq', 'cfit_sol');
         Tsol = simonlaw(cfit_sol, Psol);
         Tliq = simonlaw(cfit_liq, Pliq);
 
     %case other paper
 
 end
+
+end
+
+function [T] = simonlaw(x,P)
+
+T = x(1).*(1+P./x(2)).^(1./x(3));
 
 end

@@ -1,3 +1,6 @@
+% set directory paths
+addpath('./ternplot');
+
 % create output directory
 if ~isfolder([opdir,'/',runID])
     mkdir([opdir,'/',runID]);

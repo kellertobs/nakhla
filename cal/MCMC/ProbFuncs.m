@@ -63,15 +63,20 @@ models = models'; % the output size has to be Niter x Nvar
 end
 
 
-function [L,V] = LikeFuncSimplex(dhat, data, sigma, simplex_wt, model, cal)
+function [L,V] = LikeFuncSimplex(dhat, data, sigma, simplex_wt, Tdiff_wt, model, cal)
 % L = ProbFuncs('LikeFunc', dhat, data, sigma, model, cal)
 % assumes normally-distributed errors. 
 % 
-cmp_mem = reshape(model(1:cal.ncmp*cal.nmem),cal.ncmp,cal.nmem);
+T0      = model(           (1:cal.ncmp-1)).';
+cmp_mem = reshape(model(4*(cal.ncmp-1)+(1:cal.ncmp*cal.nmem)),cal.ncmp,cal.nmem);
 cmp_oxd = cmp_mem*cal.mem_oxd./100;
-F = [cmp_oxd(1:end-1,1:end-1).';ones(1,cal.ncmp-1)];
-V = 1/factorial(8)*abs(det(F.'*F))^0.5;
-L = (sum(- 0.5*((data(:) - dhat(:))./sigma(:)).^2 ))./sqrt(length(dhat(:))) - V*simplex_wt;
+F  = [cmp_oxd(1:end-1,1:end-1).';ones(1,cal.ncmp-1)];
+V  = 1/factorial(8)*abs(det(F.'*F))^0.5;
+P  = linspace(0,4,10).';
+A  = (cal.T0+273.15)./350;
+Tm =  T0 .* (1 + P./A).^(1./cal.B);
+DT = min(min(diff(Tm,1,2).^2));
+L  = (sum(- 0.5*((data(:) - dhat(:))./sigma(:)).^2 ))./sqrt(length(dhat(:))) - V*simplex_wt - 10^2/DT*Tdiff_wt;
 end
 
 function L = LikeFunc(dhat, data, sigma, model)

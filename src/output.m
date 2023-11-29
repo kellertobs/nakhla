@@ -385,7 +385,7 @@ else % create 2D plots
     % plot pseudo-component composition in Fig. 5
     set(0,'CurrentFigure',fh5)
     sumanh = sum(c(:,:,1:end-1),3);
-    for i = 1:cal.ncmp
+    for i = 1:cal.ncmp-1
         set(fh5,'CurrentAxes',ax(50+i));
         if i<cal.ncmp
             imagesc(Xsc,Zsc,c(:,:,i)./sumanh.*100); axis ij equal tight; box on; cb = colorbar;

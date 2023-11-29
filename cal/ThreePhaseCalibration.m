@@ -36,8 +36,8 @@ phi(phi(:,2)<=-1e-6,:) = nan;
 phi(~isnan(phi)) = max(0,phi(~isnan(phi)));
 
 %*****  set pure phase properties  ****************************************
-eta0 = [1e+18;1e+2;1e-1];  % pure-phase viscosities
-d0   = [1e-3 ;1e-4 ;1e-3];  % characteristic size
+eta0 = [1e+18;1e-1;1e-3];  % pure-phase viscosities
+d0   = [1e-3 ;1e-3;1e-3];  % characteristic size
 kv   = eta0;           % set momentum diffusivity
 kf   = d0.^2./eta0;    % set volume diffusivity
 Mv   = kv./kv.';       % get momentum diffusivity contrasts
@@ -48,7 +48,7 @@ A  =  [ 0.65, 0.25, 0.35; ...
         0.20, 0.20, 0.20; ...
         0.20, 0.20, 0.20; ];  % permission slopes
     
-B  =  [ 0.55, 0.18, 0.27; ...
+B  =  [ 0.50, 0.20, 0.30; ...
         0.64,0.012,0.348; ...
         0.80, 0.12, 0.08; ];  % permission step locations
     
@@ -65,6 +65,21 @@ for i = 1:3
 end
 Sphi = permute(Sphi,[1,3,2]);
 Xphi = permute(Xphi,[1,3,2]);
+
+thtv = squeeze(prod(Mv.'.^permute(Xphi,[2,3,1]),2)).';  % momentum permissions
+thtf = squeeze(prod(Mf.'.^permute(Xphi,[2,3,1]),2)).';  % volume permissions
+
+Kv   = phi.*kv.'.*thtv;  % momentum flux coefficients
+Kf   = phi.*kf.'.*thtf;  % volume flux coefficients
+
+Cv   = phi.*(1-phi)./(d0.'.*(1-phi)).^2.*kv.'.*thtv;  % momentum transfer coefficients
+Cf   = phi.*(1-phi)./(d0.'.*(1-phi)).^2.*kf.'.*thtf;  % volume transfer coefficients
+
+eta  = Kv./phi;     % effective viscosities
+Dv   = Kf./phi;     % effective volume diffusivities
+KD   = max(1/max(eta0.^1.5),phi.^2./Cv);  % effective segregation coefficients
+zeta = phi.^2./Cf;  % effective compaction coefficients
+
 
 %% plot 2D projections of connectivities
 f1 = figure;
@@ -92,7 +107,7 @@ for ip = 0:25:100
     plot(phi(ip*np+(1:np),1),squeeze(Xphi(ip*np+(1:np),1,2)),'Color',cmap(2,:).*(1-ip/125).^1+[1 1 1].*(1-(1-ip/125).^1)); axis tight; box on; grid on; hold on;
     plot(phi(ip*np+(1:np),1),squeeze(Xphi(ip*np+(1:np),1,3)),'Color',cmap(3,:).*(1-ip/125).^1+[1 1 1].*(1-(1-ip/125).^1)); axis tight; box on; grid on; hold on;
 end
-set(gca,FS{[1,2]},TL{:})
+set(gca,FS{[1,2]},TL{:},'XDir','reverse')
 ylabel('solid connectivities',FS{[1,3]},TX{:})
 axes(ax(2))
 for ip = 0:25:100
@@ -100,7 +115,7 @@ for ip = 0:25:100
     plot(phi(ip*np+(1:np),1),squeeze(Xphi(ip*np+(1:np),2,2)),'Color',cmap(2,:).*(1-ip/125).^1+[1 1 1].*(1-(1-ip/125).^1),'LineWidth',2); axis tight; box on; grid on; hold on;
     plot(phi(ip*np+(1:np),1),squeeze(Xphi(ip*np+(1:np),2,3)),'Color',cmap(3,:).*(1-ip/125).^1+[1 1 1].*(1-(1-ip/125).^1)); axis tight; box on; grid on; hold on;
 end
-set(gca,FS{[1,2]},TL{:})
+set(gca,FS{[1,2]},TL{:},'XDir','reverse')
 ylabel('melt connectivities',FS{[1,3]},TX{:})
 axes(ax(3))
 for ip = 0:25:100
@@ -108,10 +123,47 @@ for ip = 0:25:100
     plot(phi(ip*np+(1:np),1),squeeze(Xphi(ip*np+(1:np),3,2)),'Color',cmap(2,:).*(1-ip/125).^1+[1 1 1].*(1-(1-ip/125).^1)); axis tight; box on; grid on; hold on;
     plot(phi(ip*np+(1:np),1),squeeze(Xphi(ip*np+(1:np),3,3)),'Color',cmap(3,:).*(1-ip/125).^1+[1 1 1].*(1-(1-ip/125).^1),'LineWidth',2); axis tight; box on; grid on; hold on;
 end
-set(gca,FS{[1,2]},TL{:})
+set(gca,FS{[1,2]},TL{:},'XDir','reverse')
 ylabel('vapour connectivities',FS{[1,3]},TX{:})
 xlabel('solid fraction',FS{[1,3]},TX{:})
 
+
+%% plot effective multi-phase coefficients
+f2 = figure;
+cmap = colororder;
+axh = 8;
+axw = 16;
+ahs = 1.5;
+avs = 1.5;
+axb = 1.8;
+axt = 1.0;
+axl = 2.0;
+axr = 1.0;
+fh = axb + 2*axh + 1*avs + axt;
+fw = axl + 1*axw + 0*ahs + axr;
+set(f2,UN{[1,3]},'Position',[1 10 fw fh]);
+set(f2,'PaperUnits','Centimeters','PaperPosition',[0 0 fw fh],'PaperSize',[fw fh]);
+set(f2,'Color','w','InvertHardcopy','off');
+set(f2,'Resize','off');
+ax(1) = axes(UN{[1,3]},'position',[axl+0*axw+0*ahs axb+1*axh+1*avs axw axh]);
+ax(2) = axes(UN{[1,3]},'position',[axl+0*axw+0*ahs axb+0*axh+0*avs axw axh]);
+axes(ax(1))
+for ip = 0:25:100
+    semilogy(phi(ip*np+(1:np),1),eta(ip*np+(1:np),1),'Color',cmap(1,:).*(1-ip/125).^1+[1 1 1].*(1-(1-ip/125).^1),'LineWidth',1.5); axis tight; box on; grid on; hold on;
+    semilogy(phi(ip*np+(1:np),1),eta(ip*np+(1:np),2),'Color',cmap(2,:).*(1-ip/125).^1+[1 1 1].*(1-(1-ip/125).^1),'LineWidth',1.5); axis tight; box on; grid on; hold on;
+    semilogy(phi(ip*np+(1:np),1),eta(ip*np+(1:np),3),'Color',cmap(3,:).*(1-ip/125).^1+[1 1 1].*(1-(1-ip/125).^1),'LineWidth',1.5); axis tight; box on; grid on; hold on;
+end
+set(gca,FS{[1,2]},TL{:},'XDir','reverse')
+ylabel('effective viscosities [Pas]',FS{[1,3]},TX{:})
+axes(ax(2))
+for ip = 0:25:100
+    semilogy(phi(ip*np+(1:np),1),KD(ip*np+(1:np),1),'Color',cmap(1,:).*(1-ip/125).^1+[1 1 1].*(1-(1-ip/125).^1),'LineWidth',1.5); axis tight; box on; grid on; hold on;
+    semilogy(phi(ip*np+(1:np),1),KD(ip*np+(1:np),2),'Color',cmap(2,:).*(1-ip/125).^1+[1 1 1].*(1-(1-ip/125).^1),'LineWidth',1.5); axis tight; box on; grid on; hold on;
+    semilogy(phi(ip*np+(1:np),1),KD(ip*np+(1:np),3),'Color',cmap(3,:).*(1-ip/125).^1+[1 1 1].*(1-(1-ip/125).^1),'LineWidth',1.5); axis tight; box on; grid on; hold on;
+end
+set(gca,FS{[1,2]},TL{:},'XDir','reverse')
+ylabel('effective segregation coeffs. [m2/Pas]',FS{[1,3]},TX{:})
+xlabel('solid fraction',FS{[1,3]},TX{:})
 
 %% prepare axes/borders dimensions
 axh = 8;
@@ -127,11 +179,11 @@ fh = axb + 3*axh + 2*avs + axt;
 fw = axl + 3*axw + 2*ahs + axr;
 
 % initialize figure and axes
-f2 = figure;
-set(f2,UN{[1,3]},'Position',[1 10 fw fh]);
-set(f2,'PaperUnits','Centimeters','PaperPosition',[0 0 fw fh],'PaperSize',[fw fh]);
-set(f2,'Color','w','InvertHardcopy','off');
-set(f2,'Resize','off');
+f3 = figure;
+set(f3,UN{[1,3]},'Position',[1 10 fw fh]);
+set(f3,'PaperUnits','Centimeters','PaperPosition',[0 0 fw fh],'PaperSize',[fw fh]);
+set(f3,'Color','w','InvertHardcopy','off');
+set(f3,'Resize','off');
 ax(1) = axes(UN{[1,3]},'position',[axl+0*axw+0*ahs axb+2*axh+2*avs axw axh]);
 ax(2) = axes(UN{[1,3]},'position',[axl+1*axw+1*ahs axb+2*axh+2*avs axw axh]);
 ax(3) = axes(UN{[1,3]},'position',[axl+2*axw+2*ahs axb+2*axh+2*avs axw axh]);

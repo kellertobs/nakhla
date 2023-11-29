@@ -1,6 +1,3 @@
-% set directory paths
-addpath('./ternplot');
-
 % prepare for plotting ternary plots
 mm = 5;
 grids = linspace(0,1,mm+1);

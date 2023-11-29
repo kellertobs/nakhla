@@ -4,15 +4,15 @@ function [datafit,MLTfit,SOLfit,SYSfit,PHSfit,cmpSYS,Tsolfit,Tliqfit,Tm] = Model
 np = length(T);
 
 % get model parameters from model vector
-cmp_mem = reshape(model(1:cal.ncmp*cal.nmem),cal.ncmp,cal.nmem);
-nn      = cal.ncmp*cal.nmem;
+cal.T0      = model(               (1:cal.ncmp-1)).';
+% cal.A       = model(1*(cal.ncmp-1)+(1:cal.ncmp-1)).';
+cal.A       = (cal.T0+273.15)./350;
+cal.B       = model(2*(cal.ncmp-1)+(1:cal.ncmp-1)).';
+cal.r       = model(3*(cal.ncmp-1)+(1:cal.ncmp-1)).';
+cmp_mem     = reshape(model(4*(cal.ncmp-1)+(1:cal.ncmp*cal.nmem)),cal.ncmp,cal.nmem);
 cal.cmp_oxd = cmp_mem*cal.mem_oxd./100;
-cal.T0      = model(nn+0*(cal.ncmp-1)+(1:cal.ncmp-1)).';
-cal.A       = model(nn+1*(cal.ncmp-1)+(1:cal.ncmp-1)).';
-cal.B       = model(nn+2*(cal.ncmp-1)+(1:cal.ncmp-1)).';
-cal.r       = model(nn+3*(cal.ncmp-1)+(1:cal.ncmp-1)).';
 
-% get system composition in component fractions
+% find phase component compositions by non-negative least-squares
 cmpMLT = zeros(np,cal.ncmp);
 for ip = 1:np
     cmpMLT(ip,:) = lsqnonneg(cal.cmp_oxd.',MLT(ip,:).');
@@ -26,13 +26,6 @@ end
 cmpSOL = cmpSOL./sum(cmpSOL,2);
 
 cmpSYS = M/100.*cmpMLT + (1-M/100).*cmpSOL;
-
-% % get system composition in component fractions
-% cmpSYS = zeros(np,cal.ncmp);
-% for ip = 1:np
-%     cmpSYS(ip,:) = lsqnonneg(cal.cmp_oxd.',SYS(ip,:).');
-% end
-% cmpSYS = cmpSYS./sum(cmpSYS,2);
 
 % get fitted phase oxide compositions
 SYSfit = cmpSYS*cal.cmp_oxd;
@@ -53,7 +46,7 @@ SOLfit = var.cx*cal.cmp_oxd;
 % get fitted phase fractions
 PHSfit = zeros(np,cal.nmsy+1);
 PHSfit(:,1) = var.m*100;
-PHSfit(:,2:end) = (var.cx*cmp_mem)*cal.msy_mem.'.*(1-PHSfit(:,1)/100);
+PHSfit(:,2:end) = (var.cx*cmp_mem)*cal.msy_mem.';%.*(1-PHSfit(:,1)/100);
 
 % get solidus and liquidus at starting composition
 cal = rmfield(cal,{'Tsol' 'Tliq'});
@@ -63,12 +56,12 @@ var.P      = Psl;         % pressure [GPa]
 var.T      = 1500*ones(size(Psl));             % temperature [C]
 var.H2O    = 0*Psl; % water concentration [wt]
 cal.H2Osat = 0*Psl+0.01;
-[~,cal]  = meltmodel(var,cal,'T');
+[~,cal]    = meltmodel(var,cal,'T');
 
 Tsolfit = cal.Tsol;
 Tliqfit = cal.Tliq;
 Tm      = cal.Tm;
 
-datafit = [MLTfit(:);SOLfit(:);0*PHSfit(:);Tsolfit(:);Tliqfit(:)];%repmat(PHSfit(:,1),6,1)];
+datafit = [MLTfit(:);SOLfit(:);PHSfit(:);Tsolfit(:);Tliqfit(:)];%repmat(PHSfit(:,1),6,1)];
 
 end

@@ -4,12 +4,12 @@ function [datafit,MLTfit,SOLfit,SYSfit,PHSfit,cmpSYS] = ModelFit(model,T,P,MLT,S
 np = length(T);
 
 % get model parameters from model vector
-cmp_mem = reshape(model(1:cal.ncmp*cal.nmem),cal.ncmp,cal.nmem);
-nn      = cal.ncmp*cal.nmem;
-cal.cmp_oxd = cmp_mem*cal.mem_oxd./100;
-cal.T0      = model(nn+           (1:cal.ncmp-1)).';
-cal.r       = model(nn+cal.ncmp-1+(1:cal.ncmp-1)).';
+cal.T0      = model(           (1:cal.ncmp-1)).';
+cal.r       = model(cal.ncmp-1+(1:cal.ncmp-1)).';
 cal.A       = (cal.T0+273.15)./350;
+cmp_mem     = reshape(model(2*(cal.ncmp-1)+(1:cal.ncmp*cal.nmem)),cal.ncmp,cal.nmem);
+cal.cmp_oxd = cmp_mem*cal.mem_oxd./100;
+
 
 % find phase component compositions by non-negative least-squares
 cmpMLT = zeros(np,cal.ncmp);
@@ -57,6 +57,6 @@ PHSfit = zeros(np,cal.nmsy+1);
 PHSfit(:,1) = var.m*100;
 PHSfit(:,2:end) = (var.cx*cmp_mem)*cal.msy_mem.';%.*(1-PHSfit(:,1)/100);
 
-datafit = [MLTfit(:);SOLfit(:);0*PHSfit(:)];%repmat(PHSfit(:,1),6,1)];
+datafit = [MLTfit(:);SOLfit(:);0.2*PHSfit(:)];%repmat(PHSfit(:,1),6,1)];
 
 end

@@ -16,7 +16,7 @@ plot_cv  =  0;                   % switch on to live plot iterative convergence
 D        =  10;                  % chamber depth [m]
 N        =  100;                 % number of grid points in z-direction
 h        =  D/N;                 % grid spacing (equal in both dimensions, do not set) [m]
-L        =  D/2;                   % chamber width (equal to h for 1-D mode) [m]
+L        =  D;                   % chamber width (equal to h for 1-D mode) [m]
 
 % set model timing parameters
 Nt       =  5e5;                 % number of time steps to take
@@ -24,12 +24,12 @@ tend     =  1*yr;                % end time for simulation [s]
 dt       =  36;                  % initial time step [s]
 
 % set initial thermo-chemical state
-T0       =  1175;                % temperature top  layer [deg C]
+T0       =  1100;                % temperature top  layer [deg C]
 T1       =  T0;                  % temperature base layer [deg C]
-c0       =  [0.19  0.18  0.31  0.21  0.11  0.030];  % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
+c0       =  [0.14  0.13  0.23  0.15  0.26  0.10  0.03];  % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
 c1       =  c0;                  % components (maj comp, H2O) base layer [wt] (will be normalised to unit sum!)
-dcr      =  [-1,-1,-1,1,1,1]*1e-6;
-dcg      =  [0,0,0,0,0,0];
+dcr      =  [1,1,1,-1,-1,-1,0]*1e-4;
+dcg      =  [0,0,0,0,0,0,0];
 
 % set thermo-chemical boundary parameters
 periodic =  1;
@@ -37,9 +37,7 @@ bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top
 bnd_w    =  h;                   % boundary layer width [m]
 tau_T    =  10*hr;               % wall cooling/assimilation time [s]
 Twall    =  [300,300,nan];       % [top,bot,sds] wall rock temperature [degC] (nan = insulating)
-cwall    =  [nan,nan,nan,nan,nan,nan; ...
-             nan,nan,nan,nan,nan,nan; ...
-             nan,nan,nan,nan,nan,nan];
+cwall    =  nan(3,7);
 Ptop     =  1.5e8;               % top pressure [Pa]
 fin      =  0;
 fout     =  1;
@@ -54,7 +52,7 @@ CFL      =  0.75;                % (physical) time stepping courant number (mult
 rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-8;                % outer its absolute tolerance
 maxit    =  30;                  % maximum outer its
-Delta    =  2*D/100;             % correlation length for eddy viscosity
+Delta    =  2*h;                 % correlation length for eddy viscosity
 
 %*****  RUN NAKHLA MODEL  *************************************************
 run('../src/main')

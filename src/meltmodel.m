@@ -169,7 +169,7 @@ while rnorm > rnorm_tol  % iterate down to full accuracy
     drdT  =  (rp - rm)./eps_T;
     
     %***  apply Newton correction to Tliq
-    Tliq(ii)  =  Tliq(ii) - r(ii)./drdT(ii)/2;
+    Tliq(ii)  =  Tliq(ii) - r(ii)./drdT(ii)/8;
     
     %***  compute partition coefficients Kxi at Tliq
     var.T      = Tliq;
@@ -245,14 +245,14 @@ while rnorm > rnorm_tol     % Newton iteration
     drdm = (rp-rm)./epsm;
 
     %***  apply Newton correction to crystal fraction x
-    var.m = max(0,min(1-var.f, var.m - r./drdm/4 + (mi-mii)/4 ));
+    var.m = var.m - r./drdm/3 + (mi-mii)/6;
 
     %***  get droplet fraction f
     var.H2Om = max(0,min(cal.H2Osat, var.H2O./(var.m+1e-16) ));
     var.f    = max(0,min(var.H2O, var.H2O - var.m.*var.H2Om ));
     
     %***  get crystal fraction x
-    var.x  = max(0,min(1, 1-var.m-var.f ));
+    var.x  = 1-var.m-var.f;
     
     %***  get non-linear residual norm
     rnorm  = norm(var.m-mi,2)/sqrt(length(var.m(:)));
@@ -263,6 +263,9 @@ while rnorm > rnorm_tol     % Newton iteration
         flag.eql = 0; break;
     end
 end
+
+var.x  = max(0,min(1, var.x ));
+var.m  = max(0,min(1, var.m ));
 
 var.cm = max(0,min(1, var.c        ./(var.m + var.x.*cal.Kx + var.f.*cal.Kf + 1e-16) ));
 var.cx = max(0,min(1, var.c.*cal.Kx./(var.m + var.x.*cal.Kx + var.f.*cal.Kf + 1e-16) ));
