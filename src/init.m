@@ -35,8 +35,8 @@ Dsf = cal.dS+100;
 c0(1:end-1) = c0(1:end-1)./sum(c0(1:end-1)).*(1-c0(end));
 c1(1:end-1) = c1(1:end-1)./sum(c1(1:end-1)).*(1-c1(end));
 cwall(:,1:end-1) = cwall(:,1:end-1)./sum(cwall(:,1:end-1),2).*(1-cwall(:,end));
-dcg   = dcg-mean(dcg);
-dcr   = dcr-mean(dcr);
+dcg   = dcg-round(mean(dcg),16);
+dcr   = dcr-round(mean(dcr),16);
 
 % get coordinate arrays
 Xc        = -h/2:h:L+h/2;

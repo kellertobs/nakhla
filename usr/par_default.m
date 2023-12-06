@@ -95,6 +95,7 @@ beta     =  0.25;                % iterative damping parameter
 etacntr  =  1e+9;                % maximum viscosity contrast
 Delta    =  2*D/100;             % correlation length for eddy viscosity
 Prt      =  1;                   % turbulent Prandtl number (ratio of momentum to heat diffusivity)
+Sct      =  1;                   % turbulent Schmidt number (ratio of momentum to mass diffusivity)
 etamin   =  1e-2;                % minimum viscosity
 
 % set various options
