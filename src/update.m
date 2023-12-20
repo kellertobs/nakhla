@@ -44,10 +44,10 @@ mu     = max(0,min(1, m.*rho./rhom ));
 
 
 % update lithostatic pressure
-if Nz==1; Pt = (Pt + Ptop.*ones(size(Tp)) + Pchmb + P(2:end-1,2:end-1))/2; else
+if Nz==1; Pt    = (Pt + Ptop.*ones(size(Tp)) + Pchmb + Pcouple*P(2:end-1,2:end-1))/2; else
     Pl(1,:)     = repmat(mean(rhofz(1,:),2).*g0.*h/2,1,Nx) + Ptop;
     Pl(2:end,:) = Pl(1,:) + repmat(cumsum(mean(rhofz(2:end-1,:),2).*g0.*h),1,Nx);
-    Pt          = (Pt + Pl + Pchmb + P(2:end-1,2:end-1))/2;
+    Pt          = (Pt + Pl + Pchmb + Pcouple*P(2:end-1,2:end-1))/2;
 end
 
 % update effective constituent sizes
@@ -125,10 +125,10 @@ kW = (kW + 2.*eII.*(0.18*Delta).^2 .* (1-min(1,topshape+botshape+sdsshape)*0.9))
 end
 kwx = wx0.*dx*10;                                                          % segregation fluctuation diffusivity
 kwf = wf0.*df*10;                                                          % segregation fluctuation diffusivity
+kx  = chi.*(kwx + kW/Prt);                                                 % solid fraction diffusion 
+kf  = phi.*(kwf + kW/Prt);                                                 % fluid fraction diffusion 
 ks  = rho.*cP./T.*kW/Prt;                                                  % regularised heat diffusion
-kx  = chi.*(kwx + kW/Sct);                                                 % solid fraction diffusion 
-kf  = phi.*(kwf + kW/Sct);                                                 % fluid fraction diffusion 
-kc  =             kW/Sct;                                                  % regularised component diffusion
+kc  =             kW/Prt;                                                  % regularised component diffusion
 eta = eta + rho.*kW;                                                       % regularised momentum diffusion
 
 etamax = etacntr.*max(min(eta(:)),etamin);
