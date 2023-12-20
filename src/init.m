@@ -218,8 +218,7 @@ rhofz  = (rho(icz(1:end-1),:)+rho(icz(2:end),:))/2;
 rhofx  = (rho(:,icx(1:end-1))+rho(:,icx(2:end)))/2;
 rhoWo  = rhofz.*W(:,2:end-1); rhoWoo = rhoWo; advn_mz = 0.*rhoWo(2:end-1,:);
 rhoUo  = rhofx.*U(2:end-1,:); rhoUoo = rhoUo; advn_mx = 0.*rhoUo;
-rhoref = mean(rho,'all');
-T      =  (Tp+273.15).*exp(aT./rhoref./cP.*(Pt-Pref));
+T      =  (Tp+273.15).*exp(aT./mean(rho(1,:),'all')./cP.*(Pt-Pref));
 fq     = zeros(size(Tp));  mq = ones(size(Tp));  xq = 1-mq-fq; 
 cmq    = c; cxq = c;  cfq = 0.*c;  cfq(:,:,end) = 1;  cf = cfq;
 cm_oxd = reshape(reshape(cmq,Nz*Nx,cal.ncmp)*cal.cmp_oxd,Nz,Nx,cal.noxd);
@@ -235,8 +234,7 @@ res  = 1;  tol = 1e-12;  it = 1;
 while res > tol
     Pti = Pt; Ti = T; xi = xq; fi = fq;
     
-    rhoref = mean(rho,'all');
-    Adbt   = aT./rhoref;
+    Adbt   = aT./mean(rho(1,:),'all');
     rhofz  = (rho(icz(1:end-1),:)+rho(icz(2:end),:))/2;
     rhofx  = (rho(:,icx(1:end-1))+rho(:,icx(2:end)))/2;
     if Nz==1; Pt = Ptop.*ones(size(Tp)) + Pchmb; else
@@ -511,7 +509,7 @@ else
     update;
     history;
     output;
+    step = step+1;
 end
 
 restart = 0;
-step    = step+1;
