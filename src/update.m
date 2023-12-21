@@ -121,10 +121,10 @@ Re0 = W0.*rho.*D/10./eta;
 
 if Nx==1 && Nz==1; kW = 0;
 else              
-kW = (kW + 2.*eII.*(0.18*Delta).^2 .* (1-min(1,topshape+botshape+sdsshape)*0.9))/2;
+kW = (kW + 2.*eII.*(0.18*Delta_trb).^2 .* (1-min(1,topshape+botshape+sdsshape)*0.9))/2;
 end
-kwx = wx0.*dx*10;                                                          % segregation fluctuation diffusivity
-kwf = wf0.*df*10;                                                          % segregation fluctuation diffusivity
+kwx = wx0.*Delta_sgr;                                                      % segregation fluctuation diffusivity
+kwf = wf0.*Delta_sgr;                                                      % segregation fluctuation diffusivity
 kx  = chi.*(kwx + kW/Prt);                                                 % solid fraction diffusion 
 kf  = phi.*(kwf + kW/Prt);                                                 % fluid fraction diffusion 
 ks  = rho.*cP./T.*kW/Prt;                                                  % regularised heat diffusion

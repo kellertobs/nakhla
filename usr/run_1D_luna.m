@@ -5,7 +5,7 @@ clear; close all;
 run('./par_default')
 
 % set run parameters
-runID    =  '2D_luna';           % run identifier
+runID    =  '1D_luna';           % run identifier
 opdir    =  '../out';            % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  200;                 % output frame plotted/saved every 'nop' time steps
@@ -15,9 +15,9 @@ plot_cv  =  0;                   % switch on to live plot iterative convergence
 
 % set model domain parameters
 D        =  1000e3;              % chamber depth [m]
-N        =  120;                 % number of grid points in z-direction (incl. 2 ghosts)
+N        =  300;                 % number of grid points in z-direction (incl. 2 ghosts)
 h        =  D/N;                 % grid spacing (equal in both dimensions, do not set) [m]
-L        =  D/3;                 % chamber width [m]
+L        =  h;                 % chamber width [m]
 
 % set model timing parameters
 Nt       =  1e6;                 % number of time steps to take
@@ -29,18 +29,18 @@ dtmax    =  1*yr;                % maximum time step [s]
 Tinit    = 'linear';             % T initial condition mode ('layer' or 'linear')
 T0       =  1725;                % temperature top  layer [deg C]
 T1       =  1725;                % temperature base layer [deg C]
-c0       =  [0.30  0.33  0.09  0.21  0.04  0.03  0.00];  % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
+c0       =  [0.29  0.35  0.08  0.20  0.05  0.03  0.0];  % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
 c1       =  c0;                             % components (maj comp, H2O) bot layer [wt] (will be normalised to unit sum!)
 dcr      =  [1,1,1,-1,-1,-1,0]*1e-4;  % amplitude of random noise [wt]
 dcg      =  [0,0,0,0,0,0,0];          % amplitude of gaussian perturbation [wt]
 zlay     =  2.0;                 % layer thickness (relative to domain depth D)
 
 % set thermo-chemical boundary parameters
-periodic =  0;
+periodic =  1;
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
 bnd_w    =  h;                   % boundary layer width [m]
 tau_T    =  2*yr;                % wall cooling/assimilation time [s]
-Twall    =  [0,1825,nan];        % [top,bot,sds] wall rock temperature [degC] (nan = insulating)
+Twall    =  [0,1860,nan];        % [top,bot,sds] wall rock temperature [degC] (nan = insulating)
 cwall    =  nan(3,7);
 Ptop     =  1e5;                 % top pressure [Pa]
 
@@ -67,8 +67,8 @@ CFL      =  0.90;                % (physical) time stepping courant number (mult
 rtol     =  1e-3;                % outer its relative tolerance
 atol     =  1e-8;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its
-Delta_trb=  2*h;                % correlation length for eddy diffusivity
-Delta_sgr=  10*dx0;              % correlation length for phase fluctuation diffusivity
+Delta_trb=  20*h;                % correlation length for eddy diffusivity
+Delta_sgr=  100*dx0;             % correlation length for phase fluctuation diffusivity
 Prt      =  1;                   % turbulent Prandtl number (ratio of momentum to heat diffusivity)
 Sct      =  5;                   % turbulent Schmidt number (ratio of momentum to mass diffusivity)
 
