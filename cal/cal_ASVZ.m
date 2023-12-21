@@ -103,7 +103,7 @@ cal.pH2O    = 0.75;                 % solidus shift from water content [K/wt^pH2
 % specify geochemical model parameters
 cal.ntrc    = 6;                    % number of trace elements
 cal.trcStr  = {'K 0.01','K 0.10','K 0.9','K 3.00','K 10.0','K 1.1'};
-cal.Ktrc_mem = [0.01;0.10;0.9;3.00;10.0;1.1].*ones(cal.ntrc,cal.nmem);
+cal.Ktrc_mem = [0.01;0.10;1.0;3.00;10.0;1.0].*ones(cal.ntrc,cal.nmem);
 
 % specify density parameters
 %              ant  alb  san  for  fay  ulv  mgt  dps  mau  fau  hyp  fsl  ilm  qtz  wat

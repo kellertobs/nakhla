@@ -48,7 +48,7 @@ ibest = anneal.burnin;
 count  = 0;
 x_keep = zeros(Nvar,Niter);
 P_keep = zeros(Niter,1);
-Nprint = floor(Niter/100);
+Nprint = min(100,floor(Niter/100));
 anneal.hist = zeros(Niter,1);
 anneal.ilvl = round(anneal.burnin+(1:1:anneal.levels)*(Niter-anneal.burnin-anneal.refine)/anneal.levels);
 anneal.temp = 1;
@@ -134,10 +134,12 @@ for i=1:Niter
     anneal.hist(i) = anneal.temp;
 
     if i==anneal.burnin; count = 0; end
+
     if i>anneal.burnin && i<Niter-anneal.refine
         AcceptRatio = 100*count/(i-anneal.burnin);
+    else
+        AcceptRatio = 100*count/(i);
     end
-
 
     if mod(i,Nprint)==0
         figure(100); clf;

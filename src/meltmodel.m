@@ -245,14 +245,14 @@ while rnorm > rnorm_tol     % Newton iteration
     drdm = (rp-rm)./epsm;
 
     %***  apply Newton correction to crystal fraction x
-    var.m = var.m - r./drdm/3 + (mi-mii)/6;
+    var.m = max(0,min(1, var.m - r./drdm/3 + (mi-mii)/6 ));
 
     %***  get droplet fraction f
     var.H2Om = max(0,min(cal.H2Osat, var.H2O./(var.m+1e-16) ));
     var.f    = max(0,min(var.H2O, var.H2O - var.m.*var.H2Om ));
     
     %***  get crystal fraction x
-    var.x  = 1-var.m-var.f;
+    var.x  = max(0,min(1, 1-var.m-var.f ));
     
     %***  get non-linear residual norm
     rnorm  = norm(var.m-mi,2)/sqrt(length(var.m(:)));
@@ -297,12 +297,12 @@ cal.Tm  =  (cal.T0 - cal.dTH2O.*var.H2Om.^cal.pH2O) .* (1 + var.P./cal.A).^(1./c
 
 cal.L   = (var.T+273.15).*cal.dS;
 
-cal.Kx = zeros(size(var.c));
+cal.Kx  = zeros(size(var.c));
 cal.Kx(:,1:end-1) = exp(cal.L./cal.r.*(1./(var.T+273.15) - 1./(cal.Tm+273.15)));
 
 %***  compute volatile component equilibrium partition coefficient
 
-cal.Kf = zeros(size(var.c));
+cal.Kf  = zeros(size(var.c));
 cal.Kf(:,cal.ncmp) = 1./(cal.H2Osat+1e-16);
         
 end % function

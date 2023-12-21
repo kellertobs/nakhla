@@ -38,11 +38,10 @@ for mi = 1:Nvar
     subplot(Nrow,Ncol,mi);
     
     % plot the distribution
-    histogram(x(1:anneal.burnin,ivar(mi)), 100, 'FaceColor', [0.8 0.8 0.8], 'EdgeColor', 'none','Normalization','count'); hold on;
+    histogram(x(1:anneal.burnin,ivar(mi)), min(Niter/10,100), 'FaceColor', [0.8 0.8 0.8], 'EdgeColor', 'none','Normalization','count'); hold on;
     for i=1:anneal.levels
-        histogram(x(anneal.ilvl(i):anneal.ilvl(i+1),ivar(mi)), 100, 'FaceColor',(1-(i-1)/(anneal.levels+1))*[0.15 0.05 0.9], 'EdgeColor', 'none','Normalization','count');
+        histogram(x(anneal.ilvl(i):anneal.ilvl(i+1),ivar(mi)), min(Niter/10,100), 'FaceColor',(1-(i-1)/(anneal.levels+1))*[0.15 0.05 0.9], 'EdgeColor', 'none','Normalization','count');
     end
-    % histogram(x(end-anneal.refine:end,ivar(mi)), 100, 'FaceColor', [0.6 0.0 0.1], 'EdgeColor', 'none','Normalization','count');
 
     % bounds
     plot(xbnds(ivar(mi),1)*ones(1,2), ylim, 'r-');
