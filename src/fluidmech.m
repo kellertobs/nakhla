@@ -219,13 +219,19 @@ if periodic
     advn_mx(:,[1 end]) = repmat((advn_mx(:,1)+advn_mx(:,end))/2,1,2);
     rr  = + (a2.*rhoUo+a3.*rhoUoo)/dt ...
           - advn_mx ...
-          - mean(rhofx.*U(2:end-1,:),'all')/dt;
+          - mean(U(2:end-1,:),'all').*rhofx/dt;
 else
     advn_mx = advect(rhofx(:,2:end-1).*U(2:end-1,2:end-1),(U(2:end-1,1:end-1)+U(2:end-1,2:end))/2,(W(:,2:end-2)+W(:,3:end-1))/2,h,{ADVN,''},[1,2],BCA);
     rr  = + (a2.*rhoUo(:,2:end-1)+a3.*rhoUoo(:,2:end-1))/dt ...
           - advn_mx;
 end
-if bnchm; rr = rr + src_U_mms(2:end-1,:); end
+if bnchm
+    if periodic
+        rr = rr + src_U_mms(2:end-1,:); 
+    else
+        rr = rr + src_U_mms(2:end-1,2:end-1); 
+    end
+end
 
 IIR = [IIR; ii(:)];  AAR = [AAR; rr(:)];
 
@@ -356,8 +362,8 @@ IIR = [IIR; ii(:)]; AAR = [AAR; rr(:)];
 RP  = sparse(IIR,ones(size(IIR)),AAR,NP,1);
 
 % set P = 0 in fixed point
-nzp = round(Nz/2);
-nxp = round(Nx/2);
+nzp = round((Nz+2)/2);
+nxp = round((Nx+2)/2);
 DD(MapP(nzp,nxp),:) = 0;
 KP(MapP(nzp,nxp),:) = 0;
 KP(MapP(nzp,nxp),MapP(nzp,nxp)) = 1;
@@ -365,6 +371,16 @@ RP(MapP(nzp,nxp),:) = 0;
 
 if bnchm; RP(MapP(nzp,nxp),:) = P_mms(nzp,nxp); end
 
+if bnchm
+    % set U = 0 in fixed point
+    nzu = 1;
+    nxu = round((Nx+2)/2);
+    KV(MapU(nzu,nxu),:) = 0;
+    GG(MapU(nzu,nxu),:) = 0;
+    KV(MapU(nzu,nxu),MapU(nzu  ,nxu)) = 1;
+    KV(MapU(nzu,nxu),MapU(nzu+1,nxu)) = 1;
+    RV(MapU(nzp,nxp),:) = 0;
+end
 
 %% assemble and scale global coefficient matrix and right-hand side vector
 

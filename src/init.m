@@ -205,6 +205,11 @@ VolSrc = 0.*Tp;
 kW     = 0.*Tp;
 Tref   = min(cal.T0)+273.15;
 Pref   = 1e5;
+c0_oxd = c0*cal.cmp_oxd;
+c0_oxd_all = zeros(size(c0,1),9);
+c0_oxd_all(:,cal.ioxd) = c0_oxd;
+rhoref = DensityX(c0_oxd_all,Tref,Pref./1e8) .* (1 - aT.*(T0+273.15-Tref));
+Adbt   = aT./rhoref;
 rhom   = mean(cal.rhox0-500).*ones(size(Tp)); 
 rhox   = mean(cal.rhox0).*ones(size(Tp));
 rhof   = cal.rhof0.*ones(size(Tp));
@@ -234,7 +239,6 @@ res  = 1;  tol = 1e-12;  it = 1;
 while res > tol
     Pti = Pt; Ti = T; xi = xq; fi = fq;
     
-    Adbt   = aT./mean(rho(1,:),'all');
     rhofz  = (rho(icz(1:end-1),:)+rho(icz(2:end),:))/2;
     rhofx  = (rho(:,icx(1:end-1))+rho(:,icx(2:end)))/2;
     if Nz==1; Pt = Ptop.*ones(size(Tp)) + Pchmb; else

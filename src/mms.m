@@ -8,13 +8,13 @@ fprintf(1,'\n\n  ***  compose manufactured solution\n\n');
 
 % compose manufactured solution variables
 W_mms(x,z) = 5.00e-5.*(cos(4*(x)*pi/L).*sin(4*(z)*pi/L));
-U_mms(x,z) = 1.00e-5.*(sin(4*(x)*pi/L).*cos(4*(z)*pi/L));
-P_mms(x,z) = 2.00e+3.*(sin(4*(x)*pi/L).*sin(4*(z)*pi/L));
+U_mms(x,z) = 4.00e-5.*(sin(4*(x)*pi/L).*cos(4*(z)*pi/L));
+P_mms(x,z) =-3.00e+3.*(cos(4*(x)*pi/L).*cos(4*(z)*pi/L));
 
 % compose manufactured material coefficients and volume source
-eta_mms(x,z)  = 1e+3-8e+2.*(cos(4*(x)*pi/L).*sin(4*(z)*pi/L));
-rho_mms(x,z)  = 3e+3-1e+1.*(cos(4*(x)*pi/L).*sin(4*(z)*pi/L)); rhoref = 3e+3;
-src_mms(x,z)  =     -1e-5.*(sin(4*(x)*pi/L).*sin(4*(z)*pi/L));
+eta_mms(x,z) = 1e+3-9e+2.*(cos(4*(x)*pi/L).*sin(4*(z)*pi/L));
+rho_mms(x,z) = 3e+3-5e+1.*(cos(4*(x)*pi/L).*sin(4*(z)*pi/L)); rhoref = 3e+3;
+src_mms(x,z) =     -1e-3.*(cos(4*(x)*pi/L).*sin(4*(z)*pi/L));
 
 fprintf(1,'       W   = %s \n',char(W_mms));
 fprintf(1,'       U   = %s \n',char(U_mms));
@@ -38,9 +38,9 @@ txz_mms(x,z) = eta_mms .* exz_mms;                  % xz-shear stress
 fprintf(1,' . ');
 
 % manufactured solution residuals
-res_W_mms = (diff(tzz_mms,z) + diff(txz_mms,x)) - diff(P_mms,z) + (rho_mms(x,z)-rhoref)*g0;
-res_U_mms = (diff(txx_mms,x) + diff(txz_mms,z)) - diff(P_mms,x);
-res_P_mms =-(diff(  W_mms,z) + diff(  U_mms,x))                 + src_mms(x,z);
+res_W_mms = -(diff(tzz_mms,z) + diff(txz_mms,x)) + diff(P_mms,z) - (rho_mms(x,z)-rhoref)*g0;
+res_U_mms = -(diff(txx_mms,x) + diff(txz_mms,z)) + diff(P_mms,x);
+res_P_mms =  DivV_mms - src_mms(x,z);
 fprintf(1,' . ');
 
 % plot manufactured solution
@@ -88,9 +88,11 @@ drawnow;
 [x,z]  = meshgrid(x_mms,zw_mms);
 W_mms  = double(subs(W_mms)); fprintf(1,' . ');
 rhofz  = double(subs(rho_mms)); fprintf(1,' . ');
-rhofz  = rhofz(2:end-1,2:end-1);
+rhofz  = rhofz(:,2:end-1);
 [x,z]  = meshgrid(xu_mms,z_mms);
 U_mms  = double(subs(U_mms)); fprintf(1,' . ');
+rhofx  = double(subs(rho_mms)); fprintf(1,' . ');
+rhofx  = rhofx(2:end-1,:);
 [x,z]  = meshgrid(x_mms,z_mms);
 P_mms  = double(subs(P_mms)); fprintf(1,' . ');
 eta    = double(subs(eta_mms)); fprintf(1,' . ');
@@ -100,9 +102,14 @@ VolSrc = VolSrc(2:end-1,2:end-1);
 [x,z]  = meshgrid(xu_mms,zw_mms);
 etaco  = double(subs(eta_mms)); fprintf(1,' . ');
 
-WBG    = 0.*W_mms;
-UBG    = 0.*U_mms;
+rhoWo  = zeros(size(rhofz));
+rhoWoo = zeros(size(rhofz));
+rhoUo  = zeros(size(rhofx));
+rhoUoo = zeros(size(rhofx));
+WBG    = 0.*W_mms;  W = WBG;
+UBG    = 0.*U_mms;  U = UBG;
 SOL    = [W_mms(:);U_mms(:);P_mms(:)];
+dt     = 1e32;
 
 % get mapping arrays
 Nx = length(x_mms)-2;
@@ -115,10 +122,28 @@ MapP = reshape(1:NP,Nz+2,Nx+2);
 MapW = reshape(1:NW,Nz+1,Nx+2);
 MapU = reshape(1:NU,Nz+2,Nx+1) + NW;
 
+% set time stepping parameters
+a1 = 1; a2 = 1; a3 = 0;
+b1 = 1; b2 = 0; b3 = 0;
+
 % set boundary conditions to free slip
 sds = -1;
 top = -1;
 bot = -1;
+BCA = {'',''};
+
+% set ghosted index arrays
+if periodic
+    icx = [Nx,1:Nx,1];
+    icz = [Nz,1:Nz,1];
+    ifx = [Nx,1:Nx+1,2];
+    ifz = [Nz,1:Nz+1,2];
+else
+    icx = [1,1:Nx,Nx];
+    icz = [1,1:Nz,Nz];
+    ifx = [1,1:Nx+1,Nx+1];
+    ifz = [1,1:Nz+1,Nz+1];
+end
 
 fprintf(1,' . \n');
    
