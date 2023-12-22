@@ -98,40 +98,34 @@ end
 
 % detect where phases are stable
 hasMLT = OUT.PhaseFractions.liq >=1e-4 & OUT.PhaseFractions.sol_wt>=1e-4 & OUT.PhaseFractions.bi<=1e-4;
-hasCUM = OUT.PhaseFractions.cum >=1e-4 & hasMLT;
 hasOLV = OUT.PhaseFractions.ol  >=1e-4 & hasMLT;
 hasFSP = OUT.PhaseFractions.pl4T>=1e-4 & hasMLT;
 hasCPX = OUT.PhaseFractions.cpx >=1e-4 & hasMLT;
 hasOPX = OUT.PhaseFractions.opx >=1e-4 & hasMLT;
 hasSPN = OUT.PhaseFractions.spn >=1e-4 & hasMLT;
 hasILM = OUT.PhaseFractions.ilm >=1e-4 & hasMLT;
-% hasQTZ = OUT.PhaseFractions.q   >=1e-4 & hasMLT;
 
 % set oxides present in phases
 oxdSYS = [Si,Ti,Al,FeO,Mg,Ca,Na,K,H]; noxd = length(oxdSYS);
 oxdMLT = [Si,Ti,Al,FeO,Mg,Ca,Na,K,H];
-oxdCUM = [Si,Ti,Al,FeO,Mg,Ca,Na,K,H]; 
-oxdOLV = [Si,      FeO,Mg          ];
+oxdOLV = [Si,      FeO,Mg,Ca       ];
 oxdFSP = [Si,   Al,       Ca,Na,K  ];
-oxdCPX = [Si,   Al,FeO,Mg,Ca,Na    ];
-oxdOPX = [Si,   Al,FeO,Mg,Ca       ];
-oxdSPN = [   Ti,   FeO,Mg          ];
+oxdCPX = [Si,Ti,Al,FeO,Mg,Ca,Na,K  ];
+oxdOPX = [Si,Ti,Al,FeO,Mg,Ca       ];
+oxdSPN = [   Ti,Al,FeO,Mg          ];
 oxdILM = [   Ti,   FeO             ];
-% oxdQTZ = [Si                     ];
 
 % extract oxide composition of phases
 SOL = OUT.OxideFract.sol (hasMLT,oxdMLT).*100; SOL = SOL./sum(SOL,2)*100;
 MLT = OUT.OxideFract.liq (hasMLT,oxdMLT).*100; MLT = MLT./sum(MLT,2)*100; nMLT = size(MLT,1);
 SYS = (SOL.*OUT.PhaseFractions.sol_wt(hasMLT) + MLT.*OUT.PhaseFractions.liq_wt(hasMLT)) ...
     ./(     OUT.PhaseFractions.sol_wt(hasMLT) +      OUT.PhaseFractions.liq_wt(hasMLT));
-CUM = zeros(length(hasMLT(hasCUM)),length(oxdMLT)); CUM(:,oxdCUM) = OUT.OxideFract.cum (hasCUM,oxdCUM); CUM = CUM./sum(CUM,2)*100; nCUM = size(CUM,1);
 OLV = zeros(length(hasMLT(hasOLV)),length(oxdMLT)); OLV(:,oxdOLV) = OUT.OxideFract.ol  (hasOLV,oxdOLV); OLV = OLV./sum(OLV,2)*100; nOLV = size(OLV,1);
 FSP = zeros(length(hasFSP(hasFSP)),length(oxdMLT)); FSP(:,oxdFSP) = OUT.OxideFract.pl4T(hasFSP,oxdFSP); FSP = FSP./sum(FSP,2)*100; nFSP = size(FSP,1);
 CPX = zeros(length(hasMLT(hasCPX)),length(oxdMLT)); CPX(:,oxdCPX) = OUT.OxideFract.cpx (hasCPX,oxdCPX); CPX = CPX./sum(CPX,2)*100; nCPX = size(CPX,1);
 OPX = zeros(length(hasMLT(hasOPX)),length(oxdMLT)); OPX(:,oxdOPX) = OUT.OxideFract.opx (hasOPX,oxdOPX); OPX = OPX./sum(OPX,2)*100; nOPX = size(OPX,1);
 SPN = zeros(length(hasMLT(hasSPN)),length(oxdMLT)); SPN(:,oxdSPN) = OUT.OxideFract.spn (hasSPN,oxdSPN); SPN = SPN./sum(SPN,2)*100; nSPN = size(SPN,1);
 ILM = zeros(length(hasMLT(hasILM)),length(oxdMLT)); ILM(:,oxdILM) = OUT.OxideFract.ilm (hasILM,oxdILM); ILM = ILM./sum(ILM,2)*100; nILM = size(ILM,1);
-% QTZ = zeros(length(hasQTZ(hasQTZ)),length(oxdMLT)); QTZ(:,oxdQTZ) = OUT.OxideFract.q   (hasQTZ,oxdQTZ); QTZ = QTZ./sum(QTZ,2)*100; nQTZ = size(QTZ,1);
 T   = OUT.T(hasMLT);
 P   = OUT.P(hasMLT)*1e8;
 H2O = OUT.OxideFract.liq(hasMLT,H)*100;
@@ -145,47 +139,9 @@ PHS    = [OUT.PhaseFractions.liq( hasMLT  )./(OUT.PhaseFractions.sol_wt(hasMLT)+
           OUT.PhaseFractions.opx( hasMLT,1)./(OUT.PhaseFractions.sol_wt(hasMLT)+0*OUT.PhaseFractions.liq_wt(hasMLT)), ...
           zeros(nMLT,1)];
 
-
-%% olivine system
-DATA.PRJCT  = 'ASVZ';
-DATA.VNAMES = cal.oxdStr(oxdOLV);
-DATA.SNAMES = {};
-DATA.X = OLV(:,oxdOLV);
-
-DATA.X = DATA.X./sum(DATA.X,2);
-
-unmix
-OLV_PCA = DGN;
-
-OLVp           = zeros(size(OLV));
-OLVp(:,oxdOLV) = max(0,Xp)./sum(max(0,Xp),2)*100;
-OLV_PCA.OLVp   = OLVp;
-
-OLV_PCA.EMExt  = round(max(0,Fe)./sum(max(0,Fe),2)*100,2);
-OLV_PCA.EMInt  = round(max(0,Fi)./sum(max(0,Fi),2)*100,2);
-
-
-%% plot olivine system
-cal_ASVZ; % load melt model calibration
-
-figure(102); clf;
-subplot(1,2,1);
-scatter(OLV (:,cal.Si),OLV (:,cal.Fe),25,T(hasOLV(hasMLT))); colormap('copper'); hold on
-scatter(OLVp(:,cal.Si),OLVp(:,cal.Fe),25,T(hasOLV(hasMLT)),'filled');
-scatter(cal.mem_oxd(cal.for,cal.Si),cal.mem_oxd(cal.for,cal.Fe),200,'kh','filled');
-scatter(cal.mem_oxd(cal.fay,cal.Si),cal.mem_oxd(cal.fay,cal.Fe),200,'kh','filled');
-xlabel(cal.oxdStr(cal.Si),FS{:},TX{:})
-ylabel(cal.oxdStr(cal.Fe),FS{:},TX{:})
-subplot(1,2,2);
-scatter(OLV (:,cal.Si),OLV (:,cal.Mg),25,T(hasOLV(hasMLT))); colormap('copper'); hold on
-scatter(OLVp(:,cal.Si),OLVp(:,cal.Mg),25,T(hasOLV(hasMLT)),'filled');
-scatter(cal.mem_oxd(cal.for,cal.Si),cal.mem_oxd(cal.for,cal.Mg),200,'kh','filled');
-scatter(cal.mem_oxd(cal.fay,cal.Si),cal.mem_oxd(cal.fay,cal.Mg),200,'kh','filled');
-xlabel(cal.oxdStr(cal.Si),FS{:},TX{:})
-ylabel(cal.oxdStr(cal.Mg),FS{:},TX{:})
-
-sgtitle('OLV PCA',FS{:},TX{:})
-drawnow
+Tsol = 705.*ones(size(T));  % solidus estimate from MAGEMin
+Tliq = 1155.*ones(size(T)); % liquidus estimate from MAGEMin
+Psl  = 0.2.*ones(size(T));  % P [GPa]
 
 
 %% feldspar system
@@ -248,6 +204,113 @@ sgtitle('FSP PCA',FS{:},TX{:})
 drawnow
 
 
+%% olivine system
+DATA.PRJCT  = 'ASVZ';
+DATA.VNAMES = cal.oxdStr(oxdOLV);
+DATA.SNAMES = {};
+DATA.X = OLV(:,oxdOLV);
+
+DATA.X = DATA.X./sum(DATA.X,2);
+
+unmix
+OLV_PCA = DGN;
+
+OLVp           = zeros(size(OLV));
+OLVp(:,oxdOLV) = max(0,Xp)./sum(max(0,Xp),2)*100;
+OLV_PCA.OLVp   = OLVp;
+
+OLV_PCA.EMExt  = round(max(0,Fe)./sum(max(0,Fe),2)*100,2);
+OLV_PCA.EMInt  = round(max(0,Fi)./sum(max(0,Fi),2)*100,2);
+
+
+%% plot olivine system
+cal_ASVZ; % load melt model calibration
+
+figure(102); clf;
+subplot(1,3,1);
+scatter(OLV (:,cal.Si),OLV (:,cal.Fe),25,T(hasOLV(hasMLT))); colormap('copper'); hold on
+scatter(OLVp(:,cal.Si),OLVp(:,cal.Fe),25,T(hasOLV(hasMLT)),'filled');
+scatter(cal.mem_oxd(cal.for,cal.Si),cal.mem_oxd(cal.for,cal.Fe),200,'kh','filled');
+scatter(cal.mem_oxd(cal.fay,cal.Si),cal.mem_oxd(cal.fay,cal.Fe),200,'kh','filled');
+xlabel(cal.oxdStr(cal.Si),FS{:},TX{:})
+ylabel(cal.oxdStr(cal.Fe),FS{:},TX{:})
+subplot(1,3,2);
+scatter(OLV (:,cal.Si),OLV (:,cal.Mg),25,T(hasOLV(hasMLT))); colormap('copper'); hold on
+scatter(OLVp(:,cal.Si),OLVp(:,cal.Mg),25,T(hasOLV(hasMLT)),'filled');
+scatter(cal.mem_oxd(cal.for,cal.Si),cal.mem_oxd(cal.for,cal.Mg),200,'kh','filled');
+scatter(cal.mem_oxd(cal.fay,cal.Si),cal.mem_oxd(cal.fay,cal.Mg),200,'kh','filled');
+xlabel(cal.oxdStr(cal.Si),FS{:},TX{:})
+ylabel(cal.oxdStr(cal.Mg),FS{:},TX{:})
+subplot(1,3,3);
+scatter(OLV (:,cal.Si),OLV (:,cal.Ca),25,T(hasOLV(hasMLT))); colormap('copper'); hold on
+scatter(OLVp(:,cal.Si),OLVp(:,cal.Ca),25,T(hasOLV(hasMLT)),'filled');
+scatter(cal.mem_oxd(cal.for,cal.Si),cal.mem_oxd(cal.for,cal.Ca),200,'kh','filled');
+scatter(cal.mem_oxd(cal.fay,cal.Si),cal.mem_oxd(cal.fay,cal.Ca),200,'kh','filled');
+xlabel(cal.oxdStr(cal.Si),FS{:},TX{:})
+ylabel(cal.oxdStr(cal.Ca),FS{:},TX{:})
+
+sgtitle('OLV PCA',FS{:},TX{:})
+drawnow
+
+
+%% oxides system
+DATA.PRJCT  = 'ASVZ';
+DATA.VNAMES = cal.oxdStr(oxdSPN);
+DATA.SNAMES = {};
+DATA.X = SPN(:,oxdSPN);
+
+DATA.X = DATA.X./sum(DATA.X,2);
+
+unmix
+SPN_PCA = DGN;
+
+SPNp           = zeros(size(SPN));
+SPNp(:,oxdSPN) = max(0,Xp)./sum(max(0,Xp),2)*100;
+SPN_PCA.SPNp   = SPNp;
+
+SPN_PCA.EMExt  = round(max(0,Fe)./sum(max(0,Fe),2)*100,2);
+SPN_PCA.EMInt  = round(max(0,Fi)./sum(max(0,Fi),2)*100,2);
+
+DATA.X = ILM(:,oxdILM);
+DATA.X = DATA.X./sum(DATA.X,2);
+
+Fe             = mean(DATA.X);
+Fi             = Fe;
+Xp             = repmat(Fe,nILM,1);
+
+ILMp           = zeros(size(ILM));
+ILMp(:,oxdILM) = max(0,Xp)./sum(max(0,Xp),2)*100;
+ILM_PCA.ILMp   = ILMp;
+
+ILM_PCA.EMExt  = round(max(0,Fe)./sum(max(0,Fe),2)*100,2);
+ILM_PCA.EMInt  = round(max(0,Fi)./sum(max(0,Fi),2)*100,2);
+
+
+%%
+cal_ASVZ; % load melt model calibration
+
+figure(104); clf;
+subplot(1,2,1);
+scatter(SPN (:,cal.Fe),SPN (:,cal.Ti),25,T(hasSPN(hasMLT))); colormap('copper'); hold on
+scatter(SPNp(:,cal.Fe),SPNp(:,cal.Ti),25,T(hasSPN(hasMLT)),'filled');
+scatter(cal.mem_oxd(cal.tms,cal.Fe),cal.mem_oxd(cal.tms,cal.Ti),200,'kh','filled');
+scatter(cal.mem_oxd(cal.mgt,cal.Fe),cal.mem_oxd(cal.mgt,cal.Ti),200,'kh','filled');
+scatter(cal.mem_oxd(cal.ilm,cal.Fe),cal.mem_oxd(cal.ilm,cal.Ti),200,'kh','filled');
+xlabel(cal.oxdStr(cal.Fe),FS{:},TX{:})
+ylabel(cal.oxdStr(cal.Ti),FS{:},TX{:})
+subplot(1,2,2);
+scatter(SPN (:,cal.Fe),SPN (:,cal.Mg),25,T(hasSPN(hasMLT))); colormap('copper'); hold on
+scatter(SPNp(:,cal.Fe),SPNp(:,cal.Mg),25,T(hasSPN(hasMLT)),'filled');
+scatter(cal.mem_oxd(cal.tms,cal.Fe),cal.mem_oxd(cal.tms,cal.Mg),200,'kh','filled');
+scatter(cal.mem_oxd(cal.mgt,cal.Fe),cal.mem_oxd(cal.mgt,cal.Mg),200,'kh','filled');
+scatter(cal.mem_oxd(cal.ilm,cal.Fe),cal.mem_oxd(cal.ilm,cal.Mg),200,'kh','filled');
+xlabel(cal.oxdStr(cal.Fe),FS{:},TX{:})
+ylabel(cal.oxdStr(cal.Mg),FS{:},TX{:})
+% colorbar;
+sgtitle('SPN PCA',FS{:},TX{:})
+drawnow
+
+
 %% clinopyroxene system
 DATA.PRJCT  = 'ASVZ';
 DATA.VNAMES = cal.oxdStr(oxdCPX);
@@ -272,45 +335,53 @@ cal_ASVZ; % load melt model calibration
 
 figure(103); clf;
 subplot(2,3,1);
+scatter(CPX (:,cal.Si),CPX (:,cal.Ti),25,T(hasCPX(hasMLT))); colormap('copper'); hold on
+scatter(CPXp(:,cal.Si),CPXp(:,cal.Ti),25,T(hasCPX(hasMLT)),'filled');
+scatter(cal.mem_oxd(cal.dps,cal.Si),cal.mem_oxd(cal.dps,cal.Ti),200,'kh','filled');
+scatter(cal.mem_oxd(cal.hdb,cal.Si),cal.mem_oxd(cal.hdb,cal.Ti),200,'kh','filled');
+scatter(cal.mem_oxd(cal.aug,cal.Si),cal.mem_oxd(cal.aug,cal.Ti),200,'kh','filled');
+xlabel(cal.oxdStr(cal.Si),FS{:},TX{:})
+ylabel(cal.oxdStr(cal.Ti),FS{:},TX{:})
+subplot(2,3,2);
 scatter(CPX (:,cal.Si),CPX (:,cal.Al),25,T(hasCPX(hasMLT))); colormap('copper'); hold on
 scatter(CPXp(:,cal.Si),CPXp(:,cal.Al),25,T(hasCPX(hasMLT)),'filled');
 scatter(cal.mem_oxd(cal.dps,cal.Si),cal.mem_oxd(cal.dps,cal.Al),200,'kh','filled');
-scatter(cal.mem_oxd(cal.mau,cal.Si),cal.mem_oxd(cal.mau,cal.Al),200,'kh','filled');
-scatter(cal.mem_oxd(cal.fau,cal.Si),cal.mem_oxd(cal.fau,cal.Al),200,'kh','filled');
+scatter(cal.mem_oxd(cal.hdb,cal.Si),cal.mem_oxd(cal.hdb,cal.Al),200,'kh','filled');
+scatter(cal.mem_oxd(cal.aug,cal.Si),cal.mem_oxd(cal.aug,cal.Al),200,'kh','filled');
 xlabel(cal.oxdStr(cal.Si),FS{:},TX{:})
 ylabel(cal.oxdStr(cal.Al),FS{:},TX{:})
-subplot(2,3,2);
+subplot(2,3,3);
 scatter(CPX (:,cal.Si),CPX (:,cal.Fe),25,T(hasCPX(hasMLT))); colormap('copper'); hold on
 scatter(CPXp(:,cal.Si),CPXp(:,cal.Fe),25,T(hasCPX(hasMLT)),'filled');
 scatter(cal.mem_oxd(cal.dps,cal.Si),cal.mem_oxd(cal.dps,cal.Fe),200,'kh','filled');
-scatter(cal.mem_oxd(cal.mau,cal.Si),cal.mem_oxd(cal.mau,cal.Fe),200,'kh','filled');
-scatter(cal.mem_oxd(cal.fau,cal.Si),cal.mem_oxd(cal.fau,cal.Fe),200,'kh','filled');
+scatter(cal.mem_oxd(cal.hdb,cal.Si),cal.mem_oxd(cal.hdb,cal.Fe),200,'kh','filled');
+scatter(cal.mem_oxd(cal.aug,cal.Si),cal.mem_oxd(cal.aug,cal.Fe),200,'kh','filled');
 xlabel(cal.oxdStr(cal.Si),FS{:},TX{:})
 ylabel(cal.oxdStr(cal.Fe),FS{:},TX{:})
-subplot(2,3,3);
+subplot(2,3,4);
 scatter(CPX (:,cal.Si),CPX (:,cal.Mg),25,T(hasCPX(hasMLT))); colormap('copper'); hold on
 scatter(CPXp(:,cal.Si),CPXp(:,cal.Mg),25,T(hasCPX(hasMLT)),'filled');
 scatter(cal.mem_oxd(cal.dps,cal.Si),cal.mem_oxd(cal.dps,cal.Mg),200,'kh','filled');
-scatter(cal.mem_oxd(cal.mau,cal.Si),cal.mem_oxd(cal.mau,cal.Mg),200,'kh','filled');
-scatter(cal.mem_oxd(cal.fau,cal.Si),cal.mem_oxd(cal.fau,cal.Mg),200,'kh','filled');
+scatter(cal.mem_oxd(cal.hdb,cal.Si),cal.mem_oxd(cal.hdb,cal.Mg),200,'kh','filled');
+scatter(cal.mem_oxd(cal.aug,cal.Si),cal.mem_oxd(cal.aug,cal.Mg),200,'kh','filled');
 xlabel(cal.oxdStr(cal.Si),FS{:},TX{:})
 ylabel(cal.oxdStr(cal.Mg),FS{:},TX{:})
-subplot(2,3,4);
+subplot(2,3,5);
 scatter(CPX (:,cal.Si),CPX (:,cal.Ca),25,T(hasCPX(hasMLT))); colormap('copper'); hold on
 scatter(CPXp(:,cal.Si),CPXp(:,cal.Ca),25,T(hasCPX(hasMLT)),'filled');
 scatter(cal.mem_oxd(cal.dps,cal.Si),cal.mem_oxd(cal.dps,cal.Ca),200,'kh','filled');
-scatter(cal.mem_oxd(cal.mau,cal.Si),cal.mem_oxd(cal.mau,cal.Ca),200,'kh','filled');
-scatter(cal.mem_oxd(cal.fau,cal.Si),cal.mem_oxd(cal.fau,cal.Ca),200,'kh','filled');
+scatter(cal.mem_oxd(cal.hdb,cal.Si),cal.mem_oxd(cal.hdb,cal.Ca),200,'kh','filled');
+scatter(cal.mem_oxd(cal.aug,cal.Si),cal.mem_oxd(cal.aug,cal.Ca),200,'kh','filled');
 xlabel(cal.oxdStr(cal.Si),FS{:},TX{:})
 ylabel(cal.oxdStr(cal.Ca),FS{:},TX{:})
-subplot(2,3,5);
-scatter(CPX (:,cal.Si),CPX (:,cal.Na),25,T(hasCPX(hasMLT))); colormap('copper'); hold on
-scatter(CPXp(:,cal.Si),CPXp(:,cal.Na),25,T(hasCPX(hasMLT)),'filled');
-scatter(cal.mem_oxd(cal.dps,cal.Si),cal.mem_oxd(cal.dps,cal.Na),200,'kh','filled');
-scatter(cal.mem_oxd(cal.mau,cal.Si),cal.mem_oxd(cal.mau,cal.Na),200,'kh','filled');
-scatter(cal.mem_oxd(cal.fau,cal.Si),cal.mem_oxd(cal.fau,cal.Na),200,'kh','filled');
+subplot(2,3,6);
+scatter(CPX (:,cal.Si),CPX (:,cal.Na)+CPX (:,cal.K),25,T(hasCPX(hasMLT))); colormap('copper'); hold on
+scatter(CPXp(:,cal.Si),CPXp(:,cal.Na)+CPXp(:,cal.K),25,T(hasCPX(hasMLT)),'filled');
+scatter(cal.mem_oxd(cal.dps,cal.Si),cal.mem_oxd(cal.dps,cal.Na)+cal.mem_oxd(cal.dps,cal.K),200,'kh','filled');
+scatter(cal.mem_oxd(cal.hdb,cal.Si),cal.mem_oxd(cal.hdb,cal.Na)+cal.mem_oxd(cal.hdb,cal.K),200,'kh','filled');
+scatter(cal.mem_oxd(cal.aug,cal.Si),cal.mem_oxd(cal.aug,cal.Na)+cal.mem_oxd(cal.aug,cal.K),200,'kh','filled');
 xlabel(cal.oxdStr(cal.Si),FS{:},TX{:})
-ylabel(cal.oxdStr(cal.Na),FS{:},TX{:})
+ylabel([cal.oxdStr{cal.Na},' + ',cal.oxdStr{cal.K}],FS{:},TX{:})
 sgtitle('CPX PCA',FS{:},TX{:})
 drawnow
 
@@ -370,63 +441,6 @@ sgtitle('OPX PCA',FS{:},TX{:})
 drawnow
 
 
-%% oxides system
-DATA.PRJCT  = 'ASVZ';
-DATA.VNAMES = cal.oxdStr(oxdSPN);
-DATA.SNAMES = {};
-DATA.X = SPN(:,oxdSPN);
-
-DATA.X = DATA.X./sum(DATA.X,2);
-
-unmix
-SPN_PCA = DGN;
-
-SPNp           = zeros(size(SPN));
-SPNp(:,oxdSPN) = max(0,Xp)./sum(max(0,Xp),2)*100;
-SPN_PCA.SPNp   = SPNp;
-
-SPN_PCA.EMExt  = round(max(0,Fe)./sum(max(0,Fe),2)*100,2);
-SPN_PCA.EMInt  = round(max(0,Fi)./sum(max(0,Fi),2)*100,2);
-
-DATA.X = ILM(:,oxdILM);
-DATA.X = DATA.X./sum(DATA.X,2);
-
-Fe             = mean(DATA.X);
-Fi             = Fe;
-Xp             = repmat(Fe,nILM,1);
-
-ILMp           = zeros(size(ILM));
-ILMp(:,oxdILM) = max(0,Xp)./sum(max(0,Xp),2)*100;
-ILM_PCA.ILMp   = ILMp;
-
-ILM_PCA.EMExt  = round(max(0,Fe)./sum(max(0,Fe),2)*100,2);
-ILM_PCA.EMInt  = round(max(0,Fi)./sum(max(0,Fi),2)*100,2);
-
-%%
-cal_ASVZ; % load melt model calibration
-
-figure(104); clf;
-subplot(1,2,1);
-scatter(SPN (:,cal.Fe),SPN (:,cal.Ti),25,T(hasSPN(hasMLT))); colormap('copper'); hold on
-scatter(SPNp(:,cal.Fe),SPNp(:,cal.Ti),25,T(hasSPN(hasMLT)),'filled');
-scatter(cal.mem_oxd(cal.tms,cal.Fe),cal.mem_oxd(cal.tms,cal.Ti),200,'kh','filled');
-scatter(cal.mem_oxd(cal.mgt,cal.Fe),cal.mem_oxd(cal.mgt,cal.Ti),200,'kh','filled');
-scatter(cal.mem_oxd(cal.ilm,cal.Fe),cal.mem_oxd(cal.ilm,cal.Ti),200,'kh','filled');
-xlabel(cal.oxdStr(cal.Fe),FS{:},TX{:})
-ylabel(cal.oxdStr(cal.Ti),FS{:},TX{:})
-subplot(1,2,2);
-scatter(SPN (:,cal.Fe),SPN (:,cal.Mg),25,T(hasSPN(hasMLT))); colormap('copper'); hold on
-scatter(SPNp(:,cal.Fe),SPNp(:,cal.Mg),25,T(hasSPN(hasMLT)),'filled');
-scatter(cal.mem_oxd(cal.tms,cal.Fe),cal.mem_oxd(cal.tms,cal.Mg),200,'kh','filled');
-scatter(cal.mem_oxd(cal.mgt,cal.Fe),cal.mem_oxd(cal.mgt,cal.Mg),200,'kh','filled');
-scatter(cal.mem_oxd(cal.ilm,cal.Fe),cal.mem_oxd(cal.ilm,cal.Mg),200,'kh','filled');
-xlabel(cal.oxdStr(cal.Fe),FS{:},TX{:})
-ylabel(cal.oxdStr(cal.Mg),FS{:},TX{:})
-% colorbar;
-sgtitle('SPN PCA',FS{:},TX{:})
-drawnow
-
-
 %% add up projected mineral compositions to solid composition
 wt   = zeros(size(T)) + 1e-16;
 SOLp = zeros(size(SOL));
@@ -440,60 +454,39 @@ wt(hasOLV(hasMLT))     = wt(hasOLV(hasMLT)) + OUT.PhaseFractions.ol(hasOLV);
 SOLp(hasSPN(hasMLT),:) = SOLp(hasSPN(hasMLT),:) + SPNp.*OUT.PhaseFractions.spn(hasSPN);
 wt(hasSPN(hasMLT))     = wt(hasSPN(hasMLT)) + OUT.PhaseFractions.spn(hasSPN);
 
+SOLp(hasILM(hasMLT),:) = SOLp(hasILM(hasMLT),:) + ILMp.*OUT.PhaseFractions.ilm(hasILM);
+wt(hasILM(hasMLT))     = wt(hasILM(hasMLT)) + OUT.PhaseFractions.ilm(hasILM);
+
 SOLp(hasCPX(hasMLT),:) = SOLp(hasCPX(hasMLT),:) + CPXp.*OUT.PhaseFractions.cpx(hasCPX);
 wt(hasCPX(hasMLT))     = wt(hasCPX(hasMLT)) + OUT.PhaseFractions.cpx(hasCPX);
 
 SOLp(hasOPX(hasMLT),:) = SOLp(hasOPX(hasMLT),:) + OPXp.*OUT.PhaseFractions.opx(hasOPX);
 wt(hasOPX(hasMLT))     = wt(hasOPX(hasMLT)) + OUT.PhaseFractions.opx(hasOPX);
 
-SOLp(hasILM(hasMLT),:) = SOLp(hasILM(hasMLT),:) + ILMp.*OUT.PhaseFractions.ilm(hasILM);
-wt(hasILM(hasMLT))     = wt(hasILM(hasMLT)) + OUT.PhaseFractions.ilm(hasILM);
-
-% SOLp(hasQTZ(hasMLT),:) = SOLp(hasQTZ(hasMLT),:) + QTZ.*OUT.PhaseFractions.q(hasQTZ);
-% wt(hasQTZ(hasMLT))     = wt(hasQTZ(hasMLT)) + OUT.PhaseFractions.q(hasQTZ);
-
 SOLp = SOLp./wt;
 
-np = nMLT;
-memSOL = zeros(np,cal.nmem);
-for ip = 1:np
-    memSOL(ip,:) = lsqnonneg(cal.mem_oxd.',SOLp(ip,:).')*100;
-end
 
-
-% collate oxide compositions into global data array
+%% extract end-members encompassing all melt/solid compositions
 DATA.PRJCT  = 'ASVZ';
 DATA.VNAMES = cal.oxdStr(oxdMLT(1:H));
 DATA.SNAMES = {};
-DATA.X      = [MLT(:,1:end-1);SOLp(:,1:end-1)];%;CUM(:,1:end-1)];
+DATA.X      = [MLT(:,1:end-1);SOLp(:,1:end-1)];
 DATA.X      = DATA.X./sum(DATA.X,2);
 
 unmix;
 MLT_PCA = DGN;
 
-MLTp = MLT;  CUMp = CUM;
+MLTp = MLT;
 MLTp(:,1:end-1) = max(0,Xp(0   +(1:nMLT),:))./sum(max(0,Xp(0   +(1:nMLT),:)),2).*(100-MLT(:,end));
-% SOLp(:,1:end-1) = max(0,Xp(  nMLT+(1:nMLT),:))./sum(max(0,Xp(  nMLT+(1:nMLT),:)),2)*100; SOLp = SOLp./sum(SOLp,2)*100;
-% CUMp(:,1:end-1) = max(0,Xp(2*nMLT+(1:nCUM),:))./sum(max(0,Xp(2*nMLT+(1:nCUM),:)),2)*100; CUMp = CUMp./sum(CUMp,2)*100;
 
-memMLT = zeros(np,cal.nmem);
-for ip = 1:np
-    memMLT(ip,:) = lsqnonneg(cal.mem_oxd.',MLTp(ip,:).')*100;
-end
-
-% Fe(:,end) = 0; Fi(:,end) = 0;
 EMExt = max(0,Fe)./sum(max(0,Fe),2)*100;
 EMInt = max(0,Fi)./sum(max(0,Fi),2)*100;
 
-% EMExt(EMExt(:,Al)==max(EMExt(:,Al)),:) = [];
-[~,is] = sort(EMExt(:,Ca)-EMExt(:,K),'descend');
+[~,is] = sort(EMExt(:,Al)+EMExt(:,Mg),'descend');
 EMExt = EMExt(is,:);
-% EMExt = [cal.mem_oxd(cal.ant,1:Na);EMExt];
 
-% EMInt(EMInt(:,cal.Al)==max(EMInt(:,cal.Al)),:) = [];
-[~,is] = sort(EMInt(:,Ca)-EMInt(:,K),'descend');
+[~,is] = sort(EMInt(:,Al)+EMInt(:,Mg),'descend');
 EMInt = EMInt(is,:);
-% EMInt = [cal.mem_oxd(cal.ant,1:Na);EMInt];
 
 MLT_PCA.EMInt = EMInt;
 MLT_PCA.EMExt = EMExt;
@@ -502,9 +495,6 @@ MLT_PCA.EMExt = EMExt;
 %% reconstruct bulk composition based on projected solid and liquid compositions
 SYSp = (SOLp.*OUT.PhaseFractions.sol_wt(hasMLT) + MLTp.*OUT.PhaseFractions.liq_wt(hasMLT)) ...
      ./(      OUT.PhaseFractions.sol_wt(hasMLT) +       OUT.PhaseFractions.liq_wt(hasMLT));
-
-memSYS = (memSOL.*OUT.PhaseFractions.sol_wt(hasMLT) + memMLT.*OUT.PhaseFractions.liq_wt(hasMLT)) ...
-       ./(        OUT.PhaseFractions.sol_wt(hasMLT) +         OUT.PhaseFractions.liq_wt(hasMLT));
 
 close all;
 save('MAGEMin_processed');
@@ -586,19 +576,18 @@ drawnow
 %% load projected data and prepare for fitting routines
 load('MAGEMin_processed');
 cal_ASVZ;  % load melt model calibration
-                % ant alb san for fay tms mgt dps mau fau hyp fsl ilm qtz wat
-indmem  = logical([1   1   0   0   0   0   0   0   0   0   0   0   0   0   0
+                % ant alb san for fay tms mgt ilm dps hdb fau hyp fsl qtz wat
+indmem  = logical([1   0   0   0   0   0   0   0   0   0   0   0   0   0   0
                    1   1   0   1   0   1   0   0   0   0   0   0   0   0   0
-                   1   1   0   1   1   1   1   1   1   0   0   0   0   0   0
-                   1   1   1   0   1   1   1   1   1   1   1   0   0   0   0
-                   1   1   1   0   0   0   1   0   1   1   1   1   1   0   0
-                   0   1   1   0   0   0   0   0   0   0   0   1   1   1   0
+                   1   1   0   1   1   1   1   0   1   0   0   0   0   0   0
+                   1   1   1   0   1   0   1   0   0   1   0   1   0   0   0
+                   1   1   1   0   0   0   0   1   0   0   1   1   1   0   0
+                   0   1   1   0   0   0   0   1   0   0   0   0   1   1   0
                    0   0   0   0   0   0   0   0   0   0   0   0   0   0   1]);
 
 
 % convert factor analysis end-member to mineral end-member proportions
-
-cmp_oxd = MLT_PCA.EMInt;%(MLT_PCA.EMInt+MLT_PCA.EMExt)/2;
+cmp_oxd = 0.5*MLT_PCA.EMInt+0.5*MLT_PCA.EMExt;
 cmp_oxd = cmp_oxd./sum(cmp_oxd,2)*100;
 
 Xp = zeros(size(cmp_oxd,1),cal.nmem);
@@ -606,6 +595,12 @@ for ip = 1:size(cmp_oxd,1)
     Xp(ip,indmem(ip,:)) = lsqnonneg(cal.mem_oxd(indmem(ip,:),oxdSYS(1:end-1)).',cmp_oxd(ip,:).');
 end
 cmp_mem = Xp./sum(Xp,2)*100;
+cmp_mem(2:end,:) = max(2*indmem(2:end-1,:),min(75,cmp_mem(2:end,:)));
+cmp_mem = cmp_mem./sum(cmp_mem,2)*100;
+while max(cmp_mem(2:end,:),[],'all')>=80 || min(cmp_mem(indmem(1:end-1,:)),[],'all')<=1
+    cmp_mem(2:end,:) = max(2*indmem(2:end-1,:),min(75,cmp_mem(2:end,:)));
+    cmp_mem = cmp_mem./sum(cmp_mem,2)*100;
+end
 
 cmp_mem_FINT = zeros(cal.ncmp,cal.nmem);
 cmp_mem_FINT(1:end-1,:) = cmp_mem;
@@ -614,60 +609,59 @@ cmp_oxd_FINT = cmp_mem_FINT*cal.mem_oxd/100;
 
 cmp_mem_MAP = cmp_mem_FINT;
 
-T0_MAP = [1530  1175  1130  1090  960  780];
-r_MAP  = [24.5  2.5  2.5  7.5  13.0  8.5];
+T0_MAP = [1553  1160  1130  1080  965  750];
+A_MAP  = (cal.T0+273.15)./350;
+B_MAP  = [8  5  4.5  4  3  2.5];
+r_MAP  = [25.7  2.5  2.5  7.5  12.3  8.0];
 
-%                 % for fay ant alb dps aug tma tim ilm hyp fsl qtz wat
-% indmem  = logical([1   1   0   0   0   0   0   0   0   0   0   0   0
-%                    1   1   1   0   0   0   0   0   0   0   0   0   0
-%                    1   1   1   1   1   0   1   1   0   1   0   0   0
-%                    0   1   1   1   1   1   1   1   1   1   1   0   0
-%                    0   0   0   1   0   1   0   1   1   0   1   1   0
-%                    0   0   0   0   0   0   0   0   0   0   0   0   1]);
 
 %%
 cal_ASVZ;  % load melt model calibration
 
-data  = [MLTp(:);SOLp(:);0.2*PHS(:)];%repmat(PHS(:,1),6,1)];
-% data  = [memMLT(:);memSOL(:);PHS(:)];
+data   = [MLTp(:);SOLp(:);PHS(:);Tsol(:);Tliq(:)];
 
-m0     = [T0_MAP.';r_MAP.';cmp_mem_MAP(:).*indmem(:)];
-m0_lw  = m0 - [max(10,0.025*T0_MAP.');max(3,0.5*r_MAP.');max(10,0.5*cmp_mem_MAP(:)).*indmem(:)];
-m0_up  = m0 + [max(10,0.025*T0_MAP.');max(3,0.5*r_MAP.');max(10,0.5*cmp_mem_MAP(:)).*indmem(:)];
+m0     = [T0_MAP.';A_MAP.';B_MAP.';r_MAP.';cmp_mem_MAP(:).*indmem(:);];
+m0_lw  = m0 - [max(10,0.05*T0_MAP.');0*max(0.1,0.01*A_MAP.');0*max(1,0.3*B_MAP.');max(1,0.3*r_MAP.');max(100,1*cmp_mem_MAP(:)).*indmem(:)];
+m0_up  = m0 + [max(10,0.05*T0_MAP.');0*max(0.1,0.01*A_MAP.');0*max(1,0.3*B_MAP.');max(1,0.3*r_MAP.');max(100,1*cmp_mem_MAP(:)).*indmem(:)];
 mbnds  = [m0_lw(:),m0_up(:)]; % model parameter bounds
-mbnds(m0==1530,:) = 1530;
-mbnds(m0==780,:)  = 780;
-mbnds(m0==24.5,:) = 24.5;
-mbnds(m0==100 ,:) = 100;
-% mbnds(2:cal.ncmp-1,2) = min(mbnds(2:cal.ncmp-1,2),m0(1:cal.ncmp-2)-20);
-% mbnds(cal.ncmp*cal.nmem+           (1:cal.ncmp-1),:) = repmat(m0   (cal.ncmp*cal.nmem+           (1:cal.ncmp-1)),1,2);
 mbnds(   cal.ncmp-1 +(1:cal.ncmp-1)       ,:) = max(2,        mbnds(   cal.ncmp-1 +(1:cal.ncmp-1)       ,:));
-mbnds(2*(cal.ncmp-1)+(1:cal.ncmp*cal.nmem),:) = max(0,min(100,mbnds(2*(cal.ncmp-1)+(1:cal.ncmp*cal.nmem),:)));
+mbnds(4*(cal.ncmp-1)+(1:cal.ncmp*cal.nmem),:) = max(indmem(:),min(80,mbnds(4*(cal.ncmp-1)+(1:cal.ncmp*cal.nmem),:)));
+mbnds(m0==100 ,:) = 100;
+mbnds(m0==T0_MAP(1),:) = T0_MAP(1);
 
-mNames = cell(cal.ncmp*cal.nmem,1);
+mNames = cell(cal.ncmp*cal.nmem+4*(cal.ncmp-1),1);
 k = 1;
-for j=1:cal.ncmp-1
-    mNames{k} = ['T0:',cal.cmpStr{j}];
-    k = k+1;
-end
-for j=1:cal.ncmp-1
-    mNames{k} = ['r:',cal.cmpStr{j}];
-    k = k+1;
+for j=1:4
+    for i=1:cal.ncmp-1
+        if j==1
+            mNames{k} = ['T0:',cal.cmpStr{i}];
+        elseif j==2
+            mNames{k} = ['A:',cal.cmpStr{i}];
+        elseif j==3
+            mNames{k} = ['B:',cal.cmpStr{i}];
+        elseif j==4
+            mNames{k} = ['r:',cal.cmpStr{i}];
+        end
+        k = k+1;
+    end
 end
 for j=1:cal.nmem
     for i=1:cal.ncmp
-        mNames{k} = [cal.memStr{j},':',cal.cmpStr{i},];
+        mNames{k} = [cal.memStr{j},':',cal.cmpStr{i}];
         k = k+1;
     end
 end
 
 % set data uncertainties
-sigma  = 0.1*ones(size(data));%max(0.01,0.01*data);
+sigma_MLTSOL    =  0.1 * ones(size([MLTp(:);SOLp(:)]));
+sigma_PHS       =  0.5 * ones(size([PHS(:)]));
+sigma_TsolTliq  =  1.0 * ones(size([Tsol(:);Tliq(:)]));
+sigma = [sigma_MLTSOL;sigma_PHS;sigma_TsolTliq];
 
 % function to calculate forward model
 % m --> dhat
 % dhatFunc  = @(model) OxdFromCmpMem(model,MLTp,SOLp,PHS(:,1),cal);
-dhatFunc  = @(model) ModelFit(model,T,P,MLTp,SOLp,PHS(:,1),cal);
+dhatFunc  = @(model) ModelFitP(model,T,P,MLTp,SOLp,SYSp,PHS(:,1),Psl,cal);
 
 % function to apply further constraints to a proposed set of model param values
 % m --> m
@@ -679,48 +673,48 @@ PriorFunc = @(model) ProbFuncs('PriorFunc', model, mbnds, 'uniform');
 
 % function to calculate likelihood of dhat
 % dhat --> likelihood 
-LikeFunc  = @(dhat,model) ProbFuncs('LikeFuncSimplex',dhat,data,sigma,0.1,20,model,cal);
+LikeFunc  = @(dhat,model) ProbFuncs('LikeFuncSimplex',dhat,data,sigma,0.1,3,model,cal);
 
 % run MCMC algorithm
-Niter = 1e5;
+Niter = 2e5;
 
 % adjust step size to get reasonable acceptance ratio ~26%
-anneal.initstep = 0.0025 * diff(mbnds,1,2);
+anneal.initstep = 0.0015 * diff(mbnds,1,2);
 anneal.levels   = 3;
-anneal.burnin   = Niter/1000;
-anneal.refine   = Niter/10;
+anneal.burnin   = max(1,Niter/5);
+anneal.refine   = max(1,Niter/10);
 bestfit         = m0;
 
 tic;
-[models,prob,accept,bestfit] = mcmc(dhatFunc,PriorFunc,LikeFunc,ConstrFunc,2*(cal.ncmp-1)+(1:cal.ncmp*cal.nmem),m0,mbnds,anneal,Niter);
+[models,prob,accept,bestfit] = mcmc(dhatFunc,PriorFunc,LikeFunc,ConstrFunc,4*(cal.ncmp-1)+(1:cal.ncmp*cal.nmem),m0,mbnds,anneal,Niter);
 RunTime(1) = toc;
 
 plotmcmc(models, prob, [], mbnds, anneal, mNames);
 
-T0_MAP       = bestfit(           (1:cal.ncmp-1)).';
-r_MAP        = bestfit(cal.ncmp-1+(1:cal.ncmp-1)).';
-cmp_mem_MAP  = reshape(bestfit(2*(cal.ncmp-1)+(1:cal.ncmp*cal.nmem)),cal.ncmp,cal.nmem);
+T0_MAP       = bestfit(               (1:cal.ncmp-1)).';
+A_MAP        = bestfit(1*(cal.ncmp-1)+(1:cal.ncmp-1)).';
+B_MAP        = bestfit(2*(cal.ncmp-1)+(1:cal.ncmp-1)).';
+r_MAP        = bestfit(3*(cal.ncmp-1)+(1:cal.ncmp-1)).';
+cmp_mem_MAP  = reshape(bestfit(4*(cal.ncmp-1)+(1:cal.ncmp*cal.nmem)),cal.ncmp,cal.nmem);
 cmp_oxd_MAP  = cmp_mem_MAP*cal.mem_oxd/100;
 
-[dhat,MLTfit,SOLfit,SYSfit,PHSfit,cmpSYS] = dhatFunc([T0_MAP.';r_MAP.';cmp_mem_MAP(:)]);
+[dhat,MLTfit,SOLfit,SYSfit,PHSfit,cmpSYS,Tsolfit,Tliqfit,Tm] = dhatFunc([T0_MAP.';A_MAP.';B_MAP.';r_MAP.';cmp_mem_MAP(:)]);
 [Lbest,Vsimplex] = LikeFunc(dhat,bestfit);
 
-%
 if isfield(cal,'Tsol'); cal = rmfield(cal,{'Tsol' 'Tliq'}); end
-Psl = linspace(1e5,3e9,100).';
-var.m = ones(size(Psl)); var.x = 0*var.m; var.f = 0*var.m;
+PP         = linspace(1e5,3e9,50).';
+var.m      = ones(size(PP)); var.x = 0*var.m; var.f = 0*var.m;
 cal.T0     = T0_MAP;
 cal.A      = (cal.T0+273.15)./350;
+cal.B      = B_MAP;
 cal.r      = r_MAP;
-var.c      = repmat(mean(cmpSYS(1:5,:).*[1,1,1,1,1,1,0]./sum(cmpSYS(1:5,1:end-1),2),1),length(Psl),1);   % component fractions [wt]
-var.P      = Psl/1e9;         % pressure [GPa]
-var.T      = 1000+Psl*5e-8;             % temperature [C]
-var.H2O    = zeros(size(Psl)); % water concentration [wt]
-cal.H2Osat = fluidsat(var.T,var.P,0*var.P,cal);
+var.c      = repmat(mean(cmpSYS(1:5,:).*[1,1,1,1,1,1,0]./sum(cmpSYS(1:5,1:end-1),2),1),length(PP),1);   % component fractions [wt]
+var.P      = PP/1e9;         % pressure [GPa]
+var.T      = 1000+PP*5e-8;             % temperature [C]
+var.H2O    = zeros(size(PP)); % water concentration [wt]
+cal.H2Osat = var.H2O+0.001;
 [~,cal]    = meltmodel(var,cal,'T');
 
-Tsolfit    = cal.Tsol;
-Tliqfit    = cal.Tliq;
 Tm         = cal.Tm;
 
 % retrieve distributions
@@ -731,7 +725,7 @@ Tm         = cal.Tm;
 %% liquid, solid, mixture compositions
 % cal_ASVZ; % load melt model calibration
  
-figure(107); clf;
+figure(108); clf;
 
 subplot(2,4,1);
 scatter(MLTp(:,Si),MLTp(:,Ti),25,T,'o'); colormap('copper'); axis tight; hold on
@@ -811,33 +805,43 @@ xlabel(cal.oxdStr(cal.Si),FS{:},TX{:})
 ylabel(cal.oxdStr(cal.K ),FS{:},TX{:})
 
 subplot(2,4,8);
-scatter(MLTp(:,Si),MLTp(:,H),25,T,'o'); colormap('copper'); axis tight; hold on
-scatter(SOLp(:,Si),SOLp(:,H),25,T,'s');
-scatter(SYSp(:,Si),SYSp(:,H),25,T,'d');
-scatter(MLTfit(:,Si),MLTfit(:,H),25,T,'o','filled');
-scatter(SOLfit(:,Si),SOLfit(:,H),25,T,'s','filled');
-scatter(SYSfit(:,Si),SYSfit(:,H),25,T,'d','filled');
-% scatter(cmp_oxd_MAP(1:end-1,cal.Si),cmp_oxd_MAP(1:end-1,cal.H),200,'kh','filled');
+scatter(MLTp(:,Si),MLTp(:,H ),25,T,'o'); colormap('copper'); axis tight; hold on
+scatter(SOLp(:,Si),SOLp(:,H ),25,T,'s');
+scatter(SYSp(:,Si),SYSp(:,H ),25,T,'d');
+scatter(MLTfit(:,Si),MLTfit(:,H ),25,T,'o','filled');
+scatter(SOLfit(:,Si),SOLfit(:,H ),25,T,'s','filled');
+scatter(SYSfit(:,Si),SYSfit(:,H ),25,T,'d','filled');
+scatter(cmp_oxd_MAP(1:end-1,cal.Si),cmp_oxd_MAP(1:end-1,cal.H ),200,'kh','filled');
 xlabel(cal.oxdStr(cal.Si),FS{:},TX{:})
-ylabel(cal.oxdStr(cal.H),FS{:},TX{:})
+ylabel(cal.oxdStr(cal.H ),FS{:},TX{:})
 
 sgtitle('MCMC component fit',FS{:},TX{:})
+drawnow
 
-figure(108); clf; cmap = colororder; cmap = [cmap;[0 0 0]];
-plot(T,PHS(:,1),'-',T,PHSfit(:,1),'--','Color',cmap(2,:),'LineWidth',1.5); axis tight; hold on % melt
-plot(T,PHS(:,2),'-',T,PHSfit(:,2),'--','Color',cmap(1,:),'LineWidth',1.5); % fsp
-plot(T,PHS(:,3),'-',T,PHSfit(:,3),'--','Color',cmap(5,:),'LineWidth',1.5); % olv
-plot(T,PHS(:,4),'-',T,PHSfit(:,4),'--','Color',cmap(6,:),'LineWidth',1.5); % spn
-plot(T,PHS(:,5),'-',T,PHSfit(:,5),'--','Color',cmap(3,:),'LineWidth',1.5); % cpx
-plot(T,PHS(:,6),'-',T,PHSfit(:,6),'--','Color',cmap(4,:),'LineWidth',1.5); % opx
-plot(T,PHS(:,7),'-',T,PHSfit(:,7),'--','Color',cmap(7,:),'LineWidth',1.5); % qtz
+figure(109); clf; cmap = colororder;
+plot(T,PHS(:,1),'-','Color',cmap(2,:),'LineWidth',1.5); axis tight; hold on % mlt
+plot(T,PHS(:,2),'-','Color',cmap(5,:),'LineWidth',1.5); % fsp
+plot(T,PHS(:,3),'-','Color',cmap(6,:),'LineWidth',1.5); % olv
+plot(T,PHS(:,4),'-','Color',cmap(3,:),'LineWidth',1.5); % spn
+plot(T,PHS(:,5),'-','Color',cmap(4,:),'LineWidth',1.5); % cpx
+plot(T,PHS(:,6),'-','Color',cmap(1,:),'LineWidth',1.5); % opx
+plot(T,PHS(:,7),'-','Color',cmap(7,:),'LineWidth',1.5); % qtz
+
+plot(T,PHSfit(:,1),'--','Color',cmap(2,:),'LineWidth',1.5); % mlt
+plot(T,PHSfit(:,2),'--','Color',cmap(5,:),'LineWidth',1.5); % fsp
+plot(T,PHSfit(:,3),'--','Color',cmap(6,:),'LineWidth',1.5); % olv
+plot(T,PHSfit(:,4),'--','Color',cmap(3,:),'LineWidth',1.5); % spn
+plot(T,PHSfit(:,5),'--','Color',cmap(4,:),'LineWidth',1.5); % cpx
+plot(T,PHSfit(:,6),'--','Color',cmap(1,:),'LineWidth',1.5); % opx
+plot(T,PHSfit(:,7),'--','Color',cmap(7,:),'LineWidth',1.5); % qtz
+legend(['mlt',cal.msyStr],FS{:},TX{:})
 xlabel('Temperature [$^\circ$C]',FS{:},TX{:})
 ylabel('Phase proportions [wt\%]',FS{:},TX{:})
 sgtitle('Phase stability',FS{:},TX{:})
 drawnow
 
-% %% plot phase diagram
-figure(109); clf;
+% plot phase diagram
+figure(110); clf;
 subplot(3,3,1)
 plot(MLTp(:,Si)./sum(MLTp(:,1:end-1),2)*100,T,'o','Color',[0.7 0.7 0.7]); axis tight; hold on; box on;
 plot(SOLp(:,Si)./sum(SOLp(:,1:end-1),2)*100,T,'s','Color',[0.7 0.7 0.7]);
@@ -847,8 +851,6 @@ plot(MLTfit(:,Si)./sum(MLTfit(:,1:end-1),2)*100,T,'ro'); axis tight; hold on; bo
 plot(SOLfit(:,Si)./sum(SOLfit(:,1:end-1),2)*100,T,'bs');
 plot(SYSfit(:,Si)./sum(SYSfit(:,1:end-1),2)*100,T,'kd');
 
-% plot(cx_oxd_MAP(:,Si)./sum(cx_oxd_MAP(:,1:end-1),2)*100,T,'bs','LineWidth',2);
-% plot(cm_oxd_MAP(:,Si)./sum(cm_oxd_MAP(:,1:end-1),2)*100,T,'ro','LineWidth',2);
 xlabel([cal.oxdStr{Si},' [wt]'],'Interpreter','latex','FontSize',15)
 
 subplot(3,3,2)
@@ -860,8 +862,6 @@ plot(MLTfit(:,Ti)./sum(MLTfit(:,1:end-1),2)*100,T,'ro'); axis tight; hold on; bo
 plot(SOLfit(:,Ti)./sum(SOLfit(:,1:end-1),2)*100,T,'bs');
 plot(SYSfit(:,Ti)./sum(SYSfit(:,1:end-1),2)*100,T,'kd');
 
-% plot(cx_oxd_MAP(:,Ti)./sum(cx_oxd_MAP(:,1:end-1),2)*100,T,'bs','LineWidth',2);
-% plot(cm_oxd_MAP(:,Ti)./sum(cm_oxd_MAP(:,1:end-1),2)*100,T,'ro','LineWidth',2);
 xlabel([cal.oxdStr{Ti},' [wt]'],'Interpreter','latex','FontSize',15)
 
 subplot(3,3,3)
@@ -873,8 +873,6 @@ plot(MLTfit(:,Al)./sum(MLTfit(:,1:end-1),2)*100,T,'ro'); axis tight; hold on; bo
 plot(SOLfit(:,Al)./sum(SOLfit(:,1:end-1),2)*100,T,'bs');
 plot(SYSfit(:,Al)./sum(SYSfit(:,1:end-1),2)*100,T,'kd');
 
-% plot(cx_oxd_MAP(:,Al)./sum(cx_oxd_MAP(:,1:end-1),2)*100,T,'bs','LineWidth',2);
-% plot(cm_oxd_MAP(:,Al)./sum(cm_oxd_MAP(:,1:end-1),2)*100,T,'ro','LineWidth',2);
 xlabel([cal.oxdStr{Al},' [wt]'],'Interpreter','latex','FontSize',15)
 
 subplot(3,3,4)
@@ -886,8 +884,6 @@ plot(MLTfit(:,FeO)./sum(MLTfit(:,1:end-1),2)*100,T,'ro'); axis tight; hold on; b
 plot(SOLfit(:,FeO)./sum(SOLfit(:,1:end-1),2)*100,T,'bs');
 plot(SYSfit(:,FeO)./sum(SYSfit(:,1:end-1),2)*100,T,'kd');
 
-% plot(cx_oxd_MAP(:,FeO)./sum(cx_oxd_MAP(:,1:end-1),2)*100,T,'bs','LineWidth',2);
-% plot(cm_oxd_MAP(:,FeO)./sum(cm_oxd_MAP(:,1:end-1),2)*100,T,'ro','LineWidth',2);
 xlabel([cal.oxdStr{FeO},' [wt]'],'Interpreter','latex','FontSize',15)
 ylabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',15)
 
@@ -900,8 +896,6 @@ plot(MLTfit(:,Mg)./sum(MLTfit(:,1:end-1),2)*100,T,'ro'); axis tight; hold on; bo
 plot(SOLfit(:,Mg)./sum(SOLfit(:,1:end-1),2)*100,T,'bs');
 plot(SYSfit(:,Mg)./sum(SYSfit(:,1:end-1),2)*100,T,'kd');
 
-% plot(cx_oxd_MAP(:,Mg)./sum(cx_oxd_MAP(:,1:end-1),2)*100,T,'bs','LineWidth',2);
-% plot(cm_oxd_MAP(:,Mg)./sum(cm_oxd_MAP(:,1:end-1),2)*100,T,'ro','LineWidth',2);
 xlabel([cal.oxdStr{Mg},' [wt]'],'Interpreter','latex','FontSize',15)
 
 subplot(3,3,6)
@@ -913,8 +907,6 @@ plot(MLTfit(:,Ca)./sum(MLTfit(:,1:end-1),2)*100,T,'ro'); axis tight; hold on; bo
 plot(SOLfit(:,Ca)./sum(SOLfit(:,1:end-1),2)*100,T,'bs');
 plot(SYSfit(:,Ca)./sum(SYSfit(:,1:end-1),2)*100,T,'kd');
 
-% plot(cx_oxd_MAP(:,Ca)./sum(cx_oxd_MAP(:,1:end-1),2)*100,T,'bs','LineWidth',2);
-% plot(cm_oxd_MAP(:,Ca)./sum(cm_oxd_MAP(:,1:end-1),2)*100,T,'ro','LineWidth',2);
 xlabel([cal.oxdStr{Ca},' [wt]'],'Interpreter','latex','FontSize',15)
 
 subplot(3,3,7)
@@ -926,8 +918,6 @@ plot(MLTfit(:,Na)./sum(MLTfit(:,1:end-1),2)*100,T,'ro'); axis tight; hold on; bo
 plot(SOLfit(:,Na)./sum(SOLfit(:,1:end-1),2)*100,T,'bs');
 plot(SYSfit(:,Na)./sum(SYSfit(:,1:end-1),2)*100,T,'kd');
 
-% plot(cx_oxd_MAP(:,Na)./sum(cx_oxd_MAP(:,1:end-1),2)*100,T,'bs','LineWidth',2);
-% plot(cm_oxd_MAP(:,Na)./sum(cm_oxd_MAP(:,1:end-1),2)*100,T,'ro','LineWidth',2);
 xlabel([cal.oxdStr{Na},' [wt]'],'Interpreter','latex','FontSize',15)
 
 subplot(3,3,8)
@@ -939,34 +929,32 @@ plot(MLTfit(:,K )./sum(MLTfit(:,1:end-1),2)*100,T,'ro'); axis tight; hold on; bo
 plot(SOLfit(:,K )./sum(SOLfit(:,1:end-1),2)*100,T,'bs');
 plot(SYSfit(:,K )./sum(SYSfit(:,1:end-1),2)*100,T,'kd');
 
-% plot(cx_oxd_MAP(:,K )./sum(cx_oxd_MAP(:,1:end-1),2)*100,T,'bs','LineWidth',2);
-% plot(cm_oxd_MAP(:,K )./sum(cm_oxd_MAP(:,1:end-1),2)*100,T,'ro','LineWidth',2);
 xlabel([cal.oxdStr{K },' [wt]'],'Interpreter','latex','FontSize',15)
 
 subplot(3,3,9)
-plot(MLTp(:,H),T,'o','Color',[0.7 0.7 0.7]); axis tight; hold on; box on;
-plot(SOLp(:,H),T,'s','Color',[0.7 0.7 0.7]);
-plot(SYSp(:,H),T,'d','Color',[0.7 0.7 0.7]);
+plot(MLTp(:,H )./sum(MLTp(:,1:end-1),2)*100,T,'o','Color',[0.7 0.7 0.7]); axis tight; hold on; box on;
+plot(SOLp(:,H )./sum(SOLp(:,1:end-1),2)*100,T,'s','Color',[0.7 0.7 0.7]);
+plot(SYSp(:,H )./sum(SYSp(:,1:end-1),2)*100,T,'d','Color',[0.7 0.7 0.7]);
 
-plot(MLTfit(:,H),T,'ro'); axis tight; hold on; box on;
-plot(SOLfit(:,H),T,'bs');
-plot(SYSfit(:,H),T,'kd');
+plot(MLTfit(:,H )./sum(MLTfit(:,1:end-1),2)*100,T,'ro'); axis tight; hold on; box on;
+plot(SOLfit(:,H )./sum(SOLfit(:,1:end-1),2)*100,T,'bs');
+plot(SYSfit(:,H )./sum(SYSfit(:,1:end-1),2)*100,T,'kd');
 
-% plot(cx_oxd_MAP(:,H),T,'bs','LineWidth',2);
-% plot(cm_oxd_MAP(:,H),T,'ro','LineWidth',2);
-xlabel([cal.oxdStr{H},' [wt]'],'Interpreter','latex','FontSize',15)
+xlabel([cal.oxdStr{H },' [wt]'],'Interpreter','latex','FontSize',15)
+drawnow
 
-figure(110); clf
-plot(Tm,Psl,'LineWidth',1); axis ij tight; hold on
-% plot(Tsol,Psl,'k-'); 
-% plot(Tliq,Psl,'k-');
-plot(Tsolfit,Psl,'b-','LineWidth',2);
-plot(Tliqfit,Psl,'r-','LineWidth',2);
+figure(111); clf
+plot(Tm,PP/1e9,'LineWidth',1); axis ij tight; hold on
+plot(Tsolfit,Psl,'bo','LineWidth',2);
+plot(Tliqfit,Psl,'ro','LineWidth',2);
+plot(Tsol,Psl,'ko','LineWidth',1.5);
+plot(Tliq,Psl,'ko','LineWidth',1.5);
 
+legend([cal.cmpStr(1:end-1),'Tsol','Tliq'],FS{:},TX{:})
 xlabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',15)
 ylabel('Pressure [GPa]','Interpreter','latex','FontSize',15)
+drawnow
 
-% PlotPhaseDiagrams;
 
 %%
 save('ASVZ_calibration');
