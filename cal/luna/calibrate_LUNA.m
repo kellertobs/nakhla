@@ -531,8 +531,8 @@ cal_LUNA;  % load melt model calibration
                 % for fay ens hyp ads dps pig ant alb ams ulv qtz wat
 indmem  = logical([1   0   0   0   0   0   0   0   0   0   0   0   0
                    1   1   1   0   0   0   0   0   0   0   0   0   0
-                   1   1   1   1   1   0   0   0   0   0   0   0   0
-                   0   1   0   1   1   1   0   1   0   0   0   0   0
+                   0   1   1   1   1   0   0   0   0   0   0   0   0
+                   0   0   0   1   1   1   0   1   0   0   0   0   0
                    0   0   0   0   0   1   1   1   1   1   0   0   0
                    0   0   0   0   0   0   1   0   1   0   1   1   0
                    0   0   0   0   0   0   0   0   0   0   0   0   1]);

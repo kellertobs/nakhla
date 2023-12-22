@@ -57,11 +57,11 @@ cal.msy_mem = [1  1  0  0  0  0  0  0  0  0  0  0  0    % olivine (olv)
 % mineral end-member composition of melting model components
 %                 for     fay     ens     hyp     tdp     dps     pig     ant     alb     ams     ulv     qtz     wat
 cal.cmp_mem = [100.00       0       0       0       0       0       0       0       0       0       0       0       0
-                46.73   52.11    1.16       0       0       0       0       0       0       0       0       0       0
-                    0    1.00   75.99   21.35    1.65       0       0       0       0       0       0       0       0
-                    0       0       0    2.66   24.23   23.56       0   49.55       0       0       0       0       0
-                    0       0       0       0       0   31.95   17.62   43.23    1.04    6.15       0       0       0
-                    0       0       0       0       0       0   46.55       0   30.69       0   17.73    5.03       0
+                48.82   50.18    1.00       0       0       0       0       0       0       0       0       0       0
+                    0    1.00   76.28   19.72    3.00       0       0       0       0       0       0       0       0
+                    0       0       0    1.22   46.21    4.04       0   48.52       0       0       0       0       0
+                    0       0       0       0       0   30.26   18.44   44.01    1.01    6.28       0       0       0
+                    0       0       0       0       0       0   45.95       0   31.05       0   18.00    5.00       0
                     0       0       0       0       0       0       0       0       0       0       0       0  100.00];
 cal.cmp_mem = cal.cmp_mem./sum(cal.cmp_mem,2)*100;
 
@@ -79,22 +79,22 @@ for i=1:cal.ncmp
 end
 
 % set pure component melting points T_m^i at P=0
-cal.T0 =  [1890  1539  1509  1181  1074  1013];
+cal.T0 =  [1890  1548  1498  1177  1073  1012];
 
 % set first coeff. for P-dependence of T_m^i [GPa]
 cal.A   = (cal.T0+273.15)./350;
 
 % set second coeff. for P-dependence of T_m^i [1]
-cal.B  =  [8.55  6.08  5.85  2.43  2.00  1.84];
+cal.B  =  [8.80  6.10  5.12  2.41  1.99  1.83];
 
 % set entropy gain of fusion DeltaS [J/K]
 cal.dS =  350;
 
 % set coeff. for T-dependence of partition coefficients K^i [1/K]
-cal.r  =  [22.2  68.4  16.8  8.9  5.8  9.4];
+cal.r  =  [21.4  67.9  17.9  8.6  5.9  10.1];
 
 % initial composition used in calibration
-cal.c0 = [0.25  0.29  0.18  0.22  0.04  0.03  0.00];
+cal.c0 = [0.24  0.30  0.19  0.21  0.03  0.04  0.00];
 
 % specify melting point dependence on H2O
 cal.dTH2O   = 1400;                 % solidus shift from water content [K/wt^pH2O]
