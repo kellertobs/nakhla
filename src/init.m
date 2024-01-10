@@ -62,7 +62,7 @@ for i = 1:round(smth)
 end
 rp = rp./max(abs(rp(:)));
 
-gp = exp(-(XX-D/2).^2/(D/8)^2 - (ZZ-D/2).^2/(D/8)^2);
+gp = exp(-(XX-L/2).^2/(max(L,D)/8)^2 - (ZZ-D/2).^2/(max(L,D)/8)^2);
 
 % get mapping arrays
 NP = (Nz+2) * (Nx+2);

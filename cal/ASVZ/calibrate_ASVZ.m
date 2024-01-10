@@ -580,9 +580,9 @@ cal_ASVZ;  % load melt model calibration
 indmem  = logical([1   0   0   0   0   0   0   0   0   0   0   0   0   0   0
                    1   1   0   1   0   1   0   0   0   0   0   0   0   0   0
                    1   1   0   1   1   1   1   0   1   0   0   0   0   0   0
-                   1   1   1   0   1   0   1   0   0   1   0   1   0   0   0
+                   1   1   1   0   1   0   1   1   0   1   0   1   0   0   0
                    1   1   1   0   0   0   0   1   0   0   1   1   1   0   0
-                   0   1   1   0   0   0   0   1   0   0   0   0   1   1   0
+                   0   1   1   0   0   0   0   0   0   0   0   0   1   1   0
                    0   0   0   0   0   0   0   0   0   0   0   0   0   0   1]);
 
 
@@ -609,10 +609,10 @@ cmp_oxd_FINT = cmp_mem_FINT*cal.mem_oxd/100;
 
 cmp_mem_MAP = cmp_mem_FINT;
 
-T0_MAP = [1553  1160  1130  1080  965  750];
+T0_MAP = [1553  1170  1135  1095  980  740];
 A_MAP  = (cal.T0+273.15)./350;
 B_MAP  = [8  5  4.5  4  3  2.5];
-r_MAP  = [25.7  2.5  2.5  7.5  12.3  8.0];
+r_MAP  = [21  5  2.1  8.8  10.4  8.0];
 
 
 %%
@@ -621,10 +621,10 @@ cal_ASVZ;  % load melt model calibration
 data   = [MLTp(:);SOLp(:);PHS(:);Tsol(:);Tliq(:)];
 
 m0     = [T0_MAP.';A_MAP.';B_MAP.';r_MAP.';cmp_mem_MAP(:).*indmem(:);];
-m0_lw  = m0 - [max(10,0.05*T0_MAP.');0*max(0.1,0.01*A_MAP.');0*max(1,0.3*B_MAP.');max(1,0.3*r_MAP.');max(100,1*cmp_mem_MAP(:)).*indmem(:)];
-m0_up  = m0 + [max(10,0.05*T0_MAP.');0*max(0.1,0.01*A_MAP.');0*max(1,0.3*B_MAP.');max(1,0.3*r_MAP.');max(100,1*cmp_mem_MAP(:)).*indmem(:)];
+m0_lw  = m0 - [max(10,0.05*T0_MAP.');0*max(0.1,0.01*A_MAP.');0*max(1,0.3*B_MAP.');max(1,0.4*r_MAP.');max(100,1*cmp_mem_MAP(:)).*indmem(:)];
+m0_up  = m0 + [max(10,0.05*T0_MAP.');0*max(0.1,0.01*A_MAP.');0*max(1,0.3*B_MAP.');max(1,0.4*r_MAP.');max(100,1*cmp_mem_MAP(:)).*indmem(:)];
 mbnds  = [m0_lw(:),m0_up(:)]; % model parameter bounds
-mbnds(   cal.ncmp-1 +(1:cal.ncmp-1)       ,:) = max(2,        mbnds(   cal.ncmp-1 +(1:cal.ncmp-1)       ,:));
+mbnds(3*(cal.ncmp-1)+(1:cal.ncmp-1)       ,:) = max(2,               mbnds(3*(cal.ncmp-1)+(1:cal.ncmp-1)       ,:));
 mbnds(4*(cal.ncmp-1)+(1:cal.ncmp*cal.nmem),:) = max(indmem(:),min(80,mbnds(4*(cal.ncmp-1)+(1:cal.ncmp*cal.nmem),:)));
 mbnds(m0==100 ,:) = 100;
 mbnds(m0==T0_MAP(1),:) = T0_MAP(1);
@@ -956,161 +956,13 @@ ylabel('Pressure [GPa]','Interpreter','latex','FontSize',15)
 drawnow
 
 
-%%
+%% save and display final state of calibration
 save('ASVZ_calibration');
 
-
-%% update material closures
-Nz = length(T); Nx = 1; Ptop = min(P); Pt = P; calibrt = 1;
-var.m = ones(size(T)); var.x = 0*var.m; var.f = 0*var.m;
-
-var.c      = c;             % component fractions [wt]
-var.T      = T;             % temperature [C]
-var.P      = P/1e9;         % pressure [GPa]
-var.H2O    = c(:,end);      % water concentration [wt]
-cal.H2Osat = MLTfit(:,H)/100;
-[var,cal]  = meltmodel(var,cal,'E');
-
-c  = zeros(Nz,Nx,cal.ncmp); c (:,1,:) = var.c;
-cm = zeros(Nz,Nx,cal.ncmp); cm(:,1,:) = var.cm;
-cx = zeros(Nz,Nx,cal.ncmp); cx(:,1,:) = var.cx;
-
-m = var.m; 
-x = var.x; 
-f = var.f;
-
-T = T+273.15;
-
-update;
-
-T = T-273.15;
-
-wm =  mu.*Ksgr_m .* (rhom-rho)*g0; % melt segregation speed
-wx = chi.*Ksgr_x .* (rhox-rho)*g0; % crystal segregation speed
-wf = phi.*Ksgr_f .* (rhof-rho)*g0; % fluid segregation speed
-
-%% plot phase fractions
-figure(8); clf;
-plot(T,x.*100,'k',T,m.*100,'r',T,f.*1000,'b','LineStyle',linestyle,'LineWidth',2); hold on; box on; axis tight;
-legend('crystals','melt','fluid $\times10$','Interpreter','latex','FontSize',15,'box','off','location','east')
-set(gca,'TickLabelInterpreter','latex','FontSize',13)
-title('Melting model','Interpreter','latex','FontSize',18)
-xlabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',15)
-ylabel('Phase fractions [wt\%]','Interpreter','latex','FontSize',15)
-
-% plot major phase compositions
-figure(9); clf;
-plot(T,cx.*100,'b',T,cm.*100,'r','LineStyle',linestyle,'LineWidth',2); hold on; box on; axis tight;
-legend('crystals','melt','Interpreter','latex','FontSize',15,'box','off','location','northeast')
-set(gca,'TickLabelInterpreter','latex','FontSize',13)
-title('Phase compositions','Interpreter','latex','FontSize',18)
-xlabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',15)
-ylabel('Major component [wt\% SiO$_2$]','Interpreter','latex','FontSize',15)
-
-% plot phase densities
-figure(11); clf;
-plot(T,rhox,'k',T,rhom,'r',T,rhof,'b','LineStyle',linestyle,'LineWidth',2); hold on; box on; axis tight;
-plot(T,rho ,'Color',[0.5 0.5 0.5],'LineStyle',linestyle,'LineWidth',2); hold on; box on; axis tight;
-legend('crystals','melt','fluid','mixture','Interpreter','latex','FontSize',15,'box','off','location','best')
-set(gca,'TickLabelInterpreter','latex','FontSize',13)
-title('Density model','Interpreter','latex','FontSize',18)
-xlabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',15)
-ylabel('Density [kg/m$^3$]','Interpreter','latex','FontSize',15)
-
-% plot mixture rheology
-figure(12); clf;
-semilogy(T,eta,'k',T,etam,'r','LineStyle',linestyle,'LineWidth',2); hold on; box on; axis tight;
-legend('mixture','melt','Interpreter','latex','FontSize',15,'box','off','location','best')
-set(gca,'TickLabelInterpreter','latex','FontSize',13)
-title('Viscosity model','Interpreter','latex','FontSize',18)
-xlabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',15)
-ylabel('Viscosity [log$_{10}$ Pas]','Interpreter','latex','FontSize',15)
-
-% plot phase segregation speeds
-figure(13); clf;
-semilogy(T,max(1e-18,abs(chi.*wx)).*3600,'k',T,max(1e-18,abs(mu.*wm)).*3600,'r',T,max(1e-18,abs(phi.*wf)).*3600,'b','LineStyle',linestyle,'LineWidth',2); hold on; box on; axis tight;
-legend('crystals','melt','fluid','Interpreter','latex','FontSize',15,'box','off','location','best')
-set(gca,'TickLabelInterpreter','latex','FontSize',13)
-title('Phase segregation model','Interpreter','latex','FontSize',18)
-xlabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',15)
-ylabel('Segregation flux [m/hr]','Interpreter','latex','FontSize',15)
-
-% plot oxide compositions
-figure(14); clf;
-subplot(2,1,1)
-sgtitle('Phase Oxide Fractions','Interpreter','latex','FontSize',18)
-for i=1:cal.noxd
-    plot(T,cm_oxd(:,i).*100,'LineStyle',linestyle,'LineWidth',2,'color',ocean(round((i-1)*213/cal.noxd)+1,:)); hold on; box on; axis tight;
-end
-legend(cal.oxdStr,'Interpreter','latex','FontSize',13,'box','off','location','best')
-set(gca,'TickLabelInterpreter','latex','FontSize',13)
-ylabel('Melt composition [wt\%]','Interpreter','latex','FontSize',15)
-subplot(2,1,2)
-for i=1:cal.noxd
-    plot(T,cx_oxd(:,i).*100,'LineStyle',linestyle,'LineWidth',2,'color',ocean(round((i-1)*213/cal.noxd)+1,:)); hold on; box on; axis tight;
-end
-set(gca,'TickLabelInterpreter','latex','FontSize',13)
-xlabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',15)
-ylabel('Solid composition [wt\%]','Interpreter','latex','FontSize',15)
-
-% plot end-member component compositions
-figure(15); clf;
-subplot(2,1,1)
-sgtitle('Phase Component Fractions','Interpreter','latex','FontSize',18)
-for i=1:cal.ncmp
-    plot(T,cm(:,i).*100,'LineStyle',linestyle,'LineWidth',2,'color',ocean(round((i-1)*213/cal.ncmp)+1,:)); hold on; box on; axis tight;
-end
-legend(cal.cmpStr,'Interpreter','latex','FontSize',13,'box','off','location','best')
-set(gca,'TickLabelInterpreter','latex','FontSize',13)
-ylabel('Melt composition [wt\%]','Interpreter','latex','FontSize',15)
-subplot(2,1,2)
-for i=1:cal.ncmp
-    plot(T,cx(:,i).*100,'LineStyle',linestyle,'LineWidth',2,'color',ocean(round((i-1)*213/cal.ncmp)+1,:)); hold on; box on; axis tight;
-end
-set(gca,'TickLabelInterpreter','latex','FontSize',13)
-xlabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',15)
-ylabel('Solid composition [wt\%]','Interpreter','latex','FontSize',15)
-
-% plot simplified mineral assemblage
-figure(16); clf;
-patch([T;flipud(T)],[zeros(size(T));flipud(cx_msy(:,1))],[0.6,0.8,0.5],'LineWidth',2); hold on; box on; axis tight;
-patch([T;flipud(T)],[sum(cx_msy(:,1  ),2);flipud(sum(cx_msy(:,1:2),2))],0.7.*[0.6,0.6,0.6],'LineWidth',2);
-patch([T;flipud(T)],[sum(cx_msy(:,1:2),2);flipud(sum(cx_msy(:,1:3),2))],0.9.*[0.6,0.6,0.6],'LineWidth',2);
-patch([T;flipud(T)],[sum(cx_msy(:,1:3),2);flipud(sum(cx_msy(:,1:4),2))],1.1.*[0.6,0.6,0.6],'LineWidth',2);
-patch([T;flipud(T)],[sum(cx_msy(:,1:4),2);flipud(sum(cx_msy(:,1:5),2))],[0.9,0.9,0.9],'LineWidth',2);
-patch([T;flipud(T)],[sum(cx_msy(:,1:5),2);flipud(sum(cx_msy(:,1:6),2))],[0.9,0.7,0.9],'LineWidth',2);
-legend('~olivine','~spinel','~oreutpyroxene','~clinopyroxene','~feldspar','~quartz','Interpreter','latex','FontSize',15,'box','off','location','southeast')
-set(gca,'TickLabelInterpreter','latex','FontSize',13)
-title('Mineral assemblage','Interpreter','latex','FontSize',18)
-xlabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',15)
-ylabel('Mineral fraction [wt]','Interpreter','latex','FontSize',15)
-
-
-% create output directory
-if ~isfolder(['../out/',runID])
-    mkdir(['../out/',runID]);
-end
-
-% save output to file
-if save_plot
-    name = ['../out/',runID,'/',runID,'_phase_dgrm'];
-    print(figure(1),name,'-dpng','-r300','-opengl');
-    name = ['../out/',runID,'/',runID,'_melt_model'];
-    print(figure(2),name,'-dpng','-r300','-opengl');
-    name = ['../out/',runID,'/',runID,'_maj_compnt'];
-    print(figure(3),name,'-dpng','-r300','-opengl');
-    name = ['../out/',runID,'/',runID,'_vol_compnt'];
-    print(figure(4),name,'-dpng','-r300','-opengl');
-    name = ['../out/',runID,'/',runID,'_density'];
-    print(figure(5),name,'-dpng','-r300','-opengl');
-    name = ['../out/',runID,'/',runID,'_viscosity'];
-    print(figure(6),name,'-dpng','-r300','-opengl');
-    name = ['../out/',runID,'/',runID,'_segr_speed'];
-    print(figure(7),name,'-dpng','-r300','-opengl');
-    name = ['../out/',runID,'/',runID,'_oxides'];
-    print(figure(8),name,'-dpng','-r300','-opengl');
-    name = ['../out/',runID,'/',runID,'_components'];
-    print(figure(9),name,'-dpng','-r300','-opengl');
-    name = ['../out/',runID,'/',runID,'_modal'];
-    print(figure(10),name,'-dpng','-r300','-opengl');
-end
+% values to enter into cal file
+cmp_mem = round(cmp_mem_MAP,2)
+cmp_oxd = round(cmp_oxd_MAP,2)
+T0      = round(T0_MAP,0)
+B       = round(B_MAP,2)
+r       = round(r_MAP,1)
+c0      = round(cmpSYS(1,1:end-1)./sum(cmpSYS(1,1:end-1),2),2)

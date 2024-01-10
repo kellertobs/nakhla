@@ -553,36 +553,30 @@ if plot_cv
     if ~exist('fh12','var'); fh12 = figure(VIS{:});
     else; set(0, 'CurrentFigure', fh12); clf;
     end 
-    subplot(4,1,1);
+    subplot(3,1,1);
     plot(hist.time/TimeScale,hist.DM./hist.sumM,'k-',LW{:}); hold on; axis tight; box on;
     ylabel('consv. $M$',TX{:},FS{:}); set(gca,TL{:},TS{:},'XTickLabel',[]);
-    subplot(4,1,2);
+    subplot(3,1,2);
     plot(hist.time/TimeScale,hist.DS./hist.sumS,'k-',LW{:}); hold on; axis tight; box on;
     ylabel('consv. $S$',TX{:},FS{:}); set(gca,TL{:},TS{:},'XTickLabel',[]);
-    subplot(4,1,3);
+    subplot(3,1,3);
     plot(hist.time/TimeScale,hist.DC./hist.sumC,'k-',LW{:}); hold on; axis tight; box on;
     ylabel('consv. $C$',TX{:},FS{:}); set(gca,TL{:},TS{:},'XTickLabel',[]);
-    subplot(4,1,4);
-    plot(hist.time/TimeScale,hist.DV./hist.sumV,'k-',LW{:}); hold on; axis tight; box on;
-    ylabel('consv. $V$',TX{:},FS{:}); set(gca,TL{:},TS{:});
-    xlabel('Time [',TimeUnits,']',TX{:},FS{:});
+    xlabel(['Time [',TimeUnits,']'],TX{:},FS{:});
 
     if ~exist('fh13','var'); fh13 = figure(VIS{:});
     else; set(0, 'CurrentFigure', fh13); clf;
     end 
-    subplot(4,1,1);
+    subplot(3,1,1);
     plot(hist.time/TimeScale,hist.EM,'k-',LW{:}); hold on; axis tight; box on;
     ylabel('error $M$',TX{:},FS{:}); set(gca,TL{:},TS{:},'XTickLabel',[]);
-    subplot(4,1,2);
+    subplot(3,1,2);
     plot(hist.time/TimeScale,hist.ES,'k-',LW{:}); hold on; axis tight; box on;
     ylabel('error $S$',TX{:},FS{:}); set(gca,TL{:},TS{:},'XTickLabel',[]);
-    subplot(4,1,3);
+    subplot(3,1,3);
     plot(hist.time/TimeScale,hist.EC,'k-',LW{:}); hold on; axis tight; box on;
     ylabel('error $C$',TX{:},FS{:}); set(gca,TL{:},TS{:},'XTickLabel',[]);
-    subplot(4,1,4);
-    plot(hist.time/TimeScale,hist.EV,'k-',LW{:}); hold on; axis tight; box on;
-    ylabel('error $V$',TX{:},FS{:}); set(gca,TL{:},TS{:});
-    xlabel('Time [',TimeUnits,']',TX{:},FS{:});
+    xlabel(['Time [',TimeUnits,']'],TX{:},FS{:});
 end
 
 drawnow

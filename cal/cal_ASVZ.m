@@ -57,14 +57,14 @@ cal.msy_mem = [1  1  1  0  0  0  0  0  0  0  0  0  0  0  0    % feldspar (fsp)
                0  0  0  0  0  0  0  0  0  0  0  0  0  1  0];  % quartz (qtz)
 
 % mineral end-member composition of melting model components
-%                ant     alb     san     for     fay     tms     mgt     dps     hdb     aug     hyp     fsl     ilm     qtz     wat
-cal.cmp_mem = [91.54    8.46       0       0       0       0       0       0       0       0       0       0       0       0       0
-               69.85    6.87       0   17.33       0    5.96       0       0       0       0       0       0       0       0       0
-               69.85    6.87       0   17.33       0    5.96       0       0       0       0       0       0       0       0       0
-               23.61    5.52    5.10       0    2.73    2.33    1.95    0.73    1.96   24.82   31.25       0       0       0       0
-                6.01   72.49    1.76       0       0       0    0.03       0    2.59    5.07    1.25    9.66    1.13       0       0
-                   0   13.31   38.03       0       0       0       0       0       0       0       0    3.27       0   45.39       0
-                   0       0       0       0       0       0       0       0       0       0       0       0       0       0  100.00];
+%                 ant     alb     san     for     fay     tms     mgt     ilm     dps     hdb     aug     hyp     fsl     qtz     wat
+cal.cmp_mem = [100.00       0       0       0       0       0       0       0       0       0       0       0       0       0       0
+                73.46    9.82       0   12.22       0    4.50       0       0       0       0       0       0       0       0       0
+                25.39    5.36       0   12.42   16.37    7.22    2.38       0   30.86       0       0       0       0       0       0
+                22.66   11.09    4.04       0    1.01       0    5.39    2.07       0   24.30       0   29.44       0       0       0
+                 4.47   61.14   15.53       0       0       0       0    1.00       0       0    8.89    1.01    7.97       0       0
+                    0    1.00   56.20       0       0       0       0    1.00       0       0       0       0    4.06   37.74       0
+                    0       0       0       0       0       0       0       0       0       0       0       0       0       0  100.00];
 cal.cmp_mem = cal.cmp_mem./sum(cal.cmp_mem,2)*100;
 
 % mineral systems composition of melting model components
@@ -81,19 +81,22 @@ for i=1:cal.ncmp
 end
 
 % set pure component melting points T_m^i at P=0
-cal.T0 =  [1530  1170  1100  1080  972  780];
+cal.T0 =  [1553  1169  1133  1092  986  746];
 
 % set first coeff. for P-dependence of T_m^i [GPa]
 cal.A   = (cal.T0+273.15)./350;
 
 % set second coeff. for P-dependence of T_m^i [1]
-cal.B   = [8 5  4.4  4  3  2.5];
+cal.B   = [8.0  5.0  4.5  4.0  3.0  2.5];
 
 % set entropy gain of fusion DeltaS [J/K]
 cal.dS =  350;
 
 % set coeff. for T-dependence of partition coefficients K^i [1/K]
-cal.r  =  [28.5  2.2  2.2  8.0  15.4  8.5];
+cal.r  =  [21.1  4.5  2.0  9.7  11.8  7.1];
+
+% initial composition used in calibration
+cal.c0 = [0.08  0.20  0.12  0.30  0.21  0.10  0.03];
 
 % specify melting point dependence on H2O
 cal.dTH2O   = 1400;                 % solidus shift from water content [K/wt^pH2O]
@@ -105,7 +108,7 @@ cal.trcStr  = {'K 0.01','K 0.10','K 0.9','K 3.00','K 10.0','K 1.1'};
 cal.Ktrc_mem = [0.01;0.10;1.0;3.00;10.0;1.0].*ones(cal.ntrc,cal.nmem);
 
 % specify density parameters
-%              ant  alb  san  for  fay  ulv  mgt  ilm  dps  mau  fau  hyp  fsl  qtz  wat
+%              ant  alb  san  for  fay  ulv  mgt  ilm  dps  hdb  aug  hyp  fsl  qtz  wat
 cal.rhox0   = [2690,2590,2530,3400,3930,4120,4970,4700,3270,3400,3470,3390,3660,2650,1000]; % mineral end-member reference densities [kg/m3]
 cal.rhof0   = 500;                  % fluid reference density [kg/m3]
 

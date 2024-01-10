@@ -24,24 +24,24 @@ dtmax    =  1e3;                 % maximum time step [s]
 % set initial thermo-chemical state
 Tinit    = 'layer';              % T initial condition mode ('layer' or 'linear')
 seed     =  15;                  % random perturbation seed
-smth     =  10;                  % regularisation of initial random perturbation
+smth     =  15;                  % regularisation of initial random perturbation
 zlay     =  2.0;                 % layer thickness (relative to domain depth D)
 dlay     =  0.0;                 % random perturbation to layer thickness (relative to grid spacing h)
 wlay_T   =  0*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
 wlay_c   =  0*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
-T0       =  1150;                % temperature top layer [deg C]
-T1       =  1150;                % temperature base layer [deg C]
+T0       =  1175;                % temperature top layer [deg C]
+T1       =  1175;                % temperature base layer [deg C]
 dTr      =  0;                   % amplitude of random noise [deg C]
 dTg      =  0;                   % amplitude of centred gaussian [deg C]
-c0       =  [0.14,0.49,0.28,0.09,0.02];  % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
-c1       =  [0.14,0.49,0.28,0.09,0.02];  % components (maj comp, H2O) bot layer [wt] (will be normalised to unit sum!)
-dcr      =  [0,0,0,0,0];         % amplitude of random noise [wt SiO2]
-dcg      =  [0,0,0,0,0];         % amplitude of centred gaussian [wt SiO2]
+c0       =  [0.04,0.12,0.44,0.24,0.14,0.02,0.005];  % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
+c1       =  [0.04,0.12,0.44,0.24,0.14,0.02,0.005];  % components (maj comp, H2O) bot layer [wt] (will be normalised to unit sum!)
+dcr      =  [0,0,0,0,0,0,0];     % amplitude of random noise [wt SiO2]
+dcg      =  [0,0,0,0,0,0,0];     % amplitude of centred gaussian [wt SiO2]
 
 % set model trace and isotope geochemistry parameters (must match # trace elements and isotope ratios in calibration!)
 trc0     =  [1,1,1,1,1,1];       % trace elements top layer [wt ppm]
 trc1     =  [1,1,1,1,1,1];       % trace elements base layer [wt ppm]
-dr_trc   =  [0,0,1/2,0,0,-1/2];  % trace elements random noise [wt ppm]
+dr_trc   =  [0,0,0,0,0,0];       % trace elements random noise [wt ppm]
 dg_trc   =  [0,0,0,0,0,0];       % trace elements centred gaussian [wt ppm]
 
 % set thermo-chemical boundary parameters
@@ -55,15 +55,11 @@ fout     =  1;                   % outgassing factor (0 = no outgassing; 1 = fre
 tau_T    =  12*hr;               % wall cooling/assimilation time [s]
 tau_a    =  24*hr;               % wall cooling/assimilation tie [s]
 Twall    =  [300,300,nan];       % [top,bot,sds] wall rock temperature [degC] (nan = insulating)
-cwall    =  [nan,nan,nan,nan,nan; ...
-             nan,nan,nan,nan,nan; ...
-             nan,nan,nan,nan,nan]; % [top,bot,sds] wall rock major component [wt SiO2] (nan = no assimilation)
-trcwall  =  [nan,nan,nan,nan,nan,nan; ...
-             nan,nan,nan,nan,nan,nan; ...
-             nan,nan,nan,nan,nan,nan]; % [top,bot,sds] wall rock trace elements [wt ppm] (nan = no assimilation)
+cwall    =  nan(3,7);            % [top,bot,sds] wall rock major component [wt SiO2] (nan = no assimilation)
+trcwall  =  nan(3,6);            % [top,bot,sds] wall rock trace elements [wt ppm] (nan = no assimilation)
 
 % set thermo-chemical material parameters
-calID    =  'andesSVZ';          % phase diagram calibration
+calID    =  'MORB';              % phase diagram calibration
 kT0      =  4;                   % thermal conductivity [W/m/K]
 cP       =  1200;                % heat capacity [J/kg/K]
 tau_r    =  0;                   % reaction time scale (set to zero for quasi-equilibrium mode)
@@ -96,6 +92,7 @@ etacntr  =  1e+9;                % maximum viscosity contrast
 Delta_trb=  2*h;                 % correlation length for eddy diffusivity
 Delta_sgr=  10*dx0;              % correlation length for phase fluctuation diffusivity
 Prt      =  1;                   % turbulent Prandtl number (ratio of momentum to heat diffusivity)
+Sct      =  1;                   % turbulent Schmidt number (ratio of momentum to mass diffusivity)
 etamin   =  1e-2;                % minimum viscosity
 Pcouple  =  0;                   % coupling phase equilibria and material properties to dynamic pressure
 

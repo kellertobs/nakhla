@@ -93,6 +93,9 @@ cal.dS  = 350;
 % set coeff. for T-dependence of partition coefficients K^i [1/K]
 cal.r  = [36.7  1.6  3.3  11.6  16.2  9.9];
 
+% initial composition used in calibration
+cal.c0 = [0.10  0.13  0.28  0.35  0.06  0.08  0.005];
+
 % specify melting point dependence on H2O
 cal.dTH2O   = 1400;                 % solidus shift from water content [K/wt^pH2O]
 cal.pH2O    = 0.75;                 % solidus shift from water content [K/wt^pH2O]
