@@ -443,7 +443,7 @@ else % create 2D plots
     set(0,'CurrentFigure',fh7)
     for i = 1:cal.nmsy
         set(fh7,'CurrentAxes',ax(70+i));
-        imagesc(Xsc,Zsc,cx_msy(:,:,i).*x); axis ij equal tight; box on; cb = colorbar;
+        imagesc(Xsc,Zsc,cx_msy(:,:,i)); axis ij equal tight; box on; cb = colorbar;
         set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.msyStr{i},' [wt\%]'],TX{:},FS{:});
     end
     set(fh7,'CurrentAxes',ax(71));

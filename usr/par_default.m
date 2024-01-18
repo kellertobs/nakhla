@@ -24,7 +24,7 @@ dtmax    =  1e3;                 % maximum time step [s]
 % set initial thermo-chemical state
 Tinit    = 'layer';              % T initial condition mode ('layer' or 'linear')
 seed     =  15;                  % random perturbation seed
-smth     =  15;                  % regularisation of initial random perturbation
+smth     =  10;                  % regularisation of initial random perturbation
 zlay     =  2.0;                 % layer thickness (relative to domain depth D)
 dlay     =  0.0;                 % random perturbation to layer thickness (relative to grid spacing h)
 wlay_T   =  0*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
@@ -87,7 +87,7 @@ rtol     =  1e-6;                % outer its relative tolerance
 atol     =  1e-9;                % outer its absolute tolerance
 maxit    =  50;                  % maximum outer its
 alpha    =  0.50;                % iterative step size parameter
-beta     =  0.20;                % iterative damping parameter
+beta     =  0.10;                % iterative damping parameter
 etacntr  =  1e+9;                % maximum viscosity contrast
 Delta_trb=  2*h;                 % correlation length for eddy diffusivity
 Delta_sgr=  10*dx0;              % correlation length for phase fluctuation diffusivity

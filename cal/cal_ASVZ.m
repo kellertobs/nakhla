@@ -59,11 +59,11 @@ cal.msy_mem = [1  1  1  0  0  0  0  0  0  0  0  0  0  0  0    % feldspar (fsp)
 % mineral end-member composition of melting model components
 %                 ant     alb     san     for     fay     tms     mgt     ilm     dps     hdb     aug     hyp     fsl     qtz     wat
 cal.cmp_mem = [100.00       0       0       0       0       0       0       0       0       0       0       0       0       0       0
-                73.46    9.82       0   12.22       0    4.50       0       0       0       0       0       0       0       0       0
-                25.39    5.36       0   12.42   16.37    7.22    2.38       0   30.86       0       0       0       0       0       0
-                22.66   11.09    4.04       0    1.01       0    5.39    2.07       0   24.30       0   29.44       0       0       0
-                 4.47   61.14   15.53       0       0       0       0    1.00       0       0    8.89    1.01    7.97       0       0
-                    0    1.00   56.20       0       0       0       0    1.00       0       0       0       0    4.06   37.74       0
+                73.83    9.95       0   12.11       0    4.11       0       0       0       0       0       0       0       0       0
+                25.79    5.00       0   11.93   17.95    7.37    2.06       0   29.91       0       0       0       0       0       0
+                22.60   10.70    3.24       0    1.01       0    5.36    2.50       0   24.44       0   30.15       0       0       0 
+                 4.53   61.26   15.29       0       0       0       0    1.00       0       0    8.87    1.01    8.05       0       0 
+                    0    1.00   56.72       0       0       0       0       0       0       0       0       0    5.41   36.86       0
                     0       0       0       0       0       0       0       0       0       0       0       0       0       0  100.00];
 cal.cmp_mem = cal.cmp_mem./sum(cal.cmp_mem,2)*100;
 
@@ -81,7 +81,7 @@ for i=1:cal.ncmp
 end
 
 % set pure component melting points T_m^i at P=0
-cal.T0 =  [1553  1169  1133  1092  986  746];
+cal.T0 =  [1553  1171  1134  1092  990  745];
 
 % set first coeff. for P-dependence of T_m^i [GPa]
 cal.A   = (cal.T0+273.15)./350;
@@ -93,10 +93,10 @@ cal.B   = [8.0  5.0  4.5  4.0  3.0  2.5];
 cal.dS =  350;
 
 % set coeff. for T-dependence of partition coefficients K^i [1/K]
-cal.r  =  [21.1  4.5  2.0  9.7  11.8  7.1];
+cal.r  =  [21.0  5.1  2.0  9.5  12.4  7.4];
 
 % initial composition used in calibration
-cal.c0 = [0.08  0.20  0.12  0.30  0.21  0.10  0.03];
+cal.c0 = [0.05  0.23  0.09  0.32  0.21  0.10  0.03];
 
 % specify melting point dependence on H2O
 cal.dTH2O   = 1400;                 % solidus shift from water content [K/wt^pH2O]

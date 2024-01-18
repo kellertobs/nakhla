@@ -24,9 +24,9 @@ tend     =  1*yr;                % end time for simulation [s]
 dt       =  36;                  % initial time step [s]
 
 % set initial thermo-chemical state
-T0       =  1160;                % temperature top  layer [deg C]
+T0       =  1100;                % temperature top  layer [deg C]
 T1       =  T0;                  % temperature base layer [deg C]
-c0       =  [0.14  0.13  0.23  0.15  0.26  0.10  0.03];  % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
+c0       =  [0.05 0.23 0.09 0.32 0.21 0.10 0.03];  % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
 c1       =  c0;                  % components (maj comp, H2O) base layer [wt] (will be normalised to unit sum!)
 dcr      =  [0,0,0,0,0,0,0];
 dcg      =  [0,0,0,0,0,0,0];
@@ -48,11 +48,12 @@ calID    =  'ASVZ';              % phase diagram calibration
 % set numerical model parameters
 TINT     =  'bd2im';             % time integration scheme ('be1im','bd2im','cn2si','bd2si')
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
-CFL      =  0.25;                % (physical) time stepping courant number (multiplies stable step) [0,1]
+CFL      =  0.125;               % (physical) time stepping courant number (multiplies stable step) [0,1]
 rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-8;                % outer its absolute tolerance
 maxit    =  30;                  % maximum outer its
-Delta    =  2*h;                 % correlation length for eddy viscosity
+alpha    =  0.60;                % iterative step size parameter
+beta     =  0.10;                % iterative damping parameter
 
 %*****  RUN NAKHLA MODEL  *************************************************
 run('../src/main')
