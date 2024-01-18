@@ -52,8 +52,6 @@ CFL      =  0.125;               % (physical) time stepping courant number (mult
 rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-8;                % outer its absolute tolerance
 maxit    =  30;                  % maximum outer its
-alpha    =  0.60;                % iterative step size parameter
-beta     =  0.10;                % iterative damping parameter
 
 %*****  RUN NAKHLA MODEL  *************************************************
 run('../src/main')
