@@ -58,13 +58,13 @@ cal.msy_mem = [1  1  1  0  0  0  0  0  0  0  0  0  0  0  0    % feldspar (fsp)
 
 % mineral end-member composition of melting model components
 %                 ant     alb     san     for     fay     tms     mgt     ilm     dps     hdb     aug     hyp     fsl     qtz     wat
-cal.cmp_mem = [100.00       0       0       0       0       0       0       0       0       0       0       0       0       0       0
-                73.83    9.95       0   12.11       0    4.11       0       0       0       0       0       0       0       0       0
-                25.79    5.00       0   11.93   17.95    7.37    2.06       0   29.91       0       0       0       0       0       0
-                22.60   10.70    3.24       0    1.01       0    5.36    2.50       0   24.44       0   30.15       0       0       0 
-                 4.53   61.26   15.29       0       0       0       0    1.00       0       0    8.87    1.01    8.05       0       0 
-                    0    1.00   56.72       0       0       0       0       0       0       0       0       0    5.41   36.86       0
-                    0       0       0       0       0       0       0       0       0       0       0       0       0       0  100.00];
+cal.cmp_mem = [100.00       0       0       0       0       0       0       0       0       0       0       0       0       0       0   % anorthosite (ano)
+                73.83    9.95       0   12.11       0    4.11       0       0       0       0       0       0       0       0       0   % spinel troctolite (str)
+                25.79    5.00       0   11.93   17.95    7.37    2.06       0   29.91       0       0       0       0       0       0   % olivine gabbro (ogb)
+                22.60   10.70    3.24       0    1.01       0    5.36    2.50       0   24.44       0   30.15       0       0       0   % ferro-basalt (fbs)
+                 4.53   61.26   15.29       0       0       0       0    1.00       0       0    8.87    1.01    8.05       0       0   % trachy-dacite (trd)
+                    0    1.00   56.72       0       0       0       0       0       0       0       0       0    5.41   36.86       0   % rhyolite (rhy)
+                    0       0       0       0       0       0       0       0       0       0       0       0       0       0  100.00]; % volatiles (vol)
 cal.cmp_mem = cal.cmp_mem./sum(cal.cmp_mem,2)*100;
 
 % mineral systems composition of melting model components

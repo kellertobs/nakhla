@@ -56,13 +56,13 @@ cal.msy_mem = [1  1  0  0  0  0  0  0  0  0  0  0  0    % olivine (olv)
 
 % mineral end-member composition of melting model components
 %                for     fay     ant     alb     dps     aug     tms     mgt     ilm     hyp     fsl     qtz     wat
-cal.cmp_mem = [84.22   15.78       0       0       0       0       0       0       0       0       0       0       0
-               15.59   13.12   71.30       0       0       0       0       0       0       0       0       0       0
-                   0    4.83   37.27    9.62   45.86       0    2.42       0       0       0       0       0       0
-                   0       0   20.93   23.23   30.64    6.04    2.97   12.51       0    3.67       0       0       0
-                   0       0   12.59   34.80       0   26.40       0       0    1.47    3.26   21.48       0       0
-                   0       0       0   49.32       0       0       0       0       0       0    3.11   47.57       0
-                   0       0       0       0       0       0       0       0       0       0       0       0  100.00];
+cal.cmp_mem = [84.22   15.78       0       0       0       0       0       0       0       0       0       0       0   % dunite (dun)
+               15.59   13.12   71.30       0       0       0       0       0       0       0       0       0       0   % troctolite (tro)
+                   0    4.83   37.27    9.62   45.86       0    2.42       0       0       0       0       0       0   % olivine spinel gabbro (osg)
+                   0       0   20.93   23.23   30.64    6.04    2.97   12.51       0    3.67       0       0       0   % ferro-basalt (fbs)
+                   0       0   12.59   34.80       0   26.40       0       0    1.47    3.26   21.48       0       0   % basaltic andesite (ban)
+                   0       0       0   49.32       0       0       0       0       0       0    3.11   47.57       0   % rhyolite (rhy)
+                   0       0       0       0       0       0       0       0       0       0       0       0  100.00]; % volatiles (vol)
 cal.cmp_mem = cal.cmp_mem./sum(cal.cmp_mem,2)*100;
 
 % mineral systems composition of melting model components

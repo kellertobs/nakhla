@@ -416,8 +416,8 @@ wt(hasQTZ(hasMLT))     = wt(hasQTZ(hasMLT)) + PHS(hasQTZ(hasMLT),qtz+1);
 SOLp = SOLp./wt;
 
 
-% collate oxide compositions into global data array
-DATA.PRJCT  = 'MORB';
+%% extract end-members encompassing all melt/solid compositions
+DATA.PRJCT  = 'LUNA';
 DATA.VNAMES = cal.oxdStr(oxdMLT(1:H));
 DATA.SNAMES = {};
 DATA.X      = [MLT(:,1:end-1);SOLp(:,1:end-1)];
@@ -573,8 +573,8 @@ cal_LUNA;  % load melt model calibration
 data   = [MLTp(:);SOLp(:);PHS(:);Tsol(:);Tliq(:)];
 
 m0     = [T0_MAP.';A_MAP.';B_MAP.';r_MAP.';cmp_mem_MAP(:).*indmem(:);];
-m0_lw  = m0 - [max(10,0.05*T0_MAP.');0*max(0.1,0.01*A_MAP.');0.5*max(1,0.3*B_MAP.');max(1,0.3*r_MAP.');max(100,1*cmp_mem_MAP(:)).*indmem(:)];
-m0_up  = m0 + [max(10,0.05*T0_MAP.');0*max(0.1,0.01*A_MAP.');0.5*max(1,0.3*B_MAP.');max(1,0.3*r_MAP.');max(100,1*cmp_mem_MAP(:)).*indmem(:)];
+m0_lw  = m0 - [max(10,0.05*T0_MAP.');0*max(0.1,0.01*A_MAP.');max(1,0.3*B_MAP.');max(1,0.3*r_MAP.');max(100,1*cmp_mem_MAP(:)).*indmem(:)];
+m0_up  = m0 + [max(10,0.05*T0_MAP.');0*max(0.1,0.01*A_MAP.');max(1,0.3*B_MAP.');max(1,0.3*r_MAP.');max(100,1*cmp_mem_MAP(:)).*indmem(:)];
 mbnds  = [m0_lw(:),m0_up(:)]; % model parameter bounds
 mbnds(   cal.ncmp-1 +(1:cal.ncmp-1)       ,:) = max(2,        mbnds(   cal.ncmp-1 +(1:cal.ncmp-1)       ,:));
 mbnds(4*(cal.ncmp-1)+(1:cal.ncmp*cal.nmem),:) = max(indmem(:),min(80,mbnds(4*(cal.ncmp-1)+(1:cal.ncmp*cal.nmem),:)));
@@ -853,7 +853,7 @@ save('LUNA_calibration_olv3');
 
 % values to enter into cal file
 cmp_mem = round(cmp_mem_MAP,2)
-cmp_mem = round(cmp_oxd_MAP,2)
+cmp_oxd = round(cmp_oxd_MAP,2)
 T0      = round(T0_MAP,0)
 B       = round(B_MAP,2)
 r       = round(r_MAP,1)
