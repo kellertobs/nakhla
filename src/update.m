@@ -125,10 +125,10 @@ kW = (kW + 2.*eII.*(0.18*Delta_trb).^2 .* (1-min(1,topshape+botshape+sdsshape)*0
 end
 kwx = wx0.*Delta_sgr;                                                      % segregation fluctuation diffusivity
 kwf = wf0.*Delta_sgr;                                                      % segregation fluctuation diffusivity
-kx  = chi.*(kwx + kW/Prt);                                                 % solid fraction diffusion 
-kf  = phi.*(kwf + kW/Prt);                                                 % fluid fraction diffusion 
 ks  = rho.*cP./T.*kW/Prt;                                                  % regularised heat diffusion
-kc  =             kW/Prt;                                                  % regularised component diffusion
+kx  = chi.*(kwx + kW/Sct);                                                 % solid fraction diffusion 
+kf  = phi.*(kwf + kW/Sct);                                                 % fluid fraction diffusion 
+kc  =             kW/Sct;                                                  % regularised component diffusion
 eta = eta + rho.*kW;                                                       % regularised momentum diffusion
 
 etamax = etacntr.*max(min(eta(:)),etamin);
