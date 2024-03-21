@@ -52,8 +52,10 @@ while time <= tend && step <= Nt && any(m(:)>1e-9)
     resnorm0 = resnorm;
     iter     = 1;
     
+    if frst; alpha = alpha*2/3; end
+
     % non-linear iteration loop
-    while resnorm/resnorm0 >= rtol && resnorm >= atol && iter <= maxit
+    while resnorm/resnorm0 >= rtol/(1 + frst*10) && resnorm >= atol/(1 + frst*10) && iter <= maxit*(1 + frst)
         
         % solve thermo-chemical equations
         thermochem;
@@ -72,6 +74,9 @@ while time <= tend && step <= Nt && any(m(:)>1e-9)
 
         iter = iter+1;
     end
+
+    if frst; alpha = alpha*3/2; end
+    [~,cal,~]  = meltmodel(var,cal,'T');
 
     % record model history
     history;
