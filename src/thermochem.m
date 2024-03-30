@@ -2,6 +2,8 @@
 
 tic;
 
+if iter==1; upd_S = 0; upd_C = 0; upd_M = 0; upd_X = 0; upd_F = 0; end
+
 %***  update heat content (entropy) density
 
 % heat advection
@@ -28,8 +30,8 @@ dSdt  = advn_S + diff_S + diss_h + bnd_S;
 res_S = (a1*S-a2*So-a3*Soo)/dt - (b1*dSdt + b2*dSdto + b3*dSdtoo);
 
 % semi-implicit update of bulk entropy density
-S     = S - alpha*res_S*dt/a1 + beta*upd_S;
-upd_S =   - alpha*res_S*dt/a1 + beta*upd_S;
+upd_S = - alpha*res_S*dt/a1 + beta*upd_S;
+S     = S + upd_S;
 
 % convert entropy desnity to temperature
 Tp = Tref*exp((S - X.*Dsx - F.*Dsf)./RHO./cP);
@@ -79,11 +81,10 @@ var.T      = reshape(T,Nx*Nz,1)-273.15;   % temperature [C]
 var.P      = reshape(Pt,Nx*Nz,1)/1e9;     % pressure [GPa]
 var.m      = reshape(mq,Nx*Nz,1);         % melt fraction [wt]
 var.f      = reshape(fq,Nx*Nz,1);         % bubble fraction [wt]
-var.H2O    = reshape(c(:,:,end),Nx*Nz,1); % water concentration [wt]
-var.SiO2m  = reshape(cm_oxd(:,:,1)./sum(cm_oxd(:,:,1:end-1),3),Nx*Nz,1); % melt silica concentration [wt]
-cal.H2Osat = fluidsat(var.T,var.P,var.SiO2m,cal);
+var.H2O    = var.c(:,end);                % water concentration [wt]
+cal.H2Osat = fluidsat(var.T,var.P,0,cal); % water saturation [wt]
 
-[var,cal] = meltmodel(var,cal,'E');
+[var,cal]  = meltmodel(var,cal,'E');
 
 mq = reshape(var.m,Nz,Nx);
 fq = reshape(var.f,Nz,Nx);
@@ -105,9 +106,17 @@ advn_M   = - advect(M,Um(2:end-1,:),Wm(:,2:end-1),h,{ADVN,''},[1,2],BCA);
 advn_rho = advn_X+advn_F+advn_M;
 
 % phase mass transfer rates
-Gx = (xq.*RHO-X)./max(tau_r,4*dt);
-Gf = (fq.*RHO-F)./max(tau_r,4*dt);
-Gm = (mq.*RHO-M)./max(tau_r,4*dt);
+Gm  = (mq-m).*rho/max(tau_r,5*dt);
+Gx  = (xq-x).*rho/max(tau_r,5*dt); 
+Gf  = (fq-f).*rho/max(tau_r,5*dt);
+
+Gm = Gm + diffus(Gm,ones(size(Gm))/8,1,[1,2],BCD);
+Gx = Gx + diffus(Gx,ones(size(Gx))/8,1,[1,2],BCD);
+Gf = Gf + diffus(Gf,ones(size(Gf))/8,1,[1,2],BCD);
+
+Gxc = (cxq.*xq-cx.*x).*rho/max(tau_r,5*dt);
+Gfc = (cfq.*fq-cf.*f).*rho/max(tau_r,5*dt);
+Gmc = (cmq.*mq-cm.*m).*rho/max(tau_r,5*dt);
 
 % total rates of change
 dXdt   = advn_X + Gx;
@@ -120,12 +129,12 @@ res_F = (a1*F-a2*Fo-a3*Foo)/dt - (b1*dFdt + b2*dFdto + b3*dFdtoo);
 res_M = (a1*M-a2*Mo-a3*Moo)/dt - (b1*dMdt + b2*dMdto + b3*dMdtoo);
 
 % semi-implicit update of phase fraction densities
-X     = X - alpha*res_X*dt/a1 + beta*upd_X;
-upd_X =   - alpha*res_X*dt/a1 + beta*upd_X;
-F     = F - alpha*res_F*dt/a1 + beta*upd_F;
-upd_F =   - alpha*res_F*dt/a1 + beta*upd_F;
-M     = M - alpha*res_M*dt/a1 + beta*upd_M;
-upd_M =   - alpha*res_M*dt/a1 + beta*upd_M;
+upd_X = - alpha*res_X*dt/a1 + beta*upd_X;
+upd_F = - alpha*res_F*dt/a1 + beta*upd_F;
+upd_M = - alpha*res_M*dt/a1 + beta*upd_M;
+X     = X + upd_X;
+F     = F + upd_F;
+M     = M + upd_M;
 
 % apply minimum bound
 X   = max(0, X );
@@ -138,30 +147,49 @@ RHO = X+F+M;
 %***  update phase fractions and component concentrations
 
 % update phase fractions
-x = X./RHO;
-f = F./RHO;
-m = M./RHO;
+x = X./RHO;  
+f = F./RHO;  
+m = M./RHO; 
+
+hasx = x >= TINY^0.5;
+hasf = f >= TINY^0.5;
+hasm = m >= TINY^0.5;
 
 % update major component phase composition
-Kx     = reshape(cal.Kx,Nz,Nx,cal.ncmp);
-Kf     = reshape(cal.Kf,Nz,Nx,cal.ncmp);
-rnorm  = 1;  tol  = atol/10;
-it     = 1;  mxit = 100;
+Kx      = reshape(cal.Kx,Nz,Nx,cal.ncmp);
+Kf      = reshape(cal.Kf,Nz,Nx,cal.ncmp);
+subsol  = m<=1e-9 & T<=reshape(cal.Tsol+273.15,Nz,Nx);
+supliq  = x<=1e-9 & T>=reshape(cal.Tliq+273.15,Nz,Nx);
+subsolc = repmat(subsol,1,1,7);
+supliqc = repmat(supliq,1,1,7);
+rnorm   = 1;  tol  = 1e-8;
+it      = 1;  mxit = 200;
 while rnorm>tol && it<mxit
-    Kxi = Kx;  Kfi = Kf;
 
     cm  = c    ./(m + x.*Kx + f.*Kf + TINY);
     cx  = c.*Kx./(m + x.*Kx + f.*Kf + TINY);
-    
+    cf  = c.*Kf./(m + x.*Kx + f.*Kf + TINY);
+
     cm = cm./sum(cm,3);
     cx = cx./sum(cx,3);
+    cf = cf./sum(cf,3);
 
     Kx = cx./(cm+TINY);
     Kf = cf./(cm+TINY);
 
-    rnorm = norm(x.*cx + m.*cm + f.*cf - c,'fro')./sqrt(length(cx(:)));  
+    r     = x.*cx + m.*cm + f.*cf - c;
+    r(subsolc) = 0; r(supliqc) = 0;
+    rnorm = norm(r(:)) ./ sqrt(length(c(:)));
     it  = it+1;
 end
+
+if (it==mxit)
+    disp(['!!! Lever rule adjustment not converged after ',num2str(mxit),' iterations !!!']);
+end
+
+% fix subsolidus and superliquidus conditions
+cx(subsolc) = cxq(subsolc); x(subsol) = xq(subsol); f(subsol) = fq(subsol); m(subsol) = 0;
+cm(supliqc) = cmq(supliqc); m(supliq) = mq(supliq); f(supliq) = fq(supliq); x(supliq) = 0;
 
 % update phase entropies
 sm = (S - X.*Dsx - F.*Dsf)./RHO;

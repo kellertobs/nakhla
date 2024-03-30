@@ -138,16 +138,16 @@ else;                        bot = -1; end  % free slip for other types
 if bndmode==5;               top = -1; bot = -1; end % free slip top/bot for 'only walls(5)'
 
 % set ghosted index arrays
-if periodic
+if periodic  % periodic side boundaries
     icx = [Nx,1:Nx,1];
-    icz = [Nz,1:Nz,1];
+    icz = [1,1:Nz,Nz];
     ifx = [Nx,1:Nx+1,2];
-    ifz = [Nz,1:Nz+1,2];
-else
+    ifz = [2,1:Nz+1,Nz];
+else         % closed side boundaries
     icx = [1,1:Nx,Nx];
     icz = [1,1:Nz,Nz];
-    ifx = [1,1:Nx+1,Nx+1];
-    ifz = [1,1:Nz+1,Nz+1];
+    ifx = [2,1:Nx+1,Nx];
+    ifz = [2,1:Nz+1,Nz];
 end
 
 % initialise solution fields
@@ -187,9 +187,9 @@ for i = 1:cal.ntrc
 end
 tein = trc;
 
-U   =  zeros(Nz+2,Nx+1);  UBG = U; Ui = U;
-W   =  zeros(Nz+1,Nx+2);  WBG = W; Wi = W; wf = 0.*W; wx = 0.*W; wm = 0.*W;
-P   =  zeros(Nz+2,Nx+2);  Vel = 0.*Tp; %Div_rhoV = 0.*P;  DD = sparse(length(P(:)),length([W(:);U(:)]));
+U   =  zeros(Nz+2,Nx+1);  UBG = U; Ui = U; upd_U = 0*U;
+W   =  zeros(Nz+1,Nx+2);  WBG = W; Wi = W; wf = 0.*W; wx = 0.*W; wm = 0.*W; upd_W = 0*W;
+P   =  zeros(Nz+2,Nx+2);  Vel = 0.*Tp; upd_P = 0*P; %Div_rhoV = 0.*P;  DD = sparse(length(P(:)),length([W(:);U(:)]));
 SOL = [W(:);U(:);P(:)];
 
 % initialise auxiliary fields
@@ -224,7 +224,7 @@ rhofx  = (rho(:,icx(1:end-1))+rho(:,icx(2:end)))/2;
 rhoWo  = rhofz.*W(:,2:end-1); rhoWoo = rhoWo; advn_mz = 0.*rhoWo(2:end-1,:);
 rhoUo  = rhofx.*U(2:end-1,:); rhoUoo = rhoUo; advn_mx = 0.*rhoUo;
 T      =  (Tp+273.15).*exp(aT./mean(rho(1,:),'all')./cP.*(Pt-Pref));
-fq     = zeros(size(Tp));  mq = ones(size(Tp));  xq = 1-mq-fq; 
+fq     = zeros(size(Tp));  mq = ones(size(Tp))/2;  xq = 1-mq-fq; 
 cmq    = c; cxq = c;  cfq = 0.*c;  cfq(:,:,end) = 1;  cf = cfq;
 cm_oxd = reshape(reshape(cmq,Nz*Nx,cal.ncmp)*cal.cmp_oxd,Nz,Nx,cal.noxd);
 
@@ -256,12 +256,10 @@ while res > tol
     var.P      = reshape(Pt,Nx*Nz,1)/1e9;     % pressure [GPa]
     var.m      = reshape(mq,Nx*Nz,1);         % melt fraction [wt]
     var.f      = reshape(fq,Nx*Nz,1);         % bubble fraction [wt]
-    var.H2O    = reshape(c(:,:,end),Nx*Nz,1); % water concentration [wt]
-    var.SiO2m  = reshape(cm_oxd(:,:,1)./sum(cm_oxd(:,:,1:end-1),3),Nx*Nz,1); % melt silica concentration [wt]
-    cal.H2Osat = fluidsat(var.T,var.P,var.SiO2m,cal);
+    var.H2O    = var.c(:,end);                % water concentration [wt]
+    cal.H2Osat = fluidsat(var.T,var.P,0,cal); % water saturation [wt]
 
     [var,cal] = meltmodel(var,cal,'E');
-
 
     mq = reshape(var.m,Nz,Nx);
     fq = reshape(var.f,Nz,Nx);
@@ -286,6 +284,7 @@ while res > tol
 
     it = it+1;
 end
+
 rhoo = rho;
 dto  = dt; 
 
@@ -387,6 +386,9 @@ Tp   = Tp+273.15;
 S    = rho.*(cP.*log(T/Tref) + x.*Dsx + f.*Dsf - Adbt.*(Pt-Pref));  So = S;  res_S = 0.*S;
 S0   = rho.*(cP.*log(  Tref) + x.*Dsx + f.*Dsf - Adbt.*    Pref );  
 C    = rho.*(m.*cm + x.*cx + f.*cf); Co = C;  res_C = 0.*C;
+Cx   = rho.*x.*cx;  Cxo = Cx;  res_Cx = 0.*Cx;
+Cm   = rho.*m.*cm;  Cmo = Cm;  res_Cm = 0.*Cm;  
+Cf   = rho.*f.*cf;  Cfo = Cf;  res_Cf = 0.*Cf;
 X    = rho.*x; Xo = X;  res_X = 0.*X;
 F    = rho.*f; Fo = F;  res_F = 0.*F;
 M    = rho.*m; Mo = M;  res_M = 0.*M;
@@ -421,6 +423,9 @@ Gx  = 0.*x;  Gf  = 0.*f;  Gm  = 0.*m;
 % initialise auxiliary variables 
 dSdt   = 0.*T;  dSdto  = dSdt; diss_h = 0.*T;
 dCdt   = 0.*c;  dCdto  = dCdt;
+dCxdt  = 0.*c;  dCxdto  = dCdt;
+dCfdt  = 0.*c;  dCfdto  = dCdt;
+dCmdt  = 0.*c;  dCmdto  = dCdt;
 dFdt   = 0.*f;  dFdto  = dFdt;
 dXdt   = 0.*x;  dXdto  = dXdt;
 dMdt   = 0.*m;  dMdto  = dMdt;
@@ -435,6 +440,9 @@ dTRCdt  = 0.*trc; dTRCdto = dTRCdt;
 % dIRdt  = 0.*ir; dIRdto = dIRdt;
 upd_S  = 0.*S;
 upd_C  = 0.*C;
+upd_Cx = 0.*C;
+upd_Cf = 0.*C;
+upd_Cm = 0.*C;
 upd_X  = 0.*X;
 upd_F  = 0.*F;
 upd_M  = 0.*M;

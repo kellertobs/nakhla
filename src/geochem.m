@@ -33,9 +33,8 @@ dTRCdt = adv_TRC + dff_TRC + bnd_TRC;
 res_TRC = (a1*TRC-a2*TRCo-a3*TRCoo)/dt - (b1*dTRCdt + b2*dTRCdto + b3*dTRCdtoo);
 
 % semi-implicit update of trace element density
-TRCi = TRC;
-TRC  = TRC - alpha*res_TRC*dt/a1 + beta*upd_TRC;
-upd_TRC = TRC - TRCi;                                                          
+upd_TRC = - alpha*res_TRC*dt/a1 + beta*upd_TRC;
+TRC     = TRC + upd_TRC;
 
 % convert from densites to concentrations
 for i = 1:cal.ntrc; trc(:,:,i) = TRC(:,:,i)./RHO; end

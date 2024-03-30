@@ -104,8 +104,8 @@ Vel = sqrt(((W(1:end-1,2:end-1)+W(2:end,2:end-1))/2).^2 ...
 Div_V = ddz(W(:,2:end-1),h) + ddx(U(2:end-1,:),h);                         % get velocity divergence
 
 % update strain rates
-exx = diff(U(2:end-1,:),1,2)./h - Div_V./2;                                % x-normal strain rate
-ezz = diff(W(:,2:end-1),1,1)./h - Div_V./2;                                % z-normal strain rate
+exx = diff(U(2:end-1,:),1,2)./h - Div_V./3;                                % x-normal strain rate
+ezz = diff(W(:,2:end-1),1,1)./h - Div_V./3;                                % z-normal strain rate
 exz = 1/2.*(diff(U,1,1)./h+diff(W,1,2)./h);                                % shear strain rate
 
 eII = (0.5.*(exx.^2 + ezz.^2 ...
@@ -122,9 +122,10 @@ Re0 = W0.*rho.*D/10./eta;
 if Nx==1 && Nz==1; kW = 0;
 else              
 kW = (kW + 2.*eII.*(0.18*Delta_trb).^2 .* (1-min(1,topshape+botshape+sdsshape)*0.9))/2;
+% kW = eII.*(Delta_trb*h).^2 .* (1-min(1,topshape+botshape+sdsshape)*0.9);
 end
-kwx = wx0.*Delta_sgr;                                                      % segregation fluctuation diffusivity
-kwf = wf0.*Delta_sgr;                                                      % segregation fluctuation diffusivity
+kwx = wx0.*Delta_sgr*dx0;                                                  % segregation fluctuation diffusivity
+kwf = wf0.*Delta_sgr*df0;                                                  % segregation fluctuation diffusivity
 ks  = rho.*cP./T.*kW/Prt;                                                  % regularised heat diffusion
 kx  = chi.*(kwx + kW/Sct);                                                 % solid fraction diffusion 
 kf  = phi.*(kwf + kW/Sct);                                                 % fluid fraction diffusion 
@@ -132,7 +133,7 @@ kc  =             kW/Sct;                                                  % reg
 eta = eta + rho.*kW;                                                       % regularised momentum diffusion
 
 etamax = etacntr.*max(min(eta(:)),etamin);
-eta    = (etamax.^-0.5 + eta.^-0.5).^-2 + etamin;
+eta    = 1./(1./etamax + 1./eta) + etamin;
 
 etaco  = (eta(icz(1:end-1),icx(1:end-1)).*eta(icz(2:end),icx(1:end-1)) ...
        .* eta(icz(1:end-1),icx(2:end  )).*eta(icz(2:end),icx(2:end  ))).^0.25;
@@ -148,7 +149,7 @@ txz = etaco .* exz;                                                        % xz-
 
 tII = (0.5.*(txx.^2 + tzz.^2 ...
        + 2.*(txz(1:end-1,1:end-1).^2+txz(2:end,1:end-1).^2 ...
-       +     txz(1:end-1,2:end  ).^2+txz(2:end,2:end).^2)/4)).^0.5 + TINY;
+       +     txz(1:end-1,2:end  ).^2+txz(2:end,2:end  ).^2)/4)).^0.5 + TINY;
 
 % heat dissipation (entropy production) rate
 if Nz==1 && Nx==1

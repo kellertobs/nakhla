@@ -9,8 +9,8 @@ drhodt  = advn_rho;
 res_rho = (a1*rho-a2*rhoo-a3*rhooo)/dt - (b1*drhodt + b2*drhodto + b3*drhodtoo);
 
 % volume source and background velocity passed to fluid-mechanics solver
-VolSrc  = Div_V - alpha*res_rho./rho + beta*upd_rho;  % correct volume source term by scaled residual
-upd_rho =       - alpha*res_rho./rho + beta*upd_rho;
+upd_rho = - alpha*res_rho./b1./rho + beta*upd_rho;
+VolSrc  = VolSrc + upd_rho;  % correct volume source term by scaled residual
 
 UBG     = - 0*mean(VolSrc,'all')./2 .* (L/2-XXu);
 WBG     = - 2*mean(VolSrc,'all')./2 .* (D/2-ZZw);
@@ -18,8 +18,8 @@ WBG     = - 2*mean(VolSrc,'all')./2 .* (D/2-ZZw);
 dPchmbdt  = mod_wall*mean(VolSrc,'all') - mod_wall/eta_wall*Pchmb;
 res_Pchmb = (a1*Pchmb-a2*Pchmbo-a3*Pchmboo)/dt - (b1*dPchmbdt + b2*dPchmbdto + b3*dPchmbdtoo);
 
-Pchmb     = Pchmb - alpha*res_Pchmb*dt/a1/3 + beta*upd_Pchmb;
-upd_Pchmb =       - alpha*res_Pchmb*dt/a1/3 + beta*upd_Pchmb;
+upd_Pchmb = - alpha*res_Pchmb*dt/a1/3 + beta*upd_Pchmb;
+Pchmb     = Pchmb + upd_Pchmb;
 
 end
 
@@ -93,10 +93,10 @@ jj1 = MapW(1:end-2,2:end-1); jj2 = MapW(3:end,2:end-1); jj3 = MapW(2:end-1,1:end
 aa  = a1.*rhofz(2:end-1,:)./dt;
 IIL = [IIL; ii(:)]; JJL = [JJL;  ii(:)];   AAL = [AAL; aa(:)           ];      % inertial term
 
-aa  = 1/2*(EtaP1+EtaP2)/h^2 + 1/2*(EtaC1+EtaC2)/h^2;
+aa  = 2/3*(EtaP1+EtaP2)/h^2 + 1/2*(EtaC1+EtaC2)/h^2;
 IIL = [IIL; ii(:)]; JJL = [JJL;  ii(:)];   AAL = [AAL; aa(:)           ];      % W on stencil centre
-IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL;-1/2*EtaP1(:)/h^2];      % W one above
-IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL;-1/2*EtaP2(:)/h^2];      % W one below
+IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL;-2/3*EtaP1(:)/h^2];      % W one above
+IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL;-2/3*EtaP2(:)/h^2];      % W one below
 IIL = [IIL; ii(:)]; JJL = [JJL; jj3(:)];   AAL = [AAL;-1/2*EtaC1(:)/h^2];      % W one to the left
 IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL;-1/2*EtaC2(:)/h^2];      % W one to the right
 
@@ -110,10 +110,10 @@ end
 %         top left         ||        bottom left          ||       top right       ||       bottom right
 jj1 = MapU(2:end-2,1:end-1); jj2 = MapU(3:end-1,1:end-1); jj3 = MapU(2:end-2,2:end); jj4 = MapU(3:end-1,2:end);
 
-IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL;-(1/2*EtaC1(:)-1/2*EtaP1(:))/h^2];  % U one to the top and left
-IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL;+(1/2*EtaC1(:)-1/2*EtaP2(:))/h^2];  % U one to the bottom and left
-IIL = [IIL; ii(:)]; JJL = [JJL; jj3(:)];   AAL = [AAL;+(1/2*EtaC2(:)-1/2*EtaP1(:))/h^2];  % U one to the top and right
-IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL;-(1/2*EtaC2(:)-1/2*EtaP2(:))/h^2];  % U one to the bottom and right
+IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL;-(1/2*EtaC1(:)-1/3*EtaP1(:))/h^2];  % U one to the top and left
+IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL;+(1/2*EtaC1(:)-1/3*EtaP2(:))/h^2];  % U one to the bottom and left
+IIL = [IIL; ii(:)]; JJL = [JJL; jj3(:)];   AAL = [AAL;+(1/2*EtaC2(:)-1/3*EtaP1(:))/h^2];  % U one to the top and right
+IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL;-(1/2*EtaC2(:)-1/3*EtaP2(:))/h^2];  % U one to the bottom and right
 
 
 % z-RHS vector
@@ -177,16 +177,16 @@ else
     jj1 = MapU(2:end-1,1:end-2); jj2 = MapU(2:end-1,3:end); jj3 = MapU(1:end-2,2:end-1); jj4 = MapU(3:end,2:end-1);
 end
 if periodic
-    aa  = a1.*rhofx./dt;
+    aa  = (a1+gamma).*rhofx./dt;
 else
     aa  = a1.*rhofx(:,2:end-1)./dt;
 end
 IIL = [IIL; ii(:)]; JJL = [JJL;  ii(:)];   AAL = [AAL; aa(:)           ];      % inertial term
 
-aa  = 1/2*(EtaP1+EtaP2)/h^2 + 1/2*(EtaC1+EtaC2)/h^2;
+aa  = 2/3*(EtaP1+EtaP2)/h^2 + 1/2*(EtaC1+EtaC2)/h^2;
 IIL = [IIL; ii(:)]; JJL = [JJL;  ii(:)];   AAL = [AAL; aa(:)           ];      % U on stencil centre
-IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL;-1/2*EtaP1(:)/h^2];      % U one to the left
-IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL;-1/2*EtaP2(:)/h^2];      % U one to the right
+IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL;-2/3*EtaP1(:)/h^2];      % U one to the left
+IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL;-2/3*EtaP2(:)/h^2];      % U one to the right
 IIL = [IIL; ii(:)]; JJL = [JJL; jj3(:)];   AAL = [AAL;-1/2*EtaC1(:)/h^2];      % U one above
 IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL;-1/2*EtaC2(:)/h^2];      % U one below
 
@@ -207,10 +207,10 @@ if periodic
 else
     jj1 = MapW(1:end-1,2:end-2); jj2 = MapW(1:end-1,3:end-1); jj3 = MapW(2:end,2:end-2); jj4 = MapW(2:end,3:end-1);
 end
-IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL;-(1/2*EtaC1(:)-1/2*EtaP1(:))/h^2];  % W one to the top and left
-IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL;+(1/2*EtaC1(:)-1/2*EtaP2(:))/h^2];  % W one to the top and right
-IIL = [IIL; ii(:)]; JJL = [JJL; jj3(:)];   AAL = [AAL;+(1/2*EtaC2(:)-1/2*EtaP1(:))/h^2];  % W one to the bottom and left
-IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL;-(1/2*EtaC2(:)-1/2*EtaP2(:))/h^2];  % W one to the bottom and right
+IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL;-(1/2*EtaC1(:)-1/3*EtaP1(:))/h^2];  % W one to the top and left
+IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL;+(1/2*EtaC1(:)-1/3*EtaP2(:))/h^2];  % W one to the top and right
+IIL = [IIL; ii(:)]; JJL = [JJL; jj3(:)];   AAL = [AAL;+(1/2*EtaC2(:)-1/3*EtaP1(:))/h^2];  % W one to the bottom and left
+IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL;-(1/2*EtaC2(:)-1/3*EtaP2(:))/h^2];  % W one to the bottom and right
 
 
 % x-RHS vector
@@ -218,8 +218,7 @@ if periodic
     advn_mx = advect(rhofx.*U(2:end-1,:),(U(2:end-1,ifx(1:end-1))+U(2:end-1,ifx(2:end)))/2,(W(:,1:end-1)+W(:,2:end))/2,h,{ADVN,''},[1,2],BCA);
     advn_mx(:,[1 end]) = repmat((advn_mx(:,1)+advn_mx(:,end))/2,1,2);
     rr  = + (a2.*rhoUo+a3.*rhoUoo)/dt ...
-          - advn_mx ...
-          - mean(U(2:end-1,:),'all').*rhofx/dt;
+          - advn_mx;
 else
     advn_mx = advect(rhofx(:,2:end-1).*U(2:end-1,2:end-1),(U(2:end-1,1:end-1)+U(2:end-1,2:end))/2,(W(:,2:end-2)+W(:,3:end-1))/2,h,{ADVN,''},[1,2],BCA);
     rr  = + (a2.*rhoUo(:,2:end-1)+a3.*rhoUoo(:,2:end-1))/dt ...
@@ -310,7 +309,7 @@ end
 
 %% assemble coefficients for matrix pressure diagonal and right-hand side
 
-if ~exist('KP','var') || bnchm
+% if ~exist('KP','var') || bnchm
     IIL = [];       % equation indeces into A
     JJL = [];       % variable indeces into A
     AAL = [];       % coefficients for A
@@ -338,14 +337,29 @@ if ~exist('KP','var') || bnchm
     
     % internal points
     ii  = MapP(2:end-1,2:end-1);
-    
+    jj1 = MapP(1:end-2,2:end-1);
+    jj2 = MapP(3:end-0,2:end-1);
+    jj3 = MapP(2:end-1,1:end-2);
+    jj4 = MapP(2:end-1,3:end-0);
+
     % coefficients multiplying matrix pressure P
-    aa  = zeros(size(ii));
-    IIL = [IIL; ii(:)]; JJL = [JJL; ii(:)];    AAL = [AAL; aa(:)];  % P on stencil centre
+    % aa  = zeros(size(ii));
+    % IIL = [IIL; ii(:)]; JJL = [JJL; ii(:)];    AAL = [AAL; aa(:)];  % P on stencil centre
+    
+    kP  = lambda*h^2./eta;
+    kP1 = (kP(icz(1:end-2),:).*kP(icz(2:end-1),:)).^0.5;   kP2 = (kP(icz(2:end-1),:).*kP(icz(3:end-0),:)).^0.5;
+    kP3 = (kP(:,icx(1:end-2)).*kP(:,icx(2:end-1))).^0.5;   kP4 = (kP(:,icx(2:end-1)).*kP(:,icx(3:end-0))).^0.5;
+
+    aa  = (kP1+kP2+kP3+kP4)/h^2;
+    IIL = [IIL; ii(:)]; JJL = [JJL;  ii(:)];   AAL = [AAL;-aa(:)     ];      % P on stencil centre
+    IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; kP1(:)/h^2];      % P one above
+    IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL; kP2(:)/h^2];      % P one below
+    IIL = [IIL; ii(:)]; JJL = [JJL; jj3(:)];   AAL = [AAL; kP3(:)/h^2];      % P one above
+    IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL; kP4(:)/h^2];      % P one below
     
     % assemble coefficient matrix
     KP  = sparse(IIL,JJL,AAL,NP,NP);
-end
+% end
 
 % RHS
 IIR = [];       % equation indeces into R
@@ -390,20 +404,27 @@ LL  = [ KV   GG  ; ...
 RR  = [RV; RP];
 
 SCL = (abs(diag(LL))).^0.5;
-SCL = diag(sparse(1./(SCL+1)));
+SCL = diag(sparse(1./(SCL+1e-6)));
+
+FF  = LL*[W(:);U(:);P(:)] - RR;
 
 LL  = SCL*LL*SCL;
-RR  = SCL*RR;
+FF  = SCL*FF;
 
 
 %% Solve linear system of equations for vx, vz, P
 
-SOL = SCL*(LL\RR);  % update solution
+SOL = SCL*(LL\FF);  % update solution
 
 % map solution vector to 2D arrays
-W   = full(reshape(SOL(MapW(:))        ,Nz+1,Nx+2)); % matrix z-velocity
-U   = full(reshape(SOL(MapU(:))        ,Nz+2,Nx+1)); % matrix x-velocity
-P   = full(reshape(SOL(MapP(:)+(NW+NU)),Nz+2,Nx+2)); % matrix dynamic pressure
+upd_W = - full(reshape(SOL(MapW(:))        ,Nz+1,Nx+2));% + beta*upd_W;  % matrix z-velocity
+upd_U = - full(reshape(SOL(MapU(:))        ,Nz+2,Nx+1));% + beta*upd_U;  % matrix x-velocity
+upd_P = - full(reshape(SOL(MapP(:)+(NW+NU)),Nz+2,Nx+2));% + beta*upd_P;  % matrix dynamic pressure
+
+W = W + upd_W;
+U = U + upd_U;
+P = P + upd_P;
+
 
 if ~bnchm
 
@@ -446,7 +467,7 @@ if ~bnchm
     muz  = (mu (icz(1:end-1),icx)+mu (icz(2:end),icx))./2;
     mux  = (mu (icz,icx(1:end-1))+mu (icz,icx(2:end)))./2;
 
-    wqf = qfz./max(TINY^0.5,phiz);
+    wqf = qfz./max(TINY^0.5,phiz);  wqf([1,end],:) = min(1,1-[top-fout;bot-fin]).*wqf([2,end-1],:);
     uqf = qfx./max(TINY^0.5,phix);
 
     wqx = qxz./max(TINY^0.5,chiz);
@@ -465,11 +486,11 @@ if ~bnchm
 
     
     %% update time step
-    dtk = (h/2)^2./max([kc(:)./rho(:);(kT0+ks(:).*T(:))./rho(:)./cP])/2;          % diffusive time step size
-    dta = CFL*h/2/max(abs([Um(:).*(mux (:)>TINY^0.5);Wm(:).*(muz (:)>TINY^0.5); ... % advective time step size
+    dtk = (h/2)^2/max([kc(:)./rho(:);(kT0+ks(:).*T(:))./rho(:)./cP])/2;              % diffusive time step size
+    dta =  h/2   /max(abs([Um(:).*(mux (:)>TINY^0.5);Wm(:).*(muz (:)>TINY^0.5); ...  % advective time step size
                            Ux(:).*(chix(:)>TINY^0.5);Wx(:).*(chiz(:)>TINY^0.5); ...
                            Uf(:).*(phix(:)>TINY^0.5);Wf(:).*(phiz(:)>TINY^0.5)]+TINY));   
-    dt  = min([1.05*dto,min(dtk,dta),dtmax]);                                      % time step size
+    dt  = min([1.01*dto,min(dtk,CFL*dta),dtmax]);                                    % time step size
 end
 
 end

@@ -105,7 +105,7 @@ if Nx <= 1 && Nz <= 1  % create 0D plots
     title('Xtal oxds [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(3,1,3)
     for i=1:cal.nmsy
-        plot(hist.time/TimeScale,squeeze(hist.x(:,2).*hist.cx_msy(:,2,i)),'-',LW{:},'color',ocean(round((i-1)*213/cal.nmsy)+1,:)); axis xy tight; box on; hold on
+        plot(hist.time/TimeScale,squeeze(hist.cx_msy(:,2,i)),'-',LW{:},'color',ocean(round((i-1)*213/cal.nmsy)+1,:)); axis xy tight; box on; hold on
     end
     title('Xtal msys [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:}); legend(cal.msyStr,TX{:},FS{1},8,'Location','northeast'); set(gca,TL{:},TS{:});
     xlabel(['Time [',TimeUnits,']'],TX{:},FS{:});

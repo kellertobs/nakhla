@@ -26,7 +26,7 @@ dt       =  36;                  % initial time step [s]
 % set initial thermo-chemical state
 T0       =  1100;                % temperature top  layer [deg C]
 T1       =  T0;                  % temperature base layer [deg C]
-c0       =  [0.05 0.23 0.09 0.32 0.21 0.10 0.03];  % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
+c0       =  [0.08  0.20  0.11  0.30  0.21  0.10  0.03];  % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
 c1       =  c0;                  % components (maj comp, H2O) base layer [wt] (will be normalised to unit sum!)
 dcr      =  [0,0,0,0,0,0,0];
 dcg      =  [0,0,0,0,0,0,0];
@@ -35,7 +35,7 @@ dcg      =  [0,0,0,0,0,0,0];
 periodic =  1;
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
 bnd_w    =  h;                   % boundary layer width [m]
-tau_T    =  10*hr;               % wall cooling/assimilation time [s]
+tau_T    =  12*hr;               % wall cooling/assimilation time [s]
 Twall    =  [300,300,nan];       % [top,bot,sds] wall rock temperature [degC] (nan = insulating)
 cwall    =  nan(3,7);
 Ptop     =  1.5e8;               % top pressure [Pa]
@@ -50,8 +50,10 @@ TINT     =  'bd2im';             % time integration scheme ('be1im','bd2im','cn2
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
 CFL      =  0.125;               % (physical) time stepping courant number (multiplies stable step) [0,1]
 rtol     =  1e-4;                % outer its relative tolerance
-atol     =  1e-8;                % outer its absolute tolerance
+atol     =  1e-6;                % outer its absolute tolerance
 maxit    =  30;                  % maximum outer its
+alpha    =  0.5;
+beta     =  0.125;
 
 %*****  RUN NAKHLA MODEL  *************************************************
 run('../src/main')
