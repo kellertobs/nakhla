@@ -4,7 +4,7 @@ dsumMdtoo = dsumMdto; dsumMdto = dsumMdt;
 dsumSdtoo = dsumSdto; dsumSdto = dsumSdt;
 dsumCdtoo = dsumCdto; dsumCdto = dsumCdt;
 
-stp = max(1,step+1);
+stp = max(1,step);
 
 % record model time
 hist.time(stp) = time;
@@ -36,9 +36,9 @@ dsumCdt = squeeze(sum(sum(bnd_C*h*h*1,1),2) ...
         + sum(M(1,:).*cm(1,:,:).*Wm(1,2:end-1)*h*1,2) - sum(M(end,:).*cm(end,:,:).*Wm(end,2:end-1)*h*1,2) ...
         + sum(M(:,1).*cm(:,1,:).*Um(2:end-1,1)*h*1,1) - sum(M(:,end).*cm(:,end,:).*Um(2:end-1,end)*h*1,1)).';  % [kg/s]
 
-if step>=1; hist.DM(stp  ) = (a2*hist.DM(stp-1  ) + a3*hist.DM(max(1,stp-2)  ) + (b1*dsumMdt + b2*dsumMdto + b3*dsumMdtoo)*dt)/a1; else; hist.DM(stp  ) = 0; end  % [kg]
-if step>=1; hist.DS(stp  ) = (a2*hist.DS(stp-1  ) + a3*hist.DS(max(1,stp-2)  ) + (b1*dsumSdt + b2*dsumSdto + b3*dsumSdtoo)*dt)/a1; else; hist.DS(stp  ) = 0; end  % [kg]
-if step>=1; hist.DC(stp,:) = (a2*hist.DC(stp-1,:) + a3*hist.DC(max(1,stp-2),:) + (b1*dsumCdt + b2*dsumCdto + b3*dsumCdtoo)*dt)/a1; else; hist.DC(stp,:) = zeros(1,cal.ncmp); end  % [kg]
+if step>=1; hist.DM(stp  ) = (a2*hist.DM(max(1,stp-1)  ) + a3*hist.DM(max(1,stp-2)  ) + (b1*dsumMdt + b2*dsumMdto + b3*dsumMdtoo)*dt)/a1; else; hist.DM(stp  ) = 0; end  % [kg]
+if step>=1; hist.DS(stp  ) = (a2*hist.DS(max(1,stp-1)  ) + a3*hist.DS(max(1,stp-2)  ) + (b1*dsumSdt + b2*dsumSdto + b3*dsumSdtoo)*dt)/a1; else; hist.DS(stp  ) = 0; end  % [kg]
+if step>=1; hist.DC(stp,:) = (a2*hist.DC(max(1,stp-1),:) + a3*hist.DC(max(1,stp-2),:) + (b1*dsumCdt + b2*dsumCdto + b3*dsumCdtoo)*dt)/a1; else; hist.DC(stp,:) = zeros(1,cal.ncmp); end  % [kg]
 
 % record conservation error of mass M, heat S, components C
 hist.EM(stp  ) = (hist.sumM(stp  ) - hist.DM(stp  ))./hist.sumM(1  ) - 1;  % [kg/kg]
@@ -107,39 +107,6 @@ for i=1:cal.noxd
     hist.c_oxd(stp,3,i) = max(max(c_oxd(:,:,i)));
 end
 
-% indx     = x>1e-6;
-% indx_cmp = repmat(x>1e-6,1,1,cal.ncmp);
-% indx_oxd = repmat(x>1e-6,1,1,cal.noxd);
-% indx_msy = repmat(x>1e-6,1,1,cal.nmsy);
-% if any(indx(:)>0)
-% 
-%     for i=1:cal.ncmp
-%         hist.cx(stp,1,i) = min(min(cx(indx_cmp(:,:,i))));
-%         hist.cx(stp,2,i) = sum(sum(cx(:,:,i).*x.*rho))./sum(sum(x.*rho));
-%         hist.cx(stp,3,i) = max(max(cx(indx_cmp(:,:,i))));
-%     end
-%     for i=1:cal.noxd
-%         hist.cx_oxd(stp,1,i) = min(min(cx_oxd(indx_oxd(:,:,i))));
-%         hist.cx_oxd(stp,2,i) = sum(sum(cx_oxd(:,:,i).*x.*rho))./sum(sum(x.*rho));
-%         hist.cx_oxd(stp,3,i) = max(max(cx_oxd(indx_oxd(:,:,i))));
-%     end
-%     for i=1:cal.nmsy
-%         hist.cx_msy(stp,1,i) = min(min(cx_msy(indx_msy(:,:,i))));
-%         hist.cx_msy(stp,2,i) = sum(sum(cx_msy(:,:,i).*x.*rho))./sum(sum(x.*rho));
-%         hist.cx_msy(stp,3,i) = max(max(cx_msy(indx_msy(:,:,i))));
-%     end
-% 
-%     hist.rhox(stp,1) = min(min(rhox(indx)));
-%     hist.rhox(stp,2) = sum(sum(rhox.*x.*rho))./sum(sum(x.*rho));
-%     hist.rhox(stp,3) = max(max(rhox(indx)));
-% else
-%     hist.cx(stp,1:3,1:cal.ncmp) = NaN;
-%     hist.cx_oxd(stp,1:3,1:cal.noxd) = NaN;
-%     hist.cx_msy(stp,1:3,1:cal.nmsy) = NaN;
-%     hist.rhox(stp,1:3) = NaN;
-% end
-
-
 for i=1:cal.ncmp
     hist.cx(stp,1,i) = min(min(cx(:,:,i)));
     hist.cx(stp,2,i) = sum(sum(cx(:,:,i).*x.*rho))./sum(sum(x.*rho));
@@ -159,35 +126,6 @@ end
 hist.rhox(stp,1) = min(min(rhox));
 hist.rhox(stp,2) = sum(sum(rhox.*x.*rho))./sum(sum(x.*rho));
 hist.rhox(stp,3) = max(max(rhox));
-
-% indm     = m>1e-6;
-% indm_cmp = repmat(m>1e-6,1,1,cal.ncmp);
-% indm_oxd = repmat(m>1e-6,1,1,cal.noxd);
-% if any(indm(:)>0)
-%     for i=1:cal.ncmp
-%         hist.cm(stp,1,i) = min(min(cm(indm_cmp(:,:,i))));
-%         hist.cm(stp,2,i) = sum(sum(cm(:,:,i).*m.*rho))./sum(sum(m.*rho));
-%         hist.cm(stp,3,i) = max(max(cm(indm_cmp(:,:,i))));
-%     end
-%     for i=1:cal.noxd
-%         hist.cm_oxd(stp,1,i) = min(min(cm_oxd(indm_oxd(:,:,i))));
-%         hist.cm_oxd(stp,2,i) = sum(sum(cm_oxd(:,:,i).*m.*rho))./sum(sum(m.*rho));
-%         hist.cm_oxd(stp,3,i) = max(max(cm_oxd(indm_oxd(:,:,i))));
-%     end
-% 
-%     hist.rhom(stp,1) = min(min(rhom(indm)));
-%     hist.rhom(stp,2) = sum(sum(rhom.*m))./sum(sum(m));
-%     hist.rhom(stp,3) = max(max(rhom(indm)));
-% 
-%     hist.etam(stp,1) = min(min(etam(indm)));
-%     hist.etam(stp,2) = sum(sum(etam.*m))./sum(sum(m));
-%     hist.etam(stp,3) = max(max(etam(indm)));
-% else
-%     hist.cm(stp,1:3,1:cal.ncmp) = NaN;
-%     hist.cm_oxd(stp,1:3,1:cal.noxd) = NaN;
-%     hist.rhom(stp,1:3) = NaN;
-%     hist.etam(stp,1:3) = NaN;
-% end
 
 for i=1:cal.ncmp
     hist.cm(stp,1,i) = min(min(cm(:,:,i)));
@@ -239,6 +177,10 @@ hist.wx(stp,3) = max(max(-(chi([1,1:end],:)+chi([1:end,end],:))/2.*wx(:,2:end-1)
 hist.wf(stp,1) = min(min(-(phi([1,1:end],:)+phi([1:end,end],:))/2.*wf(:,2:end-1)));
 hist.wf(stp,2) = mean(mean(abs((phi([1,1:end],:)+phi([1:end,end],:))/2.*wf(:,2:end-1))));
 hist.wf(stp,3) = max(max(-(phi([1,1:end],:)+phi([1:end,end],:))/2.*wf(:,2:end-1)));
+
+hist.dH(stp,1) = sum(bnd_S.*T.*h^2,'all')/L;
+hist.dH(stp,2) = sum(bnd_S(1:ceil(Nz/2),:).*T(1:ceil(Nz/2),:).*h^2,'all')/L;
+hist.dH(stp,3) = sum(bnd_S(floor(Nz/2):end,:).*T(floor(Nz/2):end,:).*h^2,'all')/L;
 
 
 % % fraction, composition, and temperature of eruptible magma suspension (mu>0.55)
