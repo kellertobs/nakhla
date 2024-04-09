@@ -309,7 +309,7 @@ end
 
 %% assemble coefficients for matrix pressure diagonal and right-hand side
 
-% if ~exist('KP','var') || bnchm
+if ~exist('KP','var') || bnchm || lambda>0
     IIL = [];       % equation indeces into A
     JJL = [];       % variable indeces into A
     AAL = [];       % coefficients for A
@@ -359,7 +359,7 @@ end
     
     % assemble coefficient matrix
     KP  = sparse(IIL,JJL,AAL,NP,NP);
-% end
+end
 
 % RHS
 IIR = [];       % equation indeces into R

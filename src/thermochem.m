@@ -164,11 +164,9 @@ while rnorm>tol && it<mxit
 
     cm  = c    ./(m + x.*Kx + f.*Kf + TINY);
     cx  = c.*Kx./(m + x.*Kx + f.*Kf + TINY);
-    cf  = c.*Kf./(m + x.*Kx + f.*Kf + TINY);
 
     cm = cm./sum(cm,3);
     cx = cx./sum(cx,3);
-    cf = cf./sum(cf,3);
 
     Kx = cx./(cm+TINY);
     Kf = cf./(cm+TINY);
