@@ -82,20 +82,20 @@ mod_wall =  1e10;                % wall rock elastic modulus [Pa]
 % set numerical model parameters
 TINT     =  'bd2im';             % time integration scheme ('be1im','bd2im','cn2si','bd2si')
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
-CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
-rtol     =  1e-6;                % outer its relative tolerance
-atol     =  1e-9;                % outer its absolute tolerance
-maxit    =  50;                  % maximum outer its
-alpha    =  0.80;                % iterative step size parameter
-beta     =  0.10;                % iterative damping parameter
+CFL      =  1.00;                % (physical) time stepping courant number (multiplies stable step) [0,1]
+rtol     =  1e-4;                % outer its relative tolerance
+atol     =  1e-6;                % outer its absolute tolerance
+maxit    =  15;                  % maximum outer its
+alpha    =  0.75;                % iterative step size parameter
+beta     =  0.125;               % iterative damping parameter
 gamma    =  1e-3;                % artificial horizontal inertia parameter (only applies if periodic)
-lambda   =  1e-7;                % pressure smoothing parameter
+lambda   =  0e-7;                % pressure smoothing parameter
 etacntr  =  1e+6;                % maximum viscosity contrast
 Delta_trb=  0.75;                % correlation length for eddy diffusivity (multiple of h, 0.5-1)
 Delta_sgr=  15;                  % correlation length for phase fluctuation diffusivity (multiple of dx0, df0, 10-20)
 Prt      =  1;                   % turbulent Prandtl number (ratio of momentum to heat diffusivity)
 Sct      =  1;                   % turbulent Schmidt number (ratio of momentum to mass diffusivity)
-etamin   =  1e-2;                % minimum viscosity
+etamin   =  0.1;                 % minimum viscosity
 Pcouple  =  0;                   % coupling phase equilibria and material properties to dynamic pressure
 
 % set various options

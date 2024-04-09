@@ -22,25 +22,25 @@ L        =  D/3;                 % chamber width [m]
 % set model timing parameters
 Nt       =  1e6;                 % number of time steps to take
 tend     =  1e4*yr;              % end time for simulation [s]
-dt       =  1*hr;              % initial time step [s]
+dt       =  1*hr;                % initial time step [s]
 dtmax    =  1*yr;                % maximum time step [s]
 
 % set initial thermo-chemical state
 Tinit    = 'linear';             % T initial condition mode ('layer' or 'linear')
-T0       =  1700;                % temperature top  layer [deg C]
-T1       =  T0;                  % temperature base layer [deg C]
-c0       =  [0.27  0.35  0.10  0.21  0.04  0.03  0.001];  % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
+T0       =  1725;                % temperature top  layer [deg C]
+T1       =  1725;                % temperature base layer [deg C]
+c0       =  [0.30  0.33  0.09  0.21  0.04  0.03  0.00];  % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
 c1       =  c0;                             % components (maj comp, H2O) bot layer [wt] (will be normalised to unit sum!)
 dcr      =  [1,1,1,-1,-1,-1,0]*1e-4;  % amplitude of random noise [wt]
 dcg      =  [0,0,0,0,0,0,0];          % amplitude of gaussian perturbation [wt]
 zlay     =  2.0;                 % layer thickness (relative to domain depth D)
 
 % set thermo-chemical boundary parameters
-periodic =  1;
+periodic =  0;
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
 bnd_w    =  h;                   % boundary layer width [m]
-tau_T    =  1*yr;              % wall cooling/assimilation time [s]
-Twall    =  [0,nan,nan];         % [top,bot,sds] wall rock temperature [degC] (nan = insulating)
+tau_T    =  2*yr;                % wall cooling/assimilation time [s]
+Twall    =  [0,1825,nan];        % [top,bot,sds] wall rock temperature [degC] (nan = insulating)
 cwall    =  nan(3,7);
 Ptop     =  1e5;                 % top pressure [Pa]
 
@@ -50,9 +50,8 @@ aT       =  3e-5;                % thermal expansivity [1/K]
 cP       =  1100;                % heat capacity [J/kg/K]
 
 % set buoyancy parameters
-g0       =  1.0;                 % gravity [m/s2]
-dx0      =  3e-3;                % crystal size [m]
-dm0      =  dx0;                 % melt film size [m]
+g0       =  1.62;                % gravity [m/s2]
+dx0      =  1e-3;                % crystal size [m]
 bPx      =  1e-11;               % solid compressibility [1/Pa]
 bPm      =  2e-11;               % melt compressibility [1/Pa]
 
@@ -64,15 +63,14 @@ mod_wall =  0;                   % wall rock elastic modulus [Pa]
 % set numerical model parameters
 TINT     =  'bd2im';             % time integration scheme ('be1im','bd2im','cn2si','bd2si')
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
-CFL      =  1.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
-rtol     =  1e-4;                % outer its relative tolerance
-atol     =  1e-6;                % outer its absolute tolerance
+CFL      =  0.90;                % (physical) time stepping courant number (multiplies stable step) [0,1]
+rtol     =  1e-3;                % outer its relative tolerance
+atol     =  1e-8;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its
-Delta_trb=  0.75;                % correlation length for eddy diffusivity
-Delta_sgr=  15;                  % correlation length for phase fluctuation diffusivity
+Delta_trb=  2*h;                % correlation length for eddy diffusivity
+Delta_sgr=  10*dx0;              % correlation length for phase fluctuation diffusivity
 Prt      =  1;                   % turbulent Prandtl number (ratio of momentum to heat diffusivity)
-Sct      =  1;                   % turbulent Schmidt number (ratio of momentum to mass diffusivity)
-etamin   =  1e5;
+Sct      =  5;                   % turbulent Schmidt number (ratio of momentum to mass diffusivity)
 
 %*****  RUN NAKHLA MODEL  *************************************************
 run('../src/main')

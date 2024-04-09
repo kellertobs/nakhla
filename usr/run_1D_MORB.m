@@ -6,7 +6,7 @@ run('./par_default')
 
 % set run parameters
 runID    =  '1D_MORB';           % run identifier
-restart  = -1;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
+restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  200;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot results
 save_op  =  1;                   % switch on to save output to file
@@ -14,7 +14,7 @@ plot_cv  =  0;                   % switch on to live plot iterative convergence
 
 % set model domain parameters
 D        =  10;                  % chamber depth [m]
-N        =  240;                 % number of grid points in z-direction
+N        =  300;                 % number of grid points in z-direction
 h        =  D/N;                 % grid spacing (equal in both dimensions, do not set) [m]
 L        =  h;                   % chamber width (equal to h for 1-D mode) [m]
 
@@ -34,8 +34,8 @@ dcg      =  [0,0,0,0,0,0,0];
 % set thermo-chemical boundary parameters
 periodic =  1;
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
-bnd_w    =  h;                   % boundary layer width [m]
-tau_T    =  12*hr;               % wall cooling/assimilation time [s]
+bnd_w    =  0.075;               % boundary layer width [m]
+tau_T    =  (2*bnd_2)^2/1e-6;    % wall cooling/assimilation time [s]
 Twall    =  [300,300,nan];       % [top,bot,sds] wall rock temperature [degC] (nan = insulating)
 cwall    =  nan(3,7);
 Ptop     =  2.0e8;               % top pressure [Pa]
@@ -51,9 +51,7 @@ ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fro
 CFL      =  0.125;               % (physical) time stepping courant number (multiplies stable step) [0,1]
 rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-6;                % outer its absolute tolerance
-maxit    =  30;                  % maximum outer its
-alpha    =  0.5;
-beta     =  0.125;
+maxit    =  15;                  % maximum outer its
 
 %*****  RUN NAKHLA MODEL  *************************************************
 run('../src/main')
