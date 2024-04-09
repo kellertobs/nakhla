@@ -48,58 +48,29 @@ var.T      = Tsol;
 
 %***  get fluid fraction and composition
 f  = var.H2O;
-cf = [zeros(1,cal.ncmp-1),1];
-
-%***  get residual for sum(ci_b/Kxi) = sum(ci_v)
-cm = var.c./((1-f).*cal.Kx + f.*cal.Kf + 1e-16);
-r  = sum(cm,2)-1;
 
 rnorm      =  1;     % initialize residual norm for iterations
 n          =  0;     % initialize iteration count
 rnorm_tol  =  1e-9; % tolerance for Newton residual
-its_tol    =  200;   % maximum number of iterations
-% eps_T      =  1e-6;  % temperature perturbation for finite differencing, degrees
+its_tol    =  100;   % maximum number of iterations
 flag       =  1;     % tells us whether the Newton solver converged
 
 while rnorm > rnorm_tol  % iterate down to full accuracy
-    
-    % %***  compute partition coefficients Kxi at T+eps_T/2
-    % var.T      = Tsol+eps_T/2;
-    % [var,cal]  = meltmodel(var,cal,'K');
-    % 
-    % %***  get residual at T+eps_T/2
-    % cm = var.c./((1-f).*cal.Kx + f.*cal.Kf + 1e-16);
-    % rp = sum(cm,2)-1;
-    % 
-    % %***  compute partition coefficients Kxi at T-eps_T/2
-    % var.T      = Tsol-eps_T/2;
-    % [var,cal]  = meltmodel(var,cal,'K');
-    % 
-    % %***  get residual at T-eps_T/2
-    % cm = var.c./((1-f).*cal.Kx + f.*cal.Kf + 1e-16);
-    % rm = sum(cm,2)-1;
-    % 
-    % %***  finite difference drdT = (r(T+eps_T/2)-r(T-eps_T/2))/eps_T
-    % drdT  =  (rp - rm)/eps_T;
 
+    %***  get partition coefficients Kxi
     var.T      = Tsol;
     [var,cal]  = meltmodel(var,cal,'K');
     TK   = Tsol+273.15;
     TmK  = cal.Tm+273.15;
+
+    %***  get residual r
     r    = sum( [-(var.c(:,1:end-1).*exp((cal.dS.*(TK - TmK))./(TmK.*cal.r)))./(f - 1),var.H2Om] ,2) - 1;
 
+    %***  get analytical derivative of residual dr/dT
     drdT = sum( -(cal.dS.*var.c(:,1:end-1).*exp((cal.dS.*(TK - TmK))./(TmK.*cal.r)))./(TmK.*cal.r.*(f - 1)) ,2);
     
     %***  apply Newton correction to current guess of Tsol
     Tsol(ii)  =  Tsol(ii) - r(ii)./drdT(ii)/1.1;
-    
-    %***  compute partition coefficients Kxi at Tsol
-    % var.T      = Tsol;
-    % [var,cal]  = meltmodel(var,cal,'K');
-    
-    %***  compute residual at Tsol
-    % cm = var.c./((1-f).*cal.Kx + f.*cal.Kf + 1e-16);
-    % r  = sum(cm,2)-1;
 
     %***  compute Newton residual norm
     rnorm  =  norm(r(ii),2)./sqrt(length(r(ii)));
@@ -140,60 +111,31 @@ end
 var.T      = Tliq;
 [var,cal]  = meltmodel(var,cal,'K');
 
-%***  get fluid fraction and composition
+%***  get fluid fraction
 f  = (var.H2O-var.H2Om)./(1-var.H2Om);
-cf = [zeros(1,cal.ncmp-1),1];
-
-%***  get residual for sum(ci_b*Kxi) = sum(ci_v)
-cx = var.c.*cal.Kx./(1-f);
-r  = sum(cx,2)-1;
 
 rnorm      =  1;     % initialize residual norm for iterations
 n          =  0;     % initialize iteration count
 rnorm_tol  =  1e-9;  % tolerance for Newton residual
-its_tol    =  200;   % maximum number of iterations
-% eps_T      =  1e-6;  % temperature perturbation for finite differencing, degrees
+its_tol    =  100;   % maximum number of iterations
 flag       =  1;     % tells us whether the Newton solver converged
 
 while rnorm > rnorm_tol  % iterate down to full accuracy
-    
-    % %***  compute partition coefficients Kxi at T+eps_T/2
-    % var.T      = Tliq+eps_T/2;
-    % [var,cal]  = meltmodel(var,cal,'K');
-    % 
-    % %***  get residual at T+eps_T/2
-    % cx = var.c.*cal.Kx./(1-f);
-    % rp = sum(cx,2)-1;
-    % 
-    % %***  compute partition coefficients Kxi at T-eps_T/2
-    % var.T      = Tliq-eps_T/2;
-    % [var,cal]  = meltmodel(var,cal,'K');
-    % 
-    % %***  get residual at T-eps_T/2
-    % cx = var.c.*cal.Kx./(1-f);
-    % rm = sum(cx,2)-1;
-    % 
-    % %***  compute difference drdT = (r(T+eps_T/2)-r(T-eps_T/2))/eps_T
-    % drdT  =  (rp - rm)./eps_T;
-    
+
+    %***  get partition coefficients Kxi
     var.T      = Tliq;
     [var,cal]  = meltmodel(var,cal,'K');
     TK   = Tliq+273.15;
     TmK  = cal.Tm+273.15;
+
+    %***  get residual r
     r    = sum( -(var.c(:,1:end-1).*exp(-(cal.dS.*(TK - TmK))./(TmK.*cal.r)))./(f - 1) ,2) - 1;
 
+    %***  get get analytical derivative of residual dr/dT
     drdT = sum( (cal.dS.*var.c(:,1:end-1).*exp(-(cal.dS.*(TK - TmK))./(TmK.*cal.r)))./(TmK.*cal.r.*(f - 1)) ,2);
 
     %***  apply Newton correction to Tliq
     Tliq(ii)  =  Tliq(ii) - r(ii)./drdT(ii)/1.1;
-    
-    % %***  compute partition coefficients Kxi at Tliq
-    % var.T      = Tliq;
-    % [var,cal]  = meltmodel(var,cal,'K');
-    % 
-    % %***  compute residual at Tliq
-    % cx = var.c.*cal.Kx./(1-f);
-    % r  = sum(cx,2)-1;
     
     %***  compute Newton residual norm
     rnorm  =  norm(r(ii),2)./sqrt(length(r(ii)));
@@ -225,13 +167,6 @@ if isfield(cal,'Tsol')
     var.T = max(cal.Tsol,min(cal.Tliq,var.T));
 end
 
-%***  set reasonable initial guess for melt fraction
-% if ~isfield(var,'m') 
-%     var.m = max(0,min(1,(var.T-cal.Tsol)./(cal.Tliq-cal.Tsol)));
-% elseif ~any(var.m(:)>1e-9 & var.m(:)<1-1e-9)
-%     var.m = max(0,min(1,(var.T-cal.Tsol)./(cal.Tliq-cal.Tsol)));
-% end
-
 var.H2Om = max(0,min(cal.H2Osat, var.H2O./(var.m+1e-16) ));
 var.cf   = zeros(size(var.c)); var.cf(:,cal.ncmp) = 1;
 var.f    = max(0,min(var.H2O, var.H2O - var.m.*var.H2Om ));
@@ -240,31 +175,19 @@ var.x    = max(0,min(1,1-var.m-var.f));
 
 rnorm     = 1;     % initialize residual norm for iterations
 n         = 0;     % initialize iteration count
-rnorm_tol = 1e-12;  % tolerance for Newton residual
-its_tol   = 200;   % maximum number of iterations
-% epsm      = 1e-6;  % temperature perturbation for finite differencing, degrees
+rnorm_tol = 1e-9;  % tolerance for Newton residual
+its_tol   = 100;   % maximum number of iterations
 flag.eql  = 1;     % tells us whether the Newton solver converged
 mi        = var.m;
 
 while rnorm > rnorm_tol     % Newton iteration
     mii = mi; mi = var.m; 
 
-    % detect points at subsolidus or superliquidus conditions
-    % subsol = (var.m<=1e-9 & var.T<=cal.Tsol);
-    % supliq = (var.x<=1e-9 & var.T>=cal.Tliq);
-
-    % %***  compute residual of unity sum of components
-    % [r,var,cal] = resm(var.m,var,cal);
-    % % r(subsol | supliq) = 0;
-    % 
-    % %***  compute numerical derivative of residual dr/dm
-    % rp = resm(var.m+epsm/2,var,cal);
-    % rm = resm(var.m-epsm/2,var,cal);
-    % 
-    % drdm = (rp-rm)./epsm;
-
+    %***  get residual of unity sum of components
     [var,cal] = meltmodel(var,cal,'K');
     r    = sum( (var.c.*(1-cal.Kx)   )./(cal.Kx + (1-cal.Kx).*var.m + (cal.Kf-cal.Kx).*var.f + 1e-16)   ,2);
+
+    %***  get analytical derivative of residual dr/dm
     drdm = sum(-(var.c.*(1-cal.Kx).^2)./(cal.Kx + (1-cal.Kx).*var.m + (cal.Kf-cal.Kx).*var.f + 1e-16).^2,2);
 
     %***  apply Newton correction to crystal fraction x

@@ -121,8 +121,7 @@ Re0 = W0.*rho.*D/10./eta;
 
 if Nx==1 && Nz==1; kW = 0;
 else              
-kW = (kW + 2.*eII.*(0.18*Delta_trb).^2 .* (1-min(1,topshape+botshape+sdsshape)*0.9))/2;
-% kW = eII.*(Delta_trb*h).^2 .* (1-min(1,topshape+botshape+sdsshape)*0.9);
+kW = eII.*(Delta_trb*h).^2 .* (1-min(1,topshape+botshape+sdsshape)*0.9);
 end
 kwx = wx0.*Delta_sgr*dx0;                                                  % segregation fluctuation diffusivity
 kwf = wf0.*Delta_sgr*df0;                                                  % segregation fluctuation diffusivity

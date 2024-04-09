@@ -106,20 +106,20 @@ if ~any(bnd_h)
     switch bndmode
         case 0  % none
         case 1  % top only
-            topshape = exp( ( -ZZ+h/2)/bnd_w);
+            topshape = exp( ( -ZZ)/bnd_w);
         case 2  % bot only
-            botshape = exp(-(D-ZZ-h/2)/bnd_w);
+            botshape = exp(-(D-ZZ)/bnd_w);
         case 3  % top/bot only
-            topshape = exp( ( -ZZ+h/2)/bnd_w);
-            botshape = exp(-(D-ZZ-h/2)/bnd_w);
+            topshape = exp( ( -ZZ)/bnd_w);
+            botshape = exp(-(D-ZZ)/bnd_w);
         case 4 % all walls
-            topshape = exp( ( -ZZ+h/2)/bnd_w);
-            botshape = exp(-(D-ZZ-h/2)/bnd_w);
-            sdsshape = exp( ( -XX+h/2)/bnd_w) ...
-                     + exp(-(L-XX-h/2)/bnd_w);
+            topshape = exp( ( -ZZ)/bnd_w);
+            botshape = exp(-(D-ZZ)/bnd_w);
+            sdsshape = exp( ( -XX)/bnd_w) ...
+                     + exp(-(L-XX)/bnd_w);
         case 5 % only walls
-            sdsshape = exp( ( -XX+h/2)/bnd_w) ...
-                     + exp(-(L-XX-h/2)/bnd_w);
+            sdsshape = exp( ( -XX)/bnd_w) ...
+                     + exp(-(L-XX)/bnd_w);
     end
     sdsshape = max(0,sdsshape - topshape - botshape);
 end
@@ -284,7 +284,6 @@ while res > tol
 
     it = it+1;
 end
-
 rhoo = rho;
 dto  = dt; 
 
@@ -386,9 +385,6 @@ Tp   = Tp+273.15;
 S    = rho.*(cP.*log(T/Tref) + x.*Dsx + f.*Dsf - Adbt.*(Pt-Pref));  So = S;  res_S = 0.*S;
 S0   = rho.*(cP.*log(  Tref) + x.*Dsx + f.*Dsf - Adbt.*    Pref );  
 C    = rho.*(m.*cm + x.*cx + f.*cf); Co = C;  res_C = 0.*C;
-Cx   = rho.*x.*cx;  Cxo = Cx;  res_Cx = 0.*Cx;
-Cm   = rho.*m.*cm;  Cmo = Cm;  res_Cm = 0.*Cm;  
-Cf   = rho.*f.*cf;  Cfo = Cf;  res_Cf = 0.*Cf;
 X    = rho.*x; Xo = X;  res_X = 0.*X;
 F    = rho.*f; Fo = F;  res_F = 0.*F;
 M    = rho.*m; Mo = M;  res_M = 0.*M;
@@ -423,9 +419,6 @@ Gx  = 0.*x;  Gf  = 0.*f;  Gm  = 0.*m;
 % initialise auxiliary variables 
 dSdt   = 0.*T;  dSdto  = dSdt; diss_h = 0.*T;
 dCdt   = 0.*c;  dCdto  = dCdt;
-dCxdt  = 0.*c;  dCxdto  = dCdt;
-dCfdt  = 0.*c;  dCfdto  = dCdt;
-dCmdt  = 0.*c;  dCmdto  = dCdt;
 dFdt   = 0.*f;  dFdto  = dFdt;
 dXdt   = 0.*x;  dXdto  = dXdt;
 dMdt   = 0.*m;  dMdto  = dMdt;
@@ -440,9 +433,6 @@ dTRCdt  = 0.*trc; dTRCdto = dTRCdt;
 % dIRdt  = 0.*ir; dIRdto = dIRdt;
 upd_S  = 0.*S;
 upd_C  = 0.*C;
-upd_Cx = 0.*C;
-upd_Cf = 0.*C;
-upd_Cm = 0.*C;
 upd_X  = 0.*X;
 upd_F  = 0.*F;
 upd_M  = 0.*M;

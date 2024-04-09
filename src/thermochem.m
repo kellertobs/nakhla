@@ -110,10 +110,6 @@ Gm  = (mq-m).*rho/max(tau_r,5*dt);
 Gx  = (xq-x).*rho/max(tau_r,5*dt); 
 Gf  = (fq-f).*rho/max(tau_r,5*dt);
 
-Gm = Gm + diffus(Gm,ones(size(Gm))/8,1,[1,2],BCD);
-Gx = Gx + diffus(Gx,ones(size(Gx))/8,1,[1,2],BCD);
-Gf = Gf + diffus(Gf,ones(size(Gf))/8,1,[1,2],BCD);
-
 Gxc = (cxq.*xq-cx.*x).*rho/max(tau_r,5*dt);
 Gfc = (cfq.*fq-cf.*f).*rho/max(tau_r,5*dt);
 Gmc = (cmq.*mq-cm.*m).*rho/max(tau_r,5*dt);
@@ -162,8 +158,8 @@ subsol  = m<=1e-9 & T<=reshape(cal.Tsol+273.15,Nz,Nx);
 supliq  = x<=1e-9 & T>=reshape(cal.Tliq+273.15,Nz,Nx);
 subsolc = repmat(subsol,1,1,7);
 supliqc = repmat(supliq,1,1,7);
-rnorm   = 1;  tol  = 1e-8;
-it      = 1;  mxit = 200;
+rnorm   = 1;  tol  = atol/10;
+it      = 1;  mxit = 100;
 while rnorm>tol && it<mxit
 
     cm  = c    ./(m + x.*Kx + f.*Kf + TINY);
