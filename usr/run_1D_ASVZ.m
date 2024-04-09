@@ -35,7 +35,7 @@ dcg      =  [0,0,0,0,0,0,0];
 periodic =  1;
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
 bnd_w    =  0.075;               % boundary layer width [m]
-tau_T    =  (2*bnd_2)^2/1e-6;    % wall cooling/assimilation time [s]
+tau_T    =  (2*bnd_w)^2/1e-6;    % wall cooling/assimilation time [s]
 Twall    =  [300,300,nan];       % [top,bot,sds] wall rock temperature [degC] (nan = insulating)
 cwall    =  nan(3,7);
 Ptop     =  1.5e8;               % top pressure [Pa]
