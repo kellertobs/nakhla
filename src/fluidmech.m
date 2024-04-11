@@ -410,20 +410,25 @@ FF  = LL*[W(:);U(:);P(:)] - RR;
 
 LL  = SCL*LL*SCL;
 FF  = SCL*FF;
+RR  = SCL*RR;
 
 
 %% Solve linear system of equations for vx, vz, P
 
-SOL = SCL*(LL\FF);  % update solution
+SOL = SCL*(LL\RR);  % update solution
 
 % map solution vector to 2D arrays
-upd_W = - full(reshape(SOL(MapW(:))        ,Nz+1,Nx+2));% + beta*upd_W;  % matrix z-velocity
-upd_U = - full(reshape(SOL(MapU(:))        ,Nz+2,Nx+1));% + beta*upd_U;  % matrix x-velocity
-upd_P = - full(reshape(SOL(MapP(:)+(NW+NU)),Nz+2,Nx+2));% + beta*upd_P;  % matrix dynamic pressure
+W = full(reshape(SOL(MapW(:))        ,Nz+1,Nx+2));  % matrix z-velocity
+U = full(reshape(SOL(MapU(:))        ,Nz+2,Nx+1));  % matrix x-velocity
+P = full(reshape(SOL(MapP(:)+(NW+NU)),Nz+2,Nx+2));  % matrix dynamic pressure
 
-W = W + upd_W;
-U = U + upd_U;
-P = P + upd_P;
+% upd_W = - full(reshape(SOL(MapW(:))        ,Nz+1,Nx+2));% + beta*upd_W;  % matrix z-velocity
+% upd_U = - full(reshape(SOL(MapU(:))        ,Nz+2,Nx+1));% + beta*upd_U;  % matrix x-velocity
+% upd_P = - full(reshape(SOL(MapP(:)+(NW+NU)),Nz+2,Nx+2));% + beta*upd_P;  % matrix dynamic pressure
+% 
+% W = W + upd_W;
+% U = U + upd_U;
+% P = P + upd_P;
 
 
 if ~bnchm
@@ -490,7 +495,7 @@ if ~bnchm
     dta =  h/2   /max(abs([Um(:).*(mux (:)>TINY^0.5);Wm(:).*(muz (:)>TINY^0.5); ...  % advective time step size
                            Ux(:).*(chix(:)>TINY^0.5);Wx(:).*(chiz(:)>TINY^0.5); ...
                            Uf(:).*(phix(:)>TINY^0.5);Wf(:).*(phiz(:)>TINY^0.5)]+TINY));   
-    dt  = min([1.01*dto,min(dtk,CFL*dta),dtmax]);                                    % time step size
+    dt  = min([1.01*dto,min(dtk,CFL*dta),dtmax,tau_T/100]);                         % time step size
 end
 
 end

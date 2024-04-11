@@ -178,9 +178,9 @@ hist.wf(stp,1) = min(min(-(phi([1,1:end],:)+phi([1:end,end],:))/2.*wf(:,2:end-1)
 hist.wf(stp,2) = mean(mean(abs((phi([1,1:end],:)+phi([1:end,end],:))/2.*wf(:,2:end-1))));
 hist.wf(stp,3) = max(max(-(phi([1,1:end],:)+phi([1:end,end],:))/2.*wf(:,2:end-1)));
 
-hist.dH(stp,1) = sum(bnd_S.*T.*h^2,'all')/L;
-hist.dH(stp,2) = sum(bnd_S(1:ceil(Nz/2),:).*T(1:ceil(Nz/2),:).*h^2,'all')/L;
-hist.dH(stp,3) = sum(bnd_S(floor(Nz/2):end,:).*T(floor(Nz/2):end,:).*h^2,'all')/L;
+hist.dH(stp,1) = -sum(bnd_S(1:round(Nz/2)  ,:).*T(1:round(Nz/2)  ,:).*h^2,'all')/L;
+hist.dH(stp,2) = -sum(bnd_S(round(Nz/2):end,:).*T(round(Nz/2):end,:).*h^2,'all')/L;
+hist.dH(stp,3) = -sum(bnd_S.*T.*h^2,'all')/L;
 
 
 % % fraction, composition, and temperature of eruptible magma suspension (mu>0.55)

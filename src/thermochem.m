@@ -106,13 +106,13 @@ advn_M   = - advect(M,Um(2:end-1,:),Wm(:,2:end-1),h,{ADVN,''},[1,2],BCA);
 advn_rho = advn_X+advn_F+advn_M;
 
 % phase mass transfer rates
-Gm  = (mq-m).*rho/max(tau_r,5*dt);
-Gx  = (xq-x).*rho/max(tau_r,5*dt); 
-Gf  = (fq-f).*rho/max(tau_r,5*dt);
+Gm  = (mq.*RHO-M)/max(tau_r,5*dt);
+Gx  = (xq.*RHO-X)/max(tau_r,5*dt); 
+Gf  = (fq.*RHO-F)/max(tau_r,5*dt);
 
-Gxc = (cxq.*xq-cx.*x).*rho/max(tau_r,5*dt);
-Gfc = (cfq.*fq-cf.*f).*rho/max(tau_r,5*dt);
-Gmc = (cmq.*mq-cm.*m).*rho/max(tau_r,5*dt);
+Gmc = (cmq.*mq.*RHO-cm.*M)/max(tau_r,5*dt);
+Gxc = (cxq.*xq.*RHO-cx.*X)/max(tau_r,5*dt);
+Gfc = (cfq.*fq.*RHO-cf.*F)/max(tau_r,5*dt);
 
 % total rates of change
 dXdt   = advn_X + Gx;
@@ -158,7 +158,7 @@ subsol  = m<=1e-9 & T<=reshape(cal.Tsol+273.15,Nz,Nx);
 supliq  = x<=1e-9 & T>=reshape(cal.Tliq+273.15,Nz,Nx);
 subsolc = repmat(subsol,1,1,7);
 supliqc = repmat(supliq,1,1,7);
-rnorm   = 1;  tol  = atol/10;
+rnorm   = 1;  tol  = 1e-6;
 it      = 1;  mxit = 100;
 while rnorm>tol && it<mxit
 
@@ -171,7 +171,7 @@ while rnorm>tol && it<mxit
     Kx = cx./(cm+TINY);
     Kf = cf./(cm+TINY);
 
-    r     = x.*cx + m.*cm + f.*cf - c;
+    r = x.*cx + m.*cm + f.*cf - c;
     r(subsolc) = 0; r(supliqc) = 0;
     rnorm = norm(r(:)) ./ sqrt(length(c(:)));
     it  = it+1;
