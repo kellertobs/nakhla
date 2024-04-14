@@ -90,12 +90,13 @@ alpha    =  0.75;                % iterative step size parameter
 beta     =  0.125;               % iterative damping parameter
 gamma    =  1e-3;                % artificial horizontal inertia parameter (only applies if periodic)
 lambda   =  0e-7;                % pressure smoothing parameter
-etacntr  =  1e+6;                % maximum viscosity contrast
-Delta_trb=  0.75;                % correlation length for eddy diffusivity (multiple of h, 0.5-1)
-Delta_sgr=  15;                  % correlation length for phase fluctuation diffusivity (multiple of dx0, df0, 10-20)
-Prt      =  1;                   % turbulent Prandtl number (ratio of momentum to heat diffusivity)
-Sct      =  1;                   % turbulent Schmidt number (ratio of momentum to mass diffusivity)
+etacntr  =  1e+7;                % maximum viscosity contrast
+Delta_trb=  0.5;                 % correlation length for eddy diffusivity (multiple of h, 0.5-1)
+Delta_sgr=  10;                  % correlation length for phase fluctuation diffusivity (multiple of dx0, df0, 10-20)
+Prt      =  3;                   % turbulent Prandtl number (ratio of momentum to heat diffusivity)
+Sct      =  3;                   % turbulent Schmidt number (ratio of momentum to mass diffusivity)
 etamin   =  0.1;                 % minimum viscosity
+kmin     =  1e-8;                % minimum diffusivity
 Pcouple  =  0;                   % coupling phase equilibria and material properties to dynamic pressure
 
 % set various options

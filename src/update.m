@@ -123,13 +123,13 @@ if Nx==1 && Nz==1; kW = 0;
 else              
 kW = eII.*(Delta_trb*h).^2 .* (1-min(1,topshape+botshape+sdsshape)*0.9);
 end
-kwx = wx0.*Delta_sgr*dx0;                                                  % segregation fluctuation diffusivity
-kwf = wf0.*Delta_sgr*df0;                                                  % segregation fluctuation diffusivity
-ks  = rho.*cP./T.*kW/Prt;                                                  % regularised heat diffusion
-kx  = chi.*(kwx + kW/Sct);                                                 % solid fraction diffusion 
-kf  = phi.*(kwf + kW/Sct);                                                 % fluid fraction diffusion 
-kc  =             kW/Sct;                                                  % regularised component diffusion
-eta = eta + rho.*kW;                                                       % regularised momentum diffusion
+kwx = wx0.*Delta_sgr*dx0 + kmin;                                           % segregation diffusivity
+kwf = wf0.*Delta_sgr*df0 + kmin;                                           % segregation diffusivity
+kx  = kwx.*chi;                                                            % regularised solid fraction diffusion 
+kf  = kwf.*phi;                                                            % regularised fluid fraction diffusion 
+ks  = kW/Prt.*rho.*cP./T;                                                  % regularised heat diffusion
+kc  = kW/Sct;                                                              % regularised component diffusion
+eta = kW.*rho + eta;                                                       % regularised momentum diffusion
 
 etamax = etacntr.*max(min(eta(:)),etamin);
 eta    = 1./(1./etamax + 1./eta) + etamin;
