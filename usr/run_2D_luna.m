@@ -51,8 +51,8 @@ cP       =  1100;                % heat capacity [J/kg/K]
 
 % set buoyancy parameters
 g0       =  1.62;                % gravity [m/s2]
-dx0      =  1e-2;                % crystal size [m]
-dm0      =  1e-2;                % melt film size [m]
+dx0      =  1e-3;                % crystal size [m]
+dm0      =  1e-3;                % melt film size [m]
 bPx      =  1e-11;               % solid compressibility [1/Pa]
 bPm      =  2e-11;               % melt compressibility [1/Pa]
 
@@ -68,7 +68,10 @@ CFL      =  0.75;                % (physical) time stepping courant number (mult
 rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-6;                % outer its absolute tolerance
 maxit    =  15;                  % maximum outer its
-gamma    =  0.01;
+gamma    =  0.01;                % horizontal drag
+Delta_trb=  0.75;                % correlation length for eddy diffusivity (multiple of h, 0.5-1)
+Delta_sgr=  15;                  % correlation length for phase fluctuation diffusivity (multiple of dx0, df0, 10-20)
+etamin   = 1e3;                  % minimum viscosity
 
 %*****  RUN NAKHLA MODEL  *************************************************
 run('../src/main')

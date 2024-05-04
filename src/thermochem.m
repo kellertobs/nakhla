@@ -38,7 +38,7 @@ Tp = Tref*exp((S - X.*Dsx - F.*Dsf)./RHO./cP);
 T  = Tref*exp((S - X.*Dsx - F.*Dsf)./RHO./cP + Adbt./cP.*(Pt-Pref));
 
 
-%***  update major component (SiO2) density
+%***  update major component densities
 
 % major component advection
 advn_C = - advect(M.*cm,Um(2:end-1,:),Wm(:,2:end-1),h,{ADVN,''},[1,2],BCA) ...  % melt  advection

@@ -14,7 +14,7 @@ plot_cv  =  0;                   % switch on to live plot iterative convergence
 
 % set model domain parameters
 D        =  10;                  % chamber depth [m]
-N        =  120;                 % number of grid points in z-direction
+N        =  150;                 % number of grid points in z-direction
 h        =  D/N;                 % grid spacing (equal in both dimensions, do not set) [m]
 L        =  D/2;                 % chamber width (equal to h for 1-D mode) [m]
 
@@ -24,9 +24,9 @@ tend     =  1*yr;                % end time for simulation [s]
 dt       =  36;                  % initial time step [s]
 
 % set initial thermo-chemical state
-T0       =  1100;                % temperature top  layer [deg C]
+T0       =  1130;                % temperature top  layer [deg C]
 T1       =  T0;                  % temperature base layer [deg C]
-c0       =  [0.06  0.22  0.10  0.31  0.21  0.10  0.03];  % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
+c0       =  [0.10  0.16  0.13  0.30  0.21  0.10  0.03];  % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
 c1       =  c0;                  % components (maj comp, H2O) base layer [wt] (will be normalised to unit sum!)
 dcr      =  [1,1,1,-1,-1,-1,0]*1e-4;
 trc0     =  [1,1,1,1,1,1];       % trace elements top layer [wt ppm]
@@ -36,9 +36,9 @@ dr_trc   =  [0,0,0,0,0,0];       % trace elements random noise
 % set thermo-chemical boundary parameters
 periodic =  1;
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
-bnd_w    =  h;                 % boundary layer width [m]
+bnd_w    =  h;                   % boundary layer width [m]
 bnd_h    =  0*h*[1,1,0];         % internal wall rock layer thickness [m]
-tau_T    =  4*hr;                % wall cooling/assimilation time [s]
+tau_T    =  bnd_w^2/1e-6;        % wall cooling/assimilation time [s]
 tau_a    =  tau_T;               % wall cooling/assimilation time [s]
 Twall    =  [300,300,nan];       % [top,bot,sds] wall rock temperature [degC] (nan = insulating)
 cwall    =  [0.01  0.02  0.04  0.08  0.16  0.69  0.05; ...

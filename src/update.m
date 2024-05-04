@@ -120,8 +120,11 @@ Ra0 = W0.*D/10./(kT0./rho./cP);
 Re0 = W0.*rho.*D/10./eta;
 
 if Nx==1 && Nz==1; kW = 0;
+elseif Nx==1
+    [~,grdrhoz ] = gradient(rho(icz,icx),h);
+    kW = 10.^(-8+5.*exp(-mean(chi,2)/0.075)-1e1.*min(0,grdrhoz(2:end-1,2:end-1)./mean(rho,2)));
 else              
-kW = eII.*(Delta_trb*h).^2 .* (1-min(1,topshape+botshape+sdsshape)*0.9);
+kW = eII.*(Delta_trb*h).^2 + kmin;                                         % turbulent eddy diffusivity
 end
 kwx = wx0.*Delta_sgr*dx0 + kmin;                                           % segregation diffusivity
 kwf = wf0.*Delta_sgr*df0 + kmin;                                           % segregation diffusivity
