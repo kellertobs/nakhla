@@ -352,10 +352,10 @@ cmp_mem_init(1:end-1,:) = cmp_mem;
 cmp_mem_init(end,cal.wat) = 100;
 cmp_oxd_init = cmp_mem_init*cal.mem_oxd/100;
 
-T0_init = [1890  1205  1175  1120  1055  950  750];
+T0_init = [1890  1205  1180  1130  1060  950  750];
 A_init  = (T0_init+273.15)./350;
-B_init  = [8.8  3.7  3.3  3.3  2.9  2.4  2.3];
-r_init  = [34.0  23.0  3.0  6.4  13.1  16.3  18.5];
+B_init  = [8.8  3.6  3.4  3.3  2.8  2.4  2.3];
+r_init  = [35.0  23.0  3.0  6.6  13.1  16.2  18.3];
 
 
 %%
@@ -409,7 +409,7 @@ sigma = [sigma_MLT;sigma_SOL;sigma_PHS;sigma_TSL];
 % function to calculate forward model
 % m --> dhat
 % dhatFunc  = @(model) OxdFromCmpMem(model,MLTp,SOLp,PHS(:,1),cal);
-dhatFunc  = @(model) ModelFitP(model,Tmp,Prs,MLT_oxdp,SOL_mem,SYS_oxdp,PHS_frc,Psl,cal);
+dhatFunc  = @(model) ModelFitP(model,Tmp,Prs,MLT_oxdp,SOL_mem,SYS_oxdp,PHS_frc,Psl,cal,0.1);
 
 % function to apply further constraints to a proposed set of model param values
 % m --> m
@@ -424,7 +424,7 @@ PriorFunc = @(model) ProbFuncs('PriorFunc', model, mbnds, 'uniform');
 LikeFunc  = @(dhat,model) ProbFuncs('LikeFuncSimplex',dhat,data,sigma,0.0,1,model,cal);
 
 % run MCMC algorithm
-Niter = 1e4;
+Niter = 1e6;
 
 % adjust step size to get reasonable acceptance ratio ~26%
 anneal.initstep = 0.0005 * diff(mbnds,1,2);
