@@ -1,13 +1,22 @@
-function  [H2Osat]  =  fluidsat(T,P,SiO2,cal)
+function  [H2Osat]  =  fluidsat(var)
 
-P = min(P,0.5)*1e9;
+MW  = [60.0855, 79.88, 101.96, 71.85, 40.3, 56.08, 61.98, 94.2, 18.02];
 
-% cal.H2Osat_bas = (4.7773e-7.*P.^0.6 + 1e-11.*P) .* exp(2565/2*(1./(T+273.15)-1./(1473.15))); % Katz et al., 2003; Moore et al., 1998
-cal.H2Osat_rhy = (3.5494e-3.*P.^0.5 + 9.623e-8.*P - 1.5223e-11.*P.^1.5)./(T+273.15) + 1.2436e-14.*P.^1.5; % Liu et al., 2005
+P    = min(var.P,0.5)*1e9/1e5;
+T    = var.T+273.15;
+X    = var.X./MW ./ sum(var.X./MW,2);
+X    = X./sum(X(:,1:end-1),2);
+ln_fH2O = log(P);
 
-% c      = max(0,min(1,(SiO2-0.45)./(0.75-0.45)));
-% H2Osat = (1-c).*cal.H2Osat_bas + c.*cal.H2Osat_rhy;
+a = 2565;
+b = [-1.997,-0.9275,2.736];
+c = 1.171;
+d = -14.21;
 
-H2Osat = cal.H2Osat_rhy;
+XH2O   = exp((a./T + sum(b.*X(:,[3,4,7]),2).*(P./T) + c.*ln_fH2O + d)/2); % Moore et al., 1998
+
+H2Osat = XH2O.*MW(end) ./ sum([X(:,1:end-1), XH2O].*MW,2);
+
+% H2Osat_rhy = (3.5494e-3.*P.^0.5 + 9.623e-8.*P - 1.5223e-11.*P.^1.5)./(T+273.15) + 1.2436e-14.*P.^1.5; % Liu et al., 2005
 
 end

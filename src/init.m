@@ -226,7 +226,8 @@ rhoUo  = rhofx.*U(2:end-1,:); rhoUoo = rhoUo; advn_mx = 0.*rhoUo;
 T      =  (Tp+273.15).*exp(aT./mean(rho(1,:),'all')./cP.*(Pt-Pref));
 fq     = zeros(size(Tp));  mq = ones(size(Tp))/2;  xq = 1-mq-fq; 
 cmq    = c; cxq = c;  cfq = 0.*c;  cfq(:,:,end) = 1;  cf = cfq;
-cm_oxd = reshape(reshape(cmq,Nz*Nx,cal.ncmp)*cal.cmp_oxd,Nz,Nx,cal.noxd);
+cm_oxd = reshape(reshape(c,Nz*Nx,cal.ncmp)*cal.cmp_oxd,Nz,Nx,cal.noxd);
+cm_oxd_all(:,:,cal.ioxd) = cm_oxd;
 
 % get volume fractions and bulk density
 step    = 0;
@@ -257,7 +258,8 @@ while res > tol
     var.m      = reshape(mq,Nx*Nz,1);         % melt fraction [wt]
     var.f      = reshape(fq,Nx*Nz,1);         % bubble fraction [wt]
     var.H2O    = var.c(:,end);                % water concentration [wt]
-    cal.H2Osat = fluidsat(var.T,var.P,0,cal); % water saturation [wt]
+    var.X      = reshape(cm_oxd_all,Nz*Nx,9); % melt oxide fractions [wt %]
+    cal.H2Osat = fluidsat(var); % water saturation [wt]
 
     [var,cal] = meltmodel(var,cal,'E');
 
@@ -269,8 +271,6 @@ while res > tol
     cxq = reshape(var.cx,Nz,Nx,cal.ncmp);
     cmq = reshape(var.cm,Nz,Nx,cal.ncmp);
     cm  = cmq; cx = cxq;
-
-    cm_oxd = reshape(reshape(cm,Nz*Nx,cal.ncmp)*cal.cmp_oxd,Nz,Nx,cal.noxd);
 
     eqtime = toc(eqtime);
     EQtime = EQtime + eqtime;

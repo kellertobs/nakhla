@@ -82,7 +82,8 @@ var.P      = reshape(Pt,Nx*Nz,1)/1e9;     % pressure [GPa]
 var.m      = reshape(mq,Nx*Nz,1);         % melt fraction [wt]
 var.f      = reshape(fq,Nx*Nz,1);         % bubble fraction [wt]
 var.H2O    = var.c(:,end);                % water concentration [wt]
-cal.H2Osat = fluidsat(var.T,var.P,0,cal); % water saturation [wt]
+var.X      = reshape(cm_oxd_all,Nz*Nx,9); % melt oxide fractions [wt %]
+cal.H2Osat = fluidsat(var); % water saturation [wt]
 
 [var,cal]  = meltmodel(var,cal,'E');
 
