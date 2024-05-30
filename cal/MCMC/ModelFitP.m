@@ -5,7 +5,7 @@ np = length(T);
 
 % get model parameters from model vector
 cal.T0   = model(               (1:cal.ncmp-1)).';
-cal.A    = (cal.T0+273.15)./350;
+cal.A    = model(1*(cal.ncmp-1)+(1:cal.ncmp-1)).';
 cal.B    = model(2*(cal.ncmp-1)+(1:cal.ncmp-1)).';
 cal.r    = model(3*(cal.ncmp-1)+(1:cal.ncmp-1)).';
 cmp_mem  = reshape(model(4*(cal.ncmp-1)+(1:cal.ncmp*cal.nmem)),cal.ncmp,cal.nmem);
@@ -16,14 +16,16 @@ MLT_cmp = zeros(np,cal.ncmp);
 for ip = 1:np
     MLT_cmp(ip,:) = lsqnonneg(cmp_oxd.',MLT(ip,:).');
 end
-MLT_cmp(:,1:end-1) = MLT_cmp(:,1:end-1) + (diff(MLT_cmp([1 1:end end],1:end-1),2,1)/8 + diff(MLT_cmp(:,[1 1:end-1 end-1]),2,2)/8)*reg;
+MLT_cmp(:,1:end-1) = MLT_cmp(:,1:end-1) + reg(1) ...
+                                        + reg(2).*(diff(MLT_cmp([1 1:end end],1:end-1),2,1)/8 + diff(MLT_cmp(:,[1 1:end-1 end-1]),2,2)/8);
 MLT_cmp = MLT_cmp./sum(MLT_cmp,2);
 
 SOL_cmp = zeros(np,cal.ncmp);
 for ip = 1:np
     SOL_cmp(ip,:) = lsqnonneg(cmp_mem.',SOL(ip,:).');
 end
-SOL_cmp(:,1:end-1) = SOL_cmp(:,1:end-1) + (diff(SOL_cmp([1 1:end end],1:end-1),2,1)/8 + diff(SOL_cmp(:,[1 1:end-1 end-1]),2,2)/8)*reg;
+SOL_cmp(:,1:end-1) = SOL_cmp(:,1:end-1) + reg(1) ...
+                                        + reg(2).*(diff(SOL_cmp([1 1:end end],1:end-1),2,1)/8 + diff(SOL_cmp(:,[1 1:end-1 end-1]),2,2)/8);
 SOL_cmp = SOL_cmp./sum(SOL_cmp,2);
 
 % cmpSOL = zeros(np,cal.ncmp);
@@ -75,9 +77,10 @@ PHS_frcfit(:,2:end) = SOL_memfit*cal.msy_mem.'.*(1-PHS_frcfit(:,1)/100);
 
 % get solidus and liquidus at starting composition
 cal = rmfield(cal,{'Tsol' 'Tliq'});
+Psl = Psl(1:end/2);
 var.m = ones(size(Psl))/2; var.x = var.m; var.f = 0*var.m;
-var.c      = repmat(mean(SYS_cmp(1:5,:).*[ones(1,cal.ncmp-1),0]./sum(SYS_cmp(1:5,1:end-1),2),1),length(Psl),1);
-var.P      = Psl(:)/10;                             % pressure [GPa]
+var.c      = repmat(SYS_cmp(1,:).*[ones(1,cal.ncmp-1),0]./sum(SYS_cmp(1,1:end-1),2),length(Psl),1);
+var.P      = Psl/10;                             % pressure [GPa]
 var.T      = 1000+Psl(:)*5e-8;                      % temperature [C]
 var.H2O    = 0*var.c(1,end)+Psl(:)*0;               % water concentration [wt]
 cal.H2Osat = 0*MLT_cmp(1,end)+1e-6+Psl(:)*0;
@@ -86,6 +89,19 @@ cal.H2Osat = 0*MLT_cmp(1,end)+1e-6+Psl(:)*0;
 Tsolfit = cal.Tsol;
 Tliqfit = cal.Tliq;
 Tm      = cal.Tm;
+
+% get solidus and liquidus at end composition
+cal = rmfield(cal,{'Tsol' 'Tliq'});
+var.m = ones(size(Psl))/2; var.x = var.m; var.f = 0*var.m;
+var.c      = repmat(SYS_cmp(end,:).*[ones(1,cal.ncmp-1),0]./sum(SYS_cmp(end,1:end-1),2),length(Psl),1);
+var.P      = Psl(:)/10;                             % pressure [GPa]
+var.T      = 1000+Psl(:)*5e-8;                      % temperature [C]
+var.H2O    = 0*var.c(1,end)+Psl(:)*0;               % water concentration [wt]
+cal.H2Osat = 0*MLT_cmp(1,end)+1e-6+Psl(:)*0;
+[~,cal]    = meltmodel(var,cal,'T');
+
+Tsolfit = [Tsolfit;cal.Tsol];
+Tliqfit = [Tliqfit;cal.Tliq];
 
 datafit = [MLT_oxdfit(:);SOL_memfit(:);PHS_frcfit(:);Tsolfit(:);Tliqfit(:)];%repmat(PHSfit(:,1),6,1)];
 
