@@ -18,22 +18,25 @@ cal_MORB;  % load melt model calibration
 
 %% load MAGEMin results
 
-filename = '/Users/tokeller/Documents/Research/nakhla/cal/MORB/MORB_frac25_nobuff_H03_ig.csv';
+filename = '/Users/tokeller/Documents/Research/nakhla/cal/MORB/MAR_mod_f25_H03_ig.csv';
 uiopen(filename,1)
 
 % record Tsol, Tliq at selected P,X0 as additional constraint
-Tsol = [1119.1;1114.6;1109.6;1103.8;1097.4;1090.1;1081.9; 967.0; 956.8; 945.9; 934.4; 922.1; 909.0; 895.0];   % solidus estimate from MAGEMin
-Tliq = [1417.3;1416.1;1415.0;1413.7;1412.5;1411.2;1409.8; 1067.4; 1063.4; 1059.3; 1055.0; 1050.5; 1045.9; 1041.0];   % liquidus estimate from MAGEMin
-Psl  = [4.0;3.5;3.0;2.5;2.0;1.5;1.0;4.0;3.5;3.0;2.5;2.0;1.5;1.0]; % P [Pa]
+Tsol = [1116.1; 1111.5; 1106.1; 1100.3; 1093.7; 1086.2; 1077.9;  964.7;  954.4;  943.6;  932.1;  919.8;  906.7;  892.7];   % solidus estimate from MAGEMin
+Tliq = [1326.2; 1325.4; 1324.6; 1323.6; 1322.7; 1321.7; 1320.6; 1068.7; 1064.8; 1060.7; 1056.5; 1052.2; 1047.6; 1042.9];   % liquidus estimate from MAGEMin
+Psl  = [   4.0;    3.5;    3.0;    2.5;    2.0;    1.5;    1.0;    4.0;    3.5;    3.0;    2.5;    2.0;    1.5;    1.0]; % P [Pa]
 
 %% unpack MAGEMin results
-DAT = MORBfrac25nobuffH03ig;
+DAT = MARmodf25H03ig;
 
 phs = unique(string(DAT.phase),'stable');
 phs(phs=='system') = [];
 phs(phs=='qfm') = [];
 phs(phs=='fl') = [];
 nphs = length(phs);
+iliq = find(strcmp(phs,'liq'));
+iphs = 1:nphs; iphs(iliq) = []; iphs = [iliq,iphs];
+phs  = phs(iphs);
 oxd  = ["SiO2";"TiO2";"Al2O3";"FeO";"MgO";"CaO";"Na2O";"K2O";"H2O"];
 noxd = length(oxd);
 
@@ -93,7 +96,7 @@ hasoxd = logical(squeeze(sum(PHS_oxd,1)));
 
 % remove most minor oxides from phases
 for iph = 1:nphs
-    ilim = find(mean(squeeze(PHS_oxd(hasphs(:,iph)==1,iph,:)),1)<0.2);
+    ilim = find(mean(squeeze(PHS_oxd(hasphs(:,iph)==1,iph,:)),1)<0.18 | max(squeeze(PHS_oxd(hasphs(:,iph)==1,iph,:)),[],1)<1.8);
     hasoxd(iph,ilim) = false;
     PHS_oxd(:,iph,~hasoxd(iph,:)) = 0;
     PHS_oxd(hasphs(:,iph)==1,iph,:) = PHS_oxd(hasphs(:,iph)==1,iph,:)./sum(PHS_oxd(hasphs(:,iph)==1,iph,:),3)*100;
@@ -319,14 +322,15 @@ save('MAGEMin_processed');
 %% load projected data and prepare for fitting routines
 load('MAGEMin_processed');
 cal_MORB;  % load melt model calibration
-                % for fay ant alb san dps aug ulv mgt hyp fsl qtz wat
-indmem  = logical([1   0   0   0   0   0   0   0   0   0   0   0   0
-                   1   1   1   0   0   0   0   0   0   0   0   0   0
-                   1   1   1   1   0   1   0   0   0   0   0   0   0
-                   0   1   1   1   1   1   1   1   0   1   0   0   0
-                   0   0   0   1   1   1   1   1   1   1   1   0   0
-                   0   0   0   0   1   0   1   0   1   0   1   1   0
-                   0   0   0   0   0   0   0   0   0   0   0   0   1]);
+                % for fay  ant alb san  dps aug  ulv mgt ilm  hyp fsl  qtz wat
+indmem  = logical([1   0    0   0   0    0   0    0   0   0    0   0    0   0
+                   1   1    1   0   0    0   0    0   0   0    0   0    0   0
+                   1   1    1   1   0    1   0    0   0   0    0   0    0   0
+                   1   1    1   1   1    1   1    1   0   0    0   0    0   0
+                   0   1    1   1   1    1   1    1   1   0    1   0    0   0
+                   0   0    0   1   1    1   1    0   1   1    1   1    0   0
+                   0   0    0   0   1    0   1    0   0   1    0   1    1   0
+                   0   0    0   0   0    0   0    0   0   0    0   0    0   1]);
 
 
 % convert factor analysis end-member to mineral end-member proportions
@@ -350,10 +354,10 @@ cmp_mem_init(1:end-1,:) = cmp_mem;
 cmp_mem_init(end,cal.wat) = 100;
 cmp_oxd_init = cmp_mem_init*cal.mem_oxd/100;
 
-T0_init = [1890  1411  1165  1087  983  780];
-A_init  = (T0_init+273.15)./350;
-B_init  = [9.0  3.2  2.7  2.3  1.9  1.4];
-r_init  = [22.0  14.0  3.0  9.0  17.0  14.0];
+T0_init = [1880   1400     1253        1165        1093         987         799];
+A_init  = [6.2100  5.0  4.3200    4.0500    3.9200    3.5900    3.0100];
+B_init  = [9.0900  4.0  3.1700    2.7000    2.3100    1.8900    1.3900];
+r_init  = [21.5000 16.0 13.9000    3.2000    9.0000   16.9000   14.0000];
 
 
 %%
@@ -422,7 +426,7 @@ PriorFunc = @(model) ProbFuncs('PriorFunc', model, mbnds, 'uniform');
 LikeFunc  = @(dhat,model) ProbFuncs('LikeFuncSimplex',dhat,data,sigma,0.1,1,model,cal);
 
 % run MCMC algorithm
-Niter = 1e4;
+Niter = 1e5;
 
 % adjust step size to get reasonable acceptance ratio ~26%
 anneal.initstep = 0.0005 * diff(mbnds,1,2);
@@ -435,7 +439,7 @@ tic;
 [models,prob,accept,bestfit] = mcmc(dhatFunc,PriorFunc,LikeFunc,ConstrFunc,4*(cal.ncmp-1)+(1:cal.ncmp*cal.nmem),m0,mbnds,anneal,Niter);
 RunTime(1) = toc;
 
-plotmcmc(models, prob, [], mbnds, anneal, mNames); 
+% plotmcmc(models, prob, [], mbnds, anneal, mNames); 
 
 T0_MAP       = bestfit(               (1:cal.ncmp-1)).';
 A_MAP        = bestfit(1*(cal.ncmp-1)+(1:cal.ncmp-1)).';
@@ -448,7 +452,7 @@ cmp_oxd_MAP  = cmp_mem_MAP*cal.mem_oxd/100;
 [Lbest,Vsimplex] = LikeFunc(dhat,bestfit);
 
 if isfield(cal,'Tsol'); cal = rmfield(cal,{'Tsol' 'Tliq'}); end
-PP         = linspace(0.001,30,50).';
+PP         = linspace(0.001,2*max(Psl),50).';
 var.m      = ones(size(PP))/2; var.x = var.m; var.f = 0*var.m;
 cal.T0     = T0_MAP;
 cal.A      = A_MAP;
@@ -627,6 +631,7 @@ save('MORB_calibration');
 cmp_mem = round(cmp_mem_MAP,2)
 cmp_oxd = round(cmp_oxd_MAP,2)
 T0      = round(T0_MAP,0)
+A       = round(A_MAP,2)
 B       = round(B_MAP,2)
 r       = round(r_MAP,1)
 c0      = round(SYS_cmp(1,1:end-1)./sum(SYS_cmp(1,1:end-1),2),2)

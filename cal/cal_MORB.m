@@ -6,15 +6,15 @@ clear cal;
 % number of oxides, mineral end-members, mineral systems, model components
 cal.noxd   = 9;
 cal.nmem   = 14;
-cal.nmsy   = 7;
+cal.nmsy   = 6;
 cal.ncmp   = 8;
 
 % label strings for all compositional representations
 cal.oxdStr = {'SiO$_2$','TiO$_2$','Al$_2$O$_3$','FeO','MgO','CaO','Na$_2$O','K$_2$O','H$_2$O'};
      elStr = {'Si','Ti','Al','Fe','Mg','Ca','Na','K','H'};
-cal.memStr = {'for','fay','ant','alb','san','dps','aug','ulv','mgt','hyp','fsl','ilm','qtz','wat'};
-cal.msyStr = {'olv','fsp','cxp','spn','opx','ilt','qtz'};
-cal.cmpStr = {'frt','fyt','ogb','gbn','fbs','tra','rhy','vol'};
+cal.memStr = {'for','fay','ant','alb','san','dps','aug','ulv','mgt','ilm','hyp','fsl','qtz','wat'};
+cal.msyStr = {'olv','fsp','cxp','spn','opx','qtz'};
+cal.cmpStr = {'dun','tro','ogb','gbn','fbs','tra','rhy','vol'};
 
 for i = 1:cal.ncmp; cal.(cal.cmpStr{i}) = i; end
 for i = 1:cal.nmsy; cal.(cal.msyStr{i}) = i; end
@@ -26,18 +26,18 @@ cal.ioxd = [   1    2     3   4   5   6    7   8   9]; % oxdie indices for visco
 
 % oxide composition of mineral end-members
 %                 SiO2      TiO2     Al2O3       FeO       MgO       CaO      Na2O       K2O       H2O
-cal.mem_oxd = [42.4300         0         0    1.9000   55.6700         0         0         0         0
-               30.8400         0         0   63.4400    5.7200         0         0         0         0
-               44.4400         0   35.7100         0         0   19.0900    0.7600         0         0
-               66.5700         0   20.8900         0         0    1.7000   10.7900    0.0500         0
-               67.8900         0   19.4200         0         0    0.1800    5.8700    7.6400         0
-               53.4300    0.5300    3.0800    2.7600   21.3200   18.8800         0         0         0
-               51.5200    0.3100    0.2300   25.2300    4.6600   15.4900    2.5600         0         0
-                     0   43.8500    2.7700   24.9500   28.4300         0         0         0         0
-                     0    5.9800    0.3200   93.7000         0         0         0         0         0
-               52.7700         0    3.9700   13.4500   26.7500    3.0600         0         0         0
-               48.5300         0    0.2100   41.9000    8.3600    1.0000         0         0         0
-                     0   51.2400         0   48.7600         0         0         0         0         0
+cal.mem_oxd = [41.3600         0         0    7.6000   51.0400         0         0         0         0
+               31.2200         0         0   61.4300    7.3500         0         0         0         0
+               44.1100         0   35.9400         0         0   19.3600    0.5900         0         0
+               66.0100         0   21.2700         0         0    2.1400   10.5200    0.0600         0
+               67.6900         0   19.6200         0         0    0.3900    5.9400    6.3600         0
+               53.3500         0    3.2500    4.4200   20.6200   18.3600         0         0         0
+               51.5500         0    0.3300   25.0100    4.9000   15.8500    2.3600         0         0
+                     0   38.3900    2.9500   30.9800   27.6800         0         0         0         0
+                     0   10.2400    1.2600   88.5000         0         0         0         0         0
+                     0   52.0500         0   47.9500         0         0         0         0         0
+               52.2100         0    4.0500   15.4600   25.2100    3.0700         0         0         0
+               48.4500         0    0.4900   41.2300    8.6900    1.1400         0         0         0
               100.0000         0         0         0         0         0         0         0         0    % quartz (qtz)
                      0         0         0         0         0         0         0         0   100.000];  % water (wat)
 cal.mem_oxd = cal.mem_oxd./sum(cal.mem_oxd,2)*100; 
@@ -46,20 +46,12 @@ cal.mem_oxd = cal.mem_oxd./sum(cal.mem_oxd,2)*100;
 cal.msy_mem = [1  1  0  0  0  0  0  0  0  0  0  0  0  0    % olivine (olv)
                0  0  1  1  1  0  0  0  0  0  0  0  0  0    % feldspar (fsp)
                0  0  0  0  0  1  1  0  0  0  0  0  0  0    % clinopyroxene (cpx)
-               0  0  0  0  0  0  0  1  1  0  0  0  0  0    % spinel (spn)
-               0  0  0  0  0  0  0  0  0  1  1  0  0  0    % orthopyroxene (opx)
-               0  0  0  0  0  0  0  0  0  0  0  1  0  0    % ilmenite (ilt)
+               0  0  0  0  0  0  0  1  1  1  0  0  0  0    % spinel (spn)
+               0  0  0  0  0  0  0  0  0  0  1  1  0  0    % orthopyroxene (opx)
                0  0  0  0  0  0  0  0  0  0  0  0  1  0];  % quartz (qtz)
 
 % mineral end-member composition of melting model components
-cal.cmp_mem = [ 100.0    0       0       0       0       0       0       0       0       0       0       0       0       0
-                 0    100.0    8.05    1.83   25.22   21.42   22.30    0.74    6.06    3.01    4.97       0       0       0
-                 3.12    3.15    8.05    1.83   25.22   21.42   22.30    0.74    6.06    3.01    4.97       0       0       0
-                 3.12    3.15    8.05    1.83   25.22   21.42   22.30    0.74    6.06    3.01    4.97       0       0       0
-                    0    0.66       0    2.29    4.78       0   70.72    0.97    3.59       0    0.10    0.10       0       0
-                    0    0.66       0    2.29    4.78       0   70.72    0.97    3.59       0    0.10    0.10       0       0
-                    0       0       0       0    5.38       0       0       0    0.10       0       0    0.10   41.52       0
-                    0       0       0       0       0       0       0       0       0       0       0       0       0  100.00]; % volatiles (vol)
+cal.cmp_mem = ones(cal.ncmp,cal.nmem); % volatiles (vol)
 cal.cmp_mem = cal.cmp_mem./sum(cal.cmp_mem,2)*100;
 
 % mineral systems composition of melting model components
@@ -76,25 +68,25 @@ for i=1:cal.ncmp
 end
 
 % set pure component melting points T_m^i at P=0
-cal.T0  = [1880  1250  1177  1083 1000 975  783];
+cal.T0  = [1880  1250  1177  1083  975  783];
 
 % set first coeff. for P-dependence of T_m^i [GPa]
 cal.A   = (cal.T0+273.15)./350;
 
 % set second coeff. for P-dependence of T_m^i [1]
-cal.B   = [8.71 4.0 4.36  3.97 3.20 2.97  2.52];
+cal.B   = [8.71 4.0 4.36  3.97  2.97  2.52];
 
 % set entropy gain of fusion DeltaS [J/K]
 cal.dS  = 350;
 
 % set coeff. for T-dependence of partition coefficients K^i [1/K]
-cal.r  = [42.20 25.0 2.10  10.50 13.5 12.40  11.30];
+cal.r  = [42.20 25.0 2.10  10.50  12.40  11.30];
 
 % initial composition used in calibration
-cal.c0 = [0.17  0.05  0.23  0.08  0.02 0.02 0.01  0.003];
+cal.c0 = [0.17  0.05  0.23  0.08  0.02  0.01  0.003];
 
 % specify melting point dependence on H2O
-cal.dTH2O   = 1400;                 % solidus shift from water content [K/wt^pH2O]
+cal.dTH2O   = 1750;                 % solidus shift from water content [K/wt^pH2O]
 cal.pH2O    = 0.75;                 % solidus shift from water content [K/wt^pH2O]
 
 % specify geochemical model parameters
@@ -103,8 +95,8 @@ cal.trcStr  = {'K 0.01','K 0.10','K 1.0','K 3.00','K 10.0','K 1.0'};
 cal.Ktrc_mem = [0.01;0.10;1.0;3.0;10.0;1.0].*ones(cal.ntrc,cal.nmem);
 
 % specify density parameters
-%               for  fay  dps  mau  fau  ant  alb  san  ens  fsl  ulv  mgt  ilm  qtz  wat
-cal.rhox0   = [3150,4055,3200,3385,3475,2680,2580,2555,3240,3665,3925,4730,4875,2540,1000]; % mineral end-member reference densities [kg/m3]
+%               for  fay  ant  alb  san  dps  aug  ulv  mgt  ilm  ens  fsl  qtz  wat
+cal.rhox0   = [3150,4055,2680,2580,2555,3200,3475,3925,4730,4875,3240,3665,2540,1000]; % mineral end-member reference densities [kg/m3]
 cal.rhof0   = 1000;                 % fluid reference density [kg/m3]
 
 % specify three-phase coefficient model parameters
