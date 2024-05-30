@@ -28,22 +28,7 @@ SOL_cmp(:,1:end-1) = SOL_cmp(:,1:end-1) + reg(1) ...
                                         + reg(2).*(diff(SOL_cmp([1 1:end end],1:end-1),2,1)/8 + diff(SOL_cmp(:,[1 1:end-1 end-1]),2,2)/8);
 SOL_cmp = SOL_cmp./sum(SOL_cmp,2);
 
-% cmpSOL = zeros(np,cal.ncmp);
-% for ip = 1:np
-%     cmpSOL(ip,:) = lsqnonneg(cmp_oxd.',SOL(ip,:).');
-% end
-% cmpSOL(:,1:end-1) = cmpSOL(:,1:end-1) + diff(cmpSOL([1 1:end end],1:end-1),2,1)/8 + diff(cmpSOL(:,[1 1:end-1 end-1]),2,2)/8;
-% cmpSOL = cmpSOL./sum(cmpSOL,2);
-
 SYS_cmp = PHS(:,1)/100.*MLT_cmp + (1-PHS(:,1)/100).*SOL_cmp;
-
-% cmpSYS = zeros(np,cal.ncmp);
-% for ip = 1:np
-%     cmpSYS(ip,:) = lsqnonneg(cmp_oxd.',SYS(ip,:).');
-% end
-% for i=1:cal.ncmp-1; cmpSYS(i,max(1,i-2:end-1)) = max(0.05,cmpSYS(i,max(1,i-2:end-1))); end
-% cmpSYS = cmpSYS./sum(cmpSYS,2);
-
 
 % get fitted phase oxide compositions
 SYS_oxdfit = SYS_cmp*cmp_oxd;

@@ -7,14 +7,14 @@ clear cal;
 cal.noxd   = 9;
 cal.nmem   = 14;
 cal.nmsy   = 6;
-cal.ncmp   = 8;
+cal.ncmp   = 7;
 
 % label strings for all compositional representations
 cal.oxdStr = {'SiO$_2$','TiO$_2$','Al$_2$O$_3$','FeO','MgO','CaO','Na$_2$O','K$_2$O','H$_2$O'};
      elStr = {'Si','Ti','Al','Fe','Mg','Ca','Na','K','H'};
 cal.memStr = {'for','fay','ant','alb','san','dps','aug','ulv','mgt','ilm','hyp','fsl','qtz','wat'};
 cal.msyStr = {'olv','fsp','cxp','spn','opx','qtz'};
-cal.cmpStr = {'dun','tro','ogb','gbn','fbs','tra','rhy','vol'};
+cal.cmpStr = {'dun','tro','ogb','fbs','tra','rhy','vol'};
 
 for i = 1:cal.ncmp; cal.(cal.cmpStr{i}) = i; end
 for i = 1:cal.nmsy; cal.(cal.msyStr{i}) = i; end
@@ -38,8 +38,8 @@ cal.mem_oxd = [41.3600         0         0    7.6000   51.0400         0        
                      0   52.0500         0   47.9500         0         0         0         0         0
                52.2100         0    4.0500   15.4600   25.2100    3.0700         0         0         0
                48.4500         0    0.4900   41.2300    8.6900    1.1400         0         0         0
-              100.0000         0         0         0         0         0         0         0         0    % quartz (qtz)
-                     0         0         0         0         0         0         0         0   100.000];  % water (wat)
+              100.0000         0         0         0         0         0         0         0         0
+                     0         0         0         0         0         0         0         0  100.0000];  % water (wat)
 cal.mem_oxd = cal.mem_oxd./sum(cal.mem_oxd,2)*100; 
 
 % mineral end-members in mineral systems
@@ -86,7 +86,7 @@ cal.r  = [42.20 25.0 2.10  10.50  12.40  11.30];
 cal.c0 = [0.17  0.05  0.23  0.08  0.02  0.01  0.003];
 
 % specify melting point dependence on H2O
-cal.dTH2O   = 1750;                 % solidus shift from water content [K/wt^pH2O]
+cal.dTH2O   = 1600;                 % solidus shift from water content [K/wt^pH2O]
 cal.pH2O    = 0.75;                 % solidus shift from water content [K/wt^pH2O]
 
 % specify geochemical model parameters
@@ -96,8 +96,8 @@ cal.Ktrc_mem = [0.01;0.10;1.0;3.0;10.0;1.0].*ones(cal.ntrc,cal.nmem);
 
 % specify density parameters
 %               for  fay  ant  alb  san  dps  aug  ulv  mgt  ilm  ens  fsl  qtz  wat
-cal.rhox0   = [3150,4055,2680,2580,2555,3200,3475,3925,4730,4875,3240,3665,2540,1000]; % mineral end-member reference densities [kg/m3]
-cal.rhof0   = 1000;                 % fluid reference density [kg/m3]
+cal.rhox0   = [3200,4040,2680,2590,2560,3200,3465,3925,4760,4730,3300,3665,2540,1000]; % mem ref densities [kg/m3]
+cal.rhof0   = 1000;                 % fluid ref density [kg/m3]
 
 % specify three-phase coefficient model parameters
 cal.etax0 = 1e18;                   % solid reference viscosity [Pas]
