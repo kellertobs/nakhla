@@ -66,7 +66,7 @@ res_C = (a1*C-a2*Co-a3*Coo)/dt - (b1*dCdt + b2*dCdto + b3*dCdtoo);
 Ci    = C;
 C     = C - alpha*res_C*dt/a1 + beta*upd_C;
 C     = C./sum(C,3).*RHO;
-C     = max(0, C );
+C     = max(TINY^0.5, C );
 upd_C = C - Ci;
 
 % convert component density to concentration
@@ -134,9 +134,9 @@ F     = F + upd_F;
 M     = M + upd_M;
 
 % apply minimum bound
-X   = max(0, X );
-F   = max(0, F );
-M   = max(0, M );
+X   = max(TINY^0.5, X );
+F   = max(TINY^0.5, F );
+M   = max(TINY^0.5, M );
 
 % get dynamically evolving mixture density 
 RHO = X+F+M;
@@ -159,7 +159,7 @@ subsol  = m<=1e-9 & T<=reshape(cal.Tsol+273.15,Nz,Nx);
 supliq  = x<=1e-9 & T>=reshape(cal.Tliq+273.15,Nz,Nx);
 subsolc = repmat(subsol,1,1,7);
 supliqc = repmat(supliq,1,1,7);
-rnorm   = 1;  tol  = 1e-6;
+rnorm   = 1;  tol  = atol*10;
 it      = 1;  mxit = 100;
 while rnorm>tol && it<mxit
 

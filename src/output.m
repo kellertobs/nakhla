@@ -56,12 +56,12 @@ if Nx <= 1 && Nz <= 1  % create 0D plots
     for i=1:cal.ncmp
         pcmp(i) = plot(hist.time/TimeScale,squeeze(hist.cm(:,2,i)).*100,'-',LW{:},'color',ocean(round((i-1)*213/cal.ncmp)+1,:)); axis xy tight; box on; hold on
     end
-    title('melt cmps [wt\%]',TX{:},FS{:}); legend(pcmp,cal.cmpStr(1:end),TX{:},FS{1},8,'Location','northeast'); set(gca,TL{:},TS{:});
+    title('melt cmps [wt\%]',TX{:},FS{:}); legend(pcmp,cal.cmpStr(1:end),TX{:},FS{1},8,'Location','northwest'); set(gca,TL{:},TS{:});
     subplot(4,1,3)
     for i=1:cal.ncmp
         plot(hist.time/TimeScale,squeeze(hist.cx(:,2,i)).*100,'-',LW{:},'color',ocean(round((i-1)*213/cal.ncmp)+1,:)); axis xy tight; box on; hold on
     end
-    title('xtal cmps [wt\%]',TX{:},FS{:}); legend(pcmp,cal.cmpStr,TX{:},FS{1},8,'Location','northeast'); set(gca,TL{:},TS{:});
+    title('xtal cmps [wt\%]',TX{:},FS{:});
     subplot(4,1,4)
     plot(hist.time/TimeScale,hist.mu (:,2)*100.*(hist.mu (:,2)>1e-9),CL{[1,3]},LW{:}); axis xy tight; box on; hold on;
     plot(hist.time/TimeScale,hist.chi(:,2)*100.*(hist.chi(:,2)>1e-9),CL{[1,4]},LW{:});
@@ -93,21 +93,26 @@ if Nx <= 1 && Nz <= 1  % create 0D plots
     if ~exist('fh3','var'); fh3 = figure(VIS{:});
     else; set(0, 'CurrentFigure', fh3); clf;
     end
-    subplot(3,1,1)
+    subplot(4,1,1)
+    for i=1:cal.noxd
+        plot(hist.time/TimeScale,squeeze(hist.c_oxd(:,2,i)),'-',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis xy tight; box on; hold on
+    end
+    title('Bulk oxds [wt\%]',TX{:},FS{:}); legend(cal.oxdStr,TX{:},FS{1},8,'Location','northwest'); set(gca,TL{:},TS{:});
+    subplot(4,1,2)
     for i=1:cal.noxd
         plot(hist.time/TimeScale,squeeze(hist.cm_oxd(:,2,i)),'-',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis xy tight; box on; hold on
     end
-    title('Melt oxds [wt\%]',TX{:},FS{:}); legend(cal.oxdStr,TX{:},FS{1},8,'Location','northeast'); set(gca,TL{:},TS{:});
-    subplot(3,1,2)
+    title('Melt oxds [wt\%]',TX{:},FS{:});
+    subplot(4,1,3)
     for i=1:cal.noxd
         plot(hist.time/TimeScale,squeeze(hist.cx_oxd(:,2,i)),'-',LW{:},'color',ocean(round((i-1)*213/cal.noxd)+1,:)); axis xy tight; box on; hold on
     end
     title('Xtal oxds [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
-    subplot(3,1,3)
+    subplot(4,1,4)
     for i=1:cal.nmsy
         plot(hist.time/TimeScale,squeeze(hist.cx_msy(:,2,i)),'-',LW{:},'color',ocean(round((i-1)*213/cal.nmsy)+1,:)); axis xy tight; box on; hold on
     end
-    title('Xtal msys [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:}); legend(cal.msyStr,TX{:},FS{1},8,'Location','northeast'); set(gca,TL{:},TS{:});
+    title('Xtal msys [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:}); legend(cal.msyStr,TX{:},FS{1},8,'Location','northwest'); set(gca,TL{:},TS{:});
     xlabel(['Time [',TimeUnits,']'],TX{:},FS{:});
 
 elseif Nx <= 1  % create 1D plots

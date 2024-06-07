@@ -30,6 +30,7 @@ end
 
 Dsx = -cal.dS;
 Dsf = cal.dS+100;
+cal.tol = atol;
 
 % normalise major components to anhydrous unit sum, rescale to hydrous
 c0(1:end-1) = c0(1:end-1)./sum(c0(1:end-1)).*(1-c0(end));

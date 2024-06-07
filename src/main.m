@@ -2,7 +2,7 @@
 init;
 
 % physical time stepping loop
-while time <= tend && step <= Nt && any(m(:)>1e-9)
+while time <= tend && step <= Nt && any(m(:)>1e-9) && ~any(cal.Tliq(:)-cal.Tsol(:)<=10) && ~any(c(:,:,end)>0.2)
     
     fprintf(1,'*****  step %d;  dt = %4.4e;  time = %4.4e [%s]\n\n',step,dt./TimeScale,time./TimeScale,TimeUnits);
     TTtime  = tic;
@@ -73,6 +73,27 @@ while time <= tend && step <= Nt && any(m(:)>1e-9)
         report;
 
         iter = iter+1;
+    end
+
+    % fractionate mode for 0D-models
+    if fractxtl && Nx==1 && Nz==1
+        x = min(x,resfrac); SUM = x+m+f;
+        x = x./SUM;  m = m./SUM;  f = f./SUM;
+        X = x.*RHO;  M = m.*RHO;  F = f.*RHO;
+        c = x.*cx + m.*cm + f.*cf;
+        C = RHO.*c;
+        s = x.*sx + m.*sm + f.*sf;
+        S = s.*RHO;
+        update;
+    elseif fractmlt && Nx==1 && Nz==1
+        m = min(m,resfrac); SUM = x+m+f;
+        x = x./SUM;  m = m./SUM;  f = f./SUM;
+        X = x.*RHO;  M = m.*RHO;  F = f.*RHO;
+        c = x.*cx + m.*cm + f.*cf;
+        C = RHO.*c;
+        s = x.*sx + m.*sm + f.*sf;
+        S = s.*RHO;
+        update;
     end
 
     if frst; alpha = alpha*2; end

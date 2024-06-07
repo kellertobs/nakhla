@@ -72,7 +72,7 @@ for i=1:Niter
         anneal.temp = 1/2^anneal.levels;
     end
 
-    xstep  = anneal.initstep .* anneal.temp ;
+    xstep  = anneal.initstep .* anneal.temp .* (1+(i<anneal.burnin));
 
     flag = 0;
     
@@ -125,7 +125,7 @@ for i=1:Niter
         x_keep(:,i) = x1;
         P_keep(i) = Px1_d;
     end
-    if i>=(anneal.burnin) && Px2_d>=Pbest % found new best fit model
+    if i>=anneal.burnin && Px2_d>=Pbest % found new best fit model
         xbest = x2;
         Pbest = Px2_d;
         ibest = i;

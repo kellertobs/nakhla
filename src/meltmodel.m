@@ -51,11 +51,10 @@ f  = var.H2O;
 
 rnorm      =  1;     % initialize residual norm for iterations
 n          =  0;     % initialize iteration count
-rnorm_tol  =  1e-9; % tolerance for Newton residual
 its_tol    =  100;   % maximum number of iterations
 flag       =  1;     % tells us whether the Newton solver converged
 
-while rnorm > rnorm_tol  % iterate down to full accuracy
+while rnorm > cal.tol  % iterate down to full accuracy
 
     %***  get partition coefficients Kxi
     var.T      = Tsol;
@@ -116,11 +115,10 @@ f  = (var.H2O-var.H2Om)./(1-var.H2Om);
 
 rnorm      =  1;     % initialize residual norm for iterations
 n          =  0;     % initialize iteration count
-rnorm_tol  =  1e-9;  % tolerance for Newton residual
 its_tol    =  100;   % maximum number of iterations
 flag       =  1;     % tells us whether the Newton solver converged
 
-while rnorm > rnorm_tol  % iterate down to full accuracy
+while rnorm > cal.tol  % iterate down to full accuracy
 
     %***  get partition coefficients Kxi
     var.T      = Tliq;
@@ -175,12 +173,11 @@ var.x    = max(0,min(1,1-var.m-var.f));
 
 rnorm     = 1;     % initialize residual norm for iterations
 n         = 0;     % initialize iteration count
-rnorm_tol = 1e-9;  % tolerance for Newton residual
 its_tol   = 100;   % maximum number of iterations
 flag.eql  = 1;     % tells us whether the Newton solver converged
 mi        = var.m;
 
-while rnorm > rnorm_tol     % Newton iteration
+while rnorm > cal.tol     % Newton iteration
     mii = mi; mi = var.m; 
 
     %***  get residual of unity sum of components

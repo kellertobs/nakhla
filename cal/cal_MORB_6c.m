@@ -7,14 +7,14 @@ clear cal;
 cal.noxd   = 9;
 cal.nmem   = 14;
 cal.nmsy   = 6;
-cal.ncmp   = 8;
+cal.ncmp   = 7;
 
 % label strings for all compositional representations
 cal.oxdStr = {'SiO$_2$','TiO$_2$','Al$_2$O$_3$','FeO','MgO','CaO','Na$_2$O','K$_2$O','H$_2$O'};
      elStr = {'Si','Ti','Al','Fe','Mg','Ca','Na','K','H'};
 cal.memStr = {'for','fay','ant','alb','san','dps','aug','ulv','mgt','ilm','hyp','fsl','qtz','wat'};
 cal.msyStr = {'olv','fsp','cxp','spn','opx','qtz'};
-cal.cmpStr = {'dun','tro','ogb','osg','fbs','tra','rhy','vol'};
+cal.cmpStr = {'dun','ogb','osg','fbs','tra','rhy','vol'};
 
 for i = 1:cal.ncmp; cal.(cal.cmpStr{i}) = i; end
 for i = 1:cal.nmsy; cal.(cal.msyStr{i}) = i; end
@@ -51,14 +51,13 @@ cal.msy_mem = [1  1  0  0  0  0  0  0  0  0  0  0  0  0    % olivine (olv)
                0  0  0  0  0  0  0  0  0  0  0  0  1  0];  % quartz (qtz)
 
 % mineral end-member composition of melting model components
-cal.cmp_mem = [94.7700    5.2300         0         0         0         0         0         0         0         0         0         0         0         0
-               23.1600    8.8100   68.0300         0         0         0         0         0         0         0         0         0         0         0
-               23.1600    8.8100   68.0300         0         0         0         0         0         0         0         0         0         0         0
-                2.4800    0.9200   41.8200   18.6900         0   34.5300         0    1.5500         0         0         0         0         0         0
-                     0    9.0500   19.9100   23.7300    2.9700    6.5900   27.1100    1.8400    3.0700         0    5.7400         0         0         0
-                     0         0         0   78.4300    0.0200    0.9600    8.7300         0    0.0100    0.0300    0.0500   11.7700         0         0
-                     0         0         0         0   46.9600         0    3.9800         0         0    0.0100         0    0.7300   48.3200         0
-                     0         0         0         0         0         0         0         0         0         0         0         0         0  100.0000]; % volatiles (vol)
+cal.cmp_mem = [100.0000         0         0         0         0         0         0         0         0         0         0         0         0         0
+                 2.3300    1.8400   66.8600   11.5200         0   17.4600         0         0         0         0         0         0         0         0
+                 4.1100    0.3400   40.8200   15.4200    5.2300   29.1200    4.2500    0.7000         0         0         0         0         0         0
+                      0   10.0900   17.6600   22.5300    1.9400    9.2100   26.8100    2.1400    4.2200         0    5.4000         0         0         0
+                      0         0         0   80.0500    0.0400    0.0100    8.3400         0    0.0100    0.0300    0.0100   11.5100         0         0
+                      0         0         0         0   43.3100         0    4.2100         0         0    0.0100         0    0.0200   52.4500         0
+                      0         0         0         0         0         0         0         0         0         0         0         0         0  100.0000]; % volatiles (vol)
 cal.cmp_mem = cal.cmp_mem./sum(cal.cmp_mem,2)*100;
 
 % mineral systems composition of melting model components
@@ -75,23 +74,23 @@ for i=1:cal.ncmp
 end
 
 % set pure component melting points T_m^i at P=0
-cal.T0  = [1880  1286  1135  1060  955  774];
+cal.T0  = [1875        1281        1207        1131        1054         943         789];
 
 % set first coeff. for P-dependence of T_m^i [GPa]
-cal.A   = [2.98  2.02  1.67  1.86  1.51  0.50];
+cal.A   = [2.7400    1.7200    1.9000    2.1400    1.9600    1.6100    1.0000];
 
 % set second coeff. for P-dependence of T_m^i [1]
-cal.B   = [36.33  5.52  3.61  2.75  2.44  2.98];
+cal.B   = [29.0800    3.6200    3.0400    2.5400    2.3700    2.2200    2.2400];
 
 % set entropy gain of fusion DeltaS [J/K]
 cal.dS  = 350;
 
 % set coeff. for T-dependence of partition coefficients K^i [1/K]
-cal.r  = [40.4  12.9  4.7  7.8  10.8  10.5];
+cal.r  = [39.1000   19.7000   10.3000    4.7000    6.3000   15.3000   10.6000];
 
 % initial and final composition used in calibration
-cal.c0 = [0.104  0.008  0.460  0.420  0.006  0.001  0.0030];
-cal.c1 = [0.001  0.004  0.001  0.010  0.307  0.667  0.0140];
+cal.c0 = [0.0980    0.0060    0.0140    0.5070    0.3640    0.0100    0.0010    0.0030];
+cal.c1 = [0.0020    0.0010    0.0010    0.0010    0.0080    0.2850    0.7010    0.0030];
 
 % specify melting point dependence on H2O
 cal.dTH2O   = 1600;                 % solidus shift from water content [K/wt^pH2O]
