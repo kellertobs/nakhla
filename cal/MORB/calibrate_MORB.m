@@ -387,7 +387,7 @@ save('MAGEMin_processed');
 % !!!  Run Section to load end-member calibration and prepare for pseudo-component calibration  !!!
 load('MAGEMin_processed');
 
-cal_MORB_6c;  % read calibration file
+cal_MORB_5c;  % read calibration file
 
 % !!!  Edit end-member appearances in pseudo-components  !!!
 % - number and sequence of end-members must correspond to list in cal file
@@ -400,9 +400,8 @@ cal_MORB_6c;  % read calibration file
 
                 % for fay  ant alb san  dps aug  ulv mgt ilm  hyp fsl  qtz wat
 indmem  = logical([1   0    0   0   0    0   0    0   0   0    0   0    0   0    % dun
-                   1   1    1   0   0    1   0    0   0   0    0   0    0   0    % ogb
-                   1   1    1   1   0    1   1    1   0   0    0   0    0   0    % sgb
-                   0   1    1   1   1    1   1    1   1   0    1   0    0   0    % fbs
+                   1   1    1   0   0    1   0    1   0   0    0   0    0   0    % ogb
+                   0   1    1   1   0    1   1    1   1   0    1   0    0   0    % fbs
                    0   0    0   1   1    1   1    0   1   1    1   1    0   0    % tra
                    0   0    0   0   1    0   1    0   0   1    0   1    1   0    % rhy
                    0   0    0   0   0    0   0    0   0   0    0   0    0   1]); % vol
@@ -429,7 +428,7 @@ indmem  = logical([1   0    0   0   0    0   0    0   0   0    0   0    0   0   
 % cmp_oxd_init = cmp_mem_init*cal.mem_oxd/100;
 
 % set initial guess for pseudo-component compositions
-cmp_mem      = 0.0*EMInt + 1.0*EMExt;
+cmp_mem      = 0.5*EMInt + 0.5*EMExt;
 
 cmp_mem_init = zeros(cal.ncmp,cal.nmem);
 cmp_mem_init(1:end-1,1:end-1) = max(1/10*indmem(1:end-1,1:end-1),min(99.9,cmp_mem.*indmem(1:end-1,1:end-1)));
@@ -442,15 +441,15 @@ end
 cmp_oxd_init = cmp_mem_init*cal.mem_oxd/100;
 
 % set initial guess for melting point parameters
-T0_init = [   1875    1250    1150    1065     945     795];
-A_init  = [ 3.0000  2.4000  2.0000  2.0000  1.7000  1.1000];
-B_init  = [34.6000  4.8000  4.1000  3.4000  2.9000  2.9000];
-r_init  = [40.0000 15.0000  5.7000  6.5000 15.0000 10.9000];
+T0_init = [   1875    1150    1050     950     800];
+A_init  = [ 3.0000  2.4000  2.2000  1.7000  1.1000];
+B_init  = [35.0000  2.8000  2.5000  2.5000  2.5000];
+r_init  = [42.0000  5.0000  9.0000 20.0000 15.0000];
 
 
 %% *****  calibrate pseudo-components and melting point parameters  *******
 
-cal_MORB_6c;  % read calibration file
+cal_MORB_5c;  % read calibration file
 
 
 % uncomment following line to run MCMC again with previous best fit as initial guess
@@ -458,7 +457,7 @@ cal_MORB_6c;  % read calibration file
 
 % !!!  set MCMC parameters then Run Section to execute MCMC routine  !!!
 Niter           = 1e6;              % number of samples to take
-anneal.initstep = 0.05e-2;           % adjust step size to get reasonable acceptance ratio 20-30%
+anneal.initstep = 0.075e-2;           % adjust step size to get reasonable acceptance ratio 20-30%
 anneal.levels   = 3;                % select number of annealing levels
 anneal.burnin   = max(1,Niter/10);  % set length of initial burn-in sequence
 anneal.refine   = max(1,Niter/10);  % set length of final refinement sequence
@@ -755,4 +754,4 @@ c1      = round([SYS_cmp(end,1:end-1)./sum(SYS_cmp(end,1:end-1),2),SYS_cmp(1,end
 
 
 %% save and display calibration
-save('MORB_calibration_7cmp');
+save('MORB_calibration_6cmp');

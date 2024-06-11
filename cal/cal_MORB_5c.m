@@ -7,14 +7,14 @@ clear cal;
 cal.noxd   = 9;
 cal.nmem   = 14;
 cal.nmsy   = 6;
-cal.ncmp   = 7;
+cal.ncmp   = 6;
 
 % label strings for all compositional representations
 cal.oxdStr = {'SiO$_2$','TiO$_2$','Al$_2$O$_3$','FeO','MgO','CaO','Na$_2$O','K$_2$O','H$_2$O'};
      elStr = {'Si','Ti','Al','Fe','Mg','Ca','Na','K','H'};
 cal.memStr = {'for','fay','ant','alb','san','dps','aug','ulv','mgt','ilm','hyp','fsl','qtz','wat'};
 cal.msyStr = {'olv','fsp','cxp','spn','opx','qtz'};
-cal.cmpStr = {'dun','ogb','osg','fbs','tra','rhy','vol'};
+cal.cmpStr = {'dun','gbr','fbs','tra','rhy','vol'};
 
 for i = 1:cal.ncmp; cal.(cal.cmpStr{i}) = i; end
 for i = 1:cal.nmsy; cal.(cal.msyStr{i}) = i; end
@@ -53,7 +53,6 @@ cal.msy_mem = [1  1  0  0  0  0  0  0  0  0  0  0  0  0    % olivine (olv)
 % mineral end-member composition of melting model components
 cal.cmp_mem = [100.0000         0         0         0         0         0         0         0         0         0         0         0         0         0
                  2.3300    1.8400   66.8600   11.5200         0   17.4600         0         0         0         0         0         0         0         0
-                 4.1100    0.3400   40.8200   15.4200    5.2300   29.1200    4.2500    0.7000         0         0         0         0         0         0
                       0   10.0900   17.6600   22.5300    1.9400    9.2100   26.8100    2.1400    4.2200         0    5.4000         0         0         0
                       0         0         0   80.0500    0.0400    0.0100    8.3400         0    0.0100    0.0300    0.0100   11.5100         0         0
                       0         0         0         0   43.3100         0    4.2100         0         0    0.0100         0    0.0200   52.4500         0
