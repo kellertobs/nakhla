@@ -32,9 +32,9 @@ filename = '/Users/tokeller/Documents/Research/nakhla/cal/MORB/MAR_mod_f25_H03_i
 uiopen(filename,1)
 
 % Tsol, Tliq at selected P,X0 as additional constraint
-Tsol = [1116.1; 1111.5; 1106.1; 1100.3; 1093.7; 1086.2; 1077.9];%  964.7;  954.4;  943.6;  932.1;  919.8;  906.7;  892.7];   % solidus estimate from MAGEMin
-Tliq = [1326.2; 1325.4; 1324.6; 1323.6; 1322.7; 1321.7; 1320.6];% 1068.7; 1064.8; 1060.7; 1056.5; 1052.2; 1047.6; 1042.9];   % liquidus estimate from MAGEMin
-Psl  = [   4.0;    3.5;    3.0;    2.5;    2.0;    1.5;    1.0];%    4.0;    3.5;    3.0;    2.5;    2.0;    1.5;    1.0]; % P [Pa]
+Tsol = [1116.1; 1111.5; 1106.1; 1100.3; 1093.7; 1086.2; 1077.9;  964.7;  954.4;  943.6;  932.1;  919.8;  906.7;  892.7];   % solidus estimate from MAGEMin
+Tliq = [1326.2; 1325.4; 1324.6; 1323.6; 1322.7; 1321.7; 1320.6; 1068.7; 1064.8; 1060.7; 1056.5; 1052.2; 1047.6; 1042.9];   % liquidus estimate from MAGEMin
+Psl  = [   4.0;    3.5;    3.0;    2.5;    2.0;    1.5;    1.0;    4.0;    3.5;    3.0;    2.5;    2.0;    1.5;    1.0]; % P [Pa]
 
 
 %% *****  unpack calibration data  ****************************************
@@ -240,7 +240,7 @@ SYS_oxdp = SYS_oxdp./wt;  % projected system oxide composition
 %% *****  visualised calibrated end-member, phase compositions  ***********
 
 % !!! update calibration file name on following line, then Run Section  !!!
-cal_MORB;
+cal_MORB_6c;
 
 % plot selected end-member and projected mineral system compositions
 kmem = 1;
@@ -327,19 +327,7 @@ m0     = [T0_init.';A_init.';B_init.';r_init.';dT_init.';cmp_mem_init(:).*indmem
 % set function to calculate forward model
 % m --> dhat
 % dhatFunc  = @(model) OxdFromCmpMem(model,MLTp,SOLp,PHS(:,1),cal);
-dhatFunc  = @(model) ModelFitP(model,Tmp,Prs,MLT_oxd,SOL_mem,SYS_oxd,PHS_frc,Psl,cal,[1e-4,1e-2]);
-
-% set function to apply further constraints to a proposed set of parameter values
-% m --> m
-ConstrFunc = @(model) ConstrFuncs('SumConstr', model, cal.ncmp, cal.nmem, 100);
-
-% set function to calculate prior probability given a set of model param values
-% m --> prior prob
-PriorFunc = @(model) ProbFuncs('PriorFunc', model, mbnds, 'uniform');
-
-% set function to calculate likelihood of forward model
-% dhat --> likelihood 
-LikeFunc  = @(dhat,model) ProbFuncs('LikeFuncSimplex',dhat,data,sigma,0.05,5,max(Psl)*3,model,cal);
+dhatFunc  = @(model) ModelFitP(model,Tmp,Prs,MLT_oxd,SOL_mem,SYS_oxdp,PHS_frc,Psl,cal,[1e-4,1e-2]);
 
 % test fit function for initial guess
 [dhat,MLT_oxdfit,SOL_oxdfit,SYS_oxdfit,SOL_memfit,PHS_oxdfit,PHS_frcfit,SOL_cmp,MLT_cmp,SYS_cmp,Tsolfit,Tliqfit,~] = dhatFunc(m0);
@@ -361,56 +349,9 @@ cal.H2Osat = var.H2O+0.001;
 [~,cal]    = meltmodel(var,cal,'T');
 Tm         = cal.Tm;
 
-figno = 10;
-
-% plot fitted melting points
-figure(figno); clf; figno=figno+1;
-
-plot(Tm,PP/10,'LineWidth',1); axis ij tight; hold on
-plot(Tsol,Psl/10,'kd','LineWidth',1.5);
-plot(Tliq,Psl/10,'ko','LineWidth',1.5);
-plot(Tsolfit,Psl/10,'bd','LineWidth',2);
-plot(Tliqfit,Psl/10,'ro','LineWidth',2);
-
-legend([cal.cmpStr(1:end-1),'Tsol','Tliq','Tsol fit','Tliq fit'],Fs{:},TX{:},LB{:})
-xlabel('Temperature [$^\circ$C]',TX{:},FS{:})
-ylabel('Pressure [GPa]',TX{:},FS{:})
-title('Melting points MCMC fit',FL{:},TX{:})
-set(gca,Fs{:},TL{:});
-drawnow
-
-% plot fitted liquid, solid, mixture compositions
-figure(figno); clf; figno=figno+1;
-
-spz = ceil(sqrt(noxd-1));
-spx = ceil((noxd-1)/spz);
-
-kk = 2;
-for ix = 1:spx
-    for iz = 1:spz
-        if kk<=noxd
-            subplot(spz,spx,kk-1);
-            scatter(MLT_oxd  (:,1),MLT_oxd  (:,kk),25,Tmp,'o'); colormap('copper'); axis tight; hold on
-            scatter(SOL_oxd  (:,1),SOL_oxd  (:,kk),25,Tmp,'s'); 
-            scatter(SYS_oxd  (:,1),SYS_oxd  (:,kk),25,Tmp,'d'); 
-            scatter(MLT_oxdfit(:,1),MLT_oxdfit(:,kk),25,Tmp,'o','filled');
-            scatter(SOL_oxdfit(:,1),SOL_oxdfit(:,kk),25,Tmp,'s','filled');
-            scatter(SYS_oxdfit(:,1),SYS_oxdfit(:,kk),25,Tmp,'d','filled');
-            for iem = 1:cal.ncmp-1
-                scatter(cmp_oxd_init(iem,1),cmp_oxd_init(iem,kk),200,'kh');
-            end
-            if kk==noxd; legend([{'proj. mlt'},{'proj. sol'},{'proj. sys'},{'fit sol'},{'fit mlt'},{'fit sys'},{'best cmp'},{'init cmp'}],Fs{:},TX{:},LO{:}); end
-            xlabel(cal.oxdStr(1 ),FS{:},TX{:})
-            ylabel(cal.oxdStr(kk),FS{:},TX{:})
-            set(gca,Fs{:},TL{:});
-            kk = kk+1;
-        else
-            break;
-        end
-    end
-end
-sgtitle('MLT \& SOL MCMC fit',FL{:},TX{:})
-drawnow
+% plot basic information for initial fit
+level = 2;
+run('../MCMC/PlotFit.m')
 
 
 %% *****  calibrate pseudo-components and melting point parameters  *******
@@ -423,7 +364,7 @@ cal_MORB_6c;  % read calibration file
 % m0     = [T0_init.';A_init.';B_init.';r_init.';dT_init.';cmp_mem_init(:).*indmem(:);];
 
 % !!!  set MCMC parameters then Run Section to execute MCMC routine  !!!
-Niter           = 1e5;              % number of samples to take
+Niter           = 1e3;              % number of samples to take
 anneal.initstep = 0.1e-2;           % adjust step size to get reasonable acceptance ratio 20-30%
 anneal.levels   = 1;                % select number of annealing levels
 anneal.burnin   = max(1,Niter/10);  % set length of initial burn-in sequence
@@ -487,6 +428,18 @@ for j=1:cal.nmem
     end
 end
 
+% set function to apply further constraints to a proposed set of parameter values
+% m --> m
+ConstrFunc = @(model) ConstrFuncs('SumConstr', model, cal.ncmp, cal.nmem, 100);
+
+% set function to calculate prior probability given a set of model param values
+% m --> prior prob
+PriorFunc = @(model) ProbFuncs('PriorFunc', model, mbnds, 'uniform');
+
+% set function to calculate likelihood of forward model
+% dhat --> likelihood 
+LikeFunc  = @(dhat,model) ProbFuncs('LikeFuncSimplex',dhat,data,sigma,0.05,5,max(Psl)*3,model,cal);
+
 bestfit = m0;  % initialise bestfit from initial conditions
 
 %*****  RUN MCMC PARAMETER FITTING ROUTINE  *******************************
@@ -535,185 +488,13 @@ Tm         = cal.Tm;
 
 %% *****  visualise best fit calibration  *********************************
 
-% !!!  Run Section to visualise outcome of MCMC fitting routine !!!
-figno = 102;
+%!!!  adjust desired level of detail to plot then run section  !!!
+%     level = 1     only simple line plots
+%     level = 2     add Harker diagrams and T-X pseudo-sections
+%     level = 3     add mineral systems and display best fit parameters
 
-% plot fitted melting points
-figure(figno); clf; figno=figno+1;
-
-plot(Tm,PP/10,'LineWidth',1); axis ij tight; hold on
-plot(Tsol,Psl/10,'kd','LineWidth',1.5);
-plot(Tliq,Psl/10,'ko','LineWidth',1.5);
-plot(Tsolfit,Psl/10,'bd','LineWidth',2);
-plot(Tliqfit,Psl/10,'ro','LineWidth',2);
-
-legend([cal.cmpStr(1:end-1),'Tsol','Tliq','Tsol fit','Tliq fit'],Fs{:},TX{:},LB{:})
-xlabel('Temperature [$^\circ$C]',TX{:},FS{:})
-ylabel('Pressure [GPa]',TX{:},FS{:})
-title('Melting points MCMC fit',FL{:},TX{:})
-set(gca,Fs{:},TL{:});
-drawnow
-
-% plot fitted mineral system compositions
-kmem = 1;
-for iph=2:nphs-1
-
-    iox = find(hasoxd(iph,:)==1);
-    nox = length(iox);
-
-    figure(figno); clf; figno=figno+1;
-
-    spz = ceil(sqrt(nox-1));
-    spx = ceil((nox-1)/spz);
-
-    kk = 2;
-    for ix = 1:spx
-        for iz = 1:spz
-            if kk<=nox
-                subplot(spz,spx,kk-1);
-                scatter(squeeze(PHS_oxdp  (hasphs(:,iph)==1,iph,iox(1))),squeeze(PHS_oxdp  (hasphs(:,iph)==1,iph,iox(kk))),25,Tmp(hasphs(:,iph)==1)); colormap('copper'); axis tight; hold on
-                scatter(squeeze(PHS_oxdfit(hasphs(:,iph)==1,iph,iox(1))),squeeze(PHS_oxdfit(hasphs(:,iph)==1,iph,iox(kk))),25,Tmp(hasphs(:,iph)==1),'filled');
-                for iem = kmem:kmem+sum(cal.msy_mem(iph-1,:))-1
-                    scatter(cal.mem_oxd(iem,iox(1)),cal.mem_oxd(iem,iox(kk)),200,'kh','filled');
-                end
-                if kk==nox; legend([{'proj.'},{'fit'},{'MEM'}],Fs{:},TX{:},LB{:}); end
-                xlabel(cal.oxdStr(iox(1 )),FS{:},TX{:})
-                ylabel(cal.oxdStr(iox(kk)),FS{:},TX{:})
-                set(gca,Fs{:},TL{:});
-                kk = kk+1;
-            else 
-                break;
-            end
-        end
-    end
-    sgtitle([char(phs(iph)),' MCMC fit'],FL{:},TX{:});
-    kmem = kmem+sum(cal.msy_mem(iph-1,:));
-    drawnow
-end
-
-
-% plot fitted liquid, solid, mixture compositions
-figure(figno); clf; figno=figno+1;
-
-spz = ceil(sqrt(noxd-1));
-spx = ceil((noxd-1)/spz);
-
-kk = 2;
-for ix = 1:spx
-    for iz = 1:spz
-        if kk<=noxd
-            subplot(spz,spx,kk-1);
-            scatter(MLT_oxd  (:,1),MLT_oxd  (:,kk),25,Tmp,'o'); colormap('copper'); axis tight; hold on
-            scatter(SOL_oxd  (:,1),SOL_oxd  (:,kk),25,Tmp,'s'); 
-            scatter(SYS_oxd  (:,1),SYS_oxd  (:,kk),25,Tmp,'d'); 
-            scatter(MLT_oxdfit(:,1),MLT_oxdfit(:,kk),25,Tmp,'o','filled');
-            scatter(SOL_oxdfit(:,1),SOL_oxdfit(:,kk),25,Tmp,'s','filled');
-            scatter(SYS_oxdfit(:,1),SYS_oxdfit(:,kk),25,Tmp,'d','filled');
-            for iem = 1:cal.ncmp-1
-                scatter(cmp_oxd_best(iem,1),cmp_oxd_best(iem,kk),200,'kh','filled');
-                scatter(cmp_oxd_init(iem,1),cmp_oxd_init(iem,kk),200,'kh');
-            end
-            if kk==noxd; legend([{'proj. mlt'},{'proj. sol'},{'proj. sys'},{'fit sol'},{'fit mlt'},{'fit sys'},{'best cmp'},{'init cmp'}],Fs{:},TX{:},LO{:}); end
-            xlabel(cal.oxdStr(1 ),FS{:},TX{:})
-            ylabel(cal.oxdStr(kk),FS{:},TX{:})
-            set(gca,Fs{:},TL{:});
-            kk = kk+1;
-        else
-            break;
-        end
-    end
-end
-sgtitle('MLT \& SOL MCMC fit',FL{:},TX{:})
-drawnow
-
-
-% plot fitted T-X diagrams
-figure(figno); clf; figno=figno+1;
-
-spz = ceil(sqrt(noxd));
-spx = ceil((noxd)/spz);
-
-kk = 1;
-for ix = 1:spx
-    for iz = 1:spz
-        if kk<=noxd
-            subplot(spz,spx,kk);
-            scatter(MLT_oxd  (:,kk),Tmp,25,[0.7,0.7,0.7],'o'); axis tight; hold on
-            scatter(SOL_oxd  (:,kk),Tmp,25,[0.7,0.7,0.7],'s');
-            scatter(SYS_oxd  (:,kk),Tmp,25,[0.7,0.7,0.7],'d');
-            scatter(MLT_oxdfit(:,kk),Tmp,25,[0.7,0.1,0.2],'o','filled');
-            scatter(SOL_oxdfit(:,kk),Tmp,25,[0.2,0.1,0.7],'s','filled');
-            scatter(SYS_oxdfit(:,kk),Tmp,25,[0.1,0.1,0.1],'d','filled');
-            for iem = 1:cal.ncmp-1
-                scatter(cmp_oxd_best(iem,kk),min(1400,T0_best(iem)),200,'kh','filled');
-                scatter(cmp_oxd_init(iem,kk),min(1400,T0_init(iem)),200,'kh');
-            end
-            if kk==noxd; legend([{'proj. mlt'},{'proj. sol'},{'proj. sys'},{'fit mlt'},{'fit sol'},{'fit sys'},{'best cmp'},{'init cmp'}],Fs{:},TX{:},LO{:}); end
-            xlabel(cal.oxdStr(kk),FS{:},TX{:})
-            ylabel('Temperature [C]',FS{:},TX{:})
-            set(gca,Fs{:},TL{:});
-            kk = kk+1;
-        else
-            break;
-        end
-    end
-end
-sgtitle('MLT \& SOL MCMC fit',FL{:},TX{:})
-drawnow
-
-
-% plot fitted phase fractions
-figure(figno); clf; figno=figno+1;
-cmap = [colororder;[0 0 0]];
-
-for iph=1:cal.nmsy+1
-    plot(Tmp,PHS_frc   (:,iph),'-'  ,'Color',cmap(iph,:),'LineWidth',1.5); axis tight; hold on
-end
-for iph=1:cal.nmsy+1
-    plot(Tmp,PHS_frcfit(:,iph),'--','Color',cmap(iph,:),'LineWidth',1.5); axis tight;
-end
-legend(['mlt',cal.msyStr],Fs{:},TX{:},LB{:})
-xlabel('Temperature [$^\circ$C]',FS{:},TX{:})
-ylabel('Phase proportions [wt\%]',FS{:},TX{:})
-title('Phase stability MCMC fit',FL{:},TX{:})
-set(gca,Fs{:},TL{:});
-drawnow
-
-
-% system components fit
-figure(figno); clf; figno=figno+1;
-
-subplot(3,1,1)
-plot(Tmp,MLT_cmp*100,'LineWidth',1.5); axis tight
-ylabel('Melt comp. [wt\%]',TX{:},FS{:})
-set(gca,Fs{:},TL{:});
-
-subplot(3,1,2)
-plot(Tmp,SOL_cmp*100,'LineWidth',1.5); axis tight
-ylabel('Solid comp. [wt\%]',TX{:},FS{:})
-set(gca,Fs{:},TL{:});
-
-subplot(3,1,3)
-plot(Tmp,SYS_cmp*100,'LineWidth',1.5); axis tight
-legend(cal.cmpStr,Fs{:},TX{:},LB{:})
-xlabel('Temperature [$^\circ$C]',TX{:},FS{:})
-ylabel('System comp. [wt\%]',TX{:},FS{:})
-set(gca,Fs{:},TL{:});
-
-sgtitle('Pseudo-component evolution',FL{:},TX{:})
-drawnow
-
-% !!! enter the below values into cal file !!!
-cmp_oxd = round(cmp_oxd_best,2)     
-cmp_mem = round(cmp_mem_best,2)     % => cal.cmp_mem
-T0      = round(T0_best,0)          % => cal.T0
-A       = round(A_best,2)           % => cal.A
-B       = round(B_best,2)           % => cal.B
-r       = round(r_best,1)           % => cal.r
-dTH2O   = round(dT_best,0)          % => cal.dTH2O
-c0      = round([SYS_cmp(  1,1:end-1)./sum(SYS_cmp(  1,1:end-1),2),SYS_cmp(1,end)],3) % => cal.c0
-c1      = round([SYS_cmp(end,1:end-1)./sum(SYS_cmp(end,1:end-1),2),SYS_cmp(1,end)],3) % => cal.c1
-
+level = 3;
+PlotFit.m
 
 %% save and display calibration
 save('MORB_calibration_6cmp');
