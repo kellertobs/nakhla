@@ -92,8 +92,8 @@ cal.c0 = [0.1120    0.0160    0.4730    0.3010    0.0950    0.0030    0.0030];
 cal.c1 = [0.0010    0.0010    0.0010    0.0090    0.3090    0.6790    0.0030];
 
 % specify melting point dependence on H2O
-cal.dTH2O   = 1600;                 % solidus shift from water content [K/wt^pH2O]
-cal.pH2O    = 0.75;                 % solidus shift from water content [K/wt^pH2O]
+cal.dTH2O   = [1400,1700,1800,1900,2000]; % solidus shift from water content [K/wt^pH2O]
+cal.pH2O    = 0.75;                       % solidus shift from water content [K/wt^pH2O]
 
 % specify geochemical model parameters
 cal.ntrc    = 6;                    % number of trace elements

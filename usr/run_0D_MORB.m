@@ -25,9 +25,9 @@ dt       =  12;                  % initial time step [s]
 dtmax    =  12;                  % maximum time step [s]
 
 % set initial thermo-chemical state
-T0       =  1250;                % temperature top  layer [deg C]
+T0       =  1310;                % temperature top  layer [deg C]
 T1       =  T0;                  % temperature base layer [deg C]
-c0       =  [0.08  0.02  0.43  0.42  0.03  0.02  0.003];  % components (maj comp, H2O) top  layer [wt] (will be normalised to unit sum!)
+c0       =  [0.1070    0.0940    0.5440    0.1220    0.1290    0.0040    0.0030];  % components (maj comp, H2O) top  layer [wt] (will be normalised to unit sum!)
 c1       =  c0;                  % components (maj comp, H2O) bot layer [wt] (will be normalised to unit sum!)
 dcr      =  [0,0,0,0,0,0,0,0];
 dcg      =  [0,0,0,0,0,0,0,0];
@@ -35,7 +35,7 @@ dcg      =  [0,0,0,0,0,0,0,0];
 % set thermo-chemical boundary parameters
 fractxtl =  1;                   % fractional crystallisation mode for 0-D (Nz=Nx=1)
 fractmlt =  0;                   % fractional melting mode for 0-D (Nz=Nx=1)
-resfrac  =  0.25;                % residual fraction for fractionation mode
+fractres =  0.25;                % residual fraction for fractionation mode
 bndmode  =  1;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
 bnd_w    =  1e16;                % boundary layer width [m]
 tau_T    =  D^2/1e-6;            % wall cooling/assimilation time [s]
@@ -46,7 +46,7 @@ fin      =  0;                   % ingassing factor (0 = no ingassing; 1 = free 
 fout     =  0;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
 
 % set thermo-chemical material parameters
-calID    =  'MORB';              % phase diagram calibration
+calID    =  'MORB_6c';              % phase diagram calibration
 
 % set chamber pressure parameters
 Pchmb0   =  0;                  % initial chamber pressure [Pa]

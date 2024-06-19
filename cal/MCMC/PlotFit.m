@@ -136,6 +136,7 @@ end
 
 if level>2
 
+    figno = 107;
     % plot fitted mineral system compositions
     kmem = 1;
     for iph=2:nphs-1
@@ -143,7 +144,7 @@ if level>2
         iox = find(hasoxd(iph,:)==1);
         nox = length(iox);
 
-        figure(107); clf;
+        figure(figno); clf; figno = figno+1;
 
         spz = ceil(sqrt(nox-1));
         spx = ceil((nox-1)/spz);

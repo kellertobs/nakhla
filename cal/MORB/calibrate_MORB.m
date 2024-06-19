@@ -217,6 +217,7 @@ for iph = 2:nphs
     SOL_mem(:,imem) = SOL_mem(:,imem) .* PHS_frc(:,iph)./(100-PHS_frc(:,1)) * 100;
     kmem = kmem+PHS_nmem(iph);
 end
+SOL_oxdp = SOL_mem*cal.mem_oxd;
 
 % reconstitute system oxide composition
 SYS_oxd = zeros(npts,noxd);
@@ -302,24 +303,26 @@ cal_MORB_6c;  % read calibration file
 % - phase out mineral systems and their end-members in accordance with
 %   their fading or disappearance in PHS_frc
 
-                % for fay  ant alb san  dps aug  ulv mgt ilm  hyp fsl  qtz wat
-cmp_mem_init  = [100   0    0   0   0    0   0    0   0   0    0   0    0   0    % dun
-                  34  22   42   0   0    2   0    0   0   0    0   0    0   0    % tro
-                   5   4   32  10   0   37  10    2   0   0    0   0    0   0    % ogb
-                   5  11   24   7   0   12  25    5   6   0    5   0    0   0    % fbs
-                   0   2    0  65   5    2  11    0   2   1    3   9    0   0    % tra
-                   0   0    0   0  42    0   4    0   0   1    0   2   51   0    % rhy
-                   0   0    0   0   0    0   0    0   0   0    0   0    0 100];  % vol
+%                for  fay   ant  alb  san   dps  aug   ulv  mgt  ilm   hyp  fsl   qtz  wat
+cmp_mem_init  = [100     0     0     0     0     0     0     0     0     0     0     0     0     0
+                   1    29    60     0     0    10     0     0     0     0     0     0     0     0
+                   1     1    26    16     0    30    13     5     0     0     8     0     0     0
+                   0    12    24    16     0     9    25     2     7     0     3     2     0     0
+                   0     0     0    69     4     1    11     0     1     2     2    10     0     0
+                   0     0     0     0    44     0     6     0     0     1     0     1    48     0
+                   0     0     0     0     0     0     0     0     0     0     0     0     0   100];  % vol
 indmem = logical(cmp_mem_init);
+cmp_mem_best = cmp_mem_init;
 
 cmp_oxd_init = cmp_mem_init*cal.mem_oxd/100;
+cmp_oxd_best = cmp_oxd_init;
 
 % set initial guess for melting point parameters
-T0_init = [   1875    1180    1120    1040     965     795];
-A_init  = [ 4.2000  2.7000  2.5000  2.3000  2.2000  1.7000];
-B_init  = [ 8.0000  2.8000  2.6000  2.4000  2.2000  1.7000];
-r_init  = [30.0000   6.000  4.0000  5.0000 16.0000 10.0000];
-dT_init = [   1390    1610    1725    1750    1950    1975];
+T0_init = [   1875    1190    1140    1080    1015     825];  T0_best = T0_init;
+A_init  = [ 8.0000  3.3000  3.0000  2.8000  2.6000  1.2000];   A_best =  A_init;
+B_init  = [ 8.0000  3.8000  3.6000  3.3000  2.5000  2.2000];   B_best =  B_init;
+r_init  = [38.0000   5.000  4.0000  6.0000 15.0000 12.0000];   r_best =  r_init;
+dT_init = [   1300    1450    1500    1650    1900    2400];  dT_best = dT_init;
 
 % compose initial parameter guess
 m0     = [T0_init.';A_init.';B_init.';r_init.';dT_init.';cmp_mem_init(:).*indmem(:);];
@@ -327,7 +330,7 @@ m0     = [T0_init.';A_init.';B_init.';r_init.';dT_init.';cmp_mem_init(:).*indmem
 % set function to calculate forward model
 % m --> dhat
 % dhatFunc  = @(model) OxdFromCmpMem(model,MLTp,SOLp,PHS(:,1),cal);
-dhatFunc  = @(model) ModelFitP(model,Tmp,Prs,MLT_oxd,SOL_mem,SYS_oxdp,PHS_frc,Psl,cal,[1e-4,1e-2]);
+dhatFunc  = @(model) ModelFitP(model,Tmp,Prs,MLT_oxd,SOL_mem,SYS_oxdp,PHS_frc,Psl,cal,[1e-3,2e-1]);
 
 % test fit function for initial guess
 [dhat,MLT_oxdfit,SOL_oxdfit,SYS_oxdfit,SOL_memfit,PHS_oxdfit,PHS_frcfit,SOL_cmp,MLT_cmp,SYS_cmp,Tsolfit,Tliqfit,~] = dhatFunc(m0);
@@ -364,7 +367,7 @@ cal_MORB_6c;  % read calibration file
 % m0     = [T0_init.';A_init.';B_init.';r_init.';dT_init.';cmp_mem_init(:).*indmem(:);];
 
 % !!!  set MCMC parameters then Run Section to execute MCMC routine  !!!
-Niter           = 1e3;              % number of samples to take
+Niter           = 1e6;              % number of samples to take
 anneal.initstep = 0.1e-2;           % adjust step size to get reasonable acceptance ratio 20-30%
 anneal.levels   = 1;                % select number of annealing levels
 anneal.burnin   = max(1,Niter/10);  % set length of initial burn-in sequence
@@ -377,7 +380,7 @@ PHS_scl   = max(0.001,(PHS_frc(:)-min(PHS_frc(:)))./(max(PHS_frc(:))-min(PHS_frc
 sigma_MLT =  0.1  * MLT_scl.^0.3;      % uncertainty of melt oxide composition
 sigma_SOL =  0.2  * SOL_scl.^0.2;      % uncertainty of solid end-member composition
 sigma_PHS =  0.3  * PHS_scl.^0.1;      % uncertainty of phase fractions
-sigma_TSL =  0.5  * ones(size([Tsol(:);Tliq(:)])); % uncertainty of solidus/liquidus Temp
+sigma_TSL =  0.4  * ones(size([Tsol(:);Tliq(:)])); % uncertainty of solidus/liquidus Temp
 sigma = [sigma_MLT;sigma_SOL;sigma_PHS;sigma_TSL]; % combine all as in data vector
 
 % load calibration data constraints into data vector
@@ -388,7 +391,7 @@ dm     = [max(25,0.05*T0_init.'); ...
           max( 1,0.75* A_init.'); ...
           max( 1,0.50* B_init.'); ...
           max( 5,0.75* r_init.'); ...
-        1*max(50,0.10*dT_init.'); ...
+        0*max(50,0.10*dT_init.'); ...
           max(10,1.00*cmp_mem_init(:)).*indmem(:)];
 m0_lw  = m0 - dm;
 m0_up  = m0 + dm;
@@ -494,7 +497,7 @@ Tm         = cal.Tm;
 %     level = 3     add mineral systems and display best fit parameters
 
 level = 3;
-PlotFit.m
+run('../MCMC/PlotFit.m')
 
 %% save and display calibration
 save('MORB_calibration_6cmp');
