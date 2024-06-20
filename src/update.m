@@ -51,9 +51,9 @@ if Nz==1; Pt    = (Pt + Ptop.*ones(size(Tp)) + Pchmb + Pcouple*P(2:end-1,2:end-1
 end
 
 % update effective constituent sizes
-dx = dx0.*(1-chi);
-dm = dm0.*(1-mu );
-df = df0.*(1-phi);
+dx = dx0.*(1-chi).^0.5;
+dm = dm0.*(1-mu ).^0.5;
+df = df0.*(1-phi).^0.5;
 
 % update pure phase viscosities
 etam   = reshape(Giordano08(reshape(cm_oxd_all,Nz*Nx,9),T(:)-273.15),Nz,Nx);

@@ -305,12 +305,12 @@ cal_MORB_6c;  % read calibration file
 
 %                for  fay   ant  alb  san   dps  aug   ulv  mgt  ilm   hyp  fsl   qtz  wat
 cmp_mem_init  = [100     0     0     0     0     0     0     0     0     0     0     0     0     0
-                   1    29    60     0     0    10     0     0     0     0     0     0     0     0
-                   1     1    26    16     0    30    13     5     0     0     8     0     0     0
-                   0    12    24    16     0     9    25     2     7     0     3     2     0     0
-                   0     0     0    69     4     1    11     0     1     2     2    10     0     0
-                   0     0     0     0    44     0     6     0     0     1     0     1    48     0
-                   0     0     0     0     0     0     0     0     0     0     0     0     0   100];  % vol
+                  21    74     6     0     0     0     0     0     0     0     0     0     0     0
+                   0     0    44     9     0    41     0     2     0     0     5     0     0     0
+                   0     7    20    20     0    10    26     3     6     0     4     3     0     0
+                   0     0     0    70     4     1    10     0     1     2     2    10     0     0
+                   0     0     0     0    44     0     5     0     0     1     0     1    49     0
+                   0     0     0     0     0     0     0     0     0     0     0     0     0   100]; 
 indmem = logical(cmp_mem_init);
 cmp_mem_best = cmp_mem_init;
 
@@ -318,10 +318,10 @@ cmp_oxd_init = cmp_mem_init*cal.mem_oxd/100;
 cmp_oxd_best = cmp_oxd_init;
 
 % set initial guess for melting point parameters
-T0_init = [   1875    1190    1140    1080    1015     825];  T0_best = T0_init;
-A_init  = [ 8.0000  3.3000  3.0000  2.8000  2.6000  1.2000];   A_best =  A_init;
-B_init  = [ 8.0000  3.8000  3.6000  3.3000  2.5000  2.2000];   B_best =  B_init;
-r_init  = [38.0000   5.000  4.0000  6.0000 15.0000 12.0000];   r_best =  r_init;
+T0_init = [   1875    1220    1150    1090    1000     830];  T0_best = T0_init;
+A_init  = [ 8.0000  3.3000  2.8000  2.6000  2.5000  1.1000];   A_best =  A_init;
+B_init  = [ 7.6000  3.7000  3.3000  2.9000  2.5000  2.3000];   B_best =  B_init;
+r_init  = [38.0000  10.000  4.0000  9.0000 14.0000 12.0000];   r_best =  r_init;
 dT_init = [   1300    1450    1500    1650    1900    2400];  dT_best = dT_init;
 
 % compose initial parameter guess
@@ -367,7 +367,7 @@ cal_MORB_6c;  % read calibration file
 % m0     = [T0_init.';A_init.';B_init.';r_init.';dT_init.';cmp_mem_init(:).*indmem(:);];
 
 % !!!  set MCMC parameters then Run Section to execute MCMC routine  !!!
-Niter           = 1e6;              % number of samples to take
+Niter           = 1e5;              % number of samples to take
 anneal.initstep = 0.1e-2;           % adjust step size to get reasonable acceptance ratio 20-30%
 anneal.levels   = 1;                % select number of annealing levels
 anneal.burnin   = max(1,Niter/10);  % set length of initial burn-in sequence

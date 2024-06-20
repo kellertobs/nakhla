@@ -25,9 +25,9 @@ dt       =  12;                  % initial time step [s]
 dtmax    =  12;                  % maximum time step [s]
 
 % set initial thermo-chemical state
-T0       =  1310;                % temperature top  layer [deg C]
+T0       =  1300;                % temperature top  layer [deg C]
 T1       =  T0;                  % temperature base layer [deg C]
-c0       =  [0.1070    0.0940    0.5440    0.1220    0.1290    0.0040    0.0030];  % components (maj comp, H2O) top  layer [wt] (will be normalised to unit sum!)
+c0       =  [0.09    0.04    0.45    0.32    0.09    0.01    0.0030];  % components (maj comp, H2O) top  layer [wt] (will be normalised to unit sum!)
 c1       =  c0;                  % components (maj comp, H2O) bot layer [wt] (will be normalised to unit sum!)
 dcr      =  [0,0,0,0,0,0,0,0];
 dcg      =  [0,0,0,0,0,0,0,0];
@@ -41,7 +41,7 @@ bnd_w    =  1e16;                % boundary layer width [m]
 tau_T    =  D^2/1e-6;            % wall cooling/assimilation time [s]
 Twall    =  [300,300,nan];       % [top,bot,sds] wall rock temperature [degC] (nan = insulating)
 cwall    =  nan(3,8);
-Ptop     =  2e8;               % top pressure [Pa]
+Ptop     =  2e8;                 % top pressure [Pa]
 fin      =  0;                   % ingassing factor (0 = no ingassing; 1 = free flow ingassing)
 fout     =  0;                   % outgassing factor (0 = no outgassing; 1 = free flow outgassing)
 
