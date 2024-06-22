@@ -51,13 +51,13 @@ cal.msy_mem = [1  1  0  0  0  0  0  0  0  0  0  0  0  0    % olivine (olv)
                0  0  0  0  0  0  0  0  0  0  0  0  1  0];  % quartz (qtz)
 
 % mineral end-member composition of melting model components
-cal.cmp_mem = [100.0      0      0      0      0      0      0      0      0      0      0      0      0      0
-                19.7   74.3    6.0      0      0      0      0      0      0      0      0      0      0      0
-                   0      0   43.3   12.8      0   40.1      0    0.1      0      0    3.7      0      0      0
-                   0    6.5   21.4   20.4      0   10.0   27.4    2.4    5.5      0    3.7    2.7      0      0
-                   0      0      0   74.9    3.6      0   10.2      0    0.1    0.7    0.7    9.8      0      0
-                   0      0      0      0   45.4      0    4.7      0      0    0.1      0      0   49.8      0
-                   0      0      0      0      0      0      0      0      0      0      0      0      0  100.0]; % volatiles (vol)
+cal.cmp_mem = [100.0000         0         0         0         0         0         0         0         0         0         0         0         0         0
+                17.3000   64.7000   18.0000         0         0         0         0         0         0         0         0         0         0         0
+                      0         0   42.4000   12.4000         0   41.2000         0    0.2000         0         0    3.8000         0         0         0
+                      0    6.4000   21.5000   20.6000         0   10.2000   27.1000    2.4000    5.6000         0    3.7000    2.5000         0         0
+                      0         0         0   74.7000    3.6000         0   10.4000         0         0    0.7000    0.8000    9.8000         0         0
+                      0         0         0         0   45.6000         0    4.8000         0         0         0         0    0.1000   49.5000         0
+                      0         0         0         0         0         0         0         0         0         0         0         0         0  100.0000]; % volatiles (vol)
 cal.cmp_mem = cal.cmp_mem./sum(cal.cmp_mem,2)*100;
 
 % mineral systems composition of melting model components
@@ -74,23 +74,23 @@ for i=1:cal.ncmp
 end
 
 % set pure component melting points T_m^i at P=0
-cal.T0  = [1875        1220        1154        1088        1003         836];
+cal.T0  = [1875  1199  1159  1092  1003  837];
 
 % set first coeff. for P-dependence of T_m^i [GPa]
-cal.A   = [8.1300    2.9500    2.8700    2.5300    2.7300    1.0100];
+cal.A   = [7.4200    2.9100    3.1400    2.8100    2.4300    1.0000];
 
 % set second coeff. for P-dependence of T_m^i [1]
-cal.B   = [8.1200    3.4700    3.4300    3.1400    2.3500    2.5300];
+cal.B   = [7.0400    3.3400    3.9000    3.1700    2.5300    2.5300];
 
 % set entropy gain of fusion DeltaS [J/K]
 cal.dS  = 350;
 
 % set coeff. for T-dependence of partition coefficients K^i [1/K]
-cal.r  = [38.5000   11.3000    4.3000    8.4000   12.8000   10.6000];
+cal.r  = [37.8000    9.1000    4.3000    8.7000   12.8000   10.7000];
 
 % initial and final composition used in calibration
-cal.c0 = [0.0940    0.0380    0.4590    0.3180    0.0870    0.0030    0.0030];
-cal.c1 = [0.0020    0.0010    0.0010    0.0100    0.2450    0.7420    0.0030];
+cal.c0 = [0.0900    0.0550    0.4710    0.2860    0.0950    0.0030    0.0030];
+cal.c1 = [0.0020    0.0010    0.0010    0.0080    0.2440    0.7440    0.0300];
 
 % specify melting point dependence on H2O
 cal.dTH2O   = [1300        1450        1500        1650        1900        2400];                 % solidus shift from water content [K/wt^pH2O]
@@ -103,7 +103,7 @@ cal.Ktrc_mem = [0.01;0.10;1.0;3.0;10.0;1.0].*ones(cal.ntrc,cal.nmem);
 
 % specify density parameters
 %               for  fay  ant  alb  san  dps  aug  ulv  mgt  ilm  ens  fsl  qtz  wat
-cal.rhox0   = [3200,4040,2680,2590,2560,3200,3465,3925,4760,4730,3300,3665,2540,1000]; % mem ref densities [kg/m3]
+cal.rhox0   = [3210,4060,2680,2600,2560,3210,3460,3930,4760,4720,3300,3660,2540,1000]; % mem ref densities [kg/m3]
 cal.rhof0   = 1000;                 % fluid ref density [kg/m3]
 
 % specify three-phase coefficient model parameters

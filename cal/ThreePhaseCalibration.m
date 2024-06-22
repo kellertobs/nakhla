@@ -56,29 +56,57 @@ C  =  [ [0.30, 0.30, 0.40]*0.7; ...
         [0.52, 0.40, 0.08]*1.1; ...
         [0.15, 0.25, 0.60]*0.7; ];  % permission step widths
 
-% calculate phase permission weights functions
-for i = 1:3
-    Sphi(:,:,i)  =  (phi./B(i,:)).^(1./C(i,:)) ./ sum((phi./B(i,:)).^(1./C(i,:)),2);
-end
-for i = 1:3
-    Xphi(:,:,i)  =  sum(A(i,:).*Sphi(:,:,i),2).*phi + (1-sum(A(i,:).*Sphi(:,:,i),2)).*Sphi(:,:,i);
-end
-Sphi = permute(Sphi,[1,3,2]);
-Xphi = permute(Xphi,[1,3,2]);
+d1 = d0(1).*(1-phi1).^1;
+d2 = d0(2).*(1-phi2).^1;
+d3 = d0(3).*(1-phi3).^1;
+d  = cat(2,d1 ,d2 ,d3 );
 
-thtv = squeeze(prod(Mv.'.^permute(Xphi,[2,3,1]),2)).';  % momentum permissions
-thtf = squeeze(prod(Mf.'.^permute(Xphi,[2,3,1]),2)).';  % volume permissions
+eta1 = eta0(1).*ones(size(phi1));
+eta2 = eta0(2).*ones(size(phi1));
+eta3 = eta0(3).*ones(size(phi1));
+eta  = cat(2,eta1 ,eta2 ,eta3 );
 
-Kv   = phi.*kv.'.*thtv;  % momentum flux coefficients
-Kf   = phi.*kf.'.*thtf;  % volume flux coefficients
+% get permission weights
+kv = permute(eta,[2,1]);
+Mv = permute(repmat(kv,1,1,3),[3,1,2])./permute(repmat(kv,1,1,3),[1,3,2]);
+kf = permute(d.^2./eta,[2,1]);
+Mf = permute(repmat(kf,1,1,3),[3,1,2])./permute(repmat(kf,1,1,3),[1,3,2]);
 
-Cv   = phi.*(1-phi)./(d0.'.*(1-phi)).^2.*kv.'.*thtv;  % momentum transfer coefficients
-Cf   = phi.*(1-phi)./(d0.'.*(1-phi)).^2.*kf.'.*thtf;  % volume transfer coefficients
+dd = max(1e-6,min(1-1e-6,permute(d  ,[2,1])));
+ff = max(1e-6,min(1-1e-6,permute(phi,[2,1])));
+FF = permute(repmat(ff,1,1,3),[3,1,2]);
+Sphi = (FF./B).^(1./C);  Sphi = Sphi./sum(Sphi,2);
+Xphi = sum(A.*Sphi,2).*FF + (1-sum(A.*Sphi,2)).*Sphi;
 
-eta  = Kv./phi;     % effective viscosities
-Dv   = Kf./phi;     % effective volume diffusivities
-KD   = max(1/max(eta0.^1.5),phi.^2./Cv);  % effective segregation coefficients
-zeta = phi.^2./Cf;  % effective compaction coefficients
+% % calculate phase permission weights functions
+% for i = 1:3
+%     Sphi(:,:,i)  =  (phi./B(i,:)).^(1./C(i,:)) ./ sum((phi./B(i,:)).^(1./C(i,:)),2);
+% end
+% for i = 1:3
+%     Xphi(:,:,i)  =  sum(A(i,:).*Sphi(:,:,i),2).*phi + (1-sum(A(i,:).*Sphi(:,:,i),2)).*Sphi(:,:,i);
+% end
+% Sphi = permute(Sphi,[1,3,2]);
+% Xphi = permute(Xphi,[1,3,2]);
+
+thtv = squeeze(prod(Mv.^Xphi,2));  % momentum permissions
+thtf = squeeze(prod(Mf.^Xphi,2));  % volume permissions
+
+Kv   = ff.*kv.*thtv;
+Kf   = ff.*kf.*thtf;
+
+Cv   = ff.*(1-ff)./dd.^2.*kv.*thtv;
+Cf   = ff.*(1-ff)./dd.^2.*kf.*thtf;
+
+% Kv   = phi.*kv.'.*thtv;  % momentum flux coefficients
+% Kf   = phi.*kf.'.*thtf;  % volume flux coefficients
+% 
+% Cv   = phi.*(1-phi)./d.^2.*kv.'.*thtv;  % momentum transfer coefficients
+% Cf   = phi.*(1-phi)./d.^2.*kf.'.*thtf;  % volume transfer coefficients
+
+eta  = Kv./ff;     % effective viscosities
+Dv   = Kf./ff;     % effective volume diffusivities
+KD   = ff.^2./Cv;  % effective segregation coefficients
+zeta = ff.^2./Cf;  % effective compaction coefficients
 
 
 %% plot 2D projections of connectivities
@@ -103,25 +131,25 @@ ax(2) = axes(UN{[1,3]},'position',[axl+0*axw+0*ahs axb+1*axh+1*avs axw axh]);
 ax(3) = axes(UN{[1,3]},'position',[axl+0*axw+0*ahs axb+0*axh+0*avs axw axh]);
 axes(ax(1))
 for ip = 0:25:100
-    plot(phi(ip*np+(1:np),1),squeeze(Xphi(ip*np+(1:np),1,1)),'Color',cmap(1,:).*(1-ip/125).^1+[1 1 1].*(1-(1-ip/125).^1),'LineWidth',2); axis tight; box on; grid on; hold on;
-    plot(phi(ip*np+(1:np),1),squeeze(Xphi(ip*np+(1:np),1,2)),'Color',cmap(2,:).*(1-ip/125).^1+[1 1 1].*(1-(1-ip/125).^1)); axis tight; box on; grid on; hold on;
-    plot(phi(ip*np+(1:np),1),squeeze(Xphi(ip*np+(1:np),1,3)),'Color',cmap(3,:).*(1-ip/125).^1+[1 1 1].*(1-(1-ip/125).^1)); axis tight; box on; grid on; hold on;
+    plot(phi(ip*np+(1:np),1),squeeze(Xphi(1,1,ip*np+(1:np))),'Color',cmap(1,:).*(1-ip/125).^1+[1 1 1].*(1-(1-ip/125).^1),'LineWidth',2); axis tight; box on; grid on; hold on;
+    plot(phi(ip*np+(1:np),1),squeeze(Xphi(1,2,ip*np+(1:np))),'Color',cmap(2,:).*(1-ip/125).^1+[1 1 1].*(1-(1-ip/125).^1)); axis tight; box on; grid on; hold on;
+    plot(phi(ip*np+(1:np),1),squeeze(Xphi(1,3,ip*np+(1:np))),'Color',cmap(3,:).*(1-ip/125).^1+[1 1 1].*(1-(1-ip/125).^1)); axis tight; box on; grid on; hold on;
 end
 set(gca,FS{[1,2]},TL{:},'XDir','reverse')
 ylabel('solid connectivities',FS{[1,3]},TX{:})
 axes(ax(2))
 for ip = 0:25:100
-    plot(phi(ip*np+(1:np),1),squeeze(Xphi(ip*np+(1:np),2,1)),'Color',cmap(1,:).*(1-ip/125).^1+[1 1 1].*(1-(1-ip/125).^1)); axis tight; box on; grid on; hold on;
-    plot(phi(ip*np+(1:np),1),squeeze(Xphi(ip*np+(1:np),2,2)),'Color',cmap(2,:).*(1-ip/125).^1+[1 1 1].*(1-(1-ip/125).^1),'LineWidth',2); axis tight; box on; grid on; hold on;
-    plot(phi(ip*np+(1:np),1),squeeze(Xphi(ip*np+(1:np),2,3)),'Color',cmap(3,:).*(1-ip/125).^1+[1 1 1].*(1-(1-ip/125).^1)); axis tight; box on; grid on; hold on;
+    plot(phi(ip*np+(1:np),1),squeeze(Xphi(2,1,ip*np+(1:np))),'Color',cmap(1,:).*(1-ip/125).^1+[1 1 1].*(1-(1-ip/125).^1)); axis tight; box on; grid on; hold on;
+    plot(phi(ip*np+(1:np),1),squeeze(Xphi(2,2,ip*np+(1:np))),'Color',cmap(2,:).*(1-ip/125).^1+[1 1 1].*(1-(1-ip/125).^1),'LineWidth',2); axis tight; box on; grid on; hold on;
+    plot(phi(ip*np+(1:np),1),squeeze(Xphi(2,3,ip*np+(1:np))),'Color',cmap(3,:).*(1-ip/125).^1+[1 1 1].*(1-(1-ip/125).^1)); axis tight; box on; grid on; hold on;
 end
 set(gca,FS{[1,2]},TL{:},'XDir','reverse')
 ylabel('melt connectivities',FS{[1,3]},TX{:})
 axes(ax(3))
 for ip = 0:25:100
-    plot(phi(ip*np+(1:np),1),squeeze(Xphi(ip*np+(1:np),3,1)),'Color',cmap(1,:).*(1-ip/125).^1+[1 1 1].*(1-(1-ip/125).^1)); axis tight; box on; grid on; hold on;
-    plot(phi(ip*np+(1:np),1),squeeze(Xphi(ip*np+(1:np),3,2)),'Color',cmap(2,:).*(1-ip/125).^1+[1 1 1].*(1-(1-ip/125).^1)); axis tight; box on; grid on; hold on;
-    plot(phi(ip*np+(1:np),1),squeeze(Xphi(ip*np+(1:np),3,3)),'Color',cmap(3,:).*(1-ip/125).^1+[1 1 1].*(1-(1-ip/125).^1),'LineWidth',2); axis tight; box on; grid on; hold on;
+    plot(phi(ip*np+(1:np),1),squeeze(Xphi(3,1,ip*np+(1:np))),'Color',cmap(1,:).*(1-ip/125).^1+[1 1 1].*(1-(1-ip/125).^1)); axis tight; box on; grid on; hold on;
+    plot(phi(ip*np+(1:np),1),squeeze(Xphi(3,2,ip*np+(1:np))),'Color',cmap(2,:).*(1-ip/125).^1+[1 1 1].*(1-(1-ip/125).^1)); axis tight; box on; grid on; hold on;
+    plot(phi(ip*np+(1:np),1),squeeze(Xphi(3,3,ip*np+(1:np))),'Color',cmap(3,:).*(1-ip/125).^1+[1 1 1].*(1-(1-ip/125).^1),'LineWidth',2); axis tight; box on; grid on; hold on;
 end
 set(gca,FS{[1,2]},TL{:},'XDir','reverse')
 ylabel('vapour connectivities',FS{[1,3]},TX{:})
@@ -149,21 +177,22 @@ ax(1) = axes(UN{[1,3]},'position',[axl+0*axw+0*ahs axb+1*axh+1*avs axw axh]);
 ax(2) = axes(UN{[1,3]},'position',[axl+0*axw+0*ahs axb+0*axh+0*avs axw axh]);
 axes(ax(1))
 for ip = 0:25:100
-    semilogy(phi(ip*np+(1:np),1),eta(ip*np+(1:np),1),'Color',cmap(1,:).*(1-ip/125).^1+[1 1 1].*(1-(1-ip/125).^1),'LineWidth',1.5); axis tight; box on; grid on; hold on;
-    semilogy(phi(ip*np+(1:np),1),eta(ip*np+(1:np),2),'Color',cmap(2,:).*(1-ip/125).^1+[1 1 1].*(1-(1-ip/125).^1),'LineWidth',1.5); axis tight; box on; grid on; hold on;
-    semilogy(phi(ip*np+(1:np),1),eta(ip*np+(1:np),3),'Color',cmap(3,:).*(1-ip/125).^1+[1 1 1].*(1-(1-ip/125).^1),'LineWidth',1.5); axis tight; box on; grid on; hold on;
+    semilogy(phi(ip*np+(1:np),1),eta(1,ip*np+(1:np)),'Color',cmap(1,:).*(1-ip/125).^1+[1 1 1].*(1-(1-ip/125).^1),'LineWidth',1.5); axis tight; box on; grid on; hold on;
+    semilogy(phi(ip*np+(1:np),1),eta(2,ip*np+(1:np)),'Color',cmap(2,:).*(1-ip/125).^1+[1 1 1].*(1-(1-ip/125).^1),'LineWidth',1.5); axis tight; box on; grid on; hold on;
+    semilogy(phi(ip*np+(1:np),1),eta(3,ip*np+(1:np)),'Color',cmap(3,:).*(1-ip/125).^1+[1 1 1].*(1-(1-ip/125).^1),'LineWidth',1.5); axis tight; box on; grid on; hold on;
 end
 set(gca,FS{[1,2]},TL{:},'XDir','reverse')
 ylabel('effective viscosities [Pas]',FS{[1,3]},TX{:})
 axes(ax(2))
 for ip = 0:25:100
-    semilogy(phi(ip*np+(1:np),1),KD(ip*np+(1:np),1),'Color',cmap(1,:).*(1-ip/125).^1+[1 1 1].*(1-(1-ip/125).^1),'LineWidth',1.5); axis tight; box on; grid on; hold on;
-    semilogy(phi(ip*np+(1:np),1),KD(ip*np+(1:np),2),'Color',cmap(2,:).*(1-ip/125).^1+[1 1 1].*(1-(1-ip/125).^1),'LineWidth',1.5); axis tight; box on; grid on; hold on;
-    semilogy(phi(ip*np+(1:np),1),KD(ip*np+(1:np),3),'Color',cmap(3,:).*(1-ip/125).^1+[1 1 1].*(1-(1-ip/125).^1),'LineWidth',1.5); axis tight; box on; grid on; hold on;
+    semilogy(phi(ip*np+(1:np),1),KD(1,ip*np+(1:np)),'Color',cmap(1,:).*(1-ip/125).^1+[1 1 1].*(1-(1-ip/125).^1),'LineWidth',1.5); axis tight; box on; grid on; hold on;
+    semilogy(phi(ip*np+(1:np),1),KD(2,ip*np+(1:np)),'Color',cmap(2,:).*(1-ip/125).^1+[1 1 1].*(1-(1-ip/125).^1),'LineWidth',1.5); axis tight; box on; grid on; hold on;
+    semilogy(phi(ip*np+(1:np),1),KD(3,ip*np+(1:np)),'Color',cmap(3,:).*(1-ip/125).^1+[1 1 1].*(1-(1-ip/125).^1),'LineWidth',1.5); axis tight; box on; grid on; hold on;
 end
 set(gca,FS{[1,2]},TL{:},'XDir','reverse')
 ylabel('effective segregation coeffs. [m2/Pas]',FS{[1,3]},TX{:})
 xlabel('solid fraction',FS{[1,3]},TX{:})
+
 
 %% prepare axes/borders dimensions
 axh = 8;
@@ -204,7 +233,7 @@ labels = num2str(grids(2:end)');
 [x2, y2] = terncoords(grids, zeros(size(grids)), 1-grids);
 [x1, y1] = terncoords(zeros(size(grids)), 1-grids, grids);
 n = m-1;
-[X,Y]  =  terncoords(phi(:,1),phi(:,2),phi(:,3));
+[Xphi,Y]  =  terncoords(phi(:,1),phi(:,2),phi(:,3));
 tri    =  simpletri(np);
 
 
@@ -228,7 +257,7 @@ for i = 1:n
     plot3([x3(i+1),x1(n-i+2)],[y3(i+1),y1(n-i+2)],maxz.*ones(2,1),'k:','handlevisibility','off');
 end
 
-trisurf(tri,X,Y,Xphi(:,1,1));
+trisurf(tri,Xphi,Y,Xphi(:,1,1));
 caxis([0,1]); shading interp; view([0,90]);
 text(x3(2:end)+0.02,y3(2:end)-0.02,labels,FS{[1,3]},TX{:},HA{[1,2]},VA{[1,2]});
 text(x2(2:end)-0.00,y2(2:end)-0.02,labels,FS{[1,3]},TX{:},HA{[1,3]},VA{[1,4]});
@@ -264,7 +293,7 @@ for i = 1:n
     plot3([x3(i+1),x1(n-i+2)],[y3(i+1),y1(n-i+2)],maxz.*ones(2,1),'k:','handlevisibility','off');
 end
 
-trisurf(tri,X,Y,Xphi(:,1,2));
+trisurf(tri,Xphi,Y,Xphi(:,1,2));
 caxis([0,1]); shading interp; view([0,90]);
 text(x3(2:end)+0.02,y3(2:end)-0.02,labels,FS{[1,3]},TX{:},HA{[1,2]},VA{[1,2]});
 text(x2(2:end)-0.00,y2(2:end)-0.02,labels,FS{[1,3]},TX{:},HA{[1,3]},VA{[1,4]});
@@ -300,7 +329,7 @@ for i = 1:n
     plot3([x3(i+1),x1(n-i+2)],[y3(i+1),y1(n-i+2)],maxz.*ones(2,1),'k:','handlevisibility','off');
 end
 
-trisurf(tri,X,Y,Xphi(:,1,3));
+trisurf(tri,Xphi,Y,Xphi(:,1,3));
 caxis([0,1]); shading interp; view([0,90]);
 text(x3(2:end)+0.02,y3(2:end)-0.02,labels,FS{[1,3]},TX{:},HA{[1,2]},VA{[1,2]});
 text(x2(2:end)-0.00,y2(2:end)-0.02,labels,FS{[1,3]},TX{:},HA{[1,3]},VA{[1,4]});
@@ -336,7 +365,7 @@ for i = 1:n
     plot3([x3(i+1),x1(n-i+2)],[y3(i+1),y1(n-i+2)],maxz.*ones(2,1),'k:','handlevisibility','off');
 end
 
-trisurf(tri,X,Y,Xphi(:,2,1));
+trisurf(tri,Xphi,Y,Xphi(:,2,1));
 caxis([0,1]); shading interp; view([0,90]);
 text(x3(2:end)+0.02,y3(2:end)-0.02,labels,FS{[1,3]},TX{:},HA{[1,2]},VA{[1,2]});
 text(x2(2:end)-0.00,y2(2:end)-0.02,labels,FS{[1,3]},TX{:},HA{[1,3]},VA{[1,4]});
@@ -373,7 +402,7 @@ for i = 1:n
     plot3([x3(i+1),x1(n-i+2)],[y3(i+1),y1(n-i+2)],maxz.*ones(2,1),'k:','handlevisibility','off');
 end
 
-trisurf(tri,X,Y,Xphi(:,2,2));
+trisurf(tri,Xphi,Y,Xphi(:,2,2));
 caxis([0,1]); shading interp; view([0,90]); 
 text(x3(2:end)+0.02,y3(2:end)-0.02,labels,FS{[1,3]},TX{:},HA{[1,2]},VA{[1,2]});
 text(x2(2:end)-0.00,y2(2:end)-0.02,labels,FS{[1,3]},TX{:},HA{[1,3]},VA{[1,4]});
@@ -410,7 +439,7 @@ for i = 1:n
     plot3([x3(i+1),x1(n-i+2)],[y3(i+1),y1(n-i+2)],maxz.*ones(2,1),'k:','handlevisibility','off');
 end
 
-trisurf(tri,X,Y,Xphi(:,2,3));
+trisurf(tri,Xphi,Y,Xphi(:,2,3));
 caxis([0,1]); shading interp; view([0,90]); 
 text(x3(2:end)+0.02,y3(2:end)-0.02,labels,FS{[1,3]},TX{:},HA{[1,2]},VA{[1,2]});
 text(x2(2:end)-0.00,y2(2:end)-0.02,labels,FS{[1,3]},TX{:},HA{[1,4]},VA{[1,4]});
@@ -447,7 +476,7 @@ for i = 1:n
     plot3([x3(i+1),x1(n-i+2)],[y3(i+1),y1(n-i+2)],maxz.*ones(2,1),'k:','handlevisibility','off');
 end
 
-trisurf(tri,X,Y,Xphi(:,3,1));
+trisurf(tri,Xphi,Y,Xphi(:,3,1));
 caxis([0,1]); shading interp; view([0,90]);
 text(x3(2:end)+0.02,y3(2:end)-0.02,labels,FS{[1,3]},TX{:},HA{[1,2]},VA{[1,2]});
 text(x2(2:end)-0.00,y2(2:end)-0.02,labels,FS{[1,3]},TX{:},HA{[1,3]},VA{[1,4]});
@@ -484,7 +513,7 @@ for i = 1:n
     plot3([x3(i+1),x1(n-i+2)],[y3(i+1),y1(n-i+2)],maxz.*ones(2,1),'k:','handlevisibility','off');
 end
 
-trisurf(tri,X,Y,Xphi(:,3,2));
+trisurf(tri,Xphi,Y,Xphi(:,3,2));
 caxis([0,1]); shading interp; view([0,90]); 
 text(x3(2:end)+0.02,y3(2:end)-0.02,labels,FS{[1,3]},TX{:},HA{[1,2]},VA{[1,2]});
 text(x2(2:end)-0.00,y2(2:end)-0.02,labels,FS{[1,3]},TX{:},HA{[1,3]},VA{[1,4]});
@@ -521,7 +550,7 @@ for i = 1:n
     plot3([x3(i+1),x1(n-i+2)],[y3(i+1),y1(n-i+2)],maxz.*ones(2,1),'k:','handlevisibility','off');
 end
 
-trisurf(tri,X,Y,Xphi(:,3,3));
+trisurf(tri,Xphi,Y,Xphi(:,3,3));
 caxis([0,1]); shading interp; view([0,90]); 
 text(x3(2:end)+0.02,y3(2:end)-0.02,labels,FS{[1,3]},TX{:},HA{[1,2]},VA{[1,2]});
 text(x2(2:end)-0.00,y2(2:end)-0.02,labels,FS{[1,3]},TX{:},HA{[1,4]},VA{[1,4]});

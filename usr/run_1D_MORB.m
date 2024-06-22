@@ -5,7 +5,7 @@ clear; close all;
 run('./par_default')
 
 % set run parameters
-runID    =  '1D_MORB_6c';           % run identifier
+runID    =  '1D_MORB_kW';           % run identifier
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  200;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot results
@@ -26,7 +26,7 @@ dt       =  36;                  % initial time step [s]
 % set initial thermo-chemical state
 T0       =  1200;                % temperature top  layer [deg C]
 T1       =  T0;                  % temperature base layer [deg C]
-c0       =  [0.09    0.04    0.45    0.32    0.09    0.01    0.0030];  % components (maj comp, H2O) top  layer [wt] (will be normalised to unit sum!)
+c0       =  [0.09  0.06  0.46  0.28  0.10  0.01  0.0030];  % components (maj comp, H2O) top  layer [wt] (will be normalised to unit sum!)
 c1       =  c0;                  % components (maj comp, H2O) base layer [wt] (will be normalised to unit sum!)
 dcr      =  [0,0,0,0,0,0,0];
 dcg      =  [0,0,0,0,0,0,0];

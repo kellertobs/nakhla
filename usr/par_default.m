@@ -45,7 +45,7 @@ dr_trc   =  [0,0,0,0,0,0];       % trace elements random noise [wt ppm]
 dg_trc   =  [0,0,0,0,0,0];       % trace elements centred gaussian [wt ppm]
 
 % set thermo-chemical boundary parameters
-fractxtl =  1;                   % fractional crystallisation mode for 0-D (Nz=Nx=1)
+fractxtl =  0;                   % fractional crystallisation mode for 0-D (Nz=Nx=1)
 fractmlt =  0;                   % fractional melting mode for 0-D (Nz=Nx=1)
 fractres =  0.25;                % residual fraction for fractionation mode
 Ptop     =  125e6;               % top pressure [Pa]

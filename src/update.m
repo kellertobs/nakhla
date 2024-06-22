@@ -114,6 +114,7 @@ eII = (0.5.*(exx.^2 + ezz.^2 ...
 
 % update diffusion parameters
 W0  = (Vel./mean(Vel(:)+TINY))./4.*mean(abs(rho-mean(rho,2)).*g0.*(D/10)^2./eta,'all');
+wm0 = abs(wm(1:end-1,2:end-1)+wm(2:end,2:end-1))/2;
 wx0 = abs(wx(1:end-1,2:end-1)+wx(2:end,2:end-1))/2;
 wf0 = abs(wf(1:end-1,2:end-1)+wf(2:end,2:end-1))/2;
 Ra0 = W0.*D/10./(kT0./rho./cP);
@@ -122,12 +123,15 @@ Re0 = W0.*rho.*D/10./eta;
 if Nx==1 && Nz==1; kW = 0;
 elseif Nx==1
     [~,grdrhoz ] = gradient(rho(icz,icx),h);
-    kW = 10.^(-8+5.*exp(-mean(chi,2)/0.075)-1e1.*min(0,grdrhoz(2:end-1,2:end-1)./mean(rho,2)));
+    kW = (rho./1e3+max(0,-grdrhoz(2:end-1,2:end-1))).*g0.*h.^3./eta + kmin;
+    % kW = 10.^(-8+5.*exp(-mean(chi,2)/0.075)+1e1.*max(0,-grdrhoz(2:end-1,2:end-1)./mean(rho,2)));
 else              
-kW = eII.*(Delta_trb*h).^2 + kmin;                                         % turbulent eddy diffusivity
+    kW = eII.*(Delta_trb*h).^2 + kmin;                                         % turbulent eddy diffusivity
 end
-kwx = wx0.*Delta_sgr*dx0 + kmin;                                           % segregation diffusivity
-kwf = wf0.*Delta_sgr*df0 + kmin;                                           % segregation diffusivity
+kwm = wm0.*Delta_sgr.*dm + kmin;                                           % segregation diffusivity
+kwx = wx0.*Delta_sgr.*dx + kmin;                                           % segregation diffusivity
+kwf = wf0.*Delta_sgr.*df + kmin;                                           % segregation diffusivity
+km  = kwm.*mu ;                                                            % regularised melt  fraction diffusion 
 kx  = kwx.*chi;                                                            % regularised solid fraction diffusion 
 kf  = kwf.*phi;                                                            % regularised fluid fraction diffusion 
 ks  = kW/Prt.*rho.*cP./T;                                                  % regularised heat diffusion

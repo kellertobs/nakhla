@@ -20,14 +20,14 @@ h        =  D/N;                 % grid spacing (equal in both dimensions, do no
 
 % set model timing parameters
 Nt       =  1e4;                 % number of time steps to take
-tend     =  20*hr;               % end time for simulation [s]
+tend     =  12*hr;               % end time for simulation [s]
 dt       =  12;                  % initial time step [s]
 dtmax    =  12;                  % maximum time step [s]
 
 % set initial thermo-chemical state
-T0       =  1300;                % temperature top  layer [deg C]
+T0       =  1310;                % temperature top  layer [deg C]
 T1       =  T0;                  % temperature base layer [deg C]
-c0       =  [0.09    0.04    0.45    0.32    0.09    0.01    0.0030];  % components (maj comp, H2O) top  layer [wt] (will be normalised to unit sum!)
+c0       =  [0.09  0.06  0.46  0.28  0.10  0.01  0.0030];  % components (maj comp, H2O) top  layer [wt] (will be normalised to unit sum!)
 c1       =  c0;                  % components (maj comp, H2O) bot layer [wt] (will be normalised to unit sum!)
 dcr      =  [0,0,0,0,0,0,0,0];
 dcg      =  [0,0,0,0,0,0,0,0];

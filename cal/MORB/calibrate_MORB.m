@@ -305,7 +305,7 @@ cal_MORB_6c;  % read calibration file
 
 %                for  fay   ant  alb  san   dps  aug   ulv  mgt  ilm   hyp  fsl   qtz  wat
 cmp_mem_init  = [100     0     0     0     0     0     0     0     0     0     0     0     0     0
-                  21    74     6     0     0     0     0     0     0     0     0     0     0     0
+                  21    72     8     0     0     0     0     0     0     0     0     0     0     0
                    0     0    44     9     0    41     0     2     0     0     5     0     0     0
                    0     7    20    20     0    10    26     3     6     0     4     3     0     0
                    0     0     0    70     4     1    10     0     1     2     2    10     0     0
@@ -367,9 +367,9 @@ cal_MORB_6c;  % read calibration file
 % m0     = [T0_init.';A_init.';B_init.';r_init.';dT_init.';cmp_mem_init(:).*indmem(:);];
 
 % !!!  set MCMC parameters then Run Section to execute MCMC routine  !!!
-Niter           = 1e5;              % number of samples to take
+Niter           = 1e6;              % number of samples to take
 anneal.initstep = 0.1e-2;           % adjust step size to get reasonable acceptance ratio 20-30%
-anneal.levels   = 1;                % select number of annealing levels
+anneal.levels   = 3;                % select number of annealing levels
 anneal.burnin   = max(1,Niter/10);  % set length of initial burn-in sequence
 anneal.refine   = max(1,Niter/10);  % set length of final refinement sequence
 
@@ -441,7 +441,7 @@ PriorFunc = @(model) ProbFuncs('PriorFunc', model, mbnds, 'uniform');
 
 % set function to calculate likelihood of forward model
 % dhat --> likelihood 
-LikeFunc  = @(dhat,model) ProbFuncs('LikeFuncSimplex',dhat,data,sigma,0.05,5,max(Psl)*3,model,cal);
+LikeFunc  = @(dhat,model) ProbFuncs('LikeFuncSimplex',dhat,data,sigma,0.1,5,max(Psl)*3,model,cal);
 
 bestfit = m0;  % initialise bestfit from initial conditions
 

@@ -2,7 +2,7 @@
 init;
 
 % physical time stepping loop
-while time <= tend && step <= Nt && any(m(:)>1e-9) && ~any(cal.Tliq(:)-cal.Tsol(:)<=10) && ~any(c(:,:,end)>0.2,'all')
+while time <= tend && step <= Nt && any(m(:)>1e-9) && ~any(cal.Tliq(:)-cal.Tsol(:)<=10) && ~any(c(:,:,end)>0.25,'all')
     
     fprintf(1,'*****  step %d;  dt = %4.4e;  time = %4.4e [%s]\n\n',step,dt./TimeScale,time./TimeScale,TimeUnits);
     TTtime  = tic;
