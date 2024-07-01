@@ -42,6 +42,8 @@ chi    = max(0,min(1, x.*rho./rhox ));
 phi    = max(0,min(1, f.*rho./rhof ));
 mu     = max(0,min(1, m.*rho./rhom ));
 
+phix_mem = reshape(reshape(cx_mem/100.*rhox,Nz*Nx,cal.nmem)./cal.rhox0,Nz,Nx,cal.nmem);
+phix_mem = phix_mem./sum(phix_mem,3);
 
 % update lithostatic pressure
 if Nz==1; Pt    = (Pt + Ptop.*ones(size(Tp)) + Pchmb + Pcouple*P(2:end-1,2:end-1))/2; else
@@ -51,29 +53,38 @@ if Nz==1; Pt    = (Pt + Ptop.*ones(size(Tp)) + Pchmb + Pcouple*P(2:end-1,2:end-1
 end
 
 % update effective constituent sizes
-dx = dx0.*(1-chi).^0.5;
 dm = dm0.*(1-mu ).^0.5;
+dx = dx0.*(1-chi).^0.5;
 df = df0.*(1-phi).^0.5;
 
 % update pure phase viscosities
 etam   = reshape(Giordano08(reshape(cm_oxd_all,Nz*Nx,9),T(:)-273.15),Nz,Nx);
-etax   = cal.etax0 .* ones(size(chi)) .* exp(cal.Eax./(8.3145.*T)-cal.Eax./(8.3145.*(Tref+273.15)));
+etax0  = reshape(prod(cal.etax0(1:end-1).^reshape(phix_mem(:,:,1:end-1)+TINY,Nz*Nx,cal.nmem-1),2),Nz,Nx);
+etax   = etax0 .* ones(size(chi)) .* exp(cal.Eax./(8.3145.*T)-cal.Eax./(8.3145.*(Tref+273.15)));
 etaf   = cal.etaf0 .* ones(size(phi));
 
-% get permission weights
+% get coefficient contrasts
 kv = permute(cat(3,etax,etam,etaf),[3,1,2]);
+% kf = permute(cat(3,dx.^2./etax,dm.^2./etam,df.^2./etaf),[3,1,2]);
 Mv = permute(repmat(kv,1,1,1,3),[4,1,2,3])./permute(repmat(kv,1,1,1,3),[1,4,2,3]);
+% Mf = permute(repmat(kf,1,1,1,3),[4,1,2,3])./permute(repmat(kf,1,1,1,3),[1,4,2,3]);
 
+% get permission weights
 dd = max(1e-6,min(1-1e-6,permute(cat(3,dx ,dm ,df ),[3,1,2])));
 ff = max(1e-6,min(1-1e-6,permute(cat(3,chi,mu ,phi),[3,1,2])));
 FF = permute(repmat(ff,1,1,1,3),[4,1,2,3]);
 Sf = (FF./cal.BB).^(1./cal.CC);  Sf = Sf./sum(Sf,2);
 Xf = sum(cal.AA.*Sf,2).*FF + (1-sum(cal.AA.*Sf,2)).*Sf;
 
-% get momentum flux and coefficients
+% get momentum flux and transfer coefficients
 thtv = squeeze(prod(Mv.^Xf,2));
 Kv   = ff.*kv.*thtv;
-Cv   = ff.*(1-ff)./dd.^2.*kv.*thtv;
+Cv   = Kv.*(1-ff)./dd.^2;
+
+% get volume flux and transfer coefficients
+% thtf = squeeze(prod(Mf.^Xf,2));
+% Kf   = ff.*kf.*thtf;
+% Cf   = Kf.*(1-ff)./dd.^2;
 
 % get effective viscosity
 eta  = squeeze(sum(Kv,1)); if Nx==1; eta = eta.'; end
@@ -85,20 +96,17 @@ Ksgr_x = squeeze(Ksgr(1,:,:)) + TINY^2; if Nx==1; Ksgr_x = Ksgr_x.'; end
 Ksgr_m = squeeze(Ksgr(2,:,:)) + TINY^2; if Nx==1; Ksgr_m = Ksgr_m.'; end
 Ksgr_f = squeeze(Ksgr(3,:,:)) + TINY^2; if Nx==1; Ksgr_f = Ksgr_f.'; end
 
-% % effective mixture shear viscosity (Costa et al., 2009)
-% hh     = (1-cal.xi).*erf(sqrt(pi)./(2.*(1-cal.xi)).*(max(TINY^0.5,chi)./cal.chi_pck).*(1+(max(TINY^0.5,chi)./cal.chi_pck).^cal.gamma));
-% eta    = etam .* (1+(max(TINY^0.5,chi)./cal.chi_pck).^cal.delta) .* (1-hh).^-cal.Bchi .* max(TINY^0.5,1-phi).^-cal.Bphi;
-% 
-% % phase segregation coefficients
-% Ksgr_x = 2/9*dx^2./eta                                                                      ;
-% Ksgr_f = 2/9*df^2./eta + dx^2/cal.bf./cal.etaf0.*max(TINY^0.5,phi-cal.cf).^(cal.nf-1).*max(TINY^0.5,1-phi).^cal.mf;
-% Ksgr_m =                 dx^2/cal.bm./    etam .*max(TINY^0.5,mu -cal.cm).^(cal.nm-1).*max(TINY^0.5,1-mu ).^cal.mm;
-
 if ~calibrt % skip the following if called from calibration script
 
 % update velocity magnitude
-Vel = sqrt(((W(1:end-1,2:end-1)+W(2:end,2:end-1))/2).^2 ...
-         + ((U(2:end-1,1:end-1)+U(2:end-1,2:end))/2).^2);
+if Nx==1 && Nz==1; Vel = 0;
+elseif Nx==1
+    [grdrhox,grdrhoz] = gradient(rho(icz,icx),1);
+    Vel = (rho.*1e-4 + max(0,-grdrhoz(2:end-1,2:end-1))).*g0.*h.^2./eta;
+else
+    Vel = sqrt(((W(1:end-1,2:end-1)+W(2:end,2:end-1))/2).^2 ...
+             + ((U(2:end-1,1:end-1)+U(2:end-1,2:end))/2).^2);
+end
 
 % update velocity divergence
 Div_V = ddz(W(:,2:end-1),h) + ddx(U(2:end-1,:),h);                         % get velocity divergence
@@ -113,24 +121,17 @@ eII = (0.5.*(exx.^2 + ezz.^2 ...
        +     exz(1:end-1,2:end  ).^2+exz(2:end,2:end  ).^2)/4)).^0.5 + TINY;
 
 % update diffusion parameters
-W0  = (Vel./mean(Vel(:)+TINY))./4.*mean(abs(rho-mean(rho,2)).*g0.*(D/10)^2./eta,'all');
-wm0 = abs(wm(1:end-1,2:end-1)+wm(2:end,2:end-1))/2;
-wx0 = abs(wx(1:end-1,2:end-1)+wx(2:end,2:end-1))/2;
-wf0 = abs(wf(1:end-1,2:end-1)+wf(2:end,2:end-1))/2;
-Ra0 = W0.*D/10./(kT0./rho./cP);
-Re0 = W0.*rho.*D/10./eta;
-
 if Nx==1 && Nz==1; kW = 0;
 elseif Nx==1
-    [~,grdrhoz ] = gradient(rho(icz,icx),h);
-    kW = (rho./1e3+max(0,-grdrhoz(2:end-1,2:end-1))).*g0.*h.^3./eta + kmin;
+    kW = Vel.*Delta_cnv;
     % kW = 10.^(-8+5.*exp(-mean(chi,2)/0.075)+1e1.*max(0,-grdrhoz(2:end-1,2:end-1)./mean(rho,2)));
 else              
-    kW = eII.*(Delta_trb*h).^2 + kmin;                                         % turbulent eddy diffusivity
+    kW = (1-exp(-Re./10)).*eII.*(Delta_cnv).^2;                            % turbulent eddy diffusivity
 end
-kwm = wm0.*Delta_sgr.*dm + kmin;                                           % segregation diffusivity
-kwx = wx0.*Delta_sgr.*dx + kmin;                                           % segregation diffusivity
-kwf = wf0.*Delta_sgr.*df + kmin;                                           % segregation diffusivity
+kW  = (1./kmax + 1./kW).^-1 + kmin;
+kwm = abs(rhom-rho).*g0.*Ksgr_m.*Delta_sgr + kmin;                         % segregation diffusivity
+kwx = abs(rhox-rho).*g0.*Ksgr_x.*Delta_sgr + kmin;                         % segregation diffusivity
+kwf = abs(rhof-rho).*g0.*Ksgr_f.*Delta_sgr + kmin;                         % segregation diffusivity
 km  = kwm.*mu ;                                                            % regularised melt  fraction diffusion 
 kx  = kwx.*chi;                                                            % regularised solid fraction diffusion 
 kf  = kwf.*phi;                                                            % regularised fluid fraction diffusion 
@@ -144,9 +145,16 @@ eta    = 1./(1./etamax + 1./eta) + etamin;
 etaco  = (eta(icz(1:end-1),icx(1:end-1)).*eta(icz(2:end),icx(1:end-1)) ...
        .* eta(icz(1:end-1),icx(2:end  )).*eta(icz(2:end),icx(2:end  ))).^0.25;
 
-Ra  = Vel.*D/10./((kT0+ks.*T)./rho./cP);
-Re  = Vel.*D/10./( eta       ./rho    );
-Ru  = abs(wx(1:end-1,2:end-1)+wx(2:end,2:end-1))/2./Vel;
+% update dimensionless numbers
+Ra     = Vel.*D/10./((kT0+ks.*T)./rho./cP);
+Re     = Vel.*D/10./( eta       ./rho    );
+Rum    = abs(wm(1:end-1,2:end-1)+wm(2:end,2:end-1))/2./Vel;
+Rux    = abs(wx(1:end-1,2:end-1)+wx(2:end,2:end-1))/2./Vel;
+Ruf    = abs(wf(1:end-1,2:end-1)+wf(2:end,2:end-1))/2./Vel;
+Pr     = (eta./rho)./((kT0+ks.*T)./rho./cP);
+Sc     = (eta./rho)./( kc                 );
+deltam = sqrt(mu .*Ksgr_m.*eta./(1-chi));
+deltaf = sqrt(phi.*Ksgr_f.*eta./(1-chi));
 
 % update stresses
 txx = eta   .* exx;                                                        % x-normal stress

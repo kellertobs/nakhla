@@ -107,8 +107,9 @@ cal.rhox0   = [3210,4060,2680,2600,2560,3210,3460,3930,4760,4720,3300,3660,2540,
 cal.rhof0   = 1000;                 % fluid ref density [kg/m3]
 
 % specify three-phase coefficient model parameters
-cal.etax0 = 1e18;                   % solid reference viscosity [Pas]
-cal.etaf0 = 1e-1;                   % vapour reference viscosity [Pas]
+%             for  fay  ant  alb  san  dps  aug  ulv  mgt  ilm  ens  fsl  qtz  wat
+cal.etax0 = [1e19,1e18,1e17,1e17,1e17,1e20,1e20,1e16,1e16,1e16,1e20,1e20,1e17,1e0]; % mem ref viscosities [Pas]
+cal.etaf0 = 0.1;                  % fluid viscosity constant [Pas]
 cal.Eax   = 300e3;                  % solid viscosity activation energy [J/mol]
 cal.AA    =[ 0.65, 0.25, 0.35; ...  % permission slopes
              0.20, 0.20, 0.20; ...  % generally numbers between 0 and 1
@@ -122,14 +123,6 @@ cal.CC    =[[0.30, 0.30, 0.40]*0.7; ... % permission step widths
             [0.52, 0.40, 0.08]*1.1; ... % square brackets sum to 1, sets angle of step functions
             [0.15, 0.25, 0.60]*0.7; ];  % factor increases width of step functions
 
-% specify mixture viscosity parameters (Costa et al., 2009)
-cal.Bphi    = 2.0;                  % Einstein-Roscoe powerlaw coefficient bubbles
-cal.Bchi    = 2.0;                  % Einstein-Roscoe powerlaw coefficient crystals
-cal.chi_pck = 0.60;                 % rheologically critical crystal fraction
-cal.gamma   = 2.50;                 % step-function steepness coefficient
-cal.delta   = 27;                   % solid viscosity melt-weakening slope
-cal.xi      = 4.5e-4;               % solid viscosity level
-cal.etaf0   = 0.1;                  % fluid viscosity constant
 
 % specify segregation coefficient parameters
 cal.bm      = 50;                   % melt permeability geometric factor (k0 = dx^2/bm)

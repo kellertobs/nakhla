@@ -198,7 +198,7 @@ Wf  = W;  Uf  = U;
 Wx  = W;  Ux  = U;
 Wm  = W;  Um  = U;
 
-eIIref = 1e-6;  
+Re     = TINY;  
 Div_V  = 0.*Tp;  advn_rho = 0.*Tp;  drhodt = 0.*Tp;  drhodto = drhodt;
 exx    = 0.*Tp;  ezz = 0.*Tp;  exz = zeros(Nz-1,Nx-1);  eII = 0.*Tp;  
 txx    = 0.*Tp;  tzz = 0.*Tp;  txz = zeros(Nz-1,Nx-1);  tII = 0.*Tp; 
