@@ -97,8 +97,8 @@ cal.r  =  [26.2  55.4  15.2  9.6  6.3  9.6];
 cal.c0 = [0.30  0.33  0.09  0.21  0.04  0.03  0.00];
 
 % specify melting point dependence on H2O
-cal.dTH2O   = 1400;                 % solidus shift from water content [K/wt^pH2O]
-cal.pH2O    = 0.75;                 % solidus shift from water content [K/wt^pH2O]
+cal.dTH2O   = [1400,1400,1400,1400,1400,1400];  % solidus shift from water content [K/wt^pH2O]
+cal.pH2O    = 0.75;                             % solidus shift from water content [K/wt^pH2O]
 
 % specify geochemical model parameters
 cal.ntrc    = 6;                    % number of trace elements
@@ -111,7 +111,8 @@ cal.rhox0   = [3270,4390,3270,3600,3200,3250,3450,2690,2570,4750,4950,2650,1000]
 cal.rhof0   = 500;                  % fluid reference density [kg/m3]
 
 % specify three-phase coefficient model parameters
-cal.etax0 = 1e19;                   % solid reference viscosity [Pas]
+%             for  fay  ens  hyp  tdp  dps  pig  ant  alb  ams  ulv  qtz  wat
+cal.etax0 = [1e18,1e18,1e19,1e19,1e19,1e20,1e20,1e17,1e17,1e16,1e16,1e17,1e0]; % mem ref viscosities [Pas]
 cal.etaf0 = 1e-1;                   % vapour reference viscosity [Pas]
 cal.Eax   = 300e3;                  % solid viscosity activation energy [J/mol]
 cal.AA  =  [ 0.65, 0.25, 0.35; ...  % permission slopes

@@ -87,7 +87,7 @@ Cv   = Kv.*(1-ff)./dd.^2;
 % Cf   = Kf.*(1-ff)./dd.^2;
 
 % get effective viscosity
-eta  = squeeze(sum(Kv,1)); if Nx==1; eta = eta.'; end
+eta0 = squeeze(sum(Kv,1)); if Nx==1; eta0 = eta0.'; end
 
 % get segregation cofficients
 Ksgr   = ff./Cv;
@@ -102,7 +102,7 @@ if ~calibrt % skip the following if called from calibration script
 if Nx==1 && Nz==1; Vel = 0;
 elseif Nx==1
     [grdrhox,grdrhoz] = gradient(rho(icz,icx),1);
-    Vel = (rho.*1e-4 + max(0,-grdrhoz(2:end-1,2:end-1))).*g0.*h.^2./eta;
+    Vel = rho.*1e-6.*(1 + 1e3*(1+tanh(-grdrhoz(2:end-1,2:end-1)-5))/2).*g0.*Delta_cnv.^2./eta;
 else
     Vel = sqrt(((W(1:end-1,2:end-1)+W(2:end,2:end-1))/2).^2 ...
              + ((U(2:end-1,1:end-1)+U(2:end-1,2:end))/2).^2);
@@ -124,20 +124,20 @@ eII = (0.5.*(exx.^2 + ezz.^2 ...
 if Nx==1 && Nz==1; kW = 0;
 elseif Nx==1
     kW = Vel.*Delta_cnv;
-    % kW = 10.^(-8+5.*exp(-mean(chi,2)/0.075)+1e1.*max(0,-grdrhoz(2:end-1,2:end-1)./mean(rho,2)));
+%     kW = 10.^(-8+5.*exp(-mean(chi,2)/0.075)+1e1.*max(0,-grdrhoz(2:end-1,2:end-1)./mean(rho,2)));
 else              
-    kW = (1-exp(-Re./10)).*eII.*(Delta_cnv).^2;                            % turbulent eddy diffusivity
+    kW = (1-exp(-Re./10)).*eII.*Delta_cnv.^2;                            % turbulent eddy diffusivity
 end
 kW  = (1./kmax + 1./kW).^-1 + kmin;
 kwm = abs(rhom-rho).*g0.*Ksgr_m.*Delta_sgr + kmin;                         % segregation diffusivity
 kwx = abs(rhox-rho).*g0.*Ksgr_x.*Delta_sgr + kmin;                         % segregation diffusivity
 kwf = abs(rhof-rho).*g0.*Ksgr_f.*Delta_sgr + kmin;                         % segregation diffusivity
-km  = kwm.*mu ;                                                            % regularised melt  fraction diffusion 
-kx  = kwx.*chi;                                                            % regularised solid fraction diffusion 
-kf  = kwf.*phi;                                                            % regularised fluid fraction diffusion 
+km  = (kwm+kW).*mu ;                                                            % regularised melt  fraction diffusion 
+kx  = (kwx+kW).*chi;                                                            % regularised solid fraction diffusion 
+kf  = (kwf+kW).*phi;                                                            % regularised fluid fraction diffusion 
 ks  = kW/Prt.*rho.*cP./T;                                                  % regularised heat diffusion
 kc  = kW/Sct;                                                              % regularised component diffusion
-eta = kW.*rho + eta;                                                       % regularised momentum diffusion
+eta = (kW.*rho + eta0)/2 + eta/2;                                                       % regularised momentum diffusion
 
 etamax = etacntr.*max(min(eta(:)),etamin);
 eta    = 1./(1./etamax + 1./eta) + etamin;

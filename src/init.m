@@ -229,6 +229,7 @@ fq     = zeros(size(Tp));  mq = ones(size(Tp))/2;  xq = 1-mq-fq;
 cmq    = c; cxq = c;  cfq = 0.*c;  cfq(:,:,end) = 1;  cf = cfq;
 cm_oxd = reshape(reshape(c,Nz*Nx,cal.ncmp)*cal.cmp_oxd,Nz,Nx,cal.noxd);
 cm_oxd_all(:,:,cal.ioxd) = cm_oxd;
+eta    = ones(Nz,Nx);
 
 % get volume fractions and bulk density
 step    = 0;
