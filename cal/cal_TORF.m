@@ -14,7 +14,7 @@ cal.oxdStr = {'SiO$_2$','TiO$_2$','Al$_2$O$_3$','FeO','MgO','CaO','Na$_2$O','K$_
      elStr = {'Si','Ti','Al','Fe','Mg','Ca','Na','K','H'};
 cal.memStr = {'for','fay','dps','aug','ant','alb','san','ulv','mgt','ilm','hyp','fsl','qtz','wat'};
 cal.msyStr = {'olv','cxp','fsp','spn','opx','qtz'};
-cal.cmpStr = {'dun','ogb','fbs','tra','rhy','vol'}; % need changes? 
+cal.cmpStr = {'dun','ogb','fbs','tra','rhy','vol'};
 
 for i = 1:cal.ncmp; cal.(cal.cmpStr{i}) = i; end
 for i = 1:cal.nmsy; cal.(cal.msyStr{i}) = i; end

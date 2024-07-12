@@ -27,7 +27,7 @@ LO = {'Location','bestoutside'};
 
 % load MAGEMin results (window with table opens, using default selection
 % click Import Selection => Import Data
-filename = '/Users/tokeller/Documents/Research/nakhla/cal/TORF/BAR_VEI_AVG_MI_OLV5_frac25_ig.csv';
+filename = './BAR_VEI_AVG_MI_OLV5_frac25_ig.csv';
 uiopen(filename,1)
 
 % Tsol, Tliq at selected P,X0 as additional constraint
