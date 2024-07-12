@@ -59,12 +59,45 @@ if level>0
     sgtitle('Pseudo-component evolution',FL{:},TX{:})
     drawnow
 
+    figno = 105;
+    % plot fitted mineral system compositions
+    kmem = 1;
+    figure(figno); clf; figno = figno+1;
+
+    spz = ceil(sqrt(cal.nmsy-1));
+    spx = ceil((cal.nmsy-1)/spz);
+
+    kk = 1;
+    for ix = 1:spx
+        for iz = 1:spz
+            if kk<=cal.nmsy
+                subplot(spz,spx,kk);
+                for iem = kmem:kmem+sum(cal.msy_mem(kk,:))-1
+                    p(iem) = plot(Tmp, SOL_mem   (:,iem),'-' ,'Color',cmap(iem-kmem+1,:),'LineWidth',1.5); axis tight; hold on
+                    plot(Tmp, SOL_memfit(:,iem),'--','Color',cmap(iem-kmem+1,:),'LineWidth',1.5);
+                end
+                if kk==cal.nmsy; legend([{'proj.'},{'fit'}],Fs{:},TX{:},LB{:}); 
+                else; legend(p(kmem:kmem+sum(cal.msy_mem(kk,:))-1),cal.memStr{kmem:kmem+sum(cal.msy_mem(kk,:))-1},Fs{:},TX{:},LB{:});
+                end
+                xlabel('Temperature [$^\circ$C]',FS{:},TX{:})
+                ylabel(cal.msyStr(kk),FS{:},TX{:})
+                set(gca,Fs{:},TL{:});
+                kmem = kmem+sum(cal.msy_mem(kk,:));
+                kk = kk+1;
+            else
+                break;
+            end
+        end
+    end
+    sgtitle(['Mineral endm. MCMC fit'],FL{:},TX{:});
+    drawnow
+    
 end
 
 if level>1
 
     % plot fitted liquid, solid, mixture compositions
-    figure(105); clf;
+    figure(106); clf;
 
     spz = ceil(sqrt(noxd-1));
     spx = ceil((noxd-1)/spz);
@@ -97,9 +130,8 @@ if level>1
     sgtitle('MLT \& SOL MCMC fit',FL{:},TX{:})
     drawnow
 
-
     % plot fitted T-X diagrams
-    figure(106); clf; 
+    figure(107); clf; 
 
     spz = ceil(sqrt(noxd));
     spx = ceil((noxd)/spz);
@@ -136,7 +168,8 @@ end
 
 if level>2
 
-    figno = 107;
+
+    figno = 108;
     % plot fitted mineral system compositions
     kmem = 1;
     for iph=2:nphs-1
@@ -184,6 +217,7 @@ if level>2
     r       = round(r_best,1)           % => cal.r
     dTH2O   = round(dT_best,0)          % => cal.dTH2O
     c0      = round([SYS_cmp(  1,1:end-1)./sum(SYS_cmp(  1,1:end-1),2),SYS_cmp(1,end)],3) % => cal.c0
-    c1      = round([SYS_cmp(end,1:end-1)./sum(SYS_cmp(end,1:end-1),2),SYS_cmp(1,end)],3) % => cal.c1
-
+    c1      = round(mean([SYS_cmp(end-4:end,1:end-1)./sum(SYS_cmp(end-4:end,1:end-1),2),SYS_cmp(end-4:end,end)],1),3) % => cal.c1
+    c0_oxd  = round([SYS_oxd(  1,1:end-1)./sum(SYS_oxd(  1,1:end-1),2),SYS_oxd(1,end)/100]*100,1) % => cal.c0
+    c1_oxd  = round(mean([SYS_oxd(end-4:end,1:end-1)./sum(SYS_oxd(end-4:end,1:end-1),2),SYS_oxd(end-4:end,end)/100],1)*100,1) % => cal.c1
 end

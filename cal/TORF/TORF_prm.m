@@ -1,0 +1,2 @@
+title; comments; db; sysUnit; oxide; frac; frac2
+TORF_primary;Torfajokull data, VP;ig;wt;[SiO2, TiO2, Al2O3, FeO, MgO, CaO, Na2O, K2O, H2O, O, Cr2O3];[48.96, 1.00, 14.52, 9.76, 10.71, 13.08, 1.87, 0.10, 0.50, 0.18, 0.00];

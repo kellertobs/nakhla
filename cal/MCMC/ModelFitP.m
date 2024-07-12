@@ -48,7 +48,7 @@ var.c      = SYS_cmpfit;        % component fractions [wt]
 var.T      = T;             % temperature [C]
 var.P      = P/10;         % pressure [GPa]
 var.H2O    = SYS_cmpfit(:,end); % water concentration [wt]
-cal.H2Osat = MLT(:,end)/100+0.001;
+cal.H2Osat = MLT(:,end)/100 + 0.0;
 [var,cal]  = meltmodel(var,cal,'E');
 
 % get fitted phase oxide compositions
@@ -69,7 +69,7 @@ PHS_oxdfit = PHS_oxdfit.*(PHS>0);
 % get fitted phase fractions
 PHS_frcfit = zeros(size(PHS));
 PHS_frcfit(:,1) = var.m*100;
-PHS_frcfit(:,2:end) = SOL_memfit*cal.msy_mem.'.*(1-PHS_frcfit(:,1)/100);
+PHS_frcfit(:,2:end) = SOL_memfit*cal.msy_mem.';%.*(1-PHS_frcfit(:,1)/100);
 
 % get solidus and liquidus at starting composition
 cal = rmfield(cal,{'Tsol' 'Tliq'});
@@ -89,7 +89,7 @@ Tm      = cal.Tm;
 % get solidus and liquidus at end composition
 cal = rmfield(cal,{'Tsol' 'Tliq'});
 var.m = ones(size(Psl))/2; var.x = var.m; var.f = 0*var.m;
-var.c      = repmat(SYS_cmpfit(end,:).*[ones(1,cal.ncmp-1),0]./sum(SYS_cmpfit(end,1:end-1),2),length(Psl),1);
+var.c      = repmat(mean(SYS_cmpfit(end-4:end,:).*[ones(1,cal.ncmp-1),0]./sum(SYS_cmpfit(end-4:end,1:end-1),2),1),length(Psl),1);
 var.P      = Psl(:)/10;                             % pressure [GPa]
 var.T      = 1000+Psl(:)*5e-8;                      % temperature [C]
 var.H2O    = 0*var.c(1,end)+Psl(:)*0;               % water concentration [wt]

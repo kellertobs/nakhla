@@ -167,7 +167,7 @@ end
 
 var.H2Om = max(0,min(cal.H2Osat, var.H2O./(var.m+1e-16) ));
 var.cf   = zeros(size(var.c)); var.cf(:,cal.ncmp) = 1;
-var.f    = max(0,min(var.H2O, var.H2O - var.m.*var.H2Om ));
+var.f    = max(0,min(var.H2O, var.H2O - cal.H2Osat ));
 var.m    = max(0,min(1-var.f,var.m));
 var.x    = max(0,min(1,1-var.m-var.f));
 
@@ -175,36 +175,56 @@ rnorm     = 1;     % initialize residual norm for iterations
 n         = 0;     % initialize iteration count
 its_tol   = 100;   % maximum number of iterations
 flag.eql  = 1;     % tells us whether the Newton solver converged
-mi        = var.m;
+upd_m     = 0*var.m;
+eps       = 1e-3;
 
 while rnorm > cal.tol     % Newton iteration
-    mii = mi; mi = var.m; 
 
     %***  get residual of unity sum of components
-    [var,cal] = meltmodel(var,cal,'K');
-    r    = sum( (var.c.*(1-cal.Kx)   )./(cal.Kx + (1-cal.Kx).*var.m + (cal.Kf-cal.Kx).*var.f + 1e-16)   ,2);
+    [var,cal]   = meltmodel(var,cal,'K');
+    r           = sum( (var.c.*(1-cal.Kx)   )./(cal.Kx + (1-cal.Kx).*var.m + (cal.Kf-cal.Kx).*var.f + 1e-32)   ,2);
 
-    %***  get analytical derivative of residual dr/dm
-    drdm = sum(-(var.c.*(1-cal.Kx).^2)./(cal.Kx + (1-cal.Kx).*var.m + (cal.Kf-cal.Kx).*var.f + 1e-16).^2,2);
+    % %***  get analytical derivative of residual dr/dm
+    % drdm_a    = sum(-(var.c.*(1-cal.Kx).^2)./(cal.Kx + (1-cal.Kx).*var.m + (cal.Kf-cal.Kx).*var.f + 1e-32).^2,2);
+
+    %*** get numerical derivative of residual dr/dm
+    varp        = var;
+    varp.m      = var.m+eps;
+    varp.H2Om   = max(0,min(cal.H2Osat, varp.H2O./(varp.m+1e-32) ));
+    varp.f      = max(0,min(varp.H2O, varp.H2O - varp.m.*cal.H2Osat));
+    [varp,calp] = meltmodel(varp,cal,'K');
+    rp          = sum( (varp.c.*(1-calp.Kx)   )./(calp.Kx + (1-calp.Kx).*varp.m + (calp.Kf-calp.Kx).*varp.f + 1e-32)   ,2);
+
+    varm        = var;
+    varm.m      = var.m-eps;
+    varm.H2Om   = max(0,min(cal.H2Osat, varm.H2O./(varm.m+1e-32) ));
+    varm.f      = max(0,min(varm.H2O, varm.H2O - varm.m.*cal.H2Osat));
+    [varm,calm] = meltmodel(varm,cal,'K');
+    rm          = sum( (varm.c.*(1-calm.Kx)   )./(calm.Kx + (1-calm.Kx).*varm.m + (calm.Kf-calm.Kx).*varm.f + 1e-32)   ,2);
+
+    drdm_n      = (rp-rm)./2/eps;
 
     %***  apply Newton correction to crystal fraction x
-    var.m = max(0,min(1, var.m - r./drdm/4 + (mi-mii)/4 ));
+    upd_m = -r./drdm_n/4;
+    upd_m = max(-var.m/2,min((1-var.m)/2, upd_m ));
+    var.m = max(0,min(1, var.m + upd_m ));
 
     %***  get droplet fraction f
-    var.H2Om = max(0,min(cal.H2Osat, var.H2O./(var.m+1e-16) ));
-    var.f    = max(0,min(var.H2O, var.H2O - var.m.*var.H2Om ));
-    
+    var.H2Om = max(0,min(cal.H2Osat, var.H2O./(var.m+1e-32) ));
+    var.f    = max(0,min(var.H2O, var.H2O - var.m.*cal.H2Osat));
+
     %***  get crystal fraction x
-    var.x  = max(0,min(1, 1-var.m-var.f ));
+    var.x     = max(0,min(1, 1-var.m-var.f ));
     
     %***  get non-linear residual norm
-    rnorm  = norm(var.m-mi,2)/sqrt(length(var.m(:)));
+    rnorm  = norm(upd_m,2)/norm(ones(size(upd_m)),2);
 
     n  =  n+1;  % update iteration count
     if (n==its_tol)
         disp(['!!! Newton equilibrium solver not converged after ',num2str(its_tol),' iterations !!!']);
         flag.eql = 0; break;
     end
+
 end
 
 var.cm = max(0,min(1, var.c        ./(var.m + var.x.*cal.Kx + var.f.*cal.Kf + 1e-16) ));
