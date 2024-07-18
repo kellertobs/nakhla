@@ -38,7 +38,7 @@ bnd_w     =  0.1;                 % boundary layer width [m]
 tau_T     =  bnd_w^2/1e-6;        % wall cooling/assimilation time [s]
 Twall     =  [300,300,nan];       % [top,bot,sds] wall rock temperature [degC] (nan = insulating)
 cwall     =  nan(3,6);
-Ptop      =  2.0e8;               % top pressure [Pa]
+Ptop      =  1.5e8;               % top pressure [Pa]
 fin       =  0;
 fout      =  1;
 
