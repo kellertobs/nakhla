@@ -176,7 +176,7 @@ n         = 0;     % initialize iteration count
 its_tol   = 100;   % maximum number of iterations
 flag.eql  = 1;     % tells us whether the Newton solver converged
 upd_m     = 0*var.m;
-eps       = 1e-3;
+eps       = 1e-12;
 
 while rnorm > cal.tol     % Newton iteration
 

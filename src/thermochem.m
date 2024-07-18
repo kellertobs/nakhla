@@ -157,8 +157,8 @@ Kx      = reshape(cal.Kx,Nz,Nx,cal.ncmp);
 Kf      = reshape(cal.Kf,Nz,Nx,cal.ncmp);
 subsol  = m<=1e-9 & T<=reshape(cal.Tsol+273.15,Nz,Nx);
 supliq  = x<=1e-9 & T>=reshape(cal.Tliq+273.15,Nz,Nx);
-subsolc = repmat(subsol,1,1,7);
-supliqc = repmat(supliq,1,1,7);
+subsolc = repmat(subsol,1,1,cal.ncmp);
+supliqc = repmat(supliq,1,1,cal.ncmp);
 rnorm   = 1;  tol  = atol*10;
 it      = 1;  mxit = 100;
 while rnorm>tol && it<mxit

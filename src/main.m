@@ -77,7 +77,7 @@ while time <= tend && step <= Nt && any(m(:)>1e-9) && ~any(cal.Tliq(:)-cal.Tsol(
 
     % fractionate mode for 0D-models
     if fractxtl && Nx==1 && Nz==1
-        x = min(x,fractres); SUM = x+m+f;
+        x = min(x,fractres); f = 0; SUM = x+m+f;
         x = x./SUM;  m = m./SUM;  f = f./SUM;
         X = x.*RHO;  M = m.*RHO;  F = f.*RHO;
         c = x.*cx + m.*cm + f.*cf;
