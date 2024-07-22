@@ -1,4 +1,4 @@
-function [datafit,MLT_oxdfit,SOL_oxdfit,SYS_oxdfit,SOL_memfit,PHS_oxdfit,PHS_frcfit,SOL_cmpfit,MLT_cmpfit,SYS_cmpfit,Tsolfit,Tliqfit,Tm] = ModelFitP(model,T,P,MLT,SOL,SYS,PHS,Psl,cal,reg)
+function [datafit,MLT_oxdfit,SOL_oxdfit,SYS_oxdfit,SOL_memfit,PHS_oxdfit,PHS_frcfit,SOL_cmpfit,MLT_cmpfit,SYS_cmpfit,Tsolfit,Tliqfit,Tm] = ModelFitP(model,T,P,SYS,PHS,Psl,cal,reg)
 
 % get number of data points
 np = length(T);
@@ -45,10 +45,11 @@ SYS_oxdfit = SYS_cmpfit*cmp_oxd;
 % get local phase equilibrium
 var.m = ones(np,1)/2; var.x = var.m; var.f = 0*var.m;
 var.c      = SYS_cmpfit;        % component fractions [wt]
+var.X      = var.c*cal.cmp_oxd; % melt oxide fractions [wt %]
 var.T      = T;             % temperature [C]
 var.P      = P/10;         % pressure [GPa]
 var.H2O    = SYS_cmpfit(:,end); % water concentration [wt]
-cal.H2Osat = MLT(:,end)/100 + 0.0;
+cal.H2Osat = fluidsat(var);
 [var,cal]  = meltmodel(var,cal,'E');
 
 % get fitted phase oxide compositions
@@ -76,10 +77,10 @@ cal = rmfield(cal,{'Tsol' 'Tliq'});
 Psl = Psl(1:end/2);
 var.m = ones(size(Psl))/2; var.x = var.m; var.f = 0*var.m;
 var.c      = repmat(SYS_cmpfit(1,:).*[ones(1,cal.ncmp-1),0]./sum(SYS_cmpfit(1,1:end-1),2),length(Psl),1);
-var.P      = Psl/10;                             % pressure [GPa]
-var.T      = 1000+Psl(:)*5e-8;                      % temperature [C]
-var.H2O    = 0*var.c(1,end)+Psl(:)*0;               % water concentration [wt]
-cal.H2Osat = 0*MLT(1,end)/100+1e-6+Psl(:)*0;
+var.P      = Psl/10;                     % pressure [GPa]
+var.T      = 1000+Psl(:)*5e-8;           % temperature [C]
+var.H2O    = Psl(:)*0;                   % water concentration [wt]
+cal.H2Osat = Psl(:)*0;
 [~,cal]    = meltmodel(var,cal,'T');
 
 Tsolfit = cal.Tsol;
@@ -90,10 +91,10 @@ Tm      = cal.Tm;
 cal = rmfield(cal,{'Tsol' 'Tliq'});
 var.m = ones(size(Psl))/2; var.x = var.m; var.f = 0*var.m;
 var.c      = repmat(mean(SYS_cmpfit(end-4:end,:).*[ones(1,cal.ncmp-1),0]./sum(SYS_cmpfit(end-4:end,1:end-1),2),1),length(Psl),1);
-var.P      = Psl(:)/10;                             % pressure [GPa]
-var.T      = 1000+Psl(:)*5e-8;                      % temperature [C]
-var.H2O    = 0*var.c(1,end)+Psl(:)*0;               % water concentration [wt]
-cal.H2Osat = 0*MLT(1,end)/100+1e-6+Psl(:)*0;
+var.P      = Psl(:)/10;                  % pressure [GPa]
+var.T      = 1000+Psl(:)*5e-8;           % temperature [C]
+var.H2O    = Psl(:)*0;                   % water concentration [wt]
+cal.H2Osat = Psl(:)*0;
 [~,cal]    = meltmodel(var,cal,'T');
 
 Tsolfit = [Tsolfit;cal.Tsol];

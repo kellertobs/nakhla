@@ -503,31 +503,66 @@ else % create 2D plots
 
 end
 
-% plot phase diagram
+
+% plot T-X phase diagram in component space
 if ~exist('fh9','var'); fh9 = figure(VIS{:});
 else; set(0, 'CurrentFigure', fh9);
 end
 if Nz>1; clf; end
+for i=1:min(6,cal.ncmp)
+subplot(3,2,i)
+if i<cal.ncmp
+    plot( c(:,:,i)./sum( c(:,:,1:end-1),3)*100,T-273.15,'k.','LineWidth',2,'MarkerSize',15); axis tight; box on; hold on;
+    plot(cx(:,:,i)./sum(cx(:,:,1:end-1),3)*100,T-273.15,'b.','LineWidth',2,'MarkerSize',15);
+    plot(cm(:,:,i)./sum(cm(:,:,1:end-1),3)*100,T-273.15,'r.','LineWidth',2,'MarkerSize',15);
+else
+    plot( c(:,:,i)*100,T-273.15,'k.','LineWidth',2,'MarkerSize',15); axis tight; box on; hold on;
+    plot(cx(:,:,i)*100,T-273.15,'b.','LineWidth',2,'MarkerSize',15);
+    plot(cm(:,:,i)*100,T-273.15,'r.','LineWidth',2,'MarkerSize',15);
+end
+xlabel([cal.cmpStr{i},' [wt \%]'],'Interpreter','latex','FontSize',12)
+set(gca,'TickLabelInterpreter','latex','FontSize',10)
+end
+
+if Nz>1
+subplot(3,2,2)
+text(-0.5,1.2,['time = ',num2str(time/TimeScale,3),' [',TimeUnits,']'],TX{:},FS{:},'Color','k','HorizontalAlignment','center','Units','normalized');
+end
+subplot(3,2,3)
+ylabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',15)
+
+
+% plot T-X phase diagram in oxide space
+if ~exist('fh10','var'); fh10 = figure(VIS{:});
+else; set(0, 'CurrentFigure', fh10);
+end
+if Nz>1; clf; end
 for i=1:cal.noxd
 subplot(3,3,i)
-plot( c_oxd(:,:,i)./sum( c_oxd(:,:,1:end-1),3)*100,T-273.15,'k.','LineWidth',2,'MarkerSize',15); axis tight; box on; hold on;
-plot(cx_oxd(:,:,i)./sum(cx_oxd(:,:,1:end-1),3)*100,T-273.15,'b.','LineWidth',2,'MarkerSize',15);
-plot(cm_oxd(:,:,i)./sum(cm_oxd(:,:,1:end-1),3)*100,T-273.15,'r.','LineWidth',2,'MarkerSize',15);
+if i<cal.ncmp
+    plot( c_oxd(:,:,i)./sum( c_oxd(:,:,1:end-1),3)*100,T-273.15,'k.','LineWidth',2,'MarkerSize',15); axis tight; box on; hold on;
+    plot(cx_oxd(:,:,i)./sum(cx_oxd(:,:,1:end-1),3)*100,T-273.15,'b.','LineWidth',2,'MarkerSize',15);
+    plot(cm_oxd(:,:,i)./sum(cm_oxd(:,:,1:end-1),3)*100,T-273.15,'r.','LineWidth',2,'MarkerSize',15);
+else
+    plot( c_oxd(:,:,i),T-273.15,'k.','LineWidth',2,'MarkerSize',15); axis tight; box on; hold on;
+    plot(cx_oxd(:,:,i),T-273.15,'b.','LineWidth',2,'MarkerSize',15);
+    plot(cm_oxd(:,:,i),T-273.15,'r.','LineWidth',2,'MarkerSize',15);
+end
 xlabel([cal.oxdStr{i},' [wt \%]'],'Interpreter','latex','FontSize',12)
 set(gca,'TickLabelInterpreter','latex','FontSize',10)
 end
 
 if Nz>1
 subplot(3,3,2)
-text(0.5,1.1,['time = ',num2str(time/TimeScale,3),' [',TimeUnits,']'],TX{:},FS{:},'Color','k','HorizontalAlignment','center','Units','normalized');
+text(0.5,1.2,['time = ',num2str(time/TimeScale,3),' [',TimeUnits,']'],TX{:},FS{:},'Color','k','HorizontalAlignment','center','Units','normalized');
 end
 subplot(3,3,4)
 ylabel('Temperature [$^\circ$C]','Interpreter','latex','FontSize',15)
 
 
 % plot composition on TAS, AFM diagrams
-if ~exist('fh10','var'); fh10 = figure(VIS{:});
-else; set(0, 'CurrentFigure', fh10);
+if ~exist('fh11','var'); fh11 = figure(VIS{:});
+else; set(0, 'CurrentFigure', fh11);
 end
 if Nz>1 || step==0 || frst; clf;
 TAS; axis tight; box on; hold on;
@@ -543,8 +578,9 @@ scatter(cmSi(:),cmNK(:),50,T(:)-273.15,'filled','o');
 scatter( cSi(:), cNK(:),80,T(:)-273.15,'filled','s');
 set(cb,TL{:},'FontSize',12); set(gca,TL{:},'FontSize',15); xlabel('SiO$_2$ [wt \%]',TX{:},'FontSize',15); ylabel('Na$_2$O + K$_2$O [wt \%]',TX{:},'FontSize',15);
 
-if ~exist('fh11','var'); fh11 = figure(VIS{:});
-else; set(0, 'CurrentFigure', fh11);
+
+if ~exist('fh12','var'); fh12 = figure(VIS{:});
+else; set(0, 'CurrentFigure', fh12);
 end
 if Nz>1 || step==0 || frst; clf;
 AFM; axis tight; box on; hold on;
@@ -565,8 +601,8 @@ set(cb,TL{:},'FontSize',12); set(gca,TL{:},'FontSize',15); xlabel('SiO$_2$ [wt \
 
 % plot model history
 if plot_cv
-    if ~exist('fh12','var'); fh12 = figure(VIS{:});
-    else; set(0, 'CurrentFigure', fh12); clf;
+    if ~exist('fh13','var'); fh13 = figure(VIS{:});
+    else; set(0, 'CurrentFigure', fh13); clf;
     end 
     subplot(3,1,1);
     plot(hist.time/TimeScale,hist.DM./hist.sumM,'k-',LW{:}); hold on; axis tight; box on;
@@ -579,8 +615,8 @@ if plot_cv
     ylabel('consv. $C$',TX{:},FS{:}); set(gca,TL{:},TS{:},'XTickLabel',[]);
     xlabel(['Time [',TimeUnits,']'],TX{:},FS{:});
 
-    if ~exist('fh13','var'); fh13 = figure(VIS{:});
-    else; set(0, 'CurrentFigure', fh13); clf;
+    if ~exist('fh14','var'); fh14 = figure(VIS{:});
+    else; set(0, 'CurrentFigure', fh14); clf;
     end 
     subplot(3,1,1);
     plot(hist.time/TimeScale,hist.EM,'k-',LW{:}); hold on; axis tight; box on;
@@ -606,9 +642,9 @@ if save_op && ~restart
         name = [opdir,'/',runID,'/',runID,'_cmp',num2str(floor(step/nop))];
         print(fh3,name,'-dpng','-r300','-image');
         name = [opdir,'/',runID,'/',runID,'_TAS',num2str(floor(step/nop))];
-        print(fh10,name,'-dpng','-r300','-image');
-        name = [opdir,'/',runID,'/',runID,'_AFM',num2str(floor(step/nop))];
         print(fh11,name,'-dpng','-r300','-image');
+        name = [opdir,'/',runID,'/',runID,'_AFM',num2str(floor(step/nop))];
+        print(fh12,name,'-dpng','-r300','-image');
     elseif Nx <= 10  % create 1D plots
         name = [opdir,'/',runID,'/',runID,'_sol_',num2str(floor(step/nop))];
         print(fh1,name,'-dpng','-r300','-image');
@@ -617,9 +653,9 @@ if save_op && ~restart
         name = [opdir,'/',runID,'/',runID,'_cmp_',num2str(floor(step/nop))];
         print(fh3,name,'-dpng','-r300','-image');
         name = [opdir,'/',runID,'/',runID,'_TAS',num2str(floor(step/nop))];
-        print(fh10,name,'-dpng','-r300','-image');
-        name = [opdir,'/',runID,'/',runID,'_AFM',num2str(floor(step/nop))];
         print(fh11,name,'-dpng','-r300','-image');
+        name = [opdir,'/',runID,'/',runID,'_AFM',num2str(floor(step/nop))];
+        print(fh12,name,'-dpng','-r300','-image');
     else
         name = [opdir,'/',runID,'/',runID,'_vep_',num2str(floor(step/nop))];
         print(fh1,name,'-dpng','-r300','-image');
@@ -638,9 +674,9 @@ if save_op && ~restart
         name = [opdir,'/',runID,'/',runID,'_gch',num2str(floor(step/nop))];
         print(fh8,name,'-dpng','-r300','-image');
         name = [opdir,'/',runID,'/',runID,'_TAS',num2str(floor(step/nop))];
-        print(fh10,name,'-dpng','-r300','-image');
-        name = [opdir,'/',runID,'/',runID,'_AFM',num2str(floor(step/nop))];
         print(fh11,name,'-dpng','-r300','-image');
+        name = [opdir,'/',runID,'/',runID,'_AFM',num2str(floor(step/nop))];
+        print(fh12,name,'-dpng','-r300','-image');
     end
 
     name = [opdir,'/',runID,'/',runID,'_',num2str(floor(step/nop))];

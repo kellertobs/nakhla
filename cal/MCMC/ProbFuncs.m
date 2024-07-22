@@ -100,7 +100,7 @@ end
 
 function [logpdf, gradlogpdf] = logPosterior (model,r,nu,data,sigma,mu_prior,sig_prior)
 % for Hamiltonian MC. From the Bayesian Linear Regression Using
-% Hamitonian MC tutorial on Mathworks.
+% Hamiltonian MC tutorial on Mathworks.
 
 
 % Compute the log likelihood and its gradient (i.e. d(logL)/dmodeli)

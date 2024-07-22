@@ -24,7 +24,7 @@ dtmax    =  1e3;                 % maximum time step [s]
 % set initial thermo-chemical state
 Tinit    = 'layer';              % T initial condition mode ('layer' or 'linear')
 seed     =  15;                  % random perturbation seed
-smth     =  10;                  % regularisation of initial random perturbation
+smth     =  15;                  % regularisation of initial random perturbation
 zlay     =  2.0;                 % layer thickness (relative to domain depth D)
 dlay     =  0.0;                 % random perturbation to layer thickness (relative to grid spacing h)
 wlay_T   =  0*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
@@ -48,6 +48,7 @@ dg_trc   =  [0,0,0,0,0,0];       % trace elements centred gaussian [wt ppm]
 fractxtl =  0;                   % fractional crystallisation mode for 0-D (Nz=Nx=1)
 fractmlt =  0;                   % fractional melting mode for 0-D (Nz=Nx=1)
 fractres =  0.25;                % residual fraction for fractionation mode
+dPdT     =  0e5;                 % decompression rate for 0D models
 Ptop     =  125e6;               % top pressure [Pa]
 periodic =  0;                   % set side boundaries to periodic
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
@@ -99,7 +100,7 @@ Delta_sgr=  h/10;                % correlation length for phase fluctuation diff
 Prt      =  3;                   % turbulent Prandtl number (ratio of momentum to heat diffusivity)
 Sct      =  3;                   % turbulent Schmidt number (ratio of momentum to mass diffusivity)
 etamin   =  0.1;                 % minimum viscosity
-kmin     =  1e-8;                % minimum diffusivity
+kmin     =  1e-9;                % minimum diffusivity
 kmax     =  1e3;                 % maximum diffusivity
 Pcouple  =  0;                   % coupling phase equilibria and material properties to dynamic pressure
 

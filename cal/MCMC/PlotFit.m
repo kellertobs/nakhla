@@ -40,17 +40,17 @@ if level>0
     figure(104); clf;
 
     subplot(3,1,1)
-    plot(Tmp,MLT_cmp*100,'LineWidth',1.5); axis tight
+    plot(Tmp,MLT_cmpfit*100,'LineWidth',1.5); axis tight
     ylabel('Melt comp. [wt\%]',TX{:},FS{:})
     set(gca,Fs{:},TL{:});
 
     subplot(3,1,2)
-    plot(Tmp,SOL_cmp*100,'LineWidth',1.5); axis tight
+    plot(Tmp,SOL_cmpfit*100,'LineWidth',1.5); axis tight
     ylabel('Solid comp. [wt\%]',TX{:},FS{:})
     set(gca,Fs{:},TL{:});
 
     subplot(3,1,3)
-    plot(Tmp,SYS_cmp*100,'LineWidth',1.5); axis tight
+    plot(Tmp,SYS_cmpfit*100,'LineWidth',1.5); axis tight
     legend(cal.cmpStr,Fs{:},TX{:},LB{:})
     xlabel('Temperature [$^\circ$C]',TX{:},FS{:})
     ylabel('System comp. [wt\%]',TX{:},FS{:})
@@ -74,7 +74,7 @@ if level>0
                 subplot(spz,spx,kk);
                 for iem = kmem:kmem+sum(cal.msy_mem(kk,:))-1
                     p(iem) = plot(Tmp, SOL_mem   (:,iem),'-' ,'Color',cmap(iem-kmem+1,:),'LineWidth',1.5); axis tight; hold on
-                    plot(Tmp, SOL_memfit(:,iem),'--','Color',cmap(iem-kmem+1,:),'LineWidth',1.5);
+                             plot(Tmp, SOL_memfit(:,iem),'--','Color',cmap(iem-kmem+1,:),'LineWidth',1.5);
                 end
                 if kk==cal.nmsy; legend([{'proj.'},{'fit'}],Fs{:},TX{:},LB{:}); 
                 else; legend(p(kmem:kmem+sum(cal.msy_mem(kk,:))-1),cal.memStr{kmem:kmem+sum(cal.msy_mem(kk,:))-1},Fs{:},TX{:},LB{:});
@@ -107,9 +107,9 @@ if level>1
         for iz = 1:spz
             if kk<=noxd
                 subplot(spz,spx,kk-1);
-                scatter(MLT_oxd  (:,1),MLT_oxd  (:,kk),25,Tmp,'o'); colormap('copper'); axis tight; hold on
-                scatter(SOL_oxd  (:,1),SOL_oxd  (:,kk),25,Tmp,'s');
-                scatter(SYS_oxd  (:,1),SYS_oxd  (:,kk),25,Tmp,'d');
+                scatter(MLT_oxd   (:,1),MLT_oxd   (:,kk),25,Tmp,'o'); colormap('copper'); axis tight; hold on
+                scatter(SOL_oxdp  (:,1),SOL_oxdp  (:,kk),25,Tmp,'s');
+                scatter(SYS_oxdp  (:,1),SYS_oxdp  (:,kk),25,Tmp,'d');
                 scatter(MLT_oxdfit(:,1),MLT_oxdfit(:,kk),25,Tmp,'o','filled');
                 scatter(SOL_oxdfit(:,1),SOL_oxdfit(:,kk),25,Tmp,'s','filled');
                 scatter(SYS_oxdfit(:,1),SYS_oxdfit(:,kk),25,Tmp,'d','filled');
@@ -141,9 +141,9 @@ if level>1
         for iz = 1:spz
             if kk<=noxd
                 subplot(spz,spx,kk);
-                scatter(MLT_oxd  (:,kk),Tmp,25,[0.7,0.7,0.7],'o'); axis tight; hold on
-                scatter(SOL_oxd  (:,kk),Tmp,25,[0.7,0.7,0.7],'s');
-                scatter(SYS_oxd  (:,kk),Tmp,25,[0.7,0.7,0.7],'d');
+                scatter(MLT_oxd   (:,kk),Tmp,25,[0.7,0.7,0.7],'o'); axis tight; hold on
+                scatter(SOL_oxdp  (:,kk),Tmp,25,[0.7,0.7,0.7],'s');
+                scatter(SYS_oxdp  (:,kk),Tmp,25,[0.7,0.7,0.7],'d');
                 scatter(MLT_oxdfit(:,kk),Tmp,25,[0.7,0.1,0.2],'o','filled');
                 scatter(SOL_oxdfit(:,kk),Tmp,25,[0.2,0.1,0.7],'s','filled');
                 scatter(SYS_oxdfit(:,kk),Tmp,25,[0.1,0.1,0.1],'d','filled');
@@ -216,8 +216,8 @@ if level>2
     B       = round(B_best,2)           % => cal.B
     r       = round(r_best,1)           % => cal.r
     dTH2O   = round(dT_best,0)          % => cal.dTH2O
-    c0      = round([SYS_cmp(  1,1:end-1)./sum(SYS_cmp(  1,1:end-1),2),SYS_cmp(1,end)],3) % => cal.c0
-    c1      = round(mean([SYS_cmp(end-4:end,1:end-1)./sum(SYS_cmp(end-4:end,1:end-1),2),SYS_cmp(end-4:end,end)],1),3) % => cal.c1
+    c0      = round([SYS_cmpfit(  1,1:end-1)./sum(SYS_cmpfit(  1,1:end-1),2),SYS_cmpfit(1,end)],3) % => cal.c0
+    c1      = round(mean([SYS_cmpfit(end-4:end,1:end-1)./sum(SYS_cmpfit(end-4:end,1:end-1),2),SYS_cmpfit(end-4:end,end)],1),3) % => cal.c1
     c0_oxd  = round([SYS_oxd(  1,1:end-1)./sum(SYS_oxd(  1,1:end-1),2),SYS_oxd(1,end)/100]*100,1) % => cal.c0
     c1_oxd  = round(mean([SYS_oxd(end-4:end,1:end-1)./sum(SYS_oxd(end-4:end,1:end-1),2),SYS_oxd(end-4:end,end)/100],1)*100,1) % => cal.c1
 end

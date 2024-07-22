@@ -1,0 +1,2 @@
+title; comments; db; sysUnit; oxide; frac; frac2
+MORB_Gale_MAR_prm;Gale et al. 2015, MAR;ig;wt;[SiO2, TiO2, Al2O3, FeO, MgO, CaO, Na2O, K2O, H2O, O, Cr2O3];[49.21, 1.01, 15.11, 9.57, 11.55, 11.31, 2.12, 0.12, 0.30, 0.12, 0.00];

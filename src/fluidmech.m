@@ -515,7 +515,7 @@ if ~bnchm
 
     
     %% update time step
-    dtk = (h/2)^2/max([kc(:);kwm(:);kwx(:);kwf(:);(kT0+ks(:).*T(:))./rho(:)./cP]); % diffusive time step size
+    dtk = (h/2)^2/max([kc(:);kwm(:);kwx(:);kwf(:);(kT0+ks(:).*T(:))./rho(:)./cP])/1.1; % diffusive time step size
     % dta =  h/2   /max(abs([Um(:).*(mux (:)>TINY^0.5);Wm(:).*(muz (:)>TINY^0.5); ...  % advective time step size
     %                        Ux(:).*(chix(:)>TINY^0.5);Wx(:).*(chiz(:)>TINY^0.5); ...
     %                        Uf(:).*(phix(:)>TINY^0.5);Wf(:).*(phiz(:)>TINY^0.5)]+TINY));   
