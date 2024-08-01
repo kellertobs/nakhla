@@ -323,12 +323,12 @@ cal_MORB;  % read calibration file
 %   their fading or disappearance in PHS_frc
 
 %                for   fay   ant   alb   san   dps   aug   ulv   mgt   ilm   hyp   fsl   qtz   wat
-cmp_mem_init  = [ 98     2     0     0     0     0     0     0     0     0     0     0     0     0
-                  32    30    35     0     0     3     0     0     0     0     0     0     0     0
-                   0     0    48     3     0    38     4     2     0     0     5     0     0     0
-                   0    10     4    39     0     1    25     3     8     1     4     3     0     0
-                   0     0     0    72     3     0    10     0     1     1     1    12     0     0
-                   0     0     0     0    42     0     6     0     0     1     0     1    50     0
+cmp_mem_init  = [ 97     3     0     0     0     0     0     0     0     0     0     0     0     0
+                  40    25    32     0     0     3     0     0     0     0     0     0     0     0
+                   0     0    42     7     0    37     3     3     0     0     8     0     0     0
+                   0    11     4    35     1     2    33   1.5   7.3   1.2     1     3     0     0
+                   0     0     0    71     4     1     9     0   0.2   0.8     2    12     0     0
+                   0     0     0     0    45     0     6     0     0   0.2     0   0.8    48     0
                    0     0     0     0     0     0     0     0     0     0     0     0     0   100];
 cmp_mem_init = cmp_mem_init./sum(cmp_mem_init,2)*100;
 indmem = logical(cmp_mem_init);
@@ -338,27 +338,19 @@ cmp_oxd_init = cmp_mem_init*cal.mem_oxd/100;
 cmp_oxd_best = cmp_oxd_init;
 
 % set initial guess for melting point parameters
-T0_init = [ 1600   1250   1150   1090   1000    830];  T0_best = T0_init;
-A_init  = [ 6.20   6.10   3.60   2.80   2.40   1.20];   A_best =  A_init;
-B_init  = [ 6.90   6.50   3.60   2.80   2.10   2.20];   B_best =  B_init;
-r_init  = [23.00   6.00   4.00   7.00   8.00  12.00];   r_best =  r_init;
+T0_init = [ 1600   1240   1140   1090    990    835];  T0_best = T0_init;
+A_init  = [ 6.00   5.50   3.50   2.60   1.80   1.00];   A_best =  A_init;
+B_init  = [ 7.00   6.00   3.30   3.00   2.70   2.60];   B_best =  B_init;
+r_init  = [18.00   8.00   5.00   7.00  10.00  12.00];   r_best =  r_init;
 dT_init = [ 1100   1400   1500   1600   1800   2100];  dT_best = dT_init;
 
 % compose initial parameter guess
 m0     = [T0_init.';A_init.';B_init.';r_init.';dT_init.';cmp_mem_init(:).*indmem(:);];
 
-% % exclude last (near-solidus) point
-% Tmp = Tmp(1:end-1,:);
-% Prs = Prs(1:end-1,:);
-% MLT_oxd = MLT_oxd(1:end-1,:);
-% SOL_mem = SOL_mem(1:end-1,:);
-% PHS_frc = PHS_frc(1:end-1,:);
-% SYS_oxd = SYS_oxd(1:end-1,:);
-
 % set function to calculate forward model
 % m --> dhat
 % dhatFunc  = @(model) OxdFromCmpMem(model,MLTp,SOLp,PHS(:,1),cal);
-dhatFunc  = @(model) ModelFitP(model,Tmp,Prs,SYS_oxdp,PHS_frc,Psl,cal,[1e-3,0.75]);
+dhatFunc  = @(model) ModelFitP(model,Tmp,Prs,SYS_oxdp,PHS_frc,Psl,cal,[1e-3,0.5]);
 
 % test fit function for initial guess
 [~,MLT_oxdfit,SOL_oxdfit,SYS_oxdfit,SOL_memfit,PHS_oxdfit,PHS_frcfit,SOL_cmpfit,MLT_cmpfit,SYS_cmpfit,Tsolfit,Tliqfit,~] = dhatFunc(m0);
@@ -384,7 +376,7 @@ Tm         = cal.Tm;
 PHS_frc(:,2:end) = PHS_frc(:,2:end)./(100-PHS_frc(:,1)+eps)*100;
 
 % plot basic information for initial fit
-level = 2;
+level = 3;
 run('../MCMC/PlotFit.m')
 
 
@@ -398,8 +390,8 @@ cal_MORB;  % read calibration file
 m0      = [T0_init.';A_init.';B_init.';r_init.';dT_init.';cmp_mem_init(:).*indmem(:)];
 
 % !!!  set MCMC parameters then Run Section to execute MCMC routine  !!!
-Niter           = 1e6;              % number of samples to take
-anneal.initstep = 0.025e-2;          % adjust step size to get reasonable acceptance ratio 20-30%
+Niter           = 1e4;              % number of samples to take
+anneal.initstep = 0.1e-2;          % adjust step size to get reasonable acceptance ratio 20-30%
 anneal.levels   = 1;                % select number of annealing levels
 anneal.burnin   = max(1,Niter/10);  % set length of initial burn-in sequence
 anneal.refine   = max(1,Niter/10);  % set length of final refinement sequence
@@ -424,8 +416,8 @@ dm    =[1*max(  5,0.01*T0_init.'); ...
         1*max(0.2,0.20* A_init.'); ...
         1*max(0.2,0.20* B_init.'); ...
         1*max(0.5,0.20* r_init.'); ...
-        0*max( 50,0.10*dT_init.'); ...
-        1*max(0.5,0.10*cmp_mem_init(:)).*indmem(:)];
+        0*max( 10,0.20*dT_init.'); ...
+        0*max(0.5,min(5,0.25*cmp_mem_init(:))).*indmem(:)];
 m0_lw  = m0 - dm;
 m0_up  = m0 + dm;
 mbnds  = [m0_lw(:),m0_up(:)]; % model parameter bounds
@@ -534,4 +526,4 @@ level = 3;
 run('../MCMC/PlotFit.m')
 
 %% save and display calibration
-save('MORB_calibration_075');
+save('MORB_calibration');

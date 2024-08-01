@@ -24,7 +24,7 @@ dtmax    =  1e3;                 % maximum time step [s]
 % set initial thermo-chemical state
 Tinit    = 'layer';              % T initial condition mode ('layer' or 'linear')
 seed     =  15;                  % random perturbation seed
-smth     =  15;                  % regularisation of initial random perturbation
+smth     =  10;                  % regularisation of initial random perturbation
 zlay     =  2.0;                 % layer thickness (relative to domain depth D)
 dlay     =  0.0;                 % random perturbation to layer thickness (relative to grid spacing h)
 wlay_T   =  0*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
@@ -96,7 +96,7 @@ gamma    =  1e-3;                % artificial horizontal inertia parameter (only
 lambda   =  0e-7;                % pressure smoothing parameter
 etacntr  =  1e+7;                % maximum viscosity contrast
 Delta_cnv=  h/2;                 % correlation length for eddy diffusivity (multiple of h, 0.5-1)
-Delta_sgr=  h/10;                % correlation length for phase fluctuation diffusivity (multiple of dx0, df0, 10-20)
+Delta_sgr=  h/20;                % correlation length for phase fluctuation diffusivity (multiple of dx0, df0, 10-20)
 Prt      =  3;                   % turbulent Prandtl number (ratio of momentum to heat diffusivity)
 Sct      =  3;                   % turbulent Schmidt number (ratio of momentum to mass diffusivity)
 etamin   =  0.1;                 % minimum viscosity

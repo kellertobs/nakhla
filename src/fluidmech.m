@@ -468,8 +468,8 @@ if ~bnchm
     dchdz = ddz(chi(icz,icx),h); dchdx = ddx(chi(icz,icx),h);
     dphdz = ddz(phi(icz,icx),h); dphdx = ddx(phi(icz,icx),h);
 
-    kmz = (km(icz(1:end-1),icx)+ km(icz(2:end),icx))./2;
-    kmx = (km(icz,icx(1:end-1))+ km(icz,icx(2:end)))./2;
+    kmz = (km(icz(1:end-1),icx)+km(icz(2:end),icx))./2;
+    kmx = (km(icz,icx(1:end-1))+km(icz,icx(2:end)))./2;
 
     kxz = (kx(icz(1:end-1),icx)+kx(icz(2:end),icx))./2;
     kxx = (kx(icz,icx(1:end-1))+kx(icz,icx(2:end)))./2;
@@ -515,7 +515,7 @@ if ~bnchm
 
     
     %% update time step
-    dtk = (h/2)^2/max([kc(:);kwm(:);kwx(:);kwf(:);(kT0+ks(:).*T(:))./rho(:)./cP])/1.1; % diffusive time step size
+    dtk = (h/2)^2/max([kc(:);kwm(:);kwx(:);kwf(:);(kT0+ks(:).*T(:))./rho(:)./cP])/2; % diffusive time step size
     % dta =  h/2   /max(abs([Um(:).*(mux (:)>TINY^0.5);Wm(:).*(muz (:)>TINY^0.5); ...  % advective time step size
     %                        Ux(:).*(chix(:)>TINY^0.5);Wx(:).*(chiz(:)>TINY^0.5); ...
     %                        Uf(:).*(phix(:)>TINY^0.5);Wf(:).*(phiz(:)>TINY^0.5)]+TINY));   

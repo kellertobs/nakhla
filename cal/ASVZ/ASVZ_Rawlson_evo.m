@@ -1,0 +1,2 @@
+title; comments; db; sysUnit; oxide; frac; frac2
+MORB_Gale_MAR_evo;Rawlson et al. 2016, ASVZ;ig;wt;[SiO2, TiO2, Al2O3, FeO, MgO, CaO, Na2O, K2O, H2O, O, Cr2O3];[74.72, 0.27, 12.97, 1.35, 0.60, 1.28, 4.00, 4.80, 2.00, 0.03, 0];

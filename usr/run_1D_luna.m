@@ -7,7 +7,7 @@ run('./par_default')
 % set run parameters
 runID    =  '1D_luna';           % run identifier
 opdir    =  '../out';            % output directory
-restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
+restart  = -1;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  200;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot of results
 save_op  =  1;                   % switch on to save output to file
@@ -40,7 +40,7 @@ periodic =  1;
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
 bnd_w    =  h;                   % boundary layer width [m]
 tau_T    =  2*yr;                % wall cooling/assimilation time [s]
-Twall    =  [0,1860,nan];        % [top,bot,sds] wall rock temperature [degC] (nan = insulating)
+Twall    =  [0,nan,nan];         % [top,bot,sds] wall rock temperature [degC] (nan = insulating)
 cwall    =  nan(3,7);
 Ptop     =  1e5;                 % top pressure [Pa]
 
@@ -51,7 +51,8 @@ cP       =  1100;                % heat capacity [J/kg/K]
 
 % set buoyancy parameters
 g0       =  1.62;                % gravity [m/s2]
-dx0      =  1e-3;                % crystal size [m]
+dx0      =  3e-3;                % crystal size [m]
+dm0      =  3e-3;                % melt film size [m]
 bPx      =  1e-11;               % solid compressibility [1/Pa]
 bPm      =  2e-11;               % melt compressibility [1/Pa]
 
@@ -63,14 +64,12 @@ mod_wall =  0;                   % wall rock elastic modulus [Pa]
 % set numerical model parameters
 TINT     =  'bd2im';             % time integration scheme ('be1im','bd2im','cn2si','bd2si')
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
-CFL      =  0.90;                % (physical) time stepping courant number (multiplies stable step) [0,1]
-rtol     =  1e-3;                % outer its relative tolerance
+CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
+rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-8;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its
-Delta_trb=  20*h;                % correlation length for eddy diffusivity
-Delta_sgr=  100*dx0;             % correlation length for phase fluctuation diffusivity
-Prt      =  1;                   % turbulent Prandtl number (ratio of momentum to heat diffusivity)
-Sct      =  5;                   % turbulent Schmidt number (ratio of momentum to mass diffusivity)
+Delta_cnv=  h/2;                 % correlation length for eddy diffusivity
+Delta_sgr=  h/2;                 % correlation length for phase fluctuation diffusivity
 
 %*****  RUN NAKHLA MODEL  *************************************************
 run('../src/main')

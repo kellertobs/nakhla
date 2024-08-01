@@ -17,6 +17,4 @@ XH2O   = exp((a./T + sum(b.*X(:,[3,4,7]),2).*(P./T) + c.*ln_fH2O + d)/2); % Moor
 
 H2Osat = XH2O.*MW(end) ./ sum([X(:,1:end-1), XH2O].*MW,2);
 
-% H2Osat_rhy = (3.5494e-3.*P.^0.5 + 9.623e-8.*P - 1.5223e-11.*P.^1.5)./(T+273.15) + 1.2436e-14.*P.^1.5; % Liu et al., 2005
-
 end

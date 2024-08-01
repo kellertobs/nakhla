@@ -27,8 +27,8 @@ dtmax    =  1*yr;                % maximum time step [s]
 
 % set initial thermo-chemical state
 Tinit    = 'linear';             % T initial condition mode ('layer' or 'linear')
-T0       =  1720;                % temperature top  layer [deg C]
-T1       =  1720;                % temperature base layer [deg C]
+T0       =  1725;                % temperature top  layer [deg C]
+T1       =  1725;                % temperature base layer [deg C]
 c0       =  [0.30  0.31  0.10  0.20  0.05  0.04  0.00];  % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
 c1       =  c0;                             % components (maj comp, H2O) bot layer [wt] (will be normalised to unit sum!)
 dcr      =  [1,1,1,-1,-1,-1,0]*1e-4;  % amplitude of random noise [wt]

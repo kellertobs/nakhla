@@ -5,14 +5,14 @@ clear cal;
 
 % number of oxides, mineral end-members, mineral systems, model components
 cal.noxd   = 9;
-cal.nmem   = 15;
+cal.nmem   = 14;
 cal.nmsy   = 6;
 cal.ncmp   = 7;
 
 % label strings for all compositional representations
 cal.oxdStr = {'SiO$_2$','TiO$_2$','Al$_2$O$_3$','FeO','MgO','CaO','Na$_2$O','K$_2$O','H$_2$O'};
      elStr = {'Si','Ti','Al','Fe','Mg','Ca','Na','K','H'};
-cal.memStr = {'ant','alb','san','for','fay','tms','mgt','ilm','dps','hdb','aug','hyp','fsl','qtz','wat'};
+cal.memStr = {'ant','alb','san','for','fay','ulv','ilm','dps','aug','pig','hyp','fsl','qtz','wat'};
 cal.msyStr = {'fsp','olv','oxs','cxp','opx','qtz'};
 cal.cmpStr = {'ano','str','ogb','fbs','trd','rhy','vol'};
 
@@ -25,46 +25,39 @@ for i = 1:cal.noxd; cal.(elStr{i}) = i; end
 cal.ioxd = [   1   2    3    4   5   6    7   8   9]; % oxdie indices for viscosity, density functions
 
 % oxide composition of mineral end-members
-%                   SiO2   TiO2   Al2O3     FeO     MgO     CaO    Na2O     K2O    H2O
-cal.mem_oxd    = [ 44.40    0.0    35.84    0.0     0.0    19.20    0.56    0.0    0.0     % anorthite (ant)
-                   67.39    0.0    20.35    0.0     0.0     1.07   11.19    0.0    0.0     % albite (alb)
-                   66.55    0.0    19.47    0.0     0.0     0.54    7.00    6.44   0.0     % sanidine (san)
-
-                   38.36    0.0     0.0    23.05   38.43    0.16    0.0     0.0    0.0     % forsterite (for)
-                   32.12    0.0     0.0    56.39   11.39    0.10    0.0     0.0    0.0     % fayalite (fay)
-
-                    0.0    41.05    2.67   37.04   19.24    0.0     0.0     0.0    0.0     % Ti-Mg-bearing spinel (tms)
-                    0.0     0.0     0.20   99.80    0.0     0.0     0.0     0.0    0.0     % magnetite (mgt)
-                    0.0    51.59    0.0    48.41    0.0     0.0     0.0     0.0    0.0     % ilmenite (ilm)
-
-                   52.41    0.16    2.44    7.67   16.18   20.91    0.20    0.03   0.0     % diopside (dps)
-                   52.79    0.12    0.75   15.29   12.06   18.06    0.92    0.01   0.0     % hedenbergite (hdb)
-                   51.60    0.61    0.67   24.43    3.71   15.44    3.20    0.34   0.0     % augite (aug)
-
-                   51.43    0.12    3.27   20.45   21.97    2.76    0.0     0.0    0.0     % hypersthene (hyp)
-                   49.09    0.0     0.34   39.89    9.77    0.91    0.0     0.0    0.0     % ferrosillite (fsl)
-
-                  100.0     0.0     0.0     0.0     0.0     0.0     0.0     0.0    0.0     % quartz (qtz)
-                    0.0     0.0     0.0     0.0     0.0     0.0     0.0     0.0  100.0];   % water (wat)
+%                     SiO2      TiO2     Al2O3       FeO       MgO       CaO      Na2O       K2O       H2O
+cal.mem_oxd    = [ 43.4800         0   36.1900         0         0   19.7100    0.6200         0         0
+                   66.2900         0   21.0300         0         0    1.8800   10.8000         0         0
+                   67.0400         0   18.2800         0         0         0    6.0600    8.6200         0
+                  
+                   39.4400         0         0   17.6200   42.9400         0         0         0         0
+                   37.6700         0         0   27.0900   35.2400         0         0         0         0
+                 
+                         0   11.5300    2.8900   73.5200   12.0600         0         0         0         0
+                         0   40.6000         0   59.4000         0         0         0         0         0
+                 
+                   52.1400         0    2.8600    7.1200   16.5400   21.2000    0.1400         0         0
+                   53.7600         0    0.7300   11.7700   13.7600   18.8500    1.1300         0         0
+                   53.4000         0    0.2800   17.7700    8.5800   17.3800    2.5900         0         0
+                 
+                   52.4200         0    4.0800   14.4400   26.6900    2.3700         0         0         0
+                   51.7200         0    0.2700   29.7200   17.2800    1.0100         0         0         0
+                
+                  100.0000         0         0         0         0         0         0         0         0
+                         0         0         0         0         0         0         0         0  100.0000 ];
 cal.mem_oxd = cal.mem_oxd./sum(cal.mem_oxd,2)*100;
 
 % mineral end-members in mineral systems
-cal.msy_mem = [1  1  1  0  0  0  0  0  0  0  0  0  0  0  0    % feldspar (fsp) 
-               0  0  0  1  1  0  0  0  0  0  0  0  0  0  0    % olivine (olv)
-               0  0  0  0  0  1  1  1  0  0  0  0  0  0  0    % oxides (oxs)
-               0  0  0  0  0  0  0  0  1  1  1  0  0  0  0    % clinopyroxene (cpx)
-               0  0  0  0  0  0  0  0  0  0  0  1  1  0  0    % orthopyroxene (opx)
-               0  0  0  0  0  0  0  0  0  0  0  0  0  1  0];  % quartz (qtz)
+cal.msy_mem = [1  1  1  0  0  0  0  0  0  0  0  0  0  0    % feldspar (fsp) 
+               0  0  0  1  1  0  0  0  0  0  0  0  0  0    % olivine (olv)
+               0  0  0  0  0  1  1  0  0  0  0  0  0  0    % oxides (oxs)
+               0  0  0  0  0  0  0  1  1  1  0  0  0  0    % clinopyroxene (cpx)
+               0  0  0  0  0  0  0  0  0  0  1  1  0  0    % orthopyroxene (opx)
+               0  0  0  0  0  0  0  0  0  0  0  0  1  0];  % quartz (qtz)
 
 % mineral end-member composition of melting model components
 %                 ant     alb     san     for     fay     tms     mgt     ilm     dps     hdb     aug     hyp     fsl     qtz     wat
-cal.cmp_mem = [100.00       0       0       0       0       0       0       0       0       0       0       0       0       0       0   % anorthosite (ano)
-                73.83    9.95       0   12.11       0    4.11       0       0       0       0       0       0       0       0       0   % spinel troctolite (str)
-                25.79    5.00       0   11.93   17.95    7.37    2.06       0   29.91       0       0       0       0       0       0   % olivine gabbro (ogb)
-                22.60   10.70    3.24       0    1.01       0    5.36    2.50       0   24.44       0   30.15       0       0       0   % ferro-basalt (fbs)
-                 4.53   61.26   15.29       0       0       0       0    1.00       0       0    8.87    1.01    8.05       0       0   % trachy-dacite (trd)
-                    0    1.00   56.72       0       0       0       0       0       0       0       0       0    5.41   36.86       0   % rhyolite (rhy)
-                    0       0       0       0       0       0       0       0       0       0       0       0       0       0  100.00]; % volatiles (vol)
+cal.cmp_mem = ones(cal.ncmp,cal.nmem);
 cal.cmp_mem = cal.cmp_mem./sum(cal.cmp_mem,2)*100;
 
 % mineral systems composition of melting model components
@@ -79,6 +72,10 @@ for i=1:cal.ncmp
         cal.cmp_msy_oxd(i,j,:) = cal.cmp_mem(i,cal.msy_mem(j,:)==1)*cal.mem_oxd(cal.msy_mem(j,:)==1,:)./sum(cal.cmp_mem(i,cal.msy_mem(j,:)==1)+1e-32);
     end
 end
+
+% primary and evolved end-member compositions used in calibration
+cal.c0     = [0.0490    0.1360    0.5200    0.1680    0.1000    0.0270    0.0030];
+cal.c1     = [0.0010    0.0010    0.0010    0.0210    0.3240    0.6520    0.0240];
 
 % set pure component melting points T_m^i at P=0
 cal.T0 =  [1553  1171  1134  1092  990  745];
@@ -95,12 +92,9 @@ cal.dS =  350;
 % set coeff. for T-dependence of partition coefficients K^i [1/K]
 cal.r  =  [21.0  5.1  2.0  9.5  12.4  7.4];
 
-% initial composition used in calibration
-cal.c0 = [0.05  0.23  0.09  0.32  0.21  0.10  0.03];
-
 % specify melting point dependence on H2O
-cal.dTH2O   = 1400;                 % solidus shift from water content [K/wt^pH2O]
-cal.pH2O    = 0.75;                 % solidus shift from water content [K/wt^pH2O]
+cal.dTH2O   = [1100  1400  1500  1600  1800  2100];  % solidus shift from water content prefactor [K/wt^pH2O]
+cal.pH2O    = 0.75;                                  % solidus shift from water content exponent
 
 % specify geochemical model parameters
 cal.ntrc    = 6;                    % number of trace elements
@@ -108,41 +102,26 @@ cal.trcStr  = {'K 0.01','K 0.10','K 1.0','K 3.00','K 10.0','K 1.0'};
 cal.Ktrc_mem = [0.01;0.10;1.0;3.0;10.0;1.0].*ones(cal.ntrc,cal.nmem);
 
 % specify density parameters
-%              ant  alb  san  for  fay  ulv  mgt  ilm  dps  hdb  aug  hyp  fsl  qtz  wat
-cal.rhox0   = [2690,2590,2530,3400,3930,4120,4970,4700,3270,3400,3470,3390,3660,2650,1000]; % mineral end-member reference densities [kg/m3]
-cal.rhof0   = 500;                  % fluid reference density [kg/m3]
+%               for  fay  ant  alb  san  dps  aug  ulv  mgt  ilm  hyp  fsl  qtz  wat
+cal.rhox0   = [3200,4050,2680,2600,2570,3220,3460,3930,4760,4720,3310,3660,2540,1000]; % mem ref densities [kg/m3]
+cal.rhof0   = 1000;                 % fluid ref density [kg/m3]
 
 % specify three-phase coefficient model parameters
-cal.etax0 = 1e18;                   % solid reference viscosity [Pas]
-cal.etaf0 = 1e-1;                   % vapour reference viscosity [Pas]
+%             for  fay  ant  alb  san  dps  aug  ulv  mgt  ilm  hyp  fsl  qtz  wat
+cal.etax0 = [1e19,1e19,1e17,1e17,1e17,1e20,1e20,1e16,1e16,1e16,1e20,1e20,1e17,1e0]; % mem ref viscosities [Pas]
+cal.etaf0 = 0.1;                  % fluid viscosity constant [Pas]
 cal.Eax   = 300e3;                  % solid viscosity activation energy [J/mol]
-cal.AA  =  [ 0.65, 0.25, 0.35; ...  % permission slopes
+cal.AA    =[ 0.65, 0.25, 0.35; ...  % permission slopes
              0.20, 0.20, 0.20; ...  % generally numbers between 0 and 1
              0.20, 0.20, 0.20; ];   % increases permission slopes away from step function 
 
-cal.BB  =  [ 0.55, 0.18, 0.27; ...  % permission step locations
+cal.BB    =[ 0.55, 0.18, 0.27; ...  % permission step locations
              0.64,0.012,0.348; ...  % each row sums to 1
              0.80, 0.12, 0.08; ];   % sets midpoint of step functions
 
-cal.CC  =  [[0.30, 0.30, 0.40]*0.7; ... % permission step widths
+cal.CC    =[[0.30, 0.30, 0.40]*0.7; ... % permission step widths
             [0.52, 0.40, 0.08]*1.1; ... % square brackets sum to 1, sets angle of step functions
             [0.15, 0.25, 0.60]*0.7; ];  % factor increases width of step functions
 
-% % specify mixture viscosity parameters (Costa et al., 2009)
-% cal.Bphi    = 2.0;                  % Einstein-Roscoe powerlaw coefficient bubbles
-% cal.Bchi    = 2.0;                  % Einstein-Roscoe powerlaw coefficient crystals
-% cal.chi_pck = 0.60;                 % rheologically critical crystal fraction
-% cal.gamma   = 2.50;                 % step-function steepness coefficient
-% cal.delta   = 27;                   % solid viscosity melt-weakening slope
-% cal.xi      = 4.5e-4;               % solid viscosity level
-% cal.etaf0   = 0.1;                  % fluid viscosity constant
-% 
-% % specify segregation coefficient parameters
-% cal.bm      = 50;                   % melt permeability geometric factor (k0 = dx^2/bm)
-% cal.cm      = 0.001;                % melt percolation threshold
-% cal.nm      = 3;                    % melt permeability powerlaw (k0*(mu-cm)^nm*(1-mu)^mm)
-% cal.mm      = 2;                    % melt permeability powerlaw (k0*(mu-cm)^nm*(1-mu)^mm)
-% cal.bf      = 50;                   % fluid permeability geometric factor (k0 = dx^2/bm)
-% cal.cf      = 0.05;                 % fluid percolation threshold
-% cal.nf      = 4;                    % fluid permeability powerlaw (k0*(phi-cf)^nf*(1-phi)^mf)
-% cal.mf      = 2;                    % fluid permeability powerlaw (k0*(phi-cf)^nf*(1-phi)^mf)
+% convergence tolerance
+cal.tol     = 1e-9;
