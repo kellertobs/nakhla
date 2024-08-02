@@ -324,11 +324,11 @@ cal_ASVZ;  % read calibration file
 
 %                ant   alb   san   for   fay   ulv   ilm   dps   aug   pig   hyp   fsl   qtz   wat
 cmp_mem_init  = [ 92     8     0     0     0     0     0     0     0     0     0     0     0     0
-                  63    18     0    17     0     2     0     0     0     0     0     0     0     0
-                  18    25     3     0     5     7     4    24     2     0    12     0     0     0
-                   2    33     4     0     0     5     4     3    26     2    12    10     0     0
-                   1    67    10     0     0     0     2     0     1     9     2     8     0     0
-                   0     2    38     0     0     0     0     0     0     3     0     1    56     0
+                  51    19     0    23     0     7     0     0     0     0     0     0     0     0
+                  25     2     0     0     2    13     5    21     2     0    30     0     0     0
+                   9    56     0     0     0     0     2     0    10     6     2    15     0     0
+                   1    30    64     0     0     0     1     0     0     3     0     1     0     0
+                   3     0    53     0     0     0     0     2     0     3     0     1    38     0
                    0     0     0     0     0     0     0     0     0     0     0     0     0   100];
 cmp_mem_init = cmp_mem_init./sum(cmp_mem_init,2)*100;
 indmem = logical(cmp_mem_init);
@@ -338,10 +338,10 @@ cmp_oxd_init = cmp_mem_init*cal.mem_oxd/100;
 cmp_oxd_best = cmp_oxd_init;
 
 % set initial guess for melting point parameters
-T0_init = [ 1500   1170   1110   1060    980    830];  T0_best = T0_init;
-A_init  = [ 6.00   5.40   3.50   2.60   1.70   1.00];   A_best =  A_init;
-B_init  = [ 7.00   5.90   3.60   2.80   2.80   2.50];   B_best =  B_init;
-r_init  = [22.00   7.00   5.00   7.00  10.00  12.00];   r_best =  r_init;
+T0_init = [ 1500   1170   1140   1050    940    810];  T0_best = T0_init;
+A_init  = [ 5.50   5.00   4.50   3.50   1.90   1.00];   A_best =  A_init;
+B_init  = [ 5.50   5.00   4.50   3.50   2.90   3.30];   B_best =  B_init;
+r_init  = [36.00   3.00   3.00  10.00   7.00   5.00];   r_best =  r_init;
 dT_init = [ 1100   1400   1500   1600   1800   2100];  dT_best = dT_init;
 
 % compose initial parameter guess
@@ -350,7 +350,7 @@ m0     = [T0_init.';A_init.';B_init.';r_init.';dT_init.';cmp_mem_init(:).*indmem
 % set function to calculate forward model
 % m --> dhat
 % dhatFunc  = @(model) OxdFromCmpMem(model,MLTp,SOLp,PHS(:,1),cal);
-dhatFunc  = @(model) ModelFitP(model,Tmp,Prs,SYS_oxdp,PHS_frc,Psl,cal,[1e-3,1.0]);
+dhatFunc  = @(model) ModelFitP(model,Tmp,Prs,SYS_oxdp,PHS_frc,Psl,cal,[1e-3,0.75]);
 
 % test fit function for initial guess
 [~,MLT_oxdfit,SOL_oxdfit,SYS_oxdfit,SOL_memfit,PHS_oxdfit,PHS_frcfit,SOL_cmpfit,MLT_cmpfit,SYS_cmpfit,Tsolfit,Tliqfit,~] = dhatFunc(m0);
@@ -386,12 +386,12 @@ cal_ASVZ;  % read calibration file
 
 
 % uncomment following lines to run MCMC again with previous best fit as initial guess
-% T0_init = T0_best; A_init = A_best; B_init = B_best; r_init = r_best; cmp_mem_init = cmp_mem_best;
+T0_init = T0_best; A_init = A_best; B_init = B_best; r_init = r_best; cmp_mem_init = cmp_mem_best;
 m0      = [T0_init.';A_init.';B_init.';r_init.';dT_init.';cmp_mem_init(:).*indmem(:)];
 
 % !!!  set MCMC parameters then Run Section to execute MCMC routine  !!!
-Niter           = 2e3;              % number of samples to take
-anneal.initstep = 1e-2;          % adjust step size to get reasonable acceptance ratio 20-30%
+Niter           = 1e5;              % number of samples to take
+anneal.initstep = 0.25e-2;          % adjust step size to get reasonable acceptance ratio 20-30%
 anneal.levels   = 1;                % select number of annealing levels
 anneal.burnin   = max(1,Niter/10);  % set length of initial burn-in sequence
 anneal.refine   = max(1,Niter/10);  % set length of final refinement sequence
@@ -405,7 +405,7 @@ sigma_MLT =  0.1  * MLT_scl.^0.3;       % uncertainty of melt oxide composition
 sigma_SOL =  0.1  * SOL_scl.^0.3;       % uncertainty of melt oxide composition
 sigma_MEM =  0.1  * MEM_scl.^0.3;       % uncertainty of solid end-member composition
 sigma_PHS =  0.1  * PHS_scl.^0.3;       % uncertainty of phase fractions
-sigma_TSL =100.1  * ones(size([Tsol(:);Tliq(:)])); % uncertainty of solidus/liquidus Temp
+sigma_TSL =  0.5  * ones(size([Tsol(:);Tliq(:)])); % uncertainty of solidus/liquidus Temp
 sigma = [sigma_MLT;sigma_MEM;sigma_PHS;sigma_TSL]; % combine all as in data vector
 
 % load calibration data constraints into data vector
@@ -478,7 +478,7 @@ RunTime(1) = toc;
 %**************************************************************************
 
 % uncomment following line to plot likelihood histograms for fitted parameters (slow!)
-plotmcmc(models, prob, [], mbnds, anneal, mNames); 
+% plotmcmc(models, prob, [], mbnds, anneal, mNames); 
 
 % extract best fit parameters
 T0_best       = bestfit(               (1:cal.ncmp-1)).';

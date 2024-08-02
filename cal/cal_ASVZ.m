@@ -14,7 +14,7 @@ cal.oxdStr = {'SiO$_2$','TiO$_2$','Al$_2$O$_3$','FeO','MgO','CaO','Na$_2$O','K$_
      elStr = {'Si','Ti','Al','Fe','Mg','Ca','Na','K','H'};
 cal.memStr = {'ant','alb','san','for','fay','ulv','ilm','dps','aug','pig','hyp','fsl','qtz','wat'};
 cal.msyStr = {'fsp','olv','oxs','cxp','opx','qtz'};
-cal.cmpStr = {'ano','str','ogb','fbs','trd','rhy','vol'};
+cal.cmpStr = {'ano','str','sgn','and','trd','rhy','vol'};
 
 for i = 1:cal.ncmp; cal.(cal.cmpStr{i}) = i; end
 for i = 1:cal.nmsy; cal.(cal.msyStr{i}) = i; end
@@ -56,8 +56,14 @@ cal.msy_mem = [1  1  1  0  0  0  0  0  0  0  0  0  0  0    % feldspar (fsp)
                0  0  0  0  0  0  0  0  0  0  0  0  1  0];  % quartz (qtz)
 
 % mineral end-member composition of melting model components
-%                 ant     alb     san     for     fay     tms     mgt     ilm     dps     hdb     aug     hyp     fsl     qtz     wat
-cal.cmp_mem = ones(cal.ncmp,cal.nmem);
+%                 ant     alb     san     for     fay     ulv     ilm     dps     aug     pig     hyp     fsl     qtz     wat
+cal.cmp_mem = [ 92     8     0     0     0     0     0     0     0     0     0     0     0     0
+                51    19     0    22     0     7     0     0     0     0     0     0     0     0
+                25     2     0     0     2    13     5    21     2     0    30     0     0     0
+                 9    56     0     0     0     0     2     0    10     6     2    15     0     0
+                 1    30    64     0     0     0     1     0     0     3     0     1     0     0
+                 3     0    53     0     0     0     0     2     0     3     0     1    38     0
+                 0     0     0     0     0     0     0     0     0     0     0     0     0   100];
 cal.cmp_mem = cal.cmp_mem./sum(cal.cmp_mem,2)*100;
 
 % mineral systems composition of melting model components
@@ -102,13 +108,13 @@ cal.trcStr  = {'K 0.01','K 0.10','K 1.0','K 3.00','K 10.0','K 1.0'};
 cal.Ktrc_mem = [0.01;0.10;1.0;3.0;10.0;1.0].*ones(cal.ntrc,cal.nmem);
 
 % specify density parameters
-%               for  fay  ant  alb  san  dps  aug  ulv  mgt  ilm  hyp  fsl  qtz  wat
-cal.rhox0   = [3200,4050,2680,2600,2570,3220,3460,3930,4760,4720,3310,3660,2540,1000]; % mem ref densities [kg/m3]
+%               ant  alb  san  for  fay  ulv  ilm  dps  aug  pig  hyp  fsl  qtz  wat
+cal.rhox0   = [2530,2190,2220,3340,3470,4330,4790,3250,3320,3360,3300,3500,2540,1000]; % mem ref densities [kg/m3]
 cal.rhof0   = 1000;                 % fluid ref density [kg/m3]
 
 % specify three-phase coefficient model parameters
-%             for  fay  ant  alb  san  dps  aug  ulv  mgt  ilm  hyp  fsl  qtz  wat
-cal.etax0 = [1e19,1e19,1e17,1e17,1e17,1e20,1e20,1e16,1e16,1e16,1e20,1e20,1e17,1e0]; % mem ref viscosities [Pas]
+%             ant  alb  san  for  fay  ulv  ilm  dps  aug  pig  hyp  fsl  qtz  wat
+cal.etax0 = [1e17,1e17,1e17,1e18,1e18,1e16,1e16,1e19,1e19,1e19,1e19,1e19,1e0]; % mem ref viscosities [Pas]
 cal.etaf0 = 0.1;                  % fluid viscosity constant [Pas]
 cal.Eax   = 300e3;                  % solid viscosity activation energy [J/mol]
 cal.AA    =[ 0.65, 0.25, 0.35; ...  % permission slopes
