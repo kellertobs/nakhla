@@ -49,7 +49,7 @@ var.X      = var.c*cal.cmp_oxd; % melt oxide fractions [wt %]
 var.T      = T;             % temperature [C]
 var.P      = P/10;         % pressure [GPa]
 var.H2O    = SYS_cmpfit(:,end); % water concentration [wt]
-cal.H2Osat = fluidsat(var);
+cal.H2Osat = var.H2O./(PHS(:,1)/100);%fluidsat(var);
 [var,cal]  = meltmodel(var,cal,'E');
 
 % get fitted phase oxide compositions

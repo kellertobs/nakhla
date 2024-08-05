@@ -209,15 +209,15 @@ if level>2
 
 
     % !!! enter the below values into cal file !!!
-    cmp_oxd = round(cmp_oxd_best,2)
-    cmp_mem = round(cmp_mem_best,2)     % => cal.cmp_mem
+    cmp_oxd = round(cmp_oxd_best,1)
+    cmp_mem = round(cmp_mem_best,1)     % => cal.cmp_mem
     T0      = round(T0_best,0)          % => cal.T0
-    A       = round(A_best,2)           % => cal.A
-    B       = round(B_best,2)           % => cal.B
+    A       = round(A_best,1)           % => cal.A
+    B       = round(B_best,1)           % => cal.B
     r       = round(r_best,1)           % => cal.r
     dTH2O   = round(dT_best,0)          % => cal.dTH2O
     c0      = round([SYS_cmpfit(  1,1:end-1)./sum(SYS_cmpfit(  1,1:end-1),2),SYS_cmpfit(1,end)],3) % => cal.c0
     c1      = round(mean([SYS_cmpfit(end-4:end,1:end-1)./sum(SYS_cmpfit(end-4:end,1:end-1),2),SYS_cmpfit(end-4:end,end)],1),3) % => cal.c1
-    c0_oxd  = round([SYS_oxd(  1,1:end-1)./sum(SYS_oxd(  1,1:end-1),2),SYS_oxd(1,end)/100]*100,1) % => cal.c0
-    c1_oxd  = round(mean([SYS_oxd(end-4:end,1:end-1)./sum(SYS_oxd(end-4:end,1:end-1),2),SYS_oxd(end-4:end,end)/100],1)*100,1) % => cal.c1
+    c0_oxd  = round([SYS_oxd(  1,1:end-1)./sum(SYS_oxd(  1,1:end-1),2),SYS_oxd(1,end)/100]*100,2) % => cal.c0
+    c1_oxd  = round(mean([SYS_oxd(end-4:end,1:end-1)./sum(SYS_oxd(end-4:end,1:end-1),2),SYS_oxd(end-4:end,end)/100],1)*100,2) % => cal.c1
 end

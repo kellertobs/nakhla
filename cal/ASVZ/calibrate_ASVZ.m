@@ -322,14 +322,14 @@ cal_ASVZ;  % read calibration file
 % - phase out mineral systems and their end-members in accordance with
 %   their fading or disappearance in PHS_frc
 
-%                ant   alb   san   for   fay   ulv   ilm   dps   aug   pig   hyp   fsl   qtz   wat
-cmp_mem_init  = [ 92     8     0     0     0     0     0     0     0     0     0     0     0     0
-                  51    19     0    23     0     7     0     0     0     0     0     0     0     0
-                  25     2     0     0     2    13     5    21     2     0    30     0     0     0
-                   9    56     0     0     0     0     2     0    10     6     2    15     0     0
-                   1    30    64     0     0     0     1     0     0     3     0     1     0     0
-                   3     0    53     0     0     0     0     2     0     3     0     1    38     0
-                   0     0     0     0     0     0     0     0     0     0     0     0     0   100];
+%                ant   alb   san   for   fay   ulv   mgt   ilm   dps   aug   pig   hyp   fsl   qtz   wat
+cmp_mem_init  = [ 89.8000   10.2000         0         0         0         0         0         0         0         0         0         0         0         0         0
+                  62.7000    8.4000         0   16.7000    3.7000    4.8000    3.7000         0         0         0         0         0         0         0         0
+                  38.0000    3.8000         0         0    0.5000    3.1000    5.1000    2.6000   14.5000    7.5000         0   24.9000         0         0         0
+                   3.4000   67.1000    0.5000         0         0         0    0.5000    1.5000    0.5000    6.8000    5.3000    1.5000   13.8000         0         0
+                   0.5000   40.0000   53.4000         0         0         0         0    1.2000    0.5000    0.5000    2.3000    0.5000    1.1000         0         0
+                   3.4000    1.3000   40.4000         0         0         0         0         0    1.9000    0.7000    1.9000         0    1.3000   49.3000         0
+                        0         0         0         0         0         0         0         0         0         0         0         0         0         0  100.0000];
 cmp_mem_init = cmp_mem_init./sum(cmp_mem_init,2)*100;
 indmem = logical(cmp_mem_init);
 cmp_mem_best = cmp_mem_init;
@@ -338,10 +338,10 @@ cmp_oxd_init = cmp_mem_init*cal.mem_oxd/100;
 cmp_oxd_best = cmp_oxd_init;
 
 % set initial guess for melting point parameters
-T0_init = [ 1500   1170   1140   1050    940    810];  T0_best = T0_init;
-A_init  = [ 5.50   5.00   4.50   3.50   1.90   1.00];   A_best =  A_init;
-B_init  = [ 5.50   5.00   4.50   3.50   2.90   3.30];   B_best =  B_init;
-r_init  = [36.00   3.00   3.00  10.00   7.00   5.00];   r_best =  r_init;
+T0_init = [ 1500   1160   1130   1073    938    814];  T0_best = T0_init;
+A_init  = [ 5.10   5.30   5.70   3.40   1.60   1.00];   A_best =  A_init;
+B_init  = [ 5.30   5.90   5.30   3.40   2.50   2.40];   B_best =  B_init;
+r_init  = [20.00   3.00   3.00   10.0   11.0   3.00];   r_best =  r_init;
 dT_init = [ 1100   1400   1500   1600   1800   2100];  dT_best = dT_init;
 
 % compose initial parameter guess
@@ -376,7 +376,7 @@ Tm         = cal.Tm;
 PHS_frc(:,2:end) = PHS_frc(:,2:end)./(100-PHS_frc(:,1)+eps)*100;
 
 % plot basic information for initial fit
-level = 1;
+level = 3;
 run('../MCMC/PlotFit.m')
 
 
@@ -390,9 +390,9 @@ T0_init = T0_best; A_init = A_best; B_init = B_best; r_init = r_best; cmp_mem_in
 m0      = [T0_init.';A_init.';B_init.';r_init.';dT_init.';cmp_mem_init(:).*indmem(:)];
 
 % !!!  set MCMC parameters then Run Section to execute MCMC routine  !!!
-Niter           = 1e5;              % number of samples to take
-anneal.initstep = 0.25e-2;          % adjust step size to get reasonable acceptance ratio 20-30%
-anneal.levels   = 1;                % select number of annealing levels
+Niter           = 1e6;              % number of samples to take
+anneal.initstep = 0.1e-2;          % adjust step size to get reasonable acceptance ratio 20-30%
+anneal.levels   = 3;                % select number of annealing levels
 anneal.burnin   = max(1,Niter/10);  % set length of initial burn-in sequence
 anneal.refine   = max(1,Niter/10);  % set length of final refinement sequence
 
@@ -413,11 +413,11 @@ data   = [MLT_oxd(:);SOL_mem(:);PHS_frc(:);Tsol(:);Tliq(:)];
 
 % construct lower and upper parameter bounds
 dm    =[1*max(  5,0.01*T0_init.'); ...
-        1*max(0.2,0.20* A_init.'); ...
-        1*max(0.2,0.20* B_init.'); ...
-        1*max(0.5,0.20* r_init.'); ...
-        0*max( 10,0.20*dT_init.'); ...
-        1*max(0.5,min(5,0.25*cmp_mem_init(:))).*indmem(:)];
+        1*max(0.2,0.25* A_init.'); ...
+        1*max(0.2,0.25* B_init.'); ...
+        1*max(0.5,0.25* r_init.'); ...
+        0*max( 10,0.25*dT_init.'); ...
+        1*max(0.5,min(5,0.5*cmp_mem_init(:))).*indmem(:)];
 m0_lw  = m0 - dm;
 m0_up  = m0 + dm;
 mbnds  = [m0_lw(:),m0_up(:)]; % model parameter bounds

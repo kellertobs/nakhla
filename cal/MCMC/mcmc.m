@@ -72,7 +72,7 @@ for i=1:Niter
         anneal.temp = 1/2^anneal.levels;
     end
 
-    xstep  = anneal.initstep .* anneal.temp .* (1+(i<anneal.burnin));
+    xstep  = anneal.initstep .* anneal.temp;
 
     flag = 0;
     
