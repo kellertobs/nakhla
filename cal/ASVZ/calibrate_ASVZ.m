@@ -27,19 +27,29 @@ LO = {'Location','bestoutside'};
 
 % load MAGEMin results (window with table opens, using default selection
 % click Import Selection => Import Data
-filename = '/Users/tokeller/Documents/Research/nakhla/cal/ASVZ/ASVZ_frac25_H3_ig_prc.csv';
+filename = '/Users/tokeller/Documents/Research/nakhla/cal/ASVZ/ASVZ_F20_H2_ig.csv';
 uiopen(filename,1)
 
 % Tsol, Tliq at selected P,X0 as additional constraint
-Tsol = [ 929.1;  916.9;  903.8;  889.6;  934.3;  922.1;  908.9;  894.8;];   % solidus estimate from MAGEMin
-Tliq = [1222.6; 1220.4; 1218.0; 1215.6; 1052.0; 1047.3; 1042.4; 1037.3;];   % liquidus estimate from MAGEMin
-Psl  = [   2.5;    2.0;    1.5;    1.0;    2.5;    2.0;    1.5;    1.0;]; % P [Pa]
+Tsolpa = [ 939.9;  928.5;  916.3;  903.3;  889.3; ];   % primary anhydrous solidus estimate from MAGEMin
+Tsolph = [ 667.5;  671.2;  676.2;  684.1;  700.2; ];   % primary   hydrous solidus estimate from MAGEMin
+Tliqpa = [1256.8; 1254.6; 1252.5; 1250.0; 1247.6; ];   % primary anhydrous liquidus estimate from MAGEMin
+Tliqph = [1169.9; 1168.3; 1166.7; 1164.8; 1162.8; ];   % primary   hydrous liquidus estimate from MAGEMin
 
+Tsolea = [ 944.8;  933.3;  921.0;  907.8;  893.7; ];   % evolved anhydrous solidus estimate from MAGEMin
+Tsoleh = [ 668.4;  673.0;  679.2;  688.6;  705.9; ];   % evolved   hydrous solidus estimate from MAGEMin
+Tliqea = [1050.6; 1046.0; 1041.3; 1036.3; 1031.1; ];   % evolved anhydrous liquidus estimate from MAGEMin
+Tliqeh = [ 881.6;  876.7;  871.7;  866.6;  861.0; ];   % evolved   hydrous liquidus estimate from MAGEMin
+
+Psl    = [   3.0;    2.5;    2.0;    1.5;    1.0; ];   % P [Pa]
+Tsol   = [Tsolpa; Tsolea];
+Tliq   = [Tliqpa; Tliqea];
+Psl    = [   Psl;    Psl];
 
 %% *****  unpack calibration data  ****************************************
 
 % !!!  update table name on following line, then Run Section  !!!
-DAT = ASVZfrac25H3igprc;  % table name must correspond to table header above
+DAT = ASVZF20H2ig;  % table name must correspond to table header above
 
 % load phase names in order of appearance, liq first
 phs = unique(string(DAT.phase),'stable');                                  % load phase list
@@ -51,7 +61,7 @@ iliq = find(strcmp(phs,'liq'));                                            % ens
 iphs = 1:nphs; iphs(iliq) = []; iphs = [iliq,iphs];
 phs  = phs(iphs);
 
-liq = 1; fsp = 2; olv = 3; spn = 4; cpx = 5; opx = 6; ilm = 7; kfsp = 8; qtz = 9;    % set shortcut phase indices
+liq = 1; fsp = 2; opx = 3; spn = 4; cpx = 5; ilm = 6; kfsp = 7; qtz = 8;    % set shortcut phase indices
 
 % set oxide list in preferred sequence
 oxd  = ["SiO2";"TiO2";"Al2O3";"FeO";"MgO";"CaO";"Na2O";"K2O";"H2O"];       % set major oxides
@@ -125,7 +135,7 @@ nphs             = nphs-1;
 % hasphs(:,ilm)    = [];
 % nphs             = nphs-1;
 
-liq = 1; fsp = 2; olv = 3; spn = 4; cpx = 5; opx = 6; qtz = 7;    % set shortcut phase indices
+liq = 1; fsp = 2; opx = 3; spn = 4; cpx = 5; qtz = 6;    % set shortcut phase indices
 
 % detect which oxides are present in which phases
 hasoxd = logical(squeeze(sum(PHS_oxd,1)));
@@ -139,7 +149,19 @@ for iph = 1:nphs
 end
 PHS_oxdp = PHS_oxd;
 
-% reconstitute system oxide composition
+% extract melt oxide composition
+MLT_oxd = squeeze(PHS_oxd(:,1,:));  % melt oxide composition
+
+% extract solid phase oxide composition
+SOL_oxd = zeros(npts,noxd);
+wt  = zeros(size(SOL_oxd)) + eps;
+for iph = 2:nphs
+    SOL_oxd = SOL_oxd + squeeze(PHS_oxd(:,iph,:)).*PHS_frc(:,iph);
+    wt  = wt + PHS_frc(:,iph);
+end
+SOL_oxd = SOL_oxd./wt;  % solid oxide composition
+
+% extract system oxide composition
 SYS_oxd = zeros(npts,noxd);
 wt  = zeros(size(SYS_oxd)) + eps;
 for iph = 1:nphs
@@ -201,11 +223,12 @@ for iph=2:nphs
 end
 
 % add water as last end-member
-nmem = sum(PHS_nmem);
+nmem    = sum(PHS_nmem);
 MEM_oxd = [MEM_oxd;zeros(1,noxd-1),100.0];
 
 % record final end-member count and display results
-nmem = sum(PHS_nmem)+1;
+nmem    = sum(PHS_nmem)+1;
+PHS_nmem(1) = nmem;
 disp(MEM_oxd)
 
 % !!!  set MEM_oxd => cal.mem_oxd in cal_ASVZ.m  !!!
@@ -216,34 +239,27 @@ disp(MEM_oxd)
 % !!! update calibration file name on following line, then Run Section  !!!
 cal_ASVZ;  % read cal.mem_oxd from calibration file
 
-% extract solid phase oxide composition
-SOL_oxd = zeros(npts,noxd);
-wt  = zeros(size(SOL_oxd)) + eps;
-for iph = 2:nphs
-    SOL_oxd = SOL_oxd + squeeze(PHS_oxd(:,iph,:)).*PHS_frc(:,iph);
-    wt  = wt + PHS_frc(:,iph);
-end
-SOL_oxd = SOL_oxd./wt;  % solid oxide composition
-
-% extract melt oxide composition
-iph = 1;
-MLT_oxd  = squeeze(PHS_oxd(:,1,:));  % melt oxide composition
-
-% extract solid phase end-member composition and project back to 
+% extract melt phase end-member composition and project back to 
 % reduced oxide composition
-kmem   = 1;
-SOL_mem = zeros(npts,cal.nmem);
-for iph = 2:nphs
-    for ip = 1:npts
-        imem = kmem:kmem+PHS_nmem(iph)-1;
-        SOL_mem(ip,imem) = lsqnonneg(cal.mem_oxd(imem,:).',squeeze(PHS_oxd(ip,iph,:)));
-    end
-    SOL_mem(:,imem) = SOL_mem(:,imem)./(sum(SOL_mem(:,imem),2)+eps);
-    SOL_mem(isnan(SOL_mem)) = 0;
-    PHS_oxdp(:,iph,:) = SOL_mem(:,imem)*cal.mem_oxd(imem,:);
 
-    SOL_mem(:,imem) = SOL_mem(:,imem) .* PHS_frc(:,iph)./(100-PHS_frc(:,1)+eps) * 100;
-    kmem = kmem+PHS_nmem(iph);
+PHS_mem = zeros(npts,nphs,nmem);
+MLT_mem = zeros(npts,nmem);
+SOL_mem = zeros(npts,nmem);
+kmem = 1;
+for iph = 1:nphs
+    imem  = kmem:kmem+PHS_nmem(iph)-1;
+    A     = cal.mem_oxd(imem,:).';
+    b     = squeeze(PHS_oxd(:,iph,:));
+    PHS_mem (:,iph,imem) = lsqregcmp(A,b,[0.1 0 1])*100;
+    PHS_oxdp(:,iph,:   ) = squeeze(PHS_mem (:,iph,imem))*cal.mem_oxd(imem,:)/100;
+    if iph==1
+        MLT_mem  = squeeze(PHS_mem (:,1,:));
+        MLT_oxdp = squeeze(PHS_oxdp(:,1,:));
+    else
+        SOL_mem(:,imem) = squeeze(PHS_mem (:,iph,imem));
+        SOL_mem(:,imem) = SOL_mem(:,imem) .* PHS_frc(:,iph)./(100-PHS_frc(:,1)+eps);
+        kmem = kmem+PHS_nmem(iph); 
+    end
 end
 SOL_oxdp = SOL_mem*cal.mem_oxd/100;
 
@@ -255,6 +271,38 @@ for iph = 1:nphs
     wt  = wt + PHS_frc(:,iph);
 end
 SYS_oxdp = SYS_oxdp./wt;  % projected system oxide composition
+
+
+%% *****  reduce dimensionality by selecting number of pseudo-components **
+
+% load phase compositions into data array for analysis
+X = [MLT_oxdp(:,1:end-1);SOL_oxdp(:,1:end-1)];
+X = X./sum(X,2);
+
+% if more than 2 oxides,
+% use unmix tool to perform PCA, end-member extraction
+DATA.VNAMES = cal.oxdStr(1:end-1);
+DATA.SNAMES = {};
+DATA.X      = X;
+unmix
+
+ncmp = DGN.p+1;
+
+% process external end-members for phase composition
+EMInt = round(max(0,FInt)./sum(max(0,FInt),2)*100,2);
+EMInt(EMInt==max(EMInt,[],2)) = EMInt(EMInt==max(EMInt,[],2)) + 100 - sum(EMInt,2);
+
+% sort end-members from primitive to evolved
+[~,is] = sort(EMInt(:,cal.Si)-EMInt(:,cal.Al)-EMInt(:,cal.Mg)+EMInt(:,cal.Na)+EMInt(:,cal.K),'ascend');
+EMInt  = EMInt(is,:);
+
+% process external end-members for phase composition
+EMExt = round(max(0,FExt)./sum(max(0,FExt),2)*100,2);
+EMExt(EMExt==max(EMExt,[],2)) = EMExt(EMExt==max(EMExt,[],2)) + 100 - sum(EMExt,2);
+
+% sort end-members from primitive to evolved
+[~,is] = sort(EMExt(:,cal.Si)-EMExt(:,cal.Al)-EMExt(:,cal.Mg)+EMExt(:,cal.Na)+EMExt(:,cal.K),'ascend');
+EMExt = EMExt(is,:);
 
 
 %% *****  visualised calibrated end-member, phase compositions  ***********
@@ -282,7 +330,7 @@ for iph=2:nphs-1
                 scatter(squeeze(PHS_oxd (hasphs(:,iph)==1,iph,iox(1))),squeeze(PHS_oxd (hasphs(:,iph)==1,iph,iox(kk))),25,Tmp(hasphs(:,iph)==1)); colormap('copper'); hold on
                 scatter(squeeze(PHS_oxdp(hasphs(:,iph)==1,iph,iox(1))),squeeze(PHS_oxdp(hasphs(:,iph)==1,iph,iox(kk))),25,Tmp(hasphs(:,iph)==1),'filled');
                 for iem = kmem:kmem+sum(cal.msy_mem(iph-1,:))-1
-                    scatter(MEM_oxd        (iem,iox(1)),MEM_oxd        (iem,iox(kk)),200,'kh');
+                    scatter(MEM_oxd    (iem,iox(1)),MEM_oxd    (iem,iox(kk)),200,'kh');
                     scatter(cal.mem_oxd(iem,iox(1)),cal.mem_oxd(iem,iox(kk)),200,'kh','filled');
                 end
                 xlabel(cal.oxdStr(iox(1 )),FS{:},TX{:})
@@ -298,6 +346,39 @@ for iph=2:nphs-1
     drawnow;
 end
 
+% plot fitted liquid, solid, mixture compositions
+figure(figno); clf; figno=figno+1;
+
+spz = ceil(sqrt(noxd-1));
+spx = ceil((noxd-1)/spz);
+
+kk = 2;
+for ix = 1:spx
+    for iz = 1:spz
+        if kk<=noxd
+            subplot(spz,spx,kk-1);
+            scatter(MLT_oxd (:,1),MLT_oxd (:,kk),25,Tmp,'o'); colormap('copper'); axis tight; hold on
+            scatter(SOL_oxd (:,1),SOL_oxd (:,kk),25,Tmp,'s');
+            scatter(SYS_oxd (:,1),SYS_oxd (:,kk),25,Tmp,'d');
+            scatter(MLT_oxdp(:,1),MLT_oxdp(:,kk),25,Tmp,'o','filled');
+            scatter(SOL_oxdp(:,1),SOL_oxdp(:,kk),25,Tmp,'s','filled');
+            scatter(SYS_oxdp(:,1),SYS_oxdp(:,kk),25,Tmp,'d','filled');
+%             for icp = 1:ncmp-1
+% %                 scatter(EMInt(icp,1),EMInt(icp,kk),200,'kh','filled');
+%                 scatter(cmp_oxd(icp,1),cmp_oxd(icp,kk),200,'kh');
+%             end
+            if kk==noxd; legend([{'proj. mlt'},{'proj. sol'},{'proj. sys'},{'fit sol'},{'fit mlt'},{'fit sys'},{'best cmp'},{'init cmp'}],Fs{:},TX{:},LO{:}); end
+            xlabel(cal.oxdStr(1 ),FS{:},TX{:})
+            ylabel(cal.oxdStr(kk),FS{:},TX{:})
+            set(gca,Fs{:},TL{:});
+            kk = kk+1;
+        else
+            break;
+        end
+    end
+end
+sgtitle('MLT \& SOL MCMC fit',FL{:},TX{:})
+drawnow
 
 %% *****  save progress for later use  ************************************
 
@@ -322,14 +403,29 @@ cal_ASVZ;  % read calibration file
 % - phase out mineral systems and their end-members in accordance with
 %   their fading or disappearance in PHS_frc
 
-%                ant   alb   san   for   fay   ulv   mgt   ilm   dps   aug   pig   hyp   fsl   qtz   wat
-cmp_mem_init  = [ 89.8000   10.2000         0         0         0         0         0         0         0         0         0         0         0         0         0
-                  62.7000    8.4000         0   16.7000    3.7000    4.8000    3.7000         0         0         0         0         0         0         0         0
-                  38.0000    3.8000         0         0    0.5000    3.1000    5.1000    2.6000   14.5000    7.5000         0   24.9000         0         0         0
-                   3.4000   67.1000    0.5000         0         0         0    0.5000    1.5000    0.5000    6.8000    5.3000    1.5000   13.8000         0         0
-                   0.5000   40.0000   53.4000         0         0         0         0    1.2000    0.5000    0.5000    2.3000    0.5000    1.1000         0         0
-                   3.4000    1.3000   40.4000         0         0         0         0         0    1.9000    0.7000    1.9000         0    1.3000   49.3000         0
-                        0         0         0         0         0         0         0         0         0         0         0         0         0         0  100.0000];
+%                 ant  alb  san  ens  hyp  fsl  ulv  mgt  ilm  dps  aug  pig  qtz  wat
+indmem  = logical([1    1    0    0    0    0    0    0    0    0    0    0    0    0
+                   1    1    0    1    0    0    1    0    0    0    0    0    0    0
+                   1    1    0    0    1    0    0    1    1    1    0    0    0    0
+                   1    1    0    0    0    1    0    0    1    0    1    1    0    0
+                   1    1    1    0    0    1    0    0    1    0    0    1    0    0
+                   1    1    1    0    0    0    0    0    0    0    0    1    1    0
+                   0    0    0    0    0    0    0    0    0    0    0    0    0    1 ]);
+
+cmp_oxd = 1.0*EMInt + 0.0*EMExt;%*cal.mem_oxd(1:end-1,1:end-1)/100;
+cmp_oxd = [cmp_oxd,zeros(ncmp-1,1)];
+cmp_oxd = [cmp_oxd;zeros(1,noxd)];
+cmp_oxd(end,end) =100;
+
+cmp_mem = zeros(ncmp-1,cal.nmem);
+for ic = 1:ncmp
+    imem  = indmem(ic,:);
+    A     = cal.mem_oxd(imem,:).';
+    b     = squeeze(cmp_oxd(ic,:));
+    cmp_mem(ic,imem) = lsqregcmp(A,b,0.01)*100;
+end
+
+cmp_mem_init = round(cmp_mem,1);
 cmp_mem_init = cmp_mem_init./sum(cmp_mem_init,2)*100;
 indmem = logical(cmp_mem_init);
 cmp_mem_best = cmp_mem_init;
@@ -338,11 +434,11 @@ cmp_oxd_init = cmp_mem_init*cal.mem_oxd/100;
 cmp_oxd_best = cmp_oxd_init;
 
 % set initial guess for melting point parameters
-T0_init = [ 1500   1160   1130   1073    938    814];  T0_best = T0_init;
-A_init  = [ 5.10   5.30   5.70   3.40   1.60   1.00];   A_best =  A_init;
-B_init  = [ 5.30   5.90   5.30   3.40   2.50   2.40];   B_best =  B_init;
-r_init  = [20.00   3.00   3.00   10.0   11.0   3.00];   r_best =  r_init;
-dT_init = [ 1100   1400   1500   1600   1800   2100];  dT_best = dT_init;
+T0_init = [   1500      1150      1115      1075       925       825];  T0_best = T0_init;
+A_init  = [ 6.0000    5.0000    4.2000    3.2000    1.7000    1.0000];   A_best =  A_init;
+B_init  = [ 6.0000    5.0000    4.2000    3.2000    2.2000    2.4000];   B_best =  B_init;
+r_init  = [25.0000    3.0000    4.0000   12.0000   10.0000    3.0000];   r_best =  r_init;
+dT_init = round(1400 * 1200./T0_init,-1);  dT_best = dT_init;
 
 % compose initial parameter guess
 m0     = [T0_init.';A_init.';B_init.';r_init.';dT_init.';cmp_mem_init(:).*indmem(:);];
@@ -350,7 +446,7 @@ m0     = [T0_init.';A_init.';B_init.';r_init.';dT_init.';cmp_mem_init(:).*indmem
 % set function to calculate forward model
 % m --> dhat
 % dhatFunc  = @(model) OxdFromCmpMem(model,MLTp,SOLp,PHS(:,1),cal);
-dhatFunc  = @(model) ModelFitP(model,Tmp,Prs,SYS_oxdp,PHS_frc,Psl,cal,[1e-3,0.75]);
+dhatFunc  = @(model) ModelFitP(model,Tmp,Prs,SYS_oxdp,PHS_frc,Psl,cal,[1,5,0.5]);
 
 % test fit function for initial guess
 [~,MLT_oxdfit,SOL_oxdfit,SYS_oxdfit,SOL_memfit,PHS_oxdfit,PHS_frcfit,SOL_cmpfit,MLT_cmpfit,SYS_cmpfit,Tsolfit,Tliqfit,~] = dhatFunc(m0);
@@ -376,7 +472,7 @@ Tm         = cal.Tm;
 PHS_frc(:,2:end) = PHS_frc(:,2:end)./(100-PHS_frc(:,1)+eps)*100;
 
 % plot basic information for initial fit
-level = 3;
+level = 1;
 run('../MCMC/PlotFit.m')
 
 
@@ -391,41 +487,41 @@ m0      = [T0_init.';A_init.';B_init.';r_init.';dT_init.';cmp_mem_init(:).*indme
 
 % !!!  set MCMC parameters then Run Section to execute MCMC routine  !!!
 Niter           = 1e6;              % number of samples to take
-anneal.initstep = 0.1e-2;          % adjust step size to get reasonable acceptance ratio 20-30%
-anneal.levels   = 3;                % select number of annealing levels
+anneal.initstep = 1e-3;           % adjust step size to get reasonable acceptance ratio 20-30%
+anneal.levels   = 1;                % select number of annealing levels
 anneal.burnin   = max(1,Niter/10);  % set length of initial burn-in sequence
 anneal.refine   = max(1,Niter/10);  % set length of final refinement sequence
 
 % !!!  set data uncertainties to weight likelihood function  !!!
-MLT_scl   = max(0.01,(MLT_oxd (:)-min(MLT_oxd (:)))./(max(MLT_oxd (:))-min(MLT_oxd (:))));
-SOL_scl   = max(0.01,(SOL_oxdp(:)-min(SOL_oxdp(:)))./(max(SOL_oxdp(:))-min(SOL_oxdp(:))));
+MLT_scl   = max(0.01,(MLT_oxdp(:)-min(MLT_oxdp(:)))./(max(MLT_oxdp(:))-min(MLT_oxdp(:))));
+% SOL_scl   = max(0.01,(SOL_oxdp(:)-min(SOL_oxdp(:)))./(max(SOL_oxdp(:))-min(SOL_oxdp(:))));
 MEM_scl   = max(0.01,(SOL_mem (:)-min(SOL_mem (:)))./(max(SOL_mem (:))-min(SOL_mem (:))));
 PHS_scl   = max(0.01,(PHS_frc (:)-min(PHS_frc (:)))./(max(PHS_frc (:))-min(PHS_frc (:))));
-sigma_MLT =  0.1  * MLT_scl.^0.3;       % uncertainty of melt oxide composition
-sigma_SOL =  0.1  * SOL_scl.^0.3;       % uncertainty of melt oxide composition
-sigma_MEM =  0.1  * MEM_scl.^0.3;       % uncertainty of solid end-member composition
-sigma_PHS =  0.1  * PHS_scl.^0.3;       % uncertainty of phase fractions
-sigma_TSL =  0.5  * ones(size([Tsol(:);Tliq(:)])); % uncertainty of solidus/liquidus Temp
+sigma_MLT =  0.1  * MLT_scl.^0.25;       % uncertainty of melt oxide composition
+% sigma_SOL =  1e6  * SOL_scl.^0.25;       % uncertainty of melt oxide composition
+sigma_MEM =  0.1  * MEM_scl.^0.25;       % uncertainty of solid end-member composition
+sigma_PHS =  0.1  * PHS_scl.^0.25;       % uncertainty of phase fractions
+sigma_TSL =  0.25 * ones(size([Tsol(:);Tliq(:)])); % uncertainty of solidus/liquidus Temp
 sigma = [sigma_MLT;sigma_MEM;sigma_PHS;sigma_TSL]; % combine all as in data vector
 
 % load calibration data constraints into data vector
 data   = [MLT_oxd(:);SOL_mem(:);PHS_frc(:);Tsol(:);Tliq(:)];
 
 % construct lower and upper parameter bounds
-dm    =[1*max(  5,0.01*T0_init.'); ...
-        1*max(0.2,0.25* A_init.'); ...
-        1*max(0.2,0.25* B_init.'); ...
-        1*max(0.5,0.25* r_init.'); ...
-        0*max( 10,0.25*dT_init.'); ...
-        1*max(0.5,min(5,0.5*cmp_mem_init(:))).*indmem(:)];
+dm    =[1*max(10.0,0.02*T0_init.'); ...
+        1*max(0.25,0.25* A_init.'); ...
+        1*max(0.25,0.25* B_init.'); ...
+        1*max(1.00,0.25* r_init.'); ...
+        0*max(10.0,0.25*dT_init.'); ...
+        1*max(5.00,min(20.0,cmp_mem_init(:))).*indmem(:)];
 m0_lw  = m0 - dm;
 m0_up  = m0 + dm;
 mbnds  = [m0_lw(:),m0_up(:)]; % model parameter bounds
-mbnds(1*(cal.ncmp-1)+(1:cal.ncmp-1)       ,:) = max(0.5,                    mbnds(1*(cal.ncmp-1)+(1:cal.ncmp-1)       ,:));
-mbnds(2*(cal.ncmp-1)+(1:cal.ncmp-1)       ,:) = max(1.0,                    mbnds(2*(cal.ncmp-1)+(1:cal.ncmp-1)       ,:));
-mbnds(3*(cal.ncmp-1)+(1:cal.ncmp-1)       ,:) = max(2.0,                    mbnds(3*(cal.ncmp-1)+(1:cal.ncmp-1)       ,:));
-mbnds(4*(cal.ncmp-1)+(1:cal.ncmp-1)       ,:) = max(1000,                   mbnds(4*(cal.ncmp-1)+(1:cal.ncmp-1)       ,:));
-mbnds(5*(cal.ncmp-1)+(1:cal.ncmp*cal.nmem),:) = max(indmem(:)/100,min(99.99,mbnds(5*(cal.ncmp-1)+(1:cal.ncmp*cal.nmem),:)));
+mbnds(1*(cal.ncmp-1)+(1:cal.ncmp-1)       ,:) = max(0.5,                  mbnds(1*(cal.ncmp-1)+(1:cal.ncmp-1)       ,:));
+mbnds(2*(cal.ncmp-1)+(1:cal.ncmp-1)       ,:) = max(1.0,                  mbnds(2*(cal.ncmp-1)+(1:cal.ncmp-1)       ,:));
+mbnds(3*(cal.ncmp-1)+(1:cal.ncmp-1)       ,:) = max(2.0,                  mbnds(3*(cal.ncmp-1)+(1:cal.ncmp-1)       ,:));
+mbnds(4*(cal.ncmp-1)+(1:cal.ncmp-1)       ,:) = max(1000,                 mbnds(4*(cal.ncmp-1)+(1:cal.ncmp-1)       ,:));
+mbnds(5*(cal.ncmp-1)+(1:cal.ncmp*cal.nmem),:) = max(indmem(:)/10,min(99.9,mbnds(5*(cal.ncmp-1)+(1:cal.ncmp*cal.nmem),:)));
 mbnds(m0==100 ,:) = 100;
 % mbnds(m0==7.0 ,1) = 5.0;
 mbnds(m0==T0_init(1),:) = T0_init(1);
@@ -495,7 +591,7 @@ cmp_oxd_best  = cmp_mem_best*cal.mem_oxd/100;
 
 % evaluate melting points as function of pressure
 if isfield(cal,'Tsol'); cal = rmfield(cal,{'Tsol' 'Tliq'}); end
-PP         = linspace(0.001,max(Psl)*3,50).';
+PP         = linspace(0.001,max(Psl)*2,50).';
 var.m      = ones(size(PP))/2; var.x = var.m; var.f = 0*var.m;
 cal.T0     = T0_best;
 cal.A      = A_best;

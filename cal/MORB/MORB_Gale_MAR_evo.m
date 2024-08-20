@@ -1,2 +1,2 @@
 title; comments; db; sysUnit; oxide; frac; frac2
-MORB_Gale_MAR_evo;Gale et al. 2015, MAR;ig;wt;[SiO2, TiO2, Al2O3, FeO, MgO, CaO, Na2O, K2O, H2O, O, Cr2O3];[75.26, 0.24, 11.51, 3.40, 0.77, 2.01, 4.61, 2.20, 2.41, 0.04, 0];
+MORB_Gale_MAR_evo;Gale et al. 2015, MAR;ig;wt;[SiO2, TiO2, Al2O3, FeO, MgO, CaO, Na2O, K2O, H2O, O, Cr2O3];[74.69, 0.21, 11.15, 2.51, 0.60, 1.53, 4.57, 2.34, 2.37, 0.03, 0];

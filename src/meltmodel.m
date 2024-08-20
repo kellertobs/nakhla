@@ -175,8 +175,7 @@ rnorm     = 1;     % initialize residual norm for iterations
 n         = 0;     % initialize iteration count
 its_tol   = 100;   % maximum number of iterations
 flag.eql  = 1;     % tells us whether the Newton solver converged
-upd_m     = 0*var.m;
-eps       = 1e-12;
+eps       = 1e-9;
 
 while rnorm > cal.tol     % Newton iteration
 
@@ -205,7 +204,7 @@ while rnorm > cal.tol     % Newton iteration
     drdm_n      = (rp-rm)./2/eps;
 
     %***  apply Newton correction to crystal fraction x
-    upd_m = -r./drdm_n/2;
+    upd_m = - cal.alpha * r./drdm_n;
     upd_m = max(-var.m/2,min((1-var.m)/2, upd_m ));
     var.m = max(0,min(1, var.m + upd_m ));
 

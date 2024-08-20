@@ -1,2 +1,2 @@
 title; comments; db; sysUnit; oxide; frac; frac2
-ASVZ_Rawlson_prm;Rawlson et al. 2016, ASVZ;ig;wt;[SiO2, TiO2, Al2O3, FeO, MgO, CaO, Na2O, K2O, H2O, O, Cr2O3];[51.70, 1.12, 18.08, 9.33, 6.62, 9.32, 3.09, 0.74, 3.00, 0.29, 0.0];
+ASVZ_Rawlson_prm;Rawlson et al. 2016, ASVZ;ig;wt;[SiO2, TiO2, Al2O3, FeO, MgO, CaO, Na2O, K2O, H2O, O, Cr2O3];[50.65, 1.03, 18.83, 8.70, 5.48, 9.42, 3.01, 0.62, 2.00, 0.27, 0.00];

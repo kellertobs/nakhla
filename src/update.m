@@ -49,7 +49,7 @@ phix_mem = phix_mem./sum(phix_mem,3);
 if Nz==1; Pt    = (Pt + Ptop.*ones(size(Tp)) + Pchmb + Pcouple*P(2:end-1,2:end-1))/2; else
     Pl(1,:)     = repmat(mean(rhofz(1,:),2).*g0.*h/2,1,Nx) + Ptop;
     Pl(2:end,:) = Pl(1,:) + repmat(cumsum(mean(rhofz(2:end-1,:),2).*g0.*h),1,Nx);
-    Pt          = (Pt + Pl + Pchmb + Pcouple*P(2:end-1,2:end-1))/2;
+    Pt          = max(1e7,(Pt + Pl + Pchmb + Pcouple*P(2:end-1,2:end-1))/2);
 end
 
 % update effective constituent sizes

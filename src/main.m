@@ -2,7 +2,7 @@
 init;
 
 % physical time stepping loop
-while time <= tend && step <= Nt && any(m(:)>1e-9) && ~any(cal.Tliq(:)-cal.Tsol(:)<=10) && any(T(:)-273.15-cal.Tsol(:)>5)
+while time <= tend && step <= Nt && any(m(:)>1e-9) && ~any(cal.Tliq(:)-cal.Tsol(:)<=5) && any(T(:)-273.15-cal.Tsol(:)>1)
     
     % time step info
     timing;

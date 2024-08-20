@@ -29,7 +29,7 @@ else % closed sides
 end
 
 Dsx = -cal.dS;
-Dsf = cal.dS+100;
+Dsf =  cal.dS+100;
 cal.tol = atol;
 
 % normalise major components to anhydrous unit sum, rescale to hydrous

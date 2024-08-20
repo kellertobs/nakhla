@@ -126,3 +126,7 @@ cal.BB  =  [ 0.50, 0.20, 0.30; ...  % permission step locations
 cal.CC  =  [[0.30, 0.30, 0.40]*0.7; ... % permission step widths
             [0.52, 0.40, 0.08]*1.1; ... % square brackets sum to 1, sets angle of step functions
             [0.15, 0.25, 0.60]*0.7; ];  % factor increases width of step functions
+
+% convergence tolerance
+cal.tol     = 1e-9;
+cal.alpha   = 0.5;

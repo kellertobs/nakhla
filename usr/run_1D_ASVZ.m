@@ -7,7 +7,7 @@ run('./par_default')
 % set run parameters
 runID    =  '1D_ASVZ';           % run identifier
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
-nop      =  200;                 % output frame plotted/saved every 'nop' time steps
+nop      =  100;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot results
 save_op  =  1;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
@@ -24,9 +24,9 @@ tend     =  1*yr;                % end time for simulation [s]
 dt       =  36;                  % initial time step [s]
 
 % set initial thermo-chemical state
-T0       =  1130;                % temperature top  layer [deg C]
+T0       =  1060;                % temperature top  layer [deg C]
 T1       =  T0;                  % temperature base layer [deg C]
-c0       =  [0.10  0.16  0.13  0.30  0.21  0.10  0.03];  % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
+c0       =  [0.04  0.13  0.40  0.28  0.09  0.06  0.03];  % components (maj comp, H2O) top  layer [wt] (will be normalised to unit sum!)
 c1       =  c0;                  % components (maj comp, H2O) base layer [wt] (will be normalised to unit sum!)
 dcr      =  [0,0,0,0,0,0,0];
 dcg      =  [0,0,0,0,0,0,0];
@@ -35,7 +35,7 @@ dcg      =  [0,0,0,0,0,0,0];
 periodic =  1;
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
 bnd_w    =  0.1;                 % boundary layer width [m]
-tau_T    =  bnd_w^2/1e-6;        % wall cooling/assimilation time [s]
+tau_T    =  (2*bnd_w)^2/1e-6;    % wall cooling/assimilation time [s]
 Twall    =  [300,300,nan];       % [top,bot,sds] wall rock temperature [degC] (nan = insulating)
 cwall    =  nan(3,7);
 Ptop     =  1.5e8;               % top pressure [Pa]
@@ -51,9 +51,11 @@ ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fro
 CFL      =  0.25;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-8;                % outer its absolute tolerance
-maxit    =  15;                  % maximum outer its
-alpha    =  0.5;
-kmin     =  1e-7;
+maxit    =  100;                  % maximum outer its
+Delta_cnv=  h/2;                 % correlation length for eddy, convection diffusivity (multiple of h, 0.5-1)
+Delta_sgr=  dx0*10;              % correlation length for phase fluctuation diffusivity (multiple of dx0, df0, 10-20)
+alpha    =  0.4;
+beta     =  0.25;
 
 %*****  RUN NAKHLA MODEL  *************************************************
 run('../src/main')
