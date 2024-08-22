@@ -174,7 +174,7 @@ while rnorm>tol && it<mxit
 
     r = x.*cx + m.*cm + f.*cf - c;
     r(subsolc) = 0; r(supliqc) = 0;
-    rnorm = norm(r(:)) ./ sqrt(length(c(:)));
+    rnorm = norm(r(:))./norm(c(:));
     it  = it+1;
 end
 

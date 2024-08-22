@@ -2,7 +2,7 @@
 init;
 
 % physical time stepping loop
-while time <= tend && step <= Nt && any(m(:)>1e-9) && ~any(cal.Tliq(:)-cal.Tsol(:)<=5) && any(T(:)-273.15-cal.Tsol(:)>1)
+while time <= tend && step <= Nt && any(m(:)>1e-9) && ~any(cal.Tliq(:)-cal.Tsol(:)<=10) && any(T(:)-273.15-cal.Tsol(:)>=10)
     
     % time step info
     timing;
@@ -14,7 +14,8 @@ while time <= tend && step <= Nt && any(m(:)>1e-9) && ~any(cal.Tliq(:)-cal.Tsol(
     resnorm  = 1;
     resnorm0 = resnorm;
     iter     = 1;
-    
+    if frst; alpha = alpha/2; beta = beta/2; end
+
     % non-linear iteration loop
     while resnorm/resnorm0 >= rtol/(1 + frst*10) && resnorm >= atol/(1 + frst*10) && iter <= maxit*(1 + frst)
         
@@ -51,7 +52,7 @@ while time <= tend && step <= Nt && any(m(:)>1e-9) && ~any(cal.Tliq(:)-cal.Tsol(
     % increment time/step
     time = time+dt;
     step = step+1;
-    if frst; frst=0; end
+    if frst; alpha = alpha*2; beta = beta*2; frst=0; end
     
 end
 

@@ -2,7 +2,7 @@
 if fractxtl && Nx==1 && Nz==1
     Ptop = Ptop + (T-To).*dPdT;
 
-    x = min(x,fractres); f = min(f,0.1); SUM = x+m+f;
+    x = min(x,fractres); f = min(f,0.01); SUM = x+m+f;
     x = x./SUM;  m = m./SUM;  f = f./SUM;
     c = x.*cx + m.*cm + f.*cf;
     s = x.*sx + m.*sm + f.*sf;

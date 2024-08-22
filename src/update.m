@@ -46,10 +46,10 @@ phix_mem = reshape(reshape(cx_mem/100.*rhox,Nz*Nx,cal.nmem)./cal.rhox0,Nz,Nx,cal
 phix_mem = phix_mem./sum(phix_mem,3);
 
 % update lithostatic pressure
-if Nz==1; Pt    = (Pt + Ptop.*ones(size(Tp)) + Pchmb + Pcouple*P(2:end-1,2:end-1))/2; else
+if Nz==1; Pt    = max(1e7,(Pt + Ptop.*ones(size(Tp)) + Pcouple*(Pchmb + P(2:end-1,2:end-1)))/2); else
     Pl(1,:)     = repmat(mean(rhofz(1,:),2).*g0.*h/2,1,Nx) + Ptop;
     Pl(2:end,:) = Pl(1,:) + repmat(cumsum(mean(rhofz(2:end-1,:),2).*g0.*h),1,Nx);
-    Pt          = max(1e7,(Pt + Pl + Pchmb + Pcouple*P(2:end-1,2:end-1))/2);
+    Pt          = max(1e7,(Pt + Pl + Pcouple*(Pchmb + P(2:end-1,2:end-1))/2));
 end
 
 % update effective constituent sizes

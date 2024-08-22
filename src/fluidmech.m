@@ -28,7 +28,6 @@ if Nz==1 && Nx==1
     W  = WBG; Wm = W;  Wx = W;  Wf = W;
     U  = UBG; Um = U;  Ux = U;  Uf = U;
     P  = zeros(Nz+2,Nx+2);
-    Pt = Ptop + Pchmb + P(2:end-1,2:end-1);
     resnorm_VP = 0;
 else
 
@@ -515,14 +514,15 @@ if ~bnchm
 
     
     %% update time step
-    dtk = (h/2)^2/max([kc(:);kwm(:);kwx(:);kwf(:);(kT0+ks(:).*T(:))./rho(:)./cP])/2; % diffusive time step size
+    dtk = (h/2)^2/max([kc(:);kwm(:);kwx(:);kwf(:);(kT0+ks(:).*T(:))./rho(:)./cP])*0.9; % diffusive time step size
     % dta =  h/2   /max(abs([Um(:).*(mux (:)>TINY^0.5);Wm(:).*(muz (:)>TINY^0.5); ...  % advective time step size
     %                        Ux(:).*(chix(:)>TINY^0.5);Wx(:).*(chiz(:)>TINY^0.5); ...
     %                        Uf(:).*(phix(:)>TINY^0.5);Wf(:).*(phiz(:)>TINY^0.5)]+TINY));   
     dta =  h/2   /max(abs([Um(:).* mux(:);Wm(:).* muz(:); ...  % advective time step size
                            Ux(:).*chix(:);Wx(:).*chiz(:); ...
                            Uf(:).*phix(:);Wf(:).*phiz(:)]+TINY));
-    dt  = min([1.01*dto,min(dtk,CFL*dta),dtmax,tau_T/100]);                         % time step size
+    dtc = 0.01./max(abs([advn_X(:)./rho(:);advn_M(:)./rho(:);advn_F(:)./rho(:)]));
+    dt  = min([1.01*dto,min([dtk,CFL*dta,dtc]),dtmax,tau_T/100]);                         % time step size
 end
 
 end
