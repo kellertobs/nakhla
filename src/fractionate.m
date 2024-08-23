@@ -1,6 +1,6 @@
 % fractional crystallisation
+
 if fractxtl && Nx==1 && Nz==1
-    Ptop = Ptop + (T-To).*dPdT;
 
     x = min(x,fractres); f = min(f,0.01); SUM = x+m+f;
     x = x./SUM;  m = m./SUM;  f = f./SUM;
@@ -11,9 +11,11 @@ if fractxtl && Nx==1 && Nz==1
     C = c.*rho;
     X = x.*rho;  M = m.*rho;  F = f.*rho;
     S = s.*rho;
-% fractional melting    
+
+    
+% fractional melting  
+
 elseif fractmlt && Nx==1 && Nz==1
-    Ptop = Ptop + (T-To).*dPdT;
 
     m = min(m,fractres); SUM = x+m+f;
     x = x./SUM;  m = m./SUM;  f = f./SUM;
@@ -24,4 +26,5 @@ elseif fractmlt && Nx==1 && Nz==1
     C = c.*rho;
     X = x.*rho;  M = m.*rho;  F = f.*rho;
     S = s.*rho;
+
 end

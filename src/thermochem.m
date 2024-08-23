@@ -34,37 +34,9 @@ upd_S = - alpha*res_S*dt/a1 + beta*upd_S;
 S     = S + upd_S;
 
 % convert entropy density to temperature
-sm   = (S - X.*Dsx - F.*Dsf)./RHO;
-Tpv   = Tref*exp(sm./cP);
-Tv    = Tref*exp(sm./cP + aT./rhoref./cP.*(Pt-Pref));
+Tpv     = Tref*exp((S - X.*Dsx - F.*Dsf)./RHO./cP);
+Tv      = Tref*exp((S - X.*Dsx - F.*Dsf)./RHO./cP + aT./rhoref./cP.*(Pt-Pref));
 
-si    = s;
-s     = S./RHO;
-dsdt  = dSdt./RHO;% - dXdt.*Dsx - dFdt.*Dsf)./RHO;
-% dsdt  = (s - so)/dt;
-dPdt  = (Pt - Pto)/dt;
-
-upd_s  = s-si;
-upd_P  = Pt-Pti;
-
-dTpdt = dsdt .* T.*rho./RhoCp;
-% dTdt  = dsdt .* T.*rho./RhoCp + dPdt .* aT./RhoCp;
-
-dTdt  = (dSdt - dXdt.*Dsx + (X.*aTx./rhox + M.*aTm./rhom).*dPdt) ./ (X.*cPx./T + M.*cPm./T);
-
-res_Tp = (a1*Tp-a2*Tpo-a3*Tpoo)/dt - (b1*dTpdt + b2*dTpdto + b3*dTpdtoo);
-upd_Tp = -alpha.*res_Tp + beta.*upd_Tp;
-
-res_T  = (a1*T-a2*To-a3*Too)/dt - (b1*dTdt + b2*dTdto + b3*dTdtoo);
-upd_T  = -alpha.*res_T + beta.*upd_T;
-
-
-
-upd_Tpn = upd_s .* Tn.*rho./RhoCp;
-upd_Tn  = upd_s .* Tn.*rho./RhoCp + upd_P .* aT./RhoCp;
-
-Tn  = Tn  + upd_Tn;
-Tpn = Tpn + upd_Tpn;
 
 %***  update major component densities
 
@@ -135,13 +107,13 @@ advn_M   = - advect(M,Um(2:end-1,:),Wm(:,2:end-1),h,{ADVN,''},[1,2],BCA);
 advn_rho = advn_X+advn_F+advn_M;
 
 % phase mass transfer rates
-Gm  = (mq.*RHO-M)/max(tau_r,5*dt);
-Gx  = (xq.*RHO-X)/max(tau_r,5*dt); 
-Gf  = (fq.*RHO-F)/max(tau_r,5*dt);
+Gm  = (mq-m).*RHO/max(tau_r,5*dt);
+Gx  = (xq-x).*RHO/max(tau_r,5*dt); 
+Gf  = (fq-f).*RHO/max(tau_r,5*dt);
 
-Gmc = (cmq.*mq.*RHO-cm.*M)/max(tau_r,5*dt);
-Gxc = (cxq.*xq.*RHO-cx.*X)/max(tau_r,5*dt);
-Gfc = (cfq.*fq.*RHO-cf.*F)/max(tau_r,5*dt);
+Gmc = (cmq.*mq-cm.*m).*RHO/max(tau_r,5*dt);
+Gxc = (cxq.*xq-cx.*x).*RHO/max(tau_r,5*dt);
+Gfc = (cfq.*fq-cf.*f).*RHO/max(tau_r,5*dt);
 
 % total rates of change
 dXdt   = advn_X + Gx;
@@ -172,13 +144,28 @@ RHO = X+F+M;
 %***  update phase fractions and component concentrations
 
 % update phase fractions
-x = X./RHO;  
-f = F./RHO;  
-m = M./RHO; 
+x = X./RHO; 
+f = F./RHO; 
+m = M./RHO;
 
 hasx = x >= eps^0.5;
 hasf = f >= eps^0.5;
 hasm = m >= eps^0.5;
+
+% update phase entropies
+si = sm;
+s  = (S - X.*Dsx - F.*Dsf)./RHO;
+sm = s;
+sx = s + Dsx;
+sf = s + Dsf;
+upd_s = s-si;
+
+% update temperature
+upd_Tp = (upd_s.*rho            ) .*T./RhoCp;
+upd_T  = (upd_s.*rho + aT.*upd_P) .*T./RhoCp;
+
+Tp     = Tp + upd_Tp;
+T      = T  + upd_T;
 
 % update major component phase composition
 Kx      = reshape(cal.Kx,Nz,Nx,cal.ncmp);
@@ -189,16 +176,24 @@ subsolc = repmat(subsol,1,1,cal.ncmp);
 supliqc = repmat(supliq,1,1,cal.ncmp);
 rnorm   = 1;  tol  = atol*10;
 it      = 1;  mxit = 100;
+upd_cm  = 0.*cm;  upd_cx = 0.*cx;
+cm = cmq;  cx = cxq;
 while rnorm>tol && it<mxit
-
-    cm  = c    ./(m + x.*Kx + f.*Kf + eps);
-    cx  = c.*Kx./(m + x.*Kx + f.*Kf + eps);
-
-    cm = cm./sum(cm,3);
-    cx = cx./sum(cx,3);
 
     Kx = cx./(cm+eps);
     Kf = cf./(cm+eps);
+
+    cmK = c    ./(m + x.*Kx + f.*Kf + eps);
+    cxK = c.*Kx./(m + x.*Kx + f.*Kf + eps);
+
+    res_cm = cm - cmK./sum(cmK,3);
+    res_cx = cx - cxK./sum(cxK,3);
+
+    upd_cm = - 0.95.*res_cm + 0.25.*upd_cm;
+    upd_cx = - 0.95.*res_cx + 0.25.*upd_cx;
+
+    cm = max(0,cm + upd_cm);
+    cx = max(0,cx + upd_cx);
 
     r = x.*cx + m.*cm + f.*cf - c;
     r(subsolc) = 0; r(supliqc) = 0;
@@ -214,16 +209,6 @@ end
 cx(subsolc) = cxq(subsolc); x(subsol) = xq(subsol); f(subsol) = fq(subsol); m(subsol) = 0;
 cm(supliqc) = cmq(supliqc); m(supliq) = mq(supliq); f(supliq) = fq(supliq); x(supliq) = 0;
 
-% update phase entropies
-sm = (S - X.*Dsx - F.*Dsf)./RHO;
-sx = sm + Dsx;
-sf = sm + Dsf;
-
-upd_T  = (upd_S - upd_X.*Dsx - upd_F.*Dsf + aT.*upd_P) .* T./ RhoCp;
-upd_Tp = (upd_S - upd_X.*Dsx - upd_F.*Dsf            ) .* T./ RhoCp;
-
-T   = T  + upd_T;
-Tp  = Tp + upd_Tp;
 
 % record timing
 TCtime = TCtime + toc - eqtime;

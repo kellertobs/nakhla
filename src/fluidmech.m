@@ -3,7 +3,7 @@ tic;
 if ~bnchm && step>0
 
 %***  update mixture mass density
-drhodt  = advn_rho;
+drhodt  = advn_rho + (RHO-rho)/dt;
 
 % residual of mixture mass evolution
 res_rho = (a1*rho-a2*rhoo-a3*rhooo)/dt - (b1*drhodt + b2*drhodto + b3*drhodtoo);
@@ -514,7 +514,7 @@ if ~bnchm
 
     
     %% update time step
-    dtk = (h/2)^2/max([kc(:);kwm(:);kwx(:);kwf(:);(kT0+ks(:).*T(:))./rho(:)./cP])*0.9; % diffusive time step size  
+    dtk = (h/2)^2/max([kc(:);kwm(:);kwx(:);kwf(:);(kT(:)+ks(:).*T(:))./rho(:)./cP(:)])*0.9; % diffusive time step size  
     dta =  h/2   /max(abs([Um(:).* mux(:);Wm(:).* muz(:); ...  % advective time step size
                            Ux(:).*chix(:);Wx(:).*chiz(:); ...
                            Uf(:).*phix(:);Wf(:).*phiz(:)]+eps));

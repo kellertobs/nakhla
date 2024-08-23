@@ -342,10 +342,10 @@ M    = rho.*m; Mo = M;  res_M = 0.*M;
 RHO  = X+M+F;
 
 % get phase entropies
-s  = (S - X.*Dsx - F.*Dsf)./rho;
+s  = (S - X.*Dsx - F.*Dsf)./RHO;
 sm = s;
-sx = sm + Dsx;
-sf = sm + Dsf;
+sx = s + Dsx;
+sf = s + Dsf;
 
 % get trace element phase compositions
 Ktrc = zeros(Nz,Nx,cal.ntrc);
@@ -424,8 +424,8 @@ if restart
         Tp = Tref*exp((S - X.*Dsx - F.*Dsf)./RHO./cP);
         s  = (S - X.*Dsx - F.*Dsf)./RHO;
         sm = s;
-        sx = sm + Dsx;
-        sf = sm + Dsf;
+        sx = s + Dsx;
+        sf = s + Dsf;
 
         update; 
         

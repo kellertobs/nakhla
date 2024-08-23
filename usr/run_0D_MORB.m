@@ -21,8 +21,8 @@ h        =  D/N;                 % grid spacing (equal in both dimensions, do no
 % set model timing parameters
 Nt       =  1e4;                 % number of time steps to take
 tend     =  10*hr;               % end time for simulation [s]
-dt       =  36;                  % initial time step [s]
-dtmax    =  36;                  % maximum time step [s]
+dt       =  18;                  % initial time step [s]
+dtmax    =  18;                  % maximum time step [s]
 
 % set initial thermo-chemical state
 T0       =  1275;                % temperature top  layer [deg C]
@@ -36,7 +36,7 @@ dcg      =  [0,0,0,0,0,0,0,0];
 fractxtl =  1;                   % fractional crystallisation mode for 0-D (Nz=Nx=1)
 fractmlt =  0;                   % fractional melting mode for 0-D (Nz=Nx=1)
 fractres =  0.25;                % residual fraction for fractionation mode
-dPdT     =  0*3.1e5;               % decompression rate for 0D models
+dPdT     =  3.15e5;              % decompression rate for 0D models
 bndmode  =  1;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
 bnd_w    =  1e16;                % boundary layer width [m]
 tau_T    =  0.1^2/1e-6;          % wall cooling/assimilation time [s]
@@ -50,7 +50,7 @@ fout     =  0;                   % outgassing factor (0 = no outgassing; 1 = fre
 calID    =  'MORB';              % phase diagram calibration
 aTm      =  4e-5;                % thermal expansivity [1/K]
 aTx      =  4e-5;                % thermal expansivity [1/K]
-aTf      =  4e-5;                % thermal expansivity [1/K]
+aTf      =  4e-4;                % thermal expansivity [1/K]
 kTm      =  4;                   % thermal conductivity [W/m/K]
 kTx      =  4;                   % thermal conductivity [W/m/K]
 kTf      =  4;                   % thermal conductivity [W/m/K]
@@ -66,7 +66,7 @@ rtol     =  1e-6;                % outer its relative tolerance
 atol     =  1e-9;                % outer its absolute tolerance
 maxit    =  50;                  % maximum outer its
 Pcouple  =  0;                   % coupling phase equilibria and material properties to dynamic pressure
-
+beta     =  0;
 
 %*****  RUN NAKHLA MODEL  *************************************************
 run('../src/main')

@@ -39,7 +39,10 @@ while time <= tend && step <= Nt &&  any(mq(:)>eps^0.5) ...
     end
 
     % fractionation mode for 0D-models
-    if Nx==1 && Nz==1; fractionate; end
+    if Nx==1 && Nz==1
+        Ptop = Ptop + (T-To).*dPdT;
+        fractionate; 
+    end
 
     % record model history
     history;

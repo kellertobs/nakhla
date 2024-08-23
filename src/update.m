@@ -53,11 +53,12 @@ RhoCp = mu.*rhom.*cPm + chi.*rhox.*cPx + phi.*rhof.*cPf;
 
 % update lithostatic pressure
 Pti = Pt;
-if Nz==1; Pt    = max(1e7,(Pt + Ptop.*ones(size(Tp)) + Pcouple*(Pchmb + P(2:end-1,2:end-1)))/2); else
+if Nz==1; Pt    = max(1e7,(1-alpha).*Pt + alpha.*(Ptop.*ones(size(Tp)) + Pcouple*(Pchmb + P(2:end-1,2:end-1)))); else
     Pl(1,:)     = repmat(mean(rhofz(1,:),2).*g0.*h/2,1,Nx) + Ptop;
     Pl(2:end,:) = Pl(1,:) + repmat(cumsum(mean(rhofz(2:end-1,:),2).*g0.*h),1,Nx);
-    Pt          = max(1e7,(Pt + Pl + Pcouple*(Pchmb + P(2:end-1,2:end-1))/2));
+    Pt          = max(1e7,(1-alpha).*Pt + alpha.*(Pl + Pcouple*(Pchmb + P(2:end-1,2:end-1))));
 end
+upd_P = Pt-Pti;
 
 % update effective constituent sizes
 dm = dm0.*(1-mu ).^0.5;
