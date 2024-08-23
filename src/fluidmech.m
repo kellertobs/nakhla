@@ -495,14 +495,14 @@ if ~bnchm
     muz  = (mu (icz(1:end-1),icx)+mu (icz(2:end),icx))./2;
     mux  = (mu (icz,icx(1:end-1))+mu (icz,icx(2:end)))./2;
 
-    wqf = qfz./max(TINY^0.5,phiz);  wqf([1,end],:) = min(1,1-[top-fout;bot-fin]).*wqf([2,end-1],:);
-    uqf = qfx./max(TINY^0.5,phix);
+    wqf = qfz./max(eps^0.5,phiz);  wqf([1,end],:) = min(1,1-[top-fout;bot-fin]).*wqf([2,end-1],:);
+    uqf = qfx./max(eps^0.5,phix);
 
-    wqx = qxz./max(TINY^0.5,chiz);
-    uqx = qxx./max(TINY^0.5,chix);
+    wqx = qxz./max(eps^0.5,chiz);
+    uqx = qxx./max(eps^0.5,chix);
 
-    wqm = qmz./max(TINY^0.5,muz);
-    uqm = qmx./max(TINY^0.5,mux);
+    wqm = qmz./max(eps^0.5,muz);
+    uqm = qmx./max(eps^0.5,mux);
 
     % update phase velocities
     Wf  = W + wf + wqf;  % mvp z-velocity
@@ -514,13 +514,10 @@ if ~bnchm
 
     
     %% update time step
-    dtk = (h/2)^2/max([kc(:);kwm(:);kwx(:);kwf(:);(kT0+ks(:).*T(:))./rho(:)./cP])*0.9; % diffusive time step size
-    % dta =  h/2   /max(abs([Um(:).*(mux (:)>TINY^0.5);Wm(:).*(muz (:)>TINY^0.5); ...  % advective time step size
-    %                        Ux(:).*(chix(:)>TINY^0.5);Wx(:).*(chiz(:)>TINY^0.5); ...
-    %                        Uf(:).*(phix(:)>TINY^0.5);Wf(:).*(phiz(:)>TINY^0.5)]+TINY));   
+    dtk = (h/2)^2/max([kc(:);kwm(:);kwx(:);kwf(:);(kT0+ks(:).*T(:))./rho(:)./cP])*0.9; % diffusive time step size  
     dta =  h/2   /max(abs([Um(:).* mux(:);Wm(:).* muz(:); ...  % advective time step size
                            Ux(:).*chix(:);Wx(:).*chiz(:); ...
-                           Uf(:).*phix(:);Wf(:).*phiz(:)]+TINY));
+                           Uf(:).*phix(:);Wf(:).*phiz(:)]+eps));
     dtc = 0.01./max(abs([advn_X(:)./rho(:);advn_M(:)./rho(:);advn_F(:)./rho(:)]));
     dt  = min([1.01*dto,min([dtk,CFL*dta,dtc]),dtmax,tau_T/100]);                         % time step size
 end
