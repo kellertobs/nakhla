@@ -32,19 +32,15 @@ uiopen(filename,1)
 
 % Tsol, Tliq at selected P,X0 as additional constraint
 Tsolpa = [ 939.9;  928.5;  916.3;  903.3;  889.3; ];   % primary anhydrous solidus estimate from MAGEMin
-Tsolph = [ 667.5;  671.2;  676.2;  684.1;  700.2; ];   % primary   hydrous solidus estimate from MAGEMin
 Tliqpa = [1256.8; 1254.6; 1252.5; 1250.0; 1247.6; ];   % primary anhydrous liquidus estimate from MAGEMin
-Tliqph = [1169.9; 1168.3; 1166.7; 1164.8; 1162.8; ];   % primary   hydrous liquidus estimate from MAGEMin
 
 Tsolea = [ 944.8;  933.3;  921.0;  907.8;  893.7; ];   % evolved anhydrous solidus estimate from MAGEMin
-Tsoleh = [ 668.4;  673.0;  679.2;  688.6;  705.9; ];   % evolved   hydrous solidus estimate from MAGEMin
 Tliqea = [1050.6; 1046.0; 1041.3; 1036.3; 1031.1; ];   % evolved anhydrous liquidus estimate from MAGEMin
-Tliqeh = [ 881.6;  876.7;  871.7;  866.6;  861.0; ];   % evolved   hydrous liquidus estimate from MAGEMin
 
 Psl    = [   3.0;    2.5;    2.0;    1.5;    1.0; ];   % P [Pa]
-Tsol   = [Tsolpa; Tsolea];
-Tliq   = [Tliqpa; Tliqea];
-Psl    = [   Psl;    Psl];
+Tsol   = [Tsolp; Tsole];
+Tliq   = [Tliqp; Tliqe];
+Psl    = [  Psl;   Psl];
 
 %% *****  unpack calibration data  ****************************************
 
@@ -407,9 +403,9 @@ cal_ASVZ;  % read calibration file
 indmem  = logical([1    1    0    0    0    0    0    0    0    0    0    0    0    0
                    1    1    0    1    0    0    1    0    0    0    0    0    0    0
                    1    1    0    0    1    0    0    1    1    1    0    0    0    0
-                   1    1    0    0    0    1    0    0    1    0    1    1    0    0
+                   1    1    1    0    0    1    0    0    1    0    1    1    0    0
                    1    1    1    0    0    1    0    0    1    0    0    1    0    0
-                   1    1    1    0    0    0    0    0    0    0    0    1    1    0
+                   1    1    1    0    0    0    0    0    1    1    0    1    1    0
                    0    0    0    0    0    0    0    0    0    0    0    0    0    1 ]);
 
 cmp_oxd = 1.0*EMInt + 0.0*EMExt;%*cal.mem_oxd(1:end-1,1:end-1)/100;
@@ -434,11 +430,11 @@ cmp_oxd_init = cmp_mem_init*cal.mem_oxd/100;
 cmp_oxd_best = cmp_oxd_init;
 
 % set initial guess for melting point parameters
-T0_init = [   1500      1150      1115      1075       925       825];  T0_best = T0_init;
-A_init  = [ 6.0000    5.0000    4.2000    3.2000    1.7000    1.0000];   A_best =  A_init;
-B_init  = [ 6.0000    5.0000    4.2000    3.2000    2.2000    2.4000];   B_best =  B_init;
-r_init  = [25.0000    3.0000    4.0000   12.0000   10.0000    3.0000];   r_best =  r_init;
-dT_init = round(1400 * 1200./T0_init,-1);  dT_best = dT_init;
+T0_init = [   1550      1150      1110      1070       925       810];  T0_best = T0_init;
+A_init  = [ 6.5000    5.0000    4.5000    4.0000    1.8000    1.0000];   A_best =  A_init;
+B_init  = [ 6.5000    5.0000    4.5000    4.0000    2.2000    2.4000];   B_best =  B_init;
+r_init  = [26.0000    4.0000    4.0000    9.0000    9.0000    4.0000];   r_best =  r_init;
+dT_init = 1400 * 1200./T0_init;  dT_best = dT_init;
 
 % compose initial parameter guess
 m0     = [T0_init.';A_init.';B_init.';r_init.';dT_init.';cmp_mem_init(:).*indmem(:);];
@@ -446,7 +442,7 @@ m0     = [T0_init.';A_init.';B_init.';r_init.';dT_init.';cmp_mem_init(:).*indmem
 % set function to calculate forward model
 % m --> dhat
 % dhatFunc  = @(model) OxdFromCmpMem(model,MLTp,SOLp,PHS(:,1),cal);
-dhatFunc  = @(model) ModelFitP(model,Tmp,Prs,SYS_oxdp,PHS_frc,Psl,cal,[1,5,0.5]);
+dhatFunc  = @(model) ModelFitP(model,Tmp,Prs,SYS_oxdp,PHS_frc,Psl,cal,[0.1,10,0.5,1e-3]);
 
 % test fit function for initial guess
 [~,MLT_oxdfit,SOL_oxdfit,SYS_oxdfit,SOL_memfit,PHS_oxdfit,PHS_frcfit,SOL_cmpfit,MLT_cmpfit,SYS_cmpfit,Tsolfit,Tliqfit,~] = dhatFunc(m0);
@@ -472,7 +468,7 @@ Tm         = cal.Tm;
 PHS_frc(:,2:end) = PHS_frc(:,2:end)./(100-PHS_frc(:,1)+eps)*100;
 
 % plot basic information for initial fit
-level = 1;
+level = 0;
 run('../MCMC/PlotFit.m')
 
 
@@ -486,10 +482,10 @@ T0_init = T0_best; A_init = A_best; B_init = B_best; r_init = r_best; cmp_mem_in
 m0      = [T0_init.';A_init.';B_init.';r_init.';dT_init.';cmp_mem_init(:).*indmem(:)];
 
 % !!!  set MCMC parameters then Run Section to execute MCMC routine  !!!
-Niter           = 1e6;              % number of samples to take
-anneal.initstep = 1e-3;           % adjust step size to get reasonable acceptance ratio 20-30%
+Niter           = 2e5;              % number of samples to take
+anneal.initstep = 0.75e-3;           % adjust step size to get reasonable acceptance ratio 20-30%
 anneal.levels   = 1;                % select number of annealing levels
-anneal.burnin   = max(1,Niter/10);  % set length of initial burn-in sequence
+anneal.burnin   = max(1,Niter/ 5);  % set length of initial burn-in sequence
 anneal.refine   = max(1,Niter/10);  % set length of final refinement sequence
 
 % !!!  set data uncertainties to weight likelihood function  !!!
@@ -497,10 +493,10 @@ MLT_scl   = max(0.01,(MLT_oxdp(:)-min(MLT_oxdp(:)))./(max(MLT_oxdp(:))-min(MLT_o
 % SOL_scl   = max(0.01,(SOL_oxdp(:)-min(SOL_oxdp(:)))./(max(SOL_oxdp(:))-min(SOL_oxdp(:))));
 MEM_scl   = max(0.01,(SOL_mem (:)-min(SOL_mem (:)))./(max(SOL_mem (:))-min(SOL_mem (:))));
 PHS_scl   = max(0.01,(PHS_frc (:)-min(PHS_frc (:)))./(max(PHS_frc (:))-min(PHS_frc (:))));
-sigma_MLT =  0.1  * MLT_scl.^0.25;       % uncertainty of melt oxide composition
+sigma_MLT =  0.1  * MLT_scl.^0.5;       % uncertainty of melt oxide composition
 % sigma_SOL =  1e6  * SOL_scl.^0.25;       % uncertainty of melt oxide composition
-sigma_MEM =  0.1  * MEM_scl.^0.25;       % uncertainty of solid end-member composition
-sigma_PHS =  0.1  * PHS_scl.^0.25;       % uncertainty of phase fractions
+sigma_MEM =  0.1  * MEM_scl.^0.5;       % uncertainty of solid end-member composition
+sigma_PHS =  0.1  * PHS_scl.^0.5;       % uncertainty of phase fractions
 sigma_TSL =  0.25 * ones(size([Tsol(:);Tliq(:)])); % uncertainty of solidus/liquidus Temp
 sigma = [sigma_MLT;sigma_MEM;sigma_PHS;sigma_TSL]; % combine all as in data vector
 
@@ -519,12 +515,13 @@ m0_up  = m0 + dm;
 mbnds  = [m0_lw(:),m0_up(:)]; % model parameter bounds
 mbnds(1*(cal.ncmp-1)+(1:cal.ncmp-1)       ,:) = max(0.5,                  mbnds(1*(cal.ncmp-1)+(1:cal.ncmp-1)       ,:));
 mbnds(2*(cal.ncmp-1)+(1:cal.ncmp-1)       ,:) = max(1.0,                  mbnds(2*(cal.ncmp-1)+(1:cal.ncmp-1)       ,:));
-mbnds(3*(cal.ncmp-1)+(1:cal.ncmp-1)       ,:) = max(2.0,                  mbnds(3*(cal.ncmp-1)+(1:cal.ncmp-1)       ,:));
-mbnds(4*(cal.ncmp-1)+(1:cal.ncmp-1)       ,:) = max(1000,                 mbnds(4*(cal.ncmp-1)+(1:cal.ncmp-1)       ,:));
+mbnds(3*(cal.ncmp-1)+(1:cal.ncmp-1)       ,:) = max(3.0,                  mbnds(3*(cal.ncmp-1)+(1:cal.ncmp-1)       ,:));
+mbnds(4*(cal.ncmp-1)+(1:cal.ncmp-1)       ,:) = max(100,                  mbnds(4*(cal.ncmp-1)+(1:cal.ncmp-1)       ,:));
 mbnds(5*(cal.ncmp-1)+(1:cal.ncmp*cal.nmem),:) = max(indmem(:)/10,min(99.9,mbnds(5*(cal.ncmp-1)+(1:cal.ncmp*cal.nmem),:)));
 mbnds(m0==100 ,:) = 100;
 % mbnds(m0==7.0 ,1) = 5.0;
 mbnds(m0==T0_init(1),:) = T0_init(1);
+mbnds(m0==T0_init(end),:) = T0_init(end);
 anneal.initstep = anneal.initstep * diff(mbnds,1,2);  % resize step according to bounded bracket
 
 % set parameter names according to info from calibration file

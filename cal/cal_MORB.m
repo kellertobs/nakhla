@@ -52,13 +52,13 @@ cal.msy_mem = [1  1  0  0  0  0  0  0  0  0  0  0  0  0    % olivine (olv)
 
 % mineral end-member composition of melting model components
 %              for   fay   ant   alb   san   dps   aug   pig   ulv   mgt   ilm   hyp   fsl   qtz   wat
-cal.cmp_mem = [92.9000    7.1000         0         0         0         0         0         0         0         0         0         0         0         0
-               43.8000    4.4000   51.9000         0         0         0         0         0         0         0         0         0         0         0
-                0.1000    0.1000   34.0000   10.4000         0   52.3000         0    3.1000         0         0         0         0         0         0
-                     0    7.4000   20.0000   24.8000    0.7000   13.4000   25.5000         0    3.6000    0.9000    3.7000         0         0         0
-                     0         0    5.4000   64.9000    6.9000         0   11.0000         0    0.1000    1.3000         0   10.5000         0         0
-                     0         0    2.1000         0   44.1000         0    3.5000         0         0         0         0    0.3000   50.0000         0
-                     0         0         0         0         0         0         0         0         0         0         0         0         0  100.0000];
+cal.cmp_mem = [92.5    7.5      0         0         0         0         0         0         0         0         0         0         0         0
+               28.3    6.0   65.7         0         0         0         0         0         0         0         0         0         0         0
+                  0      0   24.8   14.0000         0   55.7000         0    5.5000         0         0         0         0         0         0
+                  0    8.8   22.6   21.6000         0   12.0000   25.8000         0    5.3000    0.8000    3.0000         0         0         0
+                  0      0    5.4   66.7000    5.3000         0   11.6000         0         0    1.0000         0   10.0000         0         0
+                  0      0    3.0         0   44.9000         0         0         0         0         0         0    2.1000   50.0000         0
+                  0      0      0         0         0         0         0         0         0         0         0         0         0  100.0000];
 cal.cmp_mem = cal.cmp_mem./sum(cal.cmp_mem,2)*100;
 
 % mineral systems composition of melting model components
@@ -75,29 +75,29 @@ for i=1:cal.ncmp
 end
 
 % primary and evolved end-member compositions used in calibration
-cal.c0     = [0.0090    0.2010    0.3080    0.3670    0.1150         0    0.0050];
-cal.c1     = [     0         0         0         0    0.3160    0.6840    0.0240];
+cal.c0     = [0.0320    0.2220    0.3170    0.3030    0.0930    0.0320    0.0050];
+cal.c1     = [0.0010    0.0010    0.0010    0.0010    0.2970    0.6990    0.0240];
 
 cal.c0_oxd = [49.20  1.01  15.11  9.58  11.55  11.31  2.12  0.12  0.30];
 cal.c1_oxd = [75.26  0.24  11.51  3.40   0.77   2.01  4.61  2.20  2.40];
 
 % set pure component melting points T_m^i at P=0
-cal.T0  = [1600  1193  1158  1078  980  819];
+cal.T0  = [1890        1181        1153        1076         983         825];
 
 % set first coeff. for P-dependence of T_m^i [GPa]
-cal.A   = [6.3  5.0  3.8  2.4  1.8  0.8];
+cal.A   = [6.6000    4.8000    3.8000    2.4000    1.7000    0.7000];
 
 % set second coeff. for P-dependence of T_m^i [1]
-cal.B   = [6.3  5.2  3.8  2.6  2.3  2.1];
+cal.B   = [6.8000    4.9000    3.6000    2.5000    2.0000    1.9000];
 
 % set entropy gain of fusion DeltaS [J/K]
 cal.dS  = 350;
 
 % set coeff. for T-dependence of partition coefficients K^i [1/K]
-cal.r  = [12.3  2.2  3.0  7.2  9.9  5.3];
+cal.r  = [28.2000    3.0000    3.0000    6.5000    9.6000   3.9000];
 
 % specify melting point dependence on H2O
-cal.dTH2O   = [1050  1410  1460  1580  1730  2060];  % solidus shift from water content prefactor [K/wt^pH2O]
+cal.dTH2O   = [889        1418        1455        1563        1706        2100];  % solidus shift from water content prefactor [K/wt^pH2O]
 cal.pH2O    = 0.75;                                  % solidus shift from water content exponent
 
 % specify geochemical model parameters
@@ -107,13 +107,13 @@ cal.Ktrc_mem = [0.01;0.10;1.0;3.0;10.0;1.0].*ones(cal.ntrc,cal.nmem);
 
 % specify density parameters
 %               for  fay  ant  alb  san  dps  aug  ulv  mgt  ilm  hyp  fsl  qtz  wat
-cal.rhox0   = [3200,4050,2680,2600,2570,3220,3460,3930,4760,4720,3310,3660,2540,1000]; % mem ref densities [kg/m3]
+cal.rhox0   = [3220,4000,2680,2600,2550,3220,3470,3900,4680,4720,3430,3650,2540,1000]; % mem ref densities [kg/m3]
 cal.rhof0   = 1000;                 % fluid ref density [kg/m3]
 
 % specify three-phase coefficient model parameters
-%             for  fay  ant  alb  san  dps  aug  ulv  mgt  ilm  hyp  fsl  qtz  wat
-cal.etax0   = [1e19,1e19,1e17,1e17,1e17,1e20,1e20,1e16,1e16,1e16,1e20,1e20,1e17,1e0]; % mem ref viscosities [Pas]
-cal.etaf0   = 0.1;                  % fluid viscosity constant [Pas]
+%              for  fay  ant  alb  san  dps  aug  ulv  mgt  ilm  hyp  fsl  qtz  wat
+cal.etax0   = [1e19,1e19,1e17,1e17,1e17,1e20,1e20,1e17,1e17,1e17,1e20,1e20,1e19,1e0]; % mem ref viscosities [Pas]
+cal.etaf0   = 0.1;                    % fluid viscosity constant [Pas]
 cal.Eax     = 300e3;                  % solid viscosity activation energy [J/mol]
 cal.AA      =[ 0.65, 0.25, 0.35; ...  % permission slopes
                0.20, 0.20, 0.20; ...  % generally numbers between 0 and 1

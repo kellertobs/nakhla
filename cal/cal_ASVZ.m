@@ -27,19 +27,23 @@ cal.ioxd = [   1   2    3    4   5   6    7   8   9]; % oxdie indices for viscos
 % oxide composition of mineral end-members
 %                     SiO2      TiO2     Al2O3       FeO       MgO       CaO      Na2O       K2O       H2O
 cal.mem_oxd    = [ 43.7200         0   36.0500         0         0   19.5400    0.6900         0         0
-   66.9000         0   20.6500         0         0    1.4200   11.0300         0         0
-   67.3600         0   18.2500         0         0         0    5.9000    8.4900         0
-   51.8100         0    5.8700   12.5500   28.5400    1.2300         0         0         0
-   52.2000         0    3.7600   15.9500   25.3500    2.7400         0         0         0
-   50.0500         0         0   37.4200   11.6900    0.8400         0         0         0
-         0   20.7400    4.7500   54.6500   19.8600         0         0         0         0
-         0    9.4000    1.6700   83.8300    5.1000         0         0         0         0
-         0   46.9200         0   53.0800         0         0         0         0         0
-   52.3200         0    2.7200    7.5800   16.5700   20.5700    0.2400         0         0
-   53.3600         0    0.8000   13.3500   12.8600   18.5300    1.1000         0         0
-   52.4900         0    0.2600   23.0300    5.0600   15.9900    3.1700         0         0
-  100.0000         0         0         0         0         0         0         0         0
-         0         0         0         0         0         0         0         0  100.0000 ];
+                   66.9000         0   20.6500         0         0    1.4200   11.0300         0         0
+                   67.3600         0   18.2500         0         0         0    5.9000    8.4900         0
+
+                   51.8100         0    5.8700   12.5500   28.5400    1.2300         0         0         0
+                   52.2000         0    3.7600   15.9500   25.3500    2.7400         0         0         0
+                   50.0500         0         0   37.4200   11.6900    0.8400         0         0         0
+
+                         0   20.7400    4.7500   54.6500   19.8600         0         0         0         0
+                         0    9.4000    1.6700   83.8300    5.1000         0         0         0         0
+                         0   46.9200         0   53.0800         0         0         0         0         0
+
+                   52.3200         0    2.7200    7.5800   16.5700   20.5700    0.2400         0         0
+                   53.3600         0    0.8000   13.3500   12.8600   18.5300    1.1000         0         0
+                   52.4900         0    0.2600   23.0300    5.0600   15.9900    3.1700         0         0
+
+                  100.0000         0         0         0         0         0         0         0         0
+                         0         0         0         0         0         0         0         0  100.0000 ];
 cal.mem_oxd = cal.mem_oxd./sum(cal.mem_oxd,2)*100;
 
 % mineral end-members in mineral systems
@@ -91,7 +95,7 @@ cal.B   = [7.3000    4.7000    5.4000    4.4000    2.2000    2.7000];
 cal.dS  = 350;
 
 % set coeff. for T-dependence of partition coefficients K^i [1/K]
-cal.r   = [29.6000    3.0000    4.0000   12.4000   10.9000    2.1000];
+cal.r   = [29.6000    3.0000    4.0000   12.4000   10.9000    3.0000];
 
 % specify melting point dependence on H2O
 cal.dTH2O   = [1120        1460        1510        1560        1820        2040];  % solidus shift from water content prefactor [K/wt^pH2O]
@@ -104,12 +108,12 @@ cal.Ktrc_mem = [0.01;0.10;1.0;3.0;10.0;1.0].*ones(cal.ntrc,cal.nmem);
 
 % specify density parameters
 %               ant  alb  san  ens  hyp  fsl  ulv  mgt  ilm  dps  aug  pig  qtz  wat
-cal.rhox0   = [2530,2190,2220,3340,3470,4330,4540,4790,3250,3320,3360,3300,3500,2540,1000]; % mem ref densities [kg/m3]
+cal.rhox0   = [2530,2190,2220,3340,3450,3470,4330,4540,4790,3250,3320,3360,2540,1000]; % mem ref densities [kg/m3]
 cal.rhof0   = 1000;                 % fluid ref density [kg/m3]
 
 % specify three-phase coefficient model parameters
-%             ant  alb  san  for  fay  ulv  mgt  ilm  dps  aug  pig  hyp  fsl  qtz  wat
-cal.etax0 = [1e17,1e17,1e17,1e18,1e18,1e16,1e16,1e16,1e19,1e19,1e19,1e19,1e19,1e19,1e0]; % mem ref viscosities [Pas]
+%             ant  alb  san  ens  hyp  fsl  ulv  mgt  ilm  dps  aug  pig  qtz  wat
+cal.etax0 = [1e17,1e17,1e17,1e18,1e18,1e18,1e16,1e16,1e16,1e19,1e19,1e19,1e18,1e0]; % mem ref viscosities [Pas]
 cal.etaf0 = 0.1;                  % fluid viscosity constant [Pas]
 cal.Eax   = 300e3;                  % solid viscosity activation energy [J/mol]
 cal.AA    =[ 0.65, 0.25, 0.35; ...  % permission slopes
