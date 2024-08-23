@@ -45,7 +45,14 @@ mu     = max(0,min(1, m.*rho./rhom ));
 phix_mem = reshape(reshape(cx_mem/100.*rhox,Nz*Nx,cal.nmem)./cal.rhox0,Nz,Nx,cal.nmem);
 phix_mem = phix_mem./sum(phix_mem,3);
 
+% update thermal parameters
+aT = mu.*aTm + chi.*aTx + phi.*aTf;
+kT = mu.*kTm + chi.*kTx + phi.*kTf;
+cP = mu.*cPm + chi.*cPx + phi.*cPf;
+RhoCp = mu.*rhom.*cPm + chi.*rhox.*cPx + phi.*rhof.*cPf;
+
 % update lithostatic pressure
+Pti = Pt;
 if Nz==1; Pt    = max(1e7,(Pt + Ptop.*ones(size(Tp)) + Pcouple*(Pchmb + P(2:end-1,2:end-1)))/2); else
     Pl(1,:)     = repmat(mean(rhofz(1,:),2).*g0.*h/2,1,Nx) + Ptop;
     Pl(2:end,:) = Pl(1,:) + repmat(cumsum(mean(rhofz(2:end-1,:),2).*g0.*h),1,Nx);
@@ -149,12 +156,12 @@ etaco  = (eta(icz(1:end-1),icx(1:end-1)).*eta(icz(2:end),icx(1:end-1)) ...
        .* eta(icz(1:end-1),icx(2:end  )).*eta(icz(2:end),icx(2:end  ))).^0.25;
 
 % update dimensionless numbers
-Ra     = Vel.*D/10./((kT0+ks.*T)./rho./cP);
+Ra     = Vel.*D/10./((kT+ks.*T)./rho./cP);
 Re     = Vel.*D/10./( eta       ./rho    );
 Rum    = abs(wm(1:end-1,2:end-1)+wm(2:end,2:end-1))/2./Vel;
 Rux    = abs(wx(1:end-1,2:end-1)+wx(2:end,2:end-1))/2./Vel;
 Ruf    = abs(wf(1:end-1,2:end-1)+wf(2:end,2:end-1))/2./Vel;
-Pr     = (eta./rho)./((kT0+ks.*T)./rho./cP);
+Pr     = (eta./rho)./((kT+ks.*T)./rho./cP);
 Sc     = (eta./rho)./( kc                 );
 deltam = sqrt(mu .*Ksgr_m.*eta./(1-chi));
 deltaf = sqrt(phi.*Ksgr_f.*eta./(1-chi));
@@ -173,7 +180,7 @@ if Nz==1 && Nx==1
     diss = 0.*T;  % no dissipation in 0-D mode (no diffusion, no shear deformation, no segregation)
 else
     [grdTx ,grdTz ] = gradient(T(icz,icx),h);
-    diss = kT0./T.*(grdTz (2:end-1,2:end-1).^2 + grdTx (2:end-1,2:end-1).^2) ...
+    diss = kT./T.*(grdTz (2:end-1,2:end-1).^2 + grdTx (2:end-1,2:end-1).^2) ...
          + exx.*txx + ezz.*tzz ...
          + 2.*(exz(1:end-1,1:end-1)+exz(2:end,1:end-1)+exz(1:end-1,2:end)+exz(2:end,2:end))./4 ...
             .*(txz(1:end-1,1:end-1)+txz(2:end,1:end-1)+txz(1:end-1,2:end)+txz(2:end,2:end))./4 ...

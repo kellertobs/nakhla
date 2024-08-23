@@ -17,5 +17,10 @@
     rhoUoo  = rhoUo; rhoUo = rhofx.*U(2:end-1,:);
     Pchmboo = Pchmbo; Pchmbo = Pchmb;
     dPchmbdtoo = dPchmbdto; dPchmbdto = dPchmbdt;
-    To      = T;
+    Pto     = Pt;
+    Tpoo    = Tpo;  Tpo = Tp;
+    Too     = To;   To  = T;
+    dTpdtoo = dTpdto; dTpdto = dTpdt;
+    dTdtoo  = dTdto;  dTdto  = dTdt;
+    so      = s;
     dto     = dt;

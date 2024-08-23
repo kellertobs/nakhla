@@ -13,7 +13,7 @@ save_op  =  1;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
 
 % set model domain parameters
-D        =  0.1;                 % chamber depth [m]
+D        =  1;                   % chamber depth [m]
 L        =  D;                   % chamber width [m]
 N        =  1;                   % number of grid points in z-direction
 h        =  D/N;                 % grid spacing (equal in both dimensions, do not set) [m]
@@ -21,13 +21,13 @@ h        =  D/N;                 % grid spacing (equal in both dimensions, do no
 % set model timing parameters
 Nt       =  1e4;                 % number of time steps to take
 tend     =  10*hr;               % end time for simulation [s]
-dt       =  18;                  % initial time step [s]
-dtmax    =  18;                  % maximum time step [s]
+dt       =  36;                  % initial time step [s]
+dtmax    =  36;                  % maximum time step [s]
 
 % set initial thermo-chemical state
-T0       =  1290;                % temperature top  layer [deg C]
+T0       =  1275;                % temperature top  layer [deg C]
 T1       =  T0;                  % temperature base layer [deg C]
-c0       =  [0.01  0.20  0.31  0.36  0.11  0.01  0.005];  % components (maj comp, H2O) top  layer [wt] (will be normalised to unit sum!)
+c0       =  [0.03  0.22  0.32  0.31  0.09  0.03  0.005];  % components (maj comp, H2O) top  layer [wt] (will be normalised to unit sum!)
 c1       =  c0;                  % components (maj comp, H2O) bot layer [wt] (will be normalised to unit sum!)
 dcr      =  [0,0,0,0,0,0,0,0];
 dcg      =  [0,0,0,0,0,0,0,0];
@@ -36,10 +36,10 @@ dcg      =  [0,0,0,0,0,0,0,0];
 fractxtl =  1;                   % fractional crystallisation mode for 0-D (Nz=Nx=1)
 fractmlt =  0;                   % fractional melting mode for 0-D (Nz=Nx=1)
 fractres =  0.25;                % residual fraction for fractionation mode
-dPdT     =  3.25e5;              % decompression rate for 0D models
+dPdT     =  0*3.1e5;               % decompression rate for 0D models
 bndmode  =  1;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
 bnd_w    =  1e16;                % boundary layer width [m]
-tau_T    =  D^2/1e-6;            % wall cooling/assimilation time [s]
+tau_T    =  0.1^2/1e-6;          % wall cooling/assimilation time [s]
 Twall    =  [300,300,nan];       % [top,bot,sds] wall rock temperature [degC] (nan = insulating)
 cwall    =  nan(3,7);
 Ptop     =  3e8;                 % top pressure [Pa]
@@ -48,13 +48,22 @@ fout     =  0;                   % outgassing factor (0 = no outgassing; 1 = fre
 
 % set thermo-chemical material parameters
 calID    =  'MORB';              % phase diagram calibration
+aTm      =  4e-5;                % thermal expansivity [1/K]
+aTx      =  4e-5;                % thermal expansivity [1/K]
+aTf      =  4e-5;                % thermal expansivity [1/K]
+kTm      =  4;                   % thermal conductivity [W/m/K]
+kTx      =  4;                   % thermal conductivity [W/m/K]
+kTf      =  4;                   % thermal conductivity [W/m/K]
+cPm      =  1200;                % heat capacity [J/kg/K]
+cPx      =  1200;                % heat capacity [J/kg/K]
+cPf      =  1200;                % heat capacity [J/kg/K]
 
 % set numerical model parameters
 TINT     =  'bd2im';             % time integration scheme ('be1im','bd2im','cn2si','bd2si')
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
 CFL      =  1.00;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 rtol     =  1e-6;                % outer its relative tolerance
-atol     =  1e-8;                % outer its absolute tolerance
+atol     =  1e-9;                % outer its absolute tolerance
 maxit    =  50;                  % maximum outer its
 Pcouple  =  0;                   % coupling phase equilibria and material properties to dynamic pressure
 

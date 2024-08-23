@@ -6,15 +6,15 @@ run('./par_default')
 
 % set run parameters
 runID    =  '1D_MORB';           % run identifier
-restart  = -1;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
-nop      =  200;                 % output frame plotted/saved every 'nop' time steps
+restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
+nop      =  10;                  % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot results
-save_op  =  1;                   % switch on to save output to file
+save_op  =  0;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
 
 % set model domain parameters
 D        =  10;                  % chamber depth [m]
-N        =  300;                 % number of grid points in z-direction
+N        =  100;                 % number of grid points in z-direction
 h        =  D/N;                 % grid spacing (equal in both dimensions, do not set) [m]
 L        =  h;                   % chamber width (equal to h for 1-D mode) [m]
 
@@ -26,7 +26,7 @@ dt       =  36;                  % initial time step [s]
 % set initial thermo-chemical state
 T0       =  1215;                % temperature top  layer [deg C]
 T1       =  T0;                  % temperature base layer [deg C]
-c0       =  [0.05  0.14  0.51  0.17  0.10  0.03  0.003];  % components (maj comp, H2O) top  layer [wt] (will be normalised to unit sum!)
+c0       =  [0.01  0.20  0.31  0.36  0.11  0.01  0.005];  % components (maj comp, H2O) top  layer [wt] (will be normalised to unit sum!)
 c1       =  c0;                  % components (maj comp, H2O) base layer [wt] (will be normalised to unit sum!)
 dcr      =  [0,0,0,0,0,0,0];
 dcg      =  [0,0,0,0,0,0,0];
@@ -44,6 +44,15 @@ fout     =  1;
 
 % set thermo-chemical material parameters
 calID    =  'MORB';              % phase diagram calibration
+aTm      =  4e-5;                % thermal expansivity [1/K]
+aTx      =  4e-5;                % thermal expansivity [1/K]
+aTf      =  4e-5;                % thermal expansivity [1/K]
+kTm      =  4;                   % thermal conductivity [W/m/K]
+kTx      =  4;                   % thermal conductivity [W/m/K]
+kTf      =  4;                   % thermal conductivity [W/m/K]
+cPm      =  1200;                % heat capacity [J/kg/K]
+cPx      =  1200;                % heat capacity [J/kg/K]
+cPf      =  1200;                % heat capacity [J/kg/K]
 
 % set numerical model parameters
 TINT     =  'bd2im';             % time integration scheme ('be1im','bd2im','cn2si','bd2si')

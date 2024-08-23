@@ -11,7 +11,7 @@ advn_S = - advect(M.*sm,Um(2:end-1,:),Wm(:,2:end-1),h,{ADVN,''},[1,2],BCA) ...  
          - advect(X.*sx,Ux(2:end-1,:),Wx(:,2:end-1),h,{ADVN,''},[1,2],BCA) ...  % solid advection
          - advect(F.*sf,Uf(2:end-1,:),Wf(:,2:end-1),h,{ADVN,''},[1,2],BCA);     % fluid advection
 
-diff_S = diffus(T,kT0./T,h,[1,2],BCD) + diffus(Tp,ks,h,[1,2],BCD);
+diff_S = diffus(T,kT./T,h,[1,2],BCD) + diffus(Tp,ks,h,[1,2],BCD);
 
 % heat dissipation
 diss_h = diss ./ T;
@@ -33,10 +33,38 @@ res_S = (a1*S-a2*So-a3*Soo)/dt - (b1*dSdt + b2*dSdto + b3*dSdtoo);
 upd_S = - alpha*res_S*dt/a1 + beta*upd_S;
 S     = S + upd_S;
 
-% convert entropy desnity to temperature
-Tp = Tref*exp((S - X.*Dsx - F.*Dsf)./RHO./cP);
-T  = Tref*exp((S - X.*Dsx - F.*Dsf)./RHO./cP + Adbt./cP.*(Pt-Pref));
+% convert entropy density to temperature
+sm   = (S - X.*Dsx - F.*Dsf)./RHO;
+Tpv   = Tref*exp(sm./cP);
+Tv    = Tref*exp(sm./cP + aT./rhoref./cP.*(Pt-Pref));
 
+si    = s;
+s     = S./RHO;
+dsdt  = dSdt./RHO;% - dXdt.*Dsx - dFdt.*Dsf)./RHO;
+% dsdt  = (s - so)/dt;
+dPdt  = (Pt - Pto)/dt;
+
+upd_s  = s-si;
+upd_P  = Pt-Pti;
+
+dTpdt = dsdt .* T.*rho./RhoCp;
+% dTdt  = dsdt .* T.*rho./RhoCp + dPdt .* aT./RhoCp;
+
+dTdt  = (dSdt - dXdt.*Dsx + (X.*aTx./rhox + M.*aTm./rhom).*dPdt) ./ (X.*cPx./T + M.*cPm./T);
+
+res_Tp = (a1*Tp-a2*Tpo-a3*Tpoo)/dt - (b1*dTpdt + b2*dTpdto + b3*dTpdtoo);
+upd_Tp = -alpha.*res_Tp + beta.*upd_Tp;
+
+res_T  = (a1*T-a2*To-a3*Too)/dt - (b1*dTdt + b2*dTdto + b3*dTdtoo);
+upd_T  = -alpha.*res_T + beta.*upd_T;
+
+
+
+upd_Tpn = upd_s .* Tn.*rho./RhoCp;
+upd_Tn  = upd_s .* Tn.*rho./RhoCp + upd_P .* aT./RhoCp;
+
+Tn  = Tn  + upd_Tn;
+Tpn = Tpn + upd_Tpn;
 
 %***  update major component densities
 
@@ -148,9 +176,9 @@ x = X./RHO;
 f = F./RHO;  
 m = M./RHO; 
 
-hasx = x >= TINY^0.5;
-hasf = f >= TINY^0.5;
-hasm = m >= TINY^0.5;
+hasx = x >= eps^0.5;
+hasf = f >= eps^0.5;
+hasm = m >= eps^0.5;
 
 % update major component phase composition
 Kx      = reshape(cal.Kx,Nz,Nx,cal.ncmp);
@@ -163,14 +191,14 @@ rnorm   = 1;  tol  = atol*10;
 it      = 1;  mxit = 100;
 while rnorm>tol && it<mxit
 
-    cm  = c    ./(m + x.*Kx + f.*Kf + TINY);
-    cx  = c.*Kx./(m + x.*Kx + f.*Kf + TINY);
+    cm  = c    ./(m + x.*Kx + f.*Kf + eps);
+    cx  = c.*Kx./(m + x.*Kx + f.*Kf + eps);
 
     cm = cm./sum(cm,3);
     cx = cx./sum(cx,3);
 
-    Kx = cx./(cm+TINY);
-    Kf = cf./(cm+TINY);
+    Kx = cx./(cm+eps);
+    Kf = cf./(cm+eps);
 
     r = x.*cx + m.*cm + f.*cf - c;
     r(subsolc) = 0; r(supliqc) = 0;
@@ -178,7 +206,7 @@ while rnorm>tol && it<mxit
     it  = it+1;
 end
 
-if (it==mxit)
+if (it==mxit && rnorm>tol)
     disp(['!!! Lever rule adjustment not converged after ',num2str(mxit),' iterations !!!']);
 end
 
@@ -191,4 +219,11 @@ sm = (S - X.*Dsx - F.*Dsf)./RHO;
 sx = sm + Dsx;
 sf = sm + Dsf;
 
+upd_T  = (upd_S - upd_X.*Dsx - upd_F.*Dsf + aT.*upd_P) .* T./ RhoCp;
+upd_Tp = (upd_S - upd_X.*Dsx - upd_F.*Dsf            ) .* T./ RhoCp;
+
+T   = T  + upd_T;
+Tp  = Tp + upd_Tp;
+
+% record timing
 TCtime = TCtime + toc - eqtime;
