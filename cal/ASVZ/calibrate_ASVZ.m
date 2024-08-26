@@ -430,10 +430,10 @@ cmp_oxd_init = cmp_mem_init*cal.mem_oxd/100;
 cmp_oxd_best = cmp_oxd_init;
 
 % set initial guess for melting point parameters
-T0_init = [   1550      1150      1110      1070       925       810];  T0_best = T0_init;
-A_init  = [ 6.5000    5.0000    4.5000    4.0000    1.8000    1.0000];   A_best =  A_init;
-B_init  = [ 6.5000    5.0000    4.5000    4.0000    2.2000    2.4000];   B_best =  B_init;
-r_init  = [26.0000    4.0000    4.0000    9.0000    9.0000    4.0000];   r_best =  r_init;
+T0_init = [   1550      1140      1120      1070       925       810];  T0_best = T0_init;
+A_init  = [ 7.0000    4.5000    4.0000    3.5000    2.0000    1.0000];   A_best =  A_init;
+B_init  = [ 7.0000    4.5000    4.0000    3.5000    2.0000    2.4000];   B_best =  B_init;
+r_init  = [32.0000    4.0000    4.0000   12.0000   11.0000    4.0000];   r_best =  r_init;
 dT_init = 1400 * 1200./T0_init;  dT_best = dT_init;
 
 % compose initial parameter guess
@@ -442,7 +442,7 @@ m0     = [T0_init.';A_init.';B_init.';r_init.';dT_init.';cmp_mem_init(:).*indmem
 % set function to calculate forward model
 % m --> dhat
 % dhatFunc  = @(model) OxdFromCmpMem(model,MLTp,SOLp,PHS(:,1),cal);
-dhatFunc  = @(model) ModelFitP(model,Tmp,Prs,SYS_oxdp,PHS_frc,Psl,cal,[0.1,10,0.5,1e-3]);
+dhatFunc  = @(model) ModelFitP(model,Tmp,Prs,SYS_oxdp,PHS_frc,Psl,cal,[0.1,8,0.6,1e-3]);
 
 % test fit function for initial guess
 [~,MLT_oxdfit,SOL_oxdfit,SYS_oxdfit,SOL_memfit,PHS_oxdfit,PHS_frcfit,SOL_cmpfit,MLT_cmpfit,SYS_cmpfit,Tsolfit,Tliqfit,~] = dhatFunc(m0);
@@ -482,8 +482,8 @@ T0_init = T0_best; A_init = A_best; B_init = B_best; r_init = r_best; cmp_mem_in
 m0      = [T0_init.';A_init.';B_init.';r_init.';dT_init.';cmp_mem_init(:).*indmem(:)];
 
 % !!!  set MCMC parameters then Run Section to execute MCMC routine  !!!
-Niter           = 2e5;              % number of samples to take
-anneal.initstep = 0.75e-3;           % adjust step size to get reasonable acceptance ratio 20-30%
+Niter           = 1e6;              % number of samples to take
+anneal.initstep = 2e-3;           % adjust step size to get reasonable acceptance ratio 20-30%
 anneal.levels   = 1;                % select number of annealing levels
 anneal.burnin   = max(1,Niter/ 5);  % set length of initial burn-in sequence
 anneal.refine   = max(1,Niter/10);  % set length of final refinement sequence
@@ -493,10 +493,10 @@ MLT_scl   = max(0.01,(MLT_oxdp(:)-min(MLT_oxdp(:)))./(max(MLT_oxdp(:))-min(MLT_o
 % SOL_scl   = max(0.01,(SOL_oxdp(:)-min(SOL_oxdp(:)))./(max(SOL_oxdp(:))-min(SOL_oxdp(:))));
 MEM_scl   = max(0.01,(SOL_mem (:)-min(SOL_mem (:)))./(max(SOL_mem (:))-min(SOL_mem (:))));
 PHS_scl   = max(0.01,(PHS_frc (:)-min(PHS_frc (:)))./(max(PHS_frc (:))-min(PHS_frc (:))));
-sigma_MLT =  0.1  * MLT_scl.^0.5;       % uncertainty of melt oxide composition
+sigma_MLT =  0.1  * MLT_scl.^0.1;       % uncertainty of melt oxide composition
 % sigma_SOL =  1e6  * SOL_scl.^0.25;       % uncertainty of melt oxide composition
-sigma_MEM =  0.1  * MEM_scl.^0.5;       % uncertainty of solid end-member composition
-sigma_PHS =  0.1  * PHS_scl.^0.5;       % uncertainty of phase fractions
+sigma_MEM =  0.1  * MEM_scl.^0.1;       % uncertainty of solid end-member composition
+sigma_PHS =  0.1  * PHS_scl.^0.1;       % uncertainty of phase fractions
 sigma_TSL =  0.25 * ones(size([Tsol(:);Tliq(:)])); % uncertainty of solidus/liquidus Temp
 sigma = [sigma_MLT;sigma_MEM;sigma_PHS;sigma_TSL]; % combine all as in data vector
 

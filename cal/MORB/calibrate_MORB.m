@@ -433,10 +433,10 @@ cmp_oxd_init = cmp_mem_init*cal.mem_oxd/100;
 cmp_oxd_best = cmp_oxd_init;
 
 % set initial guess for melting point parameters
-T0_init = [ 1890   1185   1155   1075    985    825];  T0_best = T0_init;
-A_init  = [ 6.50   5.00   3.80   2.50   1.80   1.00];   A_best =  A_init;
-B_init  = [ 6.50   5.00   3.80   2.50   2.20   2.00];   B_best =  B_init;
-r_init  = [25.00   4.00   4.00   7.00  10.00   4.00];   r_best =  r_init;
+T0_init = [ 1890   1185   1155   1080    990    820];  T0_best = T0_init;
+A_init  = [ 6.60   5.20   4.00   2.60   2.10   1.20];   A_best =  A_init;
+B_init  = [ 6.60   5.20   4.00   2.60   2.10   1.80];   B_best =  B_init;
+r_init  = [30.00   4.00   4.00   7.00  10.00   5.00];   r_best =  r_init;
 dT_init = 1400 * 1200./T0_init;  dT_best = dT_init;
 
 % compose initial parameter guess
@@ -445,7 +445,7 @@ m0     = [T0_init.';A_init.';B_init.';r_init.';dT_init.';cmp_mem_init(:).*indmem
 % set function to calculate forward model
 % m --> dhat
 % dhatFunc  = @(model) OxdFromCmpMem(model,MLTp,SOLp,PHS(:,1),cal);
-dhatFunc  = @(model) ModelFitP(model,Tmp,Prs,SYS_oxdp,PHS_frc,Psl,cal,[0.1,2,0.5,1e-3]);
+dhatFunc  = @(model) ModelFitP(model,Tmp,Prs,SYS_oxdp,PHS_frc,Psl,cal,[0.1,3,0.5,1e-3]);
 
 % test fit function for initial guess
 [~,MLT_oxdfit,SOL_oxdfit,SYS_oxdfit,SOL_memfit,PHS_oxdfit,PHS_frcfit,SOL_cmpfit,MLT_cmpfit,SYS_cmpfit,Tsolfit,Tliqfit,~] = dhatFunc(m0);
@@ -485,8 +485,8 @@ T0_init = T0_best; A_init = A_best; B_init = B_best; r_init = r_best; cmp_mem_in
 m0      = [T0_init.';A_init.';B_init.';r_init.';dT_init.';cmp_mem_init(:).*indmem(:)];
 
 % !!!  set MCMC parameters then Run Section to execute MCMC routine  !!!
-Niter           = 2e5;              % number of samples to take
-anneal.initstep = 0.75e-3;           % adjust step size to get reasonable acceptance ratio 20-30%
+Niter           = 1e6;              % number of samples to take
+anneal.initstep = 0.5e-3;           % adjust step size to get reasonable acceptance ratio 20-30%
 anneal.levels   = 1;                % select number of annealing levels
 anneal.burnin   = max(1,Niter/ 5);  % set length of initial burn-in sequence
 anneal.refine   = max(1,Niter/10);  % set length of final refinement sequence
