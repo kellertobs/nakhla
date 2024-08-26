@@ -34,8 +34,8 @@ upd_S = - alpha*res_S*dt/a1 + beta*upd_S;
 S     = S + upd_S;
 
 % convert entropy density to temperature
-Tpv     = Tref*exp((S - X.*Dsx - F.*Dsf)./RHO./cP);
-Tv      = Tref*exp((S - X.*Dsx - F.*Dsf)./RHO./cP + aT./rhoref./cP.*(Pt-Pref));
+Tpv     = Tref*exp((S - X.*Dsx - F.*Dsf)./RhoCp);
+Tv      = Tref*exp((S - X.*Dsx - F.*Dsf)./RhoCp + aT./RhoCp.*(Pt-Pref));
 
 
 %***  update major component densities

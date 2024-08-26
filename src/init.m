@@ -229,9 +229,9 @@ cm_oxd = reshape(reshape(c,Nz*Nx,cal.ncmp)*cal.cmp_oxd,Nz,Nx,cal.noxd);
 cm_oxd_all(:,:,cal.ioxd) = cm_oxd;
 aT     = aTm;
 kT     = kTm;
-cP     = cPm;
+cP     = cPm; RhoCp = rho.*cP;
 rhoref = mean(rho(:));
-T      =  (Tp+273.15).*exp(aT./rhoref./cP.*(Pt-Pref));
+T      =  (Tp+273.15).*exp(aT./RhoCp.*(Pt-Pref));
 
 % get volume fractions and bulk density
 step    = 0;
@@ -253,7 +253,7 @@ while res > tol
     end
     
     rhoref = mean(rho(:));
-    T  =  (Tp+273.15).*exp(aT./rhoref./cP.*(Pt-Pref));
+    T  = (Tp+273.15).*exp(aT./RhoCp.*(Pt-Pref));
 
     eqtime = tic;
 
@@ -333,16 +333,20 @@ fprintf('    initial f   : %4.3f \n\n',f0);
 
 % get bulk enthalpy, silica, volatile content densities
 Tp   = Tp+273.15;  Tn = T;  Tpn = Tp;  To = T;  Tpo = T;
-S    = rho.*(cP.*log(T/Tref) + x.*Dsx + f.*Dsf - aT./rhoref.*(Pt-Pref));  So = S;  res_S = 0.*S;
-S0   = rho.*(cP.*log(  Tref) + x.*Dsx + f.*Dsf - aT./rhoref.*    Pref );  
+T    = Tp.*exp(aT./RhoCp.*(Pt-Pref));
+s    = 500 + 0.*Tp;
+% s    = cP.*log(Tp/Tref);
+% S    = RhoCp.*log(T/Tref) + X.*Dsx + F.*Dsf - aT.*(Pt-Pref);
+% S0   = mean(RhoCp(:)).*log(Tref) + mean(X(:)).*Dsx + mean(F(:)).*Dsf - mean(aT(:)).*Pref;
 C    = rho.*(m.*cm + x.*cx + f.*cf); Co = C;  res_C = 0.*C;
 X    = rho.*x; Xo = X;  res_X = 0.*X;
 F    = rho.*f; Fo = F;  res_F = 0.*F;
 M    = rho.*m; Mo = M;  res_M = 0.*M;
 RHO  = X+M+F;
+S    = s.*rho + X.*Dsx + F.*Dsf;  So = S;  res_S = 0.*S;
 
 % get phase entropies
-s  = (S - X.*Dsx - F.*Dsf)./RHO;
+s  = (S - X.*Dsx - F.*Dsf)./rho;
 sm = s;
 sx = s + Dsx;
 sf = s + Dsf;
@@ -415,13 +419,12 @@ if restart
     end
     if exist(name,'file')
         fprintf('\n   restart from %s \n\n',name);
-        load(name,'U','W','P','Pt','Pchmb','f','x','m','fq','xq','mq','phi','chi','mu','X','F','M','S','C','T','c','cm','cx','cf','TRC','trc','dSdt','dCdt','dFdt','dXdt','dMdt','drhodt','dTRCdt','Gf','Gx','Gm','rho','eta','eII','tII','dt','time','step','VolSrc','wf','wx','wm','cal');
+        load(name,'U','W','P','Pt','Pchmb','f','x','m','fq','xq','mq','phi','chi','mu','X','F','M','S','C','T','Tp','c','cm','cx','cf','TRC','trc','dSdt','dCdt','dFdt','dXdt','dMdt','drhodt','dTRCdt','Gf','Gx','Gm','rho','eta','eII','tII','dt','time','step','VolSrc','wf','wx','wm','cal');
         name = [opdir,'/',runID,'/',runID,'_hist'];
         load(name,'hist');
 
         SOL = [W(:);U(:);P(:)];
         RHO = X+M+F;
-        Tp = Tref*exp((S - X.*Dsx - F.*Dsf)./RHO./cP);
         s  = (S - X.*Dsx - F.*Dsf)./RHO;
         sm = s;
         sx = s + Dsx;

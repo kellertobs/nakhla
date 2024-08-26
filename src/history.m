@@ -11,7 +11,7 @@ hist.time(stp) = time;
 
 % record total mass, heat, component mass in model (assume hy = 1, unit length in third dimension)
 hist.sumM(stp  ) = sum(rho(:)*h*h*1);  % [kg]
-hist.sumS(stp  ) = sum((S(:)+S0(:))*h*h*1);  % [J]
+hist.sumS(stp  ) = sum(  S(:)*h*h*1);  % [J]
 hist.sumC(stp,:) = squeeze(sum(sum(C*h*h*1,1),2))+TINY; % [kg]
 
 % record expected rates of change by volume change and imposed boundaries layers

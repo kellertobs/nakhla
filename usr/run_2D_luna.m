@@ -5,7 +5,7 @@ clear; close all;
 run('./par_default')
 
 % set run parameters
-runID    =  '2D_luna';           % run identifier
+runID    =  '2D_luna_liq';           % run identifier
 opdir    =  '../out';            % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  100;                 % output frame plotted/saved every 'nop' time steps
@@ -15,20 +15,20 @@ plot_cv  =  0;                   % switch on to live plot iterative convergence
 
 % set model domain parameters
 D        =  1000e3;              % chamber depth [m]
-N        =  150;                 % number of grid points in z-direction (incl. 2 ghosts)
+N        =  160;                 % number of grid points in z-direction (incl. 2 ghosts)
 h        =  D/N;                 % grid spacing (equal in both dimensions, do not set) [m]
-L        =  D/3;                 % chamber width [m]
+L        =  D/2;                 % chamber width [m]
 
 % set model timing parameters
 Nt       =  1e6;                 % number of time steps to take
 tend     =  1e4*yr;              % end time for simulation [s]
-dt       =  1/4*hr;              % initial time step [s]
+dt       =  1*hr;                % initial time step [s]
 dtmax    =  1*yr;                % maximum time step [s]
 
 % set initial thermo-chemical state
 Tinit    = 'linear';             % T initial condition mode ('layer' or 'linear')
-T0       =  1700;                % temperature top  layer [deg C]
-T1       =  1700;                % temperature base layer [deg C]
+T0       =  1745;                % temperature top  layer [deg C]
+T1       =  1745;                % temperature base layer [deg C]
 c0       =  [0.30  0.31  0.10  0.20  0.05  0.04  0.00];  % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
 c1       =  [0.30  0.31  0.10  0.20  0.05  0.04  0.00];                             % components (maj comp, H2O) bot layer [wt] (will be normalised to unit sum!)
 dcr      =  [1,1,1,-1,-1,-1,0]*1e-4;  % amplitude of random noise [wt]
@@ -39,15 +39,22 @@ zlay     =  2.0;                 % layer thickness (relative to domain depth D)
 periodic =  1;
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
 bnd_w    =  h;                   % boundary layer width [m]
-tau_T    =  1*yr;                % wall cooling/assimilation time [s]
+tau_T    =  yr/4;                % wall cooling/assimilation time [s]
 Twall    =  [0,nan,nan];         % [top,bot,sds] wall rock temperature [degC] (nan = insulating)
 cwall    =  nan(3,7);
 Ptop     =  1e5;                 % top pressure [Pa]
 
 % set thermo-chemical material parameters
 calID    =  'LUNA';              % phase diagram calibration
-aT       =  3e-5;                % thermal expansivity [1/K]
-cP       =  1100;                % heat capacity [J/kg/K]
+aTm      =  4.5e-5;              % melt  thermal expansivity [1/K]
+aTx      =  2e-5;                % xtal  thermal expansivity [1/K]
+aTf      =  1e-4;                % fluid thermal expansivity [1/K]
+kTm      =  1;                   % melt  thermal conductivity [W/m/K]
+kTx      =  4;                   % xtal  thermal conductivity [W/m/K]
+kTf      =  0.5;                 % fluid thermal conductivity [W/m/K]
+cPm      =  1300;                % melt  heat capacity [J/kg/K]
+cPx      =  1000;                % xtal  heat capacity [J/kg/K]
+cPf      =  2000;                % fluid heat capacity [J/kg/K]
 
 % set buoyancy parameters
 g0       =  1.62;                % gravity [m/s2]
@@ -64,7 +71,7 @@ mod_wall =  0;                   % wall rock elastic modulus [Pa]
 % set numerical model parameters
 TINT     =  'bd2im';             % time integration scheme ('be1im','bd2im','cn2si','bd2si')
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
-CFL      =  0.5;                 % (physical) time stepping courant number (multiplies stable step) [0,1]
+CFL      =  0.75;                 % (physical) time stepping courant number (multiplies stable step) [0,1]
 rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-7;                % outer its absolute tolerance
 maxit    =  15;                  % maximum outer its

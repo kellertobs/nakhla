@@ -64,15 +64,15 @@ trcwall  =  nan(3,6);            % [top,bot,sds] wall rock trace elements [wt pp
 
 % set thermo-chemical material parameters
 calID    =  'MORB';              % phase diagram calibration
-aTm      =  5e-5;                % thermal expansivity [1/K]
-aTx      =  1e-5;                % thermal expansivity [1/K]
-aTf      =  1e-4;                % thermal expansivity [1/K]
-kTm      =  1;                   % thermal conductivity [W/m/K]
-kTx      =  5;                   % thermal conductivity [W/m/K]
-kTf      =  0.1;                 % thermal conductivity [W/m/K]
-cPm      =  1300;                % heat capacity [J/kg/K]
-cPx      =  1000;                % heat capacity [J/kg/K]
-cPf      =  1800;                % heat capacity [J/kg/K]
+aTm      =  5e-5;                % melt  thermal expansivity [1/K]
+aTx      =  1e-5;                % xtal  thermal expansivity [1/K]
+aTf      =  1e-4;                % fluid thermal expansivity [1/K]
+kTm      =  1;                   % melt  thermal conductivity [W/m/K]
+kTx      =  5;                   % xtal  thermal conductivity [W/m/K]
+kTf      =  0.1;                 % fluid thermal conductivity [W/m/K]
+cPm      =  1300;                % melt  heat capacity [J/kg/K]
+cPx      =  1000;                % xtal  heat capacity [J/kg/K]
+cPf      =  2000;                % fluid heat capacity [J/kg/K]
 tau_r    =  0;                   % reaction time scale (set to zero for quasi-equilibrium mode)
 
 % set model buoyancy and pressure parameters
