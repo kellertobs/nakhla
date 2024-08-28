@@ -8,7 +8,7 @@ cal.T0    = model(               (1:cal.ncmp-1)).';
 cal.A     = model(1*(cal.ncmp-1)+(1:cal.ncmp-1)).';
 cal.B     = model(2*(cal.ncmp-1)+(1:cal.ncmp-1)).';
 cal.r     = model(3*(cal.ncmp-1)+(1:cal.ncmp-1)).';
-cal.dTH2O = round(1400 * 1200./cal.T0,-1); %model(4*(cal.ncmp-1)+(1:cal.ncmp-1)).';
+cal.dTH2O = 1400 * 1200./cal.T0; %model(4*(cal.ncmp-1)+(1:cal.ncmp-1)).';
 cmp_mem   = reshape(model(5*(cal.ncmp-1)+(1:cal.ncmp*cal.nmem)),cal.ncmp,cal.nmem);
 cmp_oxd   = cmp_mem*cal.mem_oxd./100;
 
