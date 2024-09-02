@@ -27,7 +27,7 @@ dtmax    =  18;                  % maximum time step [s]
 % set initial thermo-chemical state
 T0       =  1275;                % temperature top  layer [deg C]
 T1       =  T0;                  % temperature base layer [deg C]
-c0       =  [0.03  0.22  0.32  0.31  0.09  0.03  0.005];  % components (maj comp, H2O) top  layer [wt] (will be normalised to unit sum!)
+c0       =  [0.04  0.24  0.27  0.32  0.10  0.03  0.005];  % components (maj comp, H2O) top  layer [wt] (will be normalised to unit sum!)
 c1       =  c0;                  % components (maj comp, H2O) bot layer [wt] (will be normalised to unit sum!)
 dcr      =  [0,0,0,0,0,0,0,0];
 dcg      =  [0,0,0,0,0,0,0,0];
@@ -48,15 +48,6 @@ fout     =  0;                   % outgassing factor (0 = no outgassing; 1 = fre
 
 % set thermo-chemical material parameters
 calID    =  'MORB';              % phase diagram calibration
-% aTm      =  4e-5;                % melt  thermal expansivity [1/K]
-% aTx      =  4e-5;                % xtal  thermal expansivity [1/K]
-% aTf      =  4e-4;                % fluid thermal expansivity [1/K]
-% kTm      =  4;                   % melt  thermal conductivity [W/m/K]
-% kTx      =  4;                   % xtal  thermal conductivity [W/m/K]
-% kTf      =  4;                   % fluid thermal conductivity [W/m/K]
-% cPm      =  1200;                % melt  heat capacity [J/kg/K]
-% cPx      =  1200;                % xtal  heat capacity [J/kg/K]
-% cPf      =  1200;                % fluid heat capacity [J/kg/K]
 
 % set numerical model parameters
 TINT     =  'bd2im';             % time integration scheme ('be1im','bd2im','cn2si','bd2si')

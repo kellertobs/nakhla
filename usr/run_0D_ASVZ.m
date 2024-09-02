@@ -25,9 +25,9 @@ dt       =  18;                  % initial time step [s]
 dtmax    =  18;                  % maximum time step [s]
  
 % set initial thermo-chemical state
-T0       =  1200;                % temperature top  layer [deg C]
+T0       =  1210;                % temperature top  layer [deg C]
 T1       =  T0;                  % temperature base layer [deg C]
-c0       =  [0.18  0.11  0.28  0.27  0.09  0.07  0.02];  % components (maj comp, H2O) top  layer [wt] (will be normalised to unit sum!)
+c0       =  [0.20  0.11  0.28  0.25  0.08  0.08  0.02];  % components (maj comp, H2O) top  layer [wt] (will be normalised to unit sum!)
 c1       =  c0;                  % components (maj comp, H2O) bot layer [wt] (will be normalised to unit sum!)
 dcr      =  [0,0,0,0,0,0,0,0];
 dcg      =  [0,0,0,0,0,0,0,0];
@@ -36,7 +36,7 @@ dcg      =  [0,0,0,0,0,0,0,0];
 fractxtl =  1;                   % fractional crystallisation mode for 0-D (Nz=Nx=1)
 fractmlt =  0;                   % fractional melting mode for 0-D (Nz=Nx=1)
 fractres =  0.25;                % residual fraction for fractionation mode
-dPdT     =  4.0e5;               % decompression rate for 0D models
+dPdT     =  3.45e5;               % decompression rate for 0D models
 bndmode  =  1;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
 bnd_w    =  1e16;                % boundary layer width [m]
 tau_T    =  D^2/1e-6;            % wall cooling/assimilation time [s]

@@ -31,6 +31,20 @@ if Nz==1 && Nx==1
     resnorm_VP = 0;
 else
 
+if Nx==1
+    % update 1D velocity
+    W(:,2) = -flipud(cumsum(flipud([VolSrc*h;-WBG(end)])));
+
+    % update 1D pressure
+    Div_tz = ddz(tzz(icz,:),h);           % z-stress divergence
+    PrsSrc = - Div_tz;
+    P(:,2) =  flipud(cumsum(flipud([PrsSrc*h;0])));
+    P(:,2) = P(:,2) - P(Nz/2,2);
+
+    W(:,1) = W(:,2); W(:,end) = W(:,2);
+    P(:,1) = P(:,2); P(:,end) = P(:,2);
+else
+
 
 %% assemble coefficients for matrix velocity diagonal and right-hand side
 
@@ -308,7 +322,7 @@ end
 
 %% assemble coefficients for matrix pressure diagonal and right-hand side
 
-if ~exist('KP','var') || bnchm || lambda>0
+if ~exist('KP','var') || bnchm || lambda1+lambda2>0
     IIL = [];       % equation indeces into A
     JJL = [];       % variable indeces into A
     AAL = [];       % coefficients for A
@@ -342,10 +356,10 @@ if ~exist('KP','var') || bnchm || lambda>0
     jj4 = MapP(2:end-1,3:end-0);
 
     % coefficients multiplying matrix pressure P
-    % aa  = zeros(size(ii));
-    % IIL = [IIL; ii(:)]; JJL = [JJL; ii(:)];    AAL = [AAL; aa(:)];  % P on stencil centre
+    aa  = zeros(size(ii)) + lambda1*eps*h^2./eta;
+    IIL = [IIL; ii(:)]; JJL = [JJL; ii(:)];    AAL = [AAL; aa(:)];  % P on stencil centre
     
-    kP  = lambda*h^2./eta;
+    kP  = lambda2*h^2./eta;
     kP1 = (kP(icz(1:end-2),:).*kP(icz(2:end-1),:)).^0.5;   kP2 = (kP(icz(2:end-1),:).*kP(icz(3:end-0),:)).^0.5;
     kP3 = (kP(:,icx(1:end-2)).*kP(:,icx(2:end-1))).^0.5;   kP4 = (kP(:,icx(2:end-1)).*kP(:,icx(3:end-0))).^0.5;
 
@@ -377,10 +391,11 @@ RP  = sparse(IIR,ones(size(IIR)),AAR,NP,1);
 % set P = 0 in fixed point
 nzp = round((Nz+2)/2);
 nxp = round((Nx+2)/2);
-DD(MapP(nzp,nxp),:) = 0;
+np0 = MapP(nzp,nxp);
+% DD(MapP(nzp,nxp),:) = 0;
 KP(MapP(nzp,nxp),:) = 0;
 KP(MapP(nzp,nxp),MapP(nzp,nxp)) = 1;
-RP(MapP(nzp,nxp),:) = 0;
+% RP(MapP(nzp,nxp),:) = 0;
 
 if bnchm; RP(MapP(nzp,nxp),:) = P_mms(nzp,nxp); end
 
@@ -428,6 +443,8 @@ P = full(reshape(SOL(MapP(:)+(NW+NU)),Nz+2,Nx+2));  % matrix dynamic pressure
 % W = W + upd_W;
 % U = U + upd_U;
 % P = P + upd_P;
+
+end
 
 
 if ~bnchm
