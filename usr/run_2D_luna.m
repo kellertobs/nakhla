@@ -5,9 +5,9 @@ clear; close all;
 run('./par_default')
 
 % set run parameters
-runID    =  '2D_luna_liq';           % run identifier
+runID    =  '2D_luna_1650';      % run identifier
 opdir    =  '../out';            % output directory
-restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
+restart  =  250;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  100;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot of results
 save_op  =  1;                   % switch on to save output to file
@@ -15,9 +15,9 @@ plot_cv  =  0;                   % switch on to live plot iterative convergence
 
 % set model domain parameters
 D        =  1000e3;              % chamber depth [m]
-N        =  160;                 % number of grid points in z-direction (incl. 2 ghosts)
+N        =  150;                 % number of grid points in z-direction (incl. 2 ghosts)
 h        =  D/N;                 % grid spacing (equal in both dimensions, do not set) [m]
-L        =  D/2;                 % chamber width [m]
+L        =  D/3;                 % chamber width [m]
 
 % set model timing parameters
 Nt       =  1e6;                 % number of time steps to take
@@ -27,8 +27,8 @@ dtmax    =  1*yr;                % maximum time step [s]
 
 % set initial thermo-chemical state
 Tinit    = 'linear';             % T initial condition mode ('layer' or 'linear')
-T0       =  1745;                % temperature top  layer [deg C]
-T1       =  1745;                % temperature base layer [deg C]
+T0       =  1650;                % temperature top  layer [deg C]
+T1       =  1650;                % temperature base layer [deg C]
 c0       =  [0.30  0.31  0.10  0.20  0.05  0.04  0.00];  % components (maj comp, H2O) top layer [wt] (will be normalised to unit sum!)
 c1       =  [0.30  0.31  0.10  0.20  0.05  0.04  0.00];                             % components (maj comp, H2O) bot layer [wt] (will be normalised to unit sum!)
 dcr      =  [1,1,1,-1,-1,-1,0]*1e-4;  % amplitude of random noise [wt]
@@ -39,7 +39,7 @@ zlay     =  2.0;                 % layer thickness (relative to domain depth D)
 periodic =  1;
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
 bnd_w    =  h;                   % boundary layer width [m]
-tau_T    =  yr/4;                % wall cooling/assimilation time [s]
+tau_T    =  yr/10;                % wall cooling/assimilation time [s]
 Twall    =  [0,nan,nan];         % [top,bot,sds] wall rock temperature [degC] (nan = insulating)
 cwall    =  nan(3,7);
 Ptop     =  1e5;                 % top pressure [Pa]
@@ -79,8 +79,8 @@ gamma    =  0.01;                % horizontal drag
 Delta_cnv=  h/2;                 % correlation length for eddy, convection diffusivity (multiple of h, 0.5-1)
 Delta_sgr=  dx0*10;              % correlation length for phase fluctuation diffusivity (multiple of dx0, df0, 10-20)
 etamin   =  1e4;                 % minimum viscosity
-% alpha    =  0.75;
-% beta     =  0.0;
+alpha    =  0.50;
+beta     =  0.00;
 
 %*****  RUN NAKHLA MODEL  *************************************************
 run('../src/main')
