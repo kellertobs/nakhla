@@ -56,9 +56,9 @@ Pti = Pt;
 if Nz==1; Pt    = max(1e7,(1-alpha).*Pt + alpha.*(Ptop.*ones(size(Tp)) + Pcouple*(Pchmb + P(2:end-1,2:end-1)))); else
     Pl(1,:)     = repmat(mean(rhofz(1,:),2).*g0.*h/2,1,Nx) + Ptop;
     Pl(2:end,:) = Pl(1,:) + repmat(cumsum(mean(rhofz(2:end-1,:),2).*g0.*h),1,Nx);
-    Pt          = max(1e7,(1-alpha).*Pt + alpha.*(Pl + Pcouple*(Pchmb + P(2:end-1,2:end-1))));
+    Pt          = max(1e7,(1-1).*Pt + 1.*(Pl + Pcouple*(Pchmb + P(2:end-1,2:end-1))));
 end
-upd_P = Pt-Pti;
+upd_Pt = Pt-Pti;
 
 % update effective constituent sizes
 dm = dm0.*(1-mu ).^0.5;
@@ -67,7 +67,7 @@ df = df0.*(1-phi).^0.5;
 
 % update pure phase viscosities
 etam   = reshape(Giordano08(reshape(cm_oxd_all,Nz*Nx,9),T(:)-273.15),Nz,Nx);
-etax0  = reshape(prod(cal.etax0(1:end-1).^reshape(phix_mem(:,:,1:end-1)+TINY,Nz*Nx,cal.nmem-1),2),Nz,Nx);
+etax0  = reshape(prod(cal.etax0(1:end-1).^reshape(phix_mem(:,:,1:end-1)+eps,Nz*Nx,cal.nmem-1),2),Nz,Nx);
 etax   = etax0 .* ones(size(chi)) .* exp(cal.Eax./(8.3145.*T)-cal.Eax./(8.3145.*(Tref+273.15)));
 etaf   = cal.etaf0 .* ones(size(phi));
 
@@ -100,9 +100,9 @@ eta0 = squeeze(sum(Kv,1)); if Nx==1; eta0 = eta0.'; end
 % get segregation cofficients
 Ksgr   = ff./Cv;
 
-Ksgr_x = squeeze(Ksgr(1,:,:)) + TINY^2; if Nx==1; Ksgr_x = Ksgr_x.'; end
-Ksgr_m = squeeze(Ksgr(2,:,:)) + TINY^2; if Nx==1; Ksgr_m = Ksgr_m.'; end
-Ksgr_f = squeeze(Ksgr(3,:,:)) + TINY^2; if Nx==1; Ksgr_f = Ksgr_f.'; end
+Ksgr_x = squeeze(Ksgr(1,:,:)) + eps^2; if Nx==1; Ksgr_x = Ksgr_x.'; end
+Ksgr_m = squeeze(Ksgr(2,:,:)) + eps^2; if Nx==1; Ksgr_m = Ksgr_m.'; end
+Ksgr_f = squeeze(Ksgr(3,:,:)) + eps^2; if Nx==1; Ksgr_f = Ksgr_f.'; end
 
 if ~calibrt % skip the following if called from calibration script
 
@@ -127,7 +127,7 @@ exz = 1/2.*(diff(U,1,1)./h+diff(W,1,2)./h);                                % she
 
 eII = (0.5.*(exx.^2 + ezz.^2 ...
        + 2.*(exz(1:end-1,1:end-1).^2+exz(2:end,1:end-1).^2 ...
-       +     exz(1:end-1,2:end  ).^2+exz(2:end,2:end  ).^2)/4)).^0.5 + TINY;
+       +     exz(1:end-1,2:end  ).^2+exz(2:end,2:end  ).^2)/4)).^0.5 + eps;
 
 % update diffusion parameters
 if Nx==1 && Nz==1; kW = 0; Pr = Prt; Sc = Sct;
@@ -137,8 +137,8 @@ elseif Nx==1
     Sc  = Sct;
 else
     kW  = eII.*Delta_cnv.^2;                                               % turbulent eddy diffusivity
-    Pr  = Prt ./ (1-exp(-Re./10)+TINY);
-    Sc  = Sct ./ (1-exp(-Re./10)+TINY);
+    Pr  = Prt ./ (1-exp(-Re./10)+eps);
+    Sc  = Sct ./ (1-exp(-Re./10)+eps);
 end
 kwm = abs(rhom-rho).*g0.*Ksgr_m.*Delta_sgr + kmin;                         % segregation diffusivity
 kwx = abs(rhox-rho).*g0.*Ksgr_x.*Delta_sgr + kmin;                         % segregation diffusivity
@@ -174,7 +174,7 @@ txz = etaco .* exz;                                                        % xz-
 
 tII = (0.5.*(txx.^2 + tzz.^2 ...
        + 2.*(txz(1:end-1,1:end-1).^2+txz(2:end,1:end-1).^2 ...
-       +     txz(1:end-1,2:end  ).^2+txz(2:end,2:end  ).^2)/4)).^0.5 + TINY;
+       +     txz(1:end-1,2:end  ).^2+txz(2:end,2:end  ).^2)/4)).^0.5 + eps;
 
 % heat dissipation (entropy production) rate
 if Nz==1 && Nx==1

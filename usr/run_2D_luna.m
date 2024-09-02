@@ -7,7 +7,7 @@ run('./par_default')
 % set run parameters
 runID    =  '2D_luna_1650';      % run identifier
 opdir    =  '../out';            % output directory
-restart  =  250;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
+restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  100;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot of results
 save_op  =  1;                   % switch on to save output to file
@@ -79,8 +79,8 @@ gamma    =  0.01;                % horizontal drag
 Delta_cnv=  h/2;                 % correlation length for eddy, convection diffusivity (multiple of h, 0.5-1)
 Delta_sgr=  dx0*10;              % correlation length for phase fluctuation diffusivity (multiple of dx0, df0, 10-20)
 etamin   =  1e4;                 % minimum viscosity
-alpha    =  0.50;
-beta     =  0.00;
+alpha    =  0.75;
+beta     =  0.125;
 
 %*****  RUN NAKHLA MODEL  *************************************************
 run('../src/main')

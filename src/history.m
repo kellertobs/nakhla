@@ -12,7 +12,7 @@ hist.time(stp) = time;
 % record total mass, heat, component mass in model (assume hy = 1, unit length in third dimension)
 hist.sumM(stp  ) = sum(rho(:)*h*h*1);  % [kg]
 hist.sumS(stp  ) = sum(  S(:)*h*h*1);  % [J]
-hist.sumC(stp,:) = squeeze(sum(sum(C*h*h*1,1),2))+TINY; % [kg]
+hist.sumC(stp,:) = squeeze(sum(sum(C*h*h*1,1),2))+eps; % [kg]
 
 % record expected rates of change by volume change and imposed boundaries layers
 dsumMdt = sum(X(1,:).*Wx(1,2:end-1)*h*1) - sum(X(end,:).*Wx(end,2:end-1)*h*1) ...
@@ -36,13 +36,13 @@ dsumCdt = squeeze(sum(sum(bnd_C*h*h*1,1),2) ...
         + sum(M(1,:).*cm(1,:,:).*Wm(1,2:end-1)*h*1,2) - sum(M(end,:).*cm(end,:,:).*Wm(end,2:end-1)*h*1,2) ...
         + sum(M(:,1).*cm(:,1,:).*Um(2:end-1,1)*h*1,1) - sum(M(:,end).*cm(:,end,:).*Um(2:end-1,end)*h*1,1)).';  % [kg/s]
 
-% if step>=2; hist.DM(stp  ) = (a2*hist.DM(max(1,stp-1)  ) + a3*hist.DM(max(1,stp-2)  ) + (b1*dsumMdt + b2*dsumMdto + b3*dsumMdtoo)*dt)/a1; else; hist.DM(stp  ) = 0; end  % [kg]
-% if step>=2; hist.DS(stp  ) = (a2*hist.DS(max(1,stp-1)  ) + a3*hist.DS(max(1,stp-2)  ) + (b1*dsumSdt + b2*dsumSdto + b3*dsumSdtoo)*dt)/a1; else; hist.DS(stp  ) = 0; end  % [kg]
-% if step>=2; hist.DC(stp,:) = (a2*hist.DC(max(1,stp-1),:) + a3*hist.DC(max(1,stp-2),:) + (b1*dsumCdt + b2*dsumCdto + b3*dsumCdtoo)*dt)/a1; else; hist.DC(stp,:) = zeros(1,cal.ncmp); end  % [kg]
+if step>=2; hist.DM(stp  ) = (a2*hist.DM(max(1,stp-1)  ) + a3*hist.DM(max(1,stp-2)  ) + (b1*dsumMdt + b2*dsumMdto + b3*dsumMdtoo)*dt)/a1; else; hist.DM(stp  ) = 0; end  % [kg]
+if step>=2; hist.DS(stp  ) = (a2*hist.DS(max(1,stp-1)  ) + a3*hist.DS(max(1,stp-2)  ) + (b1*dsumSdt + b2*dsumSdto + b3*dsumSdtoo)*dt)/a1; else; hist.DS(stp  ) = 0; end  % [kg]
+if step>=2; hist.DC(stp,:) = (a2*hist.DC(max(1,stp-1),:) + a3*hist.DC(max(1,stp-2),:) + (b1*dsumCdt + b2*dsumCdto + b3*dsumCdtoo)*dt)/a1; else; hist.DC(stp,:) = zeros(1,cal.ncmp); end  % [kg]
 
-if stp>=2; hist.DM(stp  ) = hist.DM(max(1,stp-1)  ) + dsumMdt*dt; else; hist.DM(stp  ) = 0; end  % [kg]
-if stp>=2; hist.DS(stp  ) = hist.DS(max(1,stp-1)  ) + dsumSdt*dt; else; hist.DS(stp  ) = 0; end  % [kg]
-if stp>=2; hist.DC(stp,:) = hist.DC(max(1,stp-1),:) + dsumCdt*dt; else; hist.DC(stp,:) = zeros(1,cal.ncmp); end  % [kg]
+% if stp>=2; hist.DM(stp  ) = hist.DM(max(1,stp-1)  ) + dsumMdt*dt; else; hist.DM(stp  ) = 0; end  % [kg]
+% if stp>=2; hist.DS(stp  ) = hist.DS(max(1,stp-1)  ) + dsumSdt*dt; else; hist.DS(stp  ) = 0; end  % [kg]
+% if stp>=2; hist.DC(stp,:) = hist.DC(max(1,stp-1),:) + dsumCdt*dt; else; hist.DC(stp,:) = zeros(1,cal.ncmp); end  % [kg]
 
 % record conservation error of mass M, heat S, components C
 hist.EM(stp  ) = (hist.sumM(stp  ) - hist.DM(stp  ))./hist.sumM(1  ) - 1;  % [kg/kg]

@@ -99,7 +99,8 @@ maxit    =  20;                  % maximum outer its
 alpha    =  0.75;                % iterative step size parameter
 beta     =  0.125;               % iterative damping parameter
 gamma    =  1e-3;                % artificial horizontal inertia parameter (only applies if periodic)
-lambda   =  0e-7;                % pressure smoothing parameter
+lambda1  =  0e-7;                % pressure regularisation parameter
+lambda2  =  0e-7;                % pressure regularisation parameter
 etacntr  =  1e+7;                % maximum viscosity contrast
 Delta_cnv=  h/2;                 % correlation length for eddy diffusivity (multiple of h, 0.5-1)
 Delta_sgr=  h/20;                % correlation length for phase fluctuation diffusivity (multiple of dx0, df0, 10-20)
@@ -112,6 +113,5 @@ Pcouple  =  0;                   % coupling phase equilibria and material proper
 
 % set various options
 calibrt  =  0;                   % not in calibrate mode
-TINY     =  1e-16;               % minimum cutoff phase, component fractions
 bnchm    =  0;                   % not a benchmark run
 

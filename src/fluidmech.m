@@ -1,15 +1,15 @@
 tic;
 
-if ~bnchm && step>0
+if ~bnchm && step>0 && ~restart
 
 %***  update mixture mass density
-drhodt  = advn_rho + (RHO-rho)/dt;
+drhodt  = advn_rho;% + (RHO-rho)/dt;
 
 % residual of mixture mass evolution
 res_rho = (a1*rho-a2*rhoo-a3*rhooo)/dt - (b1*drhodt + b2*drhodto + b3*drhodtoo);
 
 % volume source and background velocity passed to fluid-mechanics solver
-upd_rho = - alpha*res_rho./b1./rho + beta*upd_rho;
+upd_rho = - 1*res_rho./b1./rho + 0*upd_rho;
 VolSrc  = VolSrc + upd_rho;  % correct volume source term by scaled residual
 
 UBG     = - 0*mean(VolSrc,'all')./2 .* (L/2-XXu);
@@ -336,12 +336,12 @@ if ~exist('KP','var') || bnchm || lambda1+lambda2>0
     IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; aa(:)+1];
     IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL; aa(:)-1];
     
-    ii  = [MapP(:,1    ); MapP(:,end)]; % left & right
+    ii  = [MapP(2:end-1,1    ); MapP(2:end-1,end)]; % left & right
     jj1 = ii;
     if periodic
-        jj2 = [MapP(:,end-1); MapP(:,2    )];
+        jj2 = [MapP(2:end-1,end-1); MapP(2:end-1,2    )];
     else
-        jj2 = [MapP(:,2    ); MapP(:,end-1)];
+        jj2 = [MapP(2:end-1,2    ); MapP(2:end-1,end-1)];
     end
     
     aa  = zeros(size(ii));
@@ -395,6 +395,7 @@ np0 = MapP(nzp,nxp);
 % DD(MapP(nzp,nxp),:) = 0;
 KP(MapP(nzp,nxp),:) = 0;
 KP(MapP(nzp,nxp),MapP(nzp,nxp)) = 1;
+KP(MapP(end,nxp),MapP(nzp,nxp)) = 1;
 % RP(MapP(nzp,nxp),:) = 0;
 
 if bnchm; RP(MapP(nzp,nxp),:) = P_mms(nzp,nxp); end
@@ -436,9 +437,9 @@ W = full(reshape(SOL(MapW(:))        ,Nz+1,Nx+2));  % matrix z-velocity
 U = full(reshape(SOL(MapU(:))        ,Nz+2,Nx+1));  % matrix x-velocity
 P = full(reshape(SOL(MapP(:)+(NW+NU)),Nz+2,Nx+2));  % matrix dynamic pressure
 
-% upd_W = - full(reshape(SOL(MapW(:))        ,Nz+1,Nx+2));% + beta*upd_W;  % matrix z-velocity
-% upd_U = - full(reshape(SOL(MapU(:))        ,Nz+2,Nx+1));% + beta*upd_U;  % matrix x-velocity
-% upd_P = - full(reshape(SOL(MapP(:)+(NW+NU)),Nz+2,Nx+2));% + beta*upd_P;  % matrix dynamic pressure
+% upd_W = - alpha*full(reshape(SOL(MapW(:))        ,Nz+1,Nx+2)) + beta*upd_W;  % matrix z-velocity
+% upd_U = - alpha*full(reshape(SOL(MapU(:))        ,Nz+2,Nx+1)) + beta*upd_U;  % matrix x-velocity
+% upd_P = - alpha*full(reshape(SOL(MapP(:)+(NW+NU)),Nz+2,Nx+2)) + beta*upd_P;  % matrix dynamic pressure
 % 
 % W = W + upd_W;
 % U = U + upd_U;

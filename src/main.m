@@ -38,6 +38,10 @@ while time <= tend && step <= Nt &&  any(mq(:)>eps^0.5) ...
         iter = iter+1;
     end
 
+    % renormalise sum of phase, component densities to bulk density
+    X = X./RHO.*rho;  M = M./RHO.*rho;  F = F./RHO.*rho;  RHO = X+M+F;
+    C = C./sum(C,3).*rho;
+
     % fractionation mode for 0D-models
     if Nx==1 && Nz==1
         Ptop = Ptop + (T-To).*dPdT;

@@ -457,6 +457,8 @@ if restart
         so      = s;
         dto     = dt;
 
+        fluidmech;
+        update;
         output;
 
         time    = time+dt;

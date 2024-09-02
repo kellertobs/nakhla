@@ -63,11 +63,8 @@ dCdt = advn_C + diff_C + bnd_C;
 res_C = (a1*C-a2*Co-a3*Coo)/dt - (b1*dCdt + b2*dCdto + b3*dCdtoo);
 
 % semi-implicit update of major component density
-Ci    = C;
-C     = C - alpha*res_C*dt/a1 + beta*upd_C;
-C     = C./sum(C,3).*RHO;
-C     = max(0, C );
-upd_C = C - Ci;
+upd_C = max(-C, - alpha*res_C*dt/a1 + beta*upd_C );
+C     = C + upd_C;
 
 % convert component density to concentration
 c = C./sum(C,3);
@@ -126,17 +123,12 @@ res_F = (a1*F-a2*Fo-a3*Foo)/dt - (b1*dFdt + b2*dFdto + b3*dFdtoo);
 res_M = (a1*M-a2*Mo-a3*Moo)/dt - (b1*dMdt + b2*dMdto + b3*dMdtoo);
 
 % semi-implicit update of phase fraction densities
-upd_X = - alpha*res_X*dt/a1 + beta*upd_X;
-upd_F = - alpha*res_F*dt/a1 + beta*upd_F;
-upd_M = - alpha*res_M*dt/a1 + beta*upd_M;
+upd_X = max(-X, - alpha*res_X*dt/a1 + beta*upd_X );
+upd_F = max(-F, - alpha*res_F*dt/a1 + beta*upd_F );
+upd_M = max(-M, - alpha*res_M*dt/a1 + beta*upd_M );
 X     = X + upd_X;
 F     = F + upd_F;
 M     = M + upd_M;
-
-% apply minimum bound
-X   = max(0, X );
-F   = max(0, F );
-M   = max(0, M );
 
 % get dynamically evolving mixture density 
 RHO = X+F+M;
@@ -161,8 +153,8 @@ sf = s + Dsf;
 upd_s = s-si;
 
 % update temperature
-upd_Tp = (upd_s.*rho            ) .*T./RhoCp;
-upd_T  = (upd_s.*rho + aT.*upd_P) .*T./RhoCp;
+upd_Tp = (upd_s.*rho             ) .*T./RhoCp;
+upd_T  = (upd_s.*rho + aT.*upd_Pt) .*T./RhoCp;
 
 Tp     = Tp + upd_Tp;
 T      = T  + upd_T;
