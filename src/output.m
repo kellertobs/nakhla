@@ -635,61 +635,61 @@ drawnow
 % save output to file
 if save_op && ~restart
     if Nx <= 10 && Nz <= 10  % print 0D plots
-        name = [opdir,'/',runID,'/',runID,'_tch_',num2str(floor(step/nop))];
+        name = [outdir,'/',runID,'/',runID,'_tch_',num2str(floor(step/nop))];
         print(fh1,name,'-dpng','-r300','-image');
-        name = [opdir,'/',runID,'/',runID,'_aux_',num2str(floor(step/nop))];
+        name = [outdir,'/',runID,'/',runID,'_aux_',num2str(floor(step/nop))];
         print(fh2,name,'-dpng','-r300','-image');
-        name = [opdir,'/',runID,'/',runID,'_cmp',num2str(floor(step/nop))];
+        name = [outdir,'/',runID,'/',runID,'_cmp',num2str(floor(step/nop))];
         print(fh3,name,'-dpng','-r300','-image');
-        name = [opdir,'/',runID,'/',runID,'_TAS',num2str(floor(step/nop))];
+        name = [outdir,'/',runID,'/',runID,'_TAS',num2str(floor(step/nop))];
         print(fh11,name,'-dpng','-r300','-image');
-        name = [opdir,'/',runID,'/',runID,'_AFM',num2str(floor(step/nop))];
+        name = [outdir,'/',runID,'/',runID,'_AFM',num2str(floor(step/nop))];
         print(fh12,name,'-dpng','-r300','-image');
     elseif Nx <= 10  % create 1D plots
-        name = [opdir,'/',runID,'/',runID,'_sol_',num2str(floor(step/nop))];
+        name = [outdir,'/',runID,'/',runID,'_sol_',num2str(floor(step/nop))];
         print(fh1,name,'-dpng','-r300','-image');
-        name = [opdir,'/',runID,'/',runID,'_aux_',num2str(floor(step/nop))];
+        name = [outdir,'/',runID,'/',runID,'_aux_',num2str(floor(step/nop))];
         print(fh2,name,'-dpng','-r300','-image');
-        name = [opdir,'/',runID,'/',runID,'_cmp_',num2str(floor(step/nop))];
+        name = [outdir,'/',runID,'/',runID,'_cmp_',num2str(floor(step/nop))];
         print(fh3,name,'-dpng','-r300','-image');
-        name = [opdir,'/',runID,'/',runID,'_TAS',num2str(floor(step/nop))];
+        name = [outdir,'/',runID,'/',runID,'_TAS',num2str(floor(step/nop))];
         print(fh11,name,'-dpng','-r300','-image');
-        name = [opdir,'/',runID,'/',runID,'_AFM',num2str(floor(step/nop))];
+        name = [outdir,'/',runID,'/',runID,'_AFM',num2str(floor(step/nop))];
         print(fh12,name,'-dpng','-r300','-image');
     else
-        name = [opdir,'/',runID,'/',runID,'_vep_',num2str(floor(step/nop))];
+        name = [outdir,'/',runID,'/',runID,'_vep_',num2str(floor(step/nop))];
         print(fh1,name,'-dpng','-r300','-image');
-        name = [opdir,'/',runID,'/',runID,'_tch_',num2str(floor(step/nop))];
+        name = [outdir,'/',runID,'/',runID,'_tch_',num2str(floor(step/nop))];
         print(fh2,name,'-dpng','-r300','-image');
-        name = [opdir,'/',runID,'/',runID,'_phs_',num2str(floor(step/nop))];
+        name = [outdir,'/',runID,'/',runID,'_phs_',num2str(floor(step/nop))];
         print(fh3,name,'-dpng','-r300','-image');
-        name = [opdir,'/',runID,'/',runID,'_sgr_',num2str(floor(step/nop))];
+        name = [outdir,'/',runID,'/',runID,'_sgr_',num2str(floor(step/nop))];
         print(fh4,name,'-dpng','-r300','-image');
-        name = [opdir,'/',runID,'/',runID,'_cmp',num2str(floor(step/nop))];
+        name = [outdir,'/',runID,'/',runID,'_cmp',num2str(floor(step/nop))];
         print(fh5,name,'-dpng','-r300','-image');
-        name = [opdir,'/',runID,'/',runID,'_oxd',num2str(floor(step/nop))];
+        name = [outdir,'/',runID,'/',runID,'_oxd',num2str(floor(step/nop))];
         print(fh6,name,'-dpng','-r300','-image');
-        name = [opdir,'/',runID,'/',runID,'_mnr',num2str(floor(step/nop))];
+        name = [outdir,'/',runID,'/',runID,'_mnr',num2str(floor(step/nop))];
         print(fh7,name,'-dpng','-r300','-image');
-        name = [opdir,'/',runID,'/',runID,'_gch',num2str(floor(step/nop))];
+        name = [outdir,'/',runID,'/',runID,'_gch',num2str(floor(step/nop))];
         print(fh8,name,'-dpng','-r300','-image');
-        name = [opdir,'/',runID,'/',runID,'_TAS',num2str(floor(step/nop))];
+        name = [outdir,'/',runID,'/',runID,'_TAS',num2str(floor(step/nop))];
         print(fh11,name,'-dpng','-r300','-image');
-        name = [opdir,'/',runID,'/',runID,'_AFM',num2str(floor(step/nop))];
+        name = [outdir,'/',runID,'/',runID,'_AFM',num2str(floor(step/nop))];
         print(fh12,name,'-dpng','-r300','-image');
     end
 
-    name = [opdir,'/',runID,'/',runID,'_',num2str(floor(step/nop))];
+    name = [outdir,'/',runID,'/',runID,'_',num2str(floor(step/nop))];
     save(name,'U','W','P','Pt','Pchmb','f','x','m','fq','xq','mq','phi','chi','mu','X','F','M','S','C','T','Tp','c','cm','cx','cf','TRC','trc','dSdt','dCdt','dFdt','dXdt','dMdt','drhodt','dTRCdt','Gf','Gx','Gm','rho','eta','eII','tII','dt','time','step','VolSrc','wf','wx','wm','cal');
-    name = [opdir,'/',runID,'/',runID,'_cont'];
+    name = [outdir,'/',runID,'/',runID,'_cont'];
     save(name,'U','W','P','Pt','Pchmb','f','x','m','fq','xq','mq','phi','chi','mu','X','F','M','S','C','T','Tp','c','cm','cx','cf','TRC','trc','dSdt','dCdt','dFdt','dXdt','dMdt','drhodt','dTRCdt','Gf','Gx','Gm','rho','eta','eII','tII','dt','time','step','VolSrc','wf','wx','wm','cal');
-    name = [opdir,'/',runID,'/',runID,'_hist'];
+    name = [outdir,'/',runID,'/',runID,'_hist'];
     save(name,'hist');
 
 end
 
 if save_op && (step==0 || restart)
-    logfile = [opdir,'/',runID,'/',runID,'.log'];
+    logfile = [outdir,'/',runID,'/',runID,'.log'];
     if exist(logfile,'file') && step==0; delete(logfile); end
     diary(logfile)
 end

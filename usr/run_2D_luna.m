@@ -6,8 +6,7 @@ run('./par_default')
 
 % set run parameters
 runID    =  '2D_luna_1650';      % run identifier
-opdir    =  '../out';            % output directory
-restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
+restart  = -1;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  100;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot of results
 save_op  =  1;                   % switch on to save output to file
@@ -15,7 +14,7 @@ plot_cv  =  0;                   % switch on to live plot iterative convergence
 
 % set model domain parameters
 D        =  1000e3;              % chamber depth [m]
-N        =  150;                 % number of grid points in z-direction (incl. 2 ghosts)
+N        =  180;                 % number of grid points in z-direction (incl. 2 ghosts)
 h        =  D/N;                 % grid spacing (equal in both dimensions, do not set) [m]
 L        =  D/3;                 % chamber width [m]
 
@@ -79,10 +78,10 @@ gamma    =  0.01;                % horizontal drag
 Delta_cnv=  h/2;                 % correlation length for eddy, convection diffusivity (multiple of h, 0.5-1)
 Delta_sgr=  dx0*10;              % correlation length for phase fluctuation diffusivity (multiple of dx0, df0, 10-20)
 etamin   =  1e4;                 % minimum viscosity
-alpha    =  0.75;
-beta     =  0.125;
+alpha    =  0.50;
+beta     =  0.00;
 
 %*****  RUN NAKHLA MODEL  *************************************************
-run('../src/main')
+run([srcdir,'/main'])
 %**************************************************************************
 

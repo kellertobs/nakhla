@@ -2,13 +2,13 @@
 addpath('./ternplot');
 
 % create output directory
-if ~isfolder([opdir,'/',runID])
-    mkdir([opdir,'/',runID]);
+if ~isfolder([outdir,'/',runID])
+    mkdir([outdir,'/',runID]);
 end
 
 % save input parameters and runtime options (unless restarting)
 if restart == 0 && save_op == 1
-    parfile = [opdir,'/',runID,'/',runID,'_par'];
+    parfile = [outdir,'/',runID,'/',runID,'_par'];
     save(parfile);
 end
 
@@ -413,14 +413,14 @@ dsumCdt = 0; dsumCdto = 0;
 % overwrite fields from file if restarting run
 if restart
     if     restart < 0  % restart from last continuation frame
-        name = [opdir,'/',runID,'/',runID,'_cont.mat'];
+        name = [outdir,'/',runID,'/',runID,'_cont.mat'];
     elseif restart > 0  % restart from specified continuation frame
-        name = [opdir,'/',runID,'/',runID,'_',num2str(restart),'.mat'];
+        name = [outdir,'/',runID,'/',runID,'_',num2str(restart),'.mat'];
     end
     if exist(name,'file')
         fprintf('\n   restart from %s \n\n',name);
         load(name,'U','W','P','Pt','Pchmb','f','x','m','fq','xq','mq','phi','chi','mu','X','F','M','S','C','T','Tp','c','cm','cx','cf','TRC','trc','dSdt','dCdt','dFdt','dXdt','dMdt','drhodt','dTRCdt','Gf','Gx','Gm','rho','eta','eII','tII','dt','time','step','VolSrc','wf','wx','wm','cal');
-        name = [opdir,'/',runID,'/',runID,'_hist'];
+        name = [outdir,'/',runID,'/',runID,'_hist'];
         load(name,'hist');
 
         SOL = [W(:);U(:);P(:)];

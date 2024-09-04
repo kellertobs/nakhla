@@ -5,8 +5,8 @@ clear; close all;
 run('./par_default')
 
 % set run parameters
-runID     =  '2D_ASVZ';           % run identifier
-restart   =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
+runID     =  '2D_DEMO';           % run identifier
+restart   = -1;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop       =  100;                 % output frame plotted/saved every 'nop' time steps
 plot_op   =  1;                   % switch on to live plot results
 save_op   =  1;                   % switch on to save output to file
@@ -24,11 +24,11 @@ tend      =  1*yr;                % end time for simulation [s]
 dt        =  36;                  % initial time step [s]
 
 % set initial thermo-chemical state
-T0        =  1200;                % temperature top  layer [deg C]
+T0        =  1215;                % temperature top  layer [deg C]
 T1        =  T0;                  % temperature base layer [deg C]
-c0        =  [0.20  0.11  0.28  0.25  0.08  0.08  0.02];  % components (maj comp, H2O) top  layer [wt] (will be normalised to unit sum!)
+c0        =  [0.10  0.75  0.15  0.01];  % components (maj comp, H2O) top  layer [wt] (will be normalised to unit sum!)
 c1        =  c0;                  % components (maj comp, H2O) base layer [wt] (will be normalised to unit sum!)
-dcr       =  [1,1,1,-1,-1,-1,0]*1e-4;
+dcr       =  [1,-1/2,-1/2,0]*1e-4;
 dr_trc    =  [0,0,1,0,0,-1];      % trace elements random noise
 
 % set thermo-chemical boundary parameters
@@ -37,13 +37,13 @@ bndmode   =  3;                   % boundary assimilation mode (0 = none; 1 = to
 bnd_w     =  0.1;                 % boundary layer width [m]
 tau_T     =  bnd_w^2/1e-6;        % wall cooling/assimilation time [s]
 Twall     =  [300,300,nan];       % [top,bot,sds] wall rock temperature [degC] (nan = insulating)
-cwall     =  nan(3,7);
+cwall     =  nan(3,4);
 Ptop      =  1.5e8;               % top pressure [Pa]
 fin       =  0;
 fout      =  1;
 
 % set thermo-chemical material parameters
-calID     =  'ASVZ';              % phase diagram calibration
+calID     =  'DEMO';              % phase diagram calibration
 
 % set numerical model parameters
 TINT      =  'bd2im';             % time integration scheme ('be1im','bd2im','cn2si','bd2si')
