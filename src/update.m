@@ -109,9 +109,9 @@ if ~calibrt % skip the following if called from calibration script
 % update velocity magnitude
 if Nx==1 && Nz==1; Vel = 0;
 elseif Nx==1
-    drhoz = gradient(rho);
+    drhoz = gradient(rho.*(1-(mu.*bPm+chi.*bPx.*phi.*bPf).*Pt));
     for i=1:ceil(Nz^2/2e4); drhoz = drhoz + diffus(drhoz,1/8*ones(size(rp)),1,[1,2],BCD); end
-    Vel   = (1e-3.*rho .* 10.^(-drhoz./20)).*g0.*Delta_cnv.^2./eta;
+    Vel   = 1e-3.*rho.*10.^(-drhoz./15) .*g0.*Delta_cnv.^2./eta;
 else
     Vel = sqrt(((W(1:end-1,2:end-1)+W(2:end,2:end-1))/2).^2 ...
              + ((U(2:end-1,1:end-1)+U(2:end-1,2:end))/2).^2);
