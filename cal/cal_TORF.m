@@ -85,9 +85,6 @@ cal.A   = [5.82  2.67  3.42  3.43  1.00];
 % set second coeff. for P-dependence of T_m^i [1]
 cal.B   = [9.52  3.04  2.70  1.91  2.17];
 
-% set entropy gain of fusion DeltaS [J/K]
-cal.dS  = 350;
-
 % set coeff. for T-dependence of partition coefficients K^i [1/K]
 cal.r  = [23.50 4.10  8.00  10.50 14.30];
 
@@ -98,6 +95,10 @@ cal.c1 = [0.001  0.001  0.020  0.277  0.700  0.023];
 % specify melting point dependence on H2O                
 cal.dTH2O   = [1300   1500  1650  1900  2200];   % solidus shift from water content [K/wt^pH2O]
 cal.pH2O    = 0.75;                              % solidus shift from water content [K/wt^pH2O]
+
+% set entropy gain of crystallisation and evaporation DeltaS [J/K]
+cal.Dsx = 350;
+cal.Dsf = 500;
 
 % specify geochemical model parameters
 cal.ntrc    = 6;                    % number of trace elements
@@ -128,3 +129,4 @@ cal.CC    =[[0.30, 0.30, 0.40]*0.7; ... % permission step widths
 
 % convergence tolerance
 cal.tol     = 1e-9;
+cal.alpha   = 0.5;

@@ -104,12 +104,12 @@ lambda1  =  0e-7;                % pressure regularisation parameter
 lambda2  =  0e-7;                % pressure regularisation parameter
 etacntr  =  1e+7;                % maximum viscosity contrast
 Delta_cnv=  h/2;                 % correlation length for eddy diffusivity (multiple of h, 0.5-1)
-Delta_sgr=  h/20;                % correlation length for phase fluctuation diffusivity (multiple of dx0, df0, 10-20)
+Delta_sgr=  dx0*20;              % correlation length for phase fluctuation diffusivity (multiple of dx0, df0, 10-20)
 Prt      =  3;                   % turbulent Prandtl number (ratio of momentum to heat diffusivity)
 Sct      =  3;                   % turbulent Schmidt number (ratio of momentum to mass diffusivity)
 etamin   =  0.1;                 % minimum viscosity
 kmin     =  1e-9;                % minimum diffusivity
-kmax     =  1e3;                 % maximum diffusivity
+kmax     =  1e9;                 % maximum diffusivity
 Pcouple  =  0;                   % coupling phase equilibria and material properties to dynamic pressure
 
 % set various options

@@ -28,8 +28,8 @@ else % closed sides
     BCD     =  {'',''};  % boundary condition on advection (top/bot, sides) 
 end
 
-Dsx = -cal.dS;
-Dsf =  cal.dS+100;
+Dsx = -cal.Dsx;
+Dsf =  cal.Dsf;
 cal.tol = atol;
 
 % normalise major components to anhydrous unit sum, rescale to hydrous

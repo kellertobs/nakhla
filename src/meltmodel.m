@@ -63,10 +63,10 @@ while rnorm > cal.tol  % iterate down to full accuracy
     TmK  = cal.Tm+273.15;
 
     %***  get residual r
-    r    = sum( [-(var.c(:,1:end-1).*exp((cal.dS.*(TK - TmK))./(TmK.*cal.r)))./(f - 1),var.H2Om] ,2) - 1;
+    r    = sum( [-(var.c(:,1:end-1).*exp((cal.Dsx.*(TK - TmK))./(TmK.*cal.r)))./(f - 1),var.H2Om] ,2) - 1;
 
     %***  get analytical derivative of residual dr/dT
-    drdT = sum( -(cal.dS.*var.c(:,1:end-1).*exp((cal.dS.*(TK - TmK))./(TmK.*cal.r)))./(TmK.*cal.r.*(f - 1)) ,2);
+    drdT = sum( -(cal.Dsx.*var.c(:,1:end-1).*exp((cal.Dsx.*(TK - TmK))./(TmK.*cal.r)))./(TmK.*cal.r.*(f - 1)) ,2);
     
     %***  apply Newton correction to current guess of Tsol
     Tsol(ii)  =  Tsol(ii) - r(ii)./drdT(ii)/1.1;
@@ -127,10 +127,10 @@ while rnorm > cal.tol  % iterate down to full accuracy
     TmK  = cal.Tm+273.15;
 
     %***  get residual r
-    r    = sum( -(var.c(:,1:end-1).*exp(-(cal.dS.*(TK - TmK))./(TmK.*cal.r)))./(f - 1) ,2) - 1;
+    r    = sum( -(var.c(:,1:end-1).*exp(-(cal.Dsx.*(TK - TmK))./(TmK.*cal.r)))./(f - 1) ,2) - 1;
 
     %***  get get analytical derivative of residual dr/dT
-    drdT = sum( (cal.dS.*var.c(:,1:end-1).*exp(-(cal.dS.*(TK - TmK))./(TmK.*cal.r)))./(TmK.*cal.r.*(f - 1)) ,2);
+    drdT = sum( (cal.Dsx.*var.c(:,1:end-1).*exp(-(cal.Dsx.*(TK - TmK))./(TmK.*cal.r)))./(TmK.*cal.r.*(f - 1)) ,2);
 
     %***  apply Newton correction to Tliq
     Tliq(ii)  =  Tliq(ii) - r(ii)./drdT(ii)/1.1;
@@ -254,7 +254,7 @@ cal.Tm  =  (cal.T0 - cal.dTH2O.*var.H2Om.^cal.pH2O) .* (1 + var.P./cal.A).^(1./c
 %***  compute T,P-dependence of major component equilibrium partition coefficients
 %     Parameterization after Rudge, Bercovici, & Spiegelman (2010)
 
-cal.L   = (var.T+273.15).*cal.dS;
+cal.L   = (var.T+273.15).*cal.Dsx;
 
 cal.Kx  = zeros(size(var.c));
 cal.Kx(:,1:end-1) = exp(cal.L./cal.r.*(1./(var.T+273.15) - 1./(cal.Tm+273.15)));

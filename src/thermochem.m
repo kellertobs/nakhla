@@ -104,13 +104,13 @@ advn_M   = - advect(M,Um(2:end-1,:),Wm(:,2:end-1),h,{ADVN,''},[1,2],BCA);
 advn_rho = advn_X+advn_F+advn_M;
 
 % phase mass transfer rates
-Gm  = (mq-m).*RHO/max(tau_r,5*dt);
-Gx  = (xq-x).*RHO/max(tau_r,5*dt); 
-Gf  = (fq-f).*RHO/max(tau_r,5*dt);
+Gm  = (mq-m).*RHO/max(tau_r,10*dt);
+Gx  = (xq-x).*RHO/max(tau_r,10*dt); 
+Gf  = (fq-f).*RHO/max(tau_r,10*dt);
 
-Gmc = (cmq.*mq-cm.*m).*RHO/max(tau_r,5*dt);
-Gxc = (cxq.*xq-cx.*x).*RHO/max(tau_r,5*dt);
-Gfc = (cfq.*fq-cf.*f).*RHO/max(tau_r,5*dt);
+Gmc = (cmq.*mq-cm.*m).*RHO/max(tau_r,10*dt);
+Gxc = (cxq.*xq-cx.*x).*RHO/max(tau_r,10*dt);
+Gfc = (cfq.*fq-cf.*f).*RHO/max(tau_r,10*dt);
 
 % total rates of change
 dXdt   = advn_X + Gx;
