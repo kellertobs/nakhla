@@ -242,7 +242,7 @@ UDtime  = 0;
 a1      = 1; a2 = 0; a3 = 0; b1 = 1; b2 = 0; b3 = 0;
 res  = 1;  tol = 1e-9;  it = 1;
 while res > tol
-    Pti = Pt; Ti = T; xi = xq; fi = fq;
+    Ptii = Pt; Ti = T; xi = xq; fi = fq;
     
     rhofz  = (rho(icz(1:end-1),:)+rho(icz(2:end),:))/2;
     rhofx  = (rho(:,icx(1:end-1))+rho(:,icx(2:end)))/2;
@@ -282,10 +282,10 @@ while res > tol
 
     update;
 
-    res  = norm(Pt(:)-Pti(:),2)./norm(Pt(:),2) ...
-         + norm( T(:)- Ti(:),2)./norm( T(:),2) ...
-         + norm((x(:)- xi(:)).*(x(:)>eps^0.5),2)./(norm(x(:),2)+eps) ...
-         + norm((f(:)- fi(:)).*(f(:)>eps^0.5),2)./(norm(f(:),2)+eps);
+    res  = norm(Pt(:)-Ptii(:),2)./norm(Pt(:),2) ...
+         + norm( T(:)-Ti  (:),2)./norm( T(:),2) ...
+         + norm((x(:)-xi  (:)).*(x(:)>eps^0.5),2)./(norm(x(:),2)+eps) ...
+         + norm((f(:)-fi  (:)).*(f(:)>eps^0.5),2)./(norm(f(:),2)+eps);
 
     it = it+1;
 end
