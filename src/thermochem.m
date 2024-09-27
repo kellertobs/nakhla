@@ -80,7 +80,7 @@ var.m      = reshape(mq,Nx*Nz,1);         % melt fraction [wt]
 var.f      = reshape(fq,Nx*Nz,1);         % bubble fraction [wt]
 var.H2O    = var.c(:,end);                % water concentration [wt]
 var.X      = reshape(cm_oxd_all,Nz*Nx,9); % melt oxide fractions [wt %]
-cal.H2Osat = fluidsat(var); % water saturation [wt]
+cal.H2Osat = fluidsat(var);               % water saturation [wt]
 
 [var,cal]  = meltmodel(var,cal,'E');
 
@@ -104,13 +104,13 @@ advn_M   = - advect(M,Um(2:end-1,:),Wm(:,2:end-1),h,{ADVN,''},[1,2],BCA);
 advn_rho = advn_X+advn_F+advn_M;
 
 % phase mass transfer rates
-Gm  = (mq-m).*RHO/max(tau_r,10*dt);
-Gx  = (xq-x).*RHO/max(tau_r,10*dt); 
-Gf  = (fq-f).*RHO/max(tau_r,10*dt);
+Gm  = (Gmo + (mq-m).*RHO/max(tau_r,5*dt))/2;
+Gx  = (Gxo + (xq-x).*RHO/max(tau_r,5*dt))/2; 
+Gf  = (Gfo + (fq-f).*RHO/max(tau_r,5*dt))/2;
 
-Gmc = (cmq.*mq-cm.*m).*RHO/max(tau_r,10*dt);
-Gxc = (cxq.*xq-cx.*x).*RHO/max(tau_r,10*dt);
-Gfc = (cfq.*fq-cf.*f).*RHO/max(tau_r,10*dt);
+Gmc = (cmq.*mq-cm.*m).*RHO/max(tau_r,5*dt);
+Gxc = (cxq.*xq-cx.*x).*RHO/max(tau_r,5*dt);
+Gfc = (cfq.*fq-cf.*f).*RHO/max(tau_r,5*dt);
 
 % total rates of change
 dXdt   = advn_X + Gx;

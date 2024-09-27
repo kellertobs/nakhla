@@ -446,9 +446,8 @@ if restart
         dMdto = dMdt;
         drhodto = drhodt;
         dTRCdto = dTRCdt;
-        Div_Vo  = Div_V;
-        rhoWo   = rhofz.*W(:,2:end-1);
-        rhoUo   = rhofx.*U(2:end-1,:);
+        rhoWo   = rhoW;
+        rhoUo   = rhoU;
         Pchmbo  = Pchmb;
         dPchmbdto = dPchmbdt;
         Pto     = Pt;
@@ -456,6 +455,9 @@ if restart
         Tpo     = Tp;
         so      = s;
         dto     = dt;
+        Gmo     = Gm;
+        Gxo     = Gx;
+        Gfo     = Gf;
 
         fluidmech;
         update;

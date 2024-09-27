@@ -9,7 +9,7 @@ drhodt  = advn_rho;% + (RHO-rho)/dt;
 res_rho = (a1*rho-a2*rhoo-a3*rhooo)/dt - (b1*drhodt + b2*drhodto + b3*drhodtoo);
 
 % volume source and background velocity passed to fluid-mechanics solver
-upd_rho = - 1*res_rho./b1./rho + 0*upd_rho;
+upd_rho = - res_rho./b1./rho;% + beta*upd_rho;
 VolSrc  = VolSrc + upd_rho;  % correct volume source term by scaled residual
 
 UBG     = - 0*mean(VolSrc,'all')./2 .* (L/2-XXu);
@@ -532,12 +532,12 @@ if ~bnchm
 
     
     %% update time step
-    dtk = (h/2)^2/max([kc(:);kwm(:);kwx(:);kwf(:);(kT(:)+ks(:).*T(:))./rho(:)./cP(:)])*0.95; % diffusive time step size  
+    dtk = (h/2)^2/max([kc(:);kwm(:);kwx(:);kwf(:);(kT(:)+ks(:).*T(:))./rho(:)./cP(:)])*0.9; % diffusive time step size  
     dta =  h/2   /max(abs([Um(:).* mux(:);Wm(:).* muz(:); ...  % advective time step size
                            Ux(:).*chix(:);Wx(:).*chiz(:); ...
                            Uf(:).*phix(:);Wf(:).*phiz(:)]+eps));
-    dtc = 0.01./max(abs([advn_X(:)./rho(:);advn_M(:)./rho(:);advn_F(:)./rho(:)]));
-    dt  = min([1.1*dto,min([dtk,CFL*dta,dtc]),dtmax,tau_T/100]);                         % time step size
+    dtc = 0.003./max(abs([advn_X(:)./rho(:);advn_M(:)./rho(:);advn_F(:)./rho(:)]));
+    dt  = min([1.1*dto,min([dtk,CFL*dta,dtc]),dtmax,tau_T/10]);                         % time step size
 end
 
 end

@@ -35,6 +35,9 @@ rhof   = cal.rhof0                                                              
 rhofz  = (rho(icz(1:end-1),:)+rho(icz(2:end),:))/2;
 rhofx  = (rho(:,icx(1:end-1))+rho(:,icx(2:end)))/2;
 
+rhoW = rhofz.*W(:,2:end-1);
+rhoU = rhofx.*U(2:end-1,:);
+
 % convert weight to volume fraction, update bulk density
 rho    = 1./(m./rhom + x./rhox + f./rhof);
 
@@ -132,7 +135,7 @@ eII = (0.5.*(exx.^2 + ezz.^2 ...
 % update diffusion parameters
 if Nx==1 && Nz==1; kW = 0; Pr = Prt; Sc = Sct;
 elseif Nx==1
-    kW  = Vel.*Delta_cnv;                                                   % convective mixing diffusivity
+    kW  = Vel.*Delta_cnv;                                                  % convective mixing diffusivity
     Pr  = Prt;
     Sc  = Sct;
 else
@@ -146,8 +149,8 @@ kwf = abs(rhof-rho).*g0.*Ksgr_f.*Delta_sgr + kmin;                         % seg
 km  = (kwm+kW).*mu ;                                                       % regularised melt  fraction diffusion 
 kx  = (kwx+kW).*chi;                                                       % regularised solid fraction diffusion 
 kf  = (kwf+kW).*phi;                                                       % regularised fluid fraction diffusion 
-ks  = (kW./Pr + kmin).*rho.*cP./T;                                        % regularised heat diffusion
-kc  =  kW./Sc + kmin;                                                     % regularised component diffusion
+ks  = (kW./Pr + kmin).*rho.*cP./T;                                         % regularised heat diffusion
+kc  =  kW./Sc + kmin;                                                      % regularised component diffusion
 eta = (kW.*rho + eta0)/2 + eta/2;                                          % regularised momentum diffusion
 
 etamax = etacntr.*max(min(eta(:)),etamin);
