@@ -88,7 +88,8 @@ cal.A   = (cal.T0+273.15)./350;
 cal.B  =  [8.37  6.82  5.27  2.38  2.00  1.85];
 
 % set entropy gain of fusion DeltaS [J/K]
-cal.dS =  350;
+cal.Dsx =  350;
+cal.Dsf =  450;
 
 % set coeff. for T-dependence of partition coefficients K^i [1/K]
 cal.r  =  [26.2  55.4  15.2  9.6  6.3  9.6];

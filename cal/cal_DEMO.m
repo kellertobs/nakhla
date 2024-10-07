@@ -76,8 +76,9 @@ cal.B   = [6  4  2];
 % set coeff. for T-dependence of partition coefficients K^i [1/K]
 cal.r   = [40 20 10];
 
-% set entropy gain of fusion DeltaS [J/K]
-cal.dS  = 350;
+% set entropy gain of fusion and evaporation DeltaS [J/K]
+cal.Dsx  = 350;
+cal.Dsf  = 450;
 
 % specify melting point dependence on H2O
 cal.dTH2O = [900  1500  2000];  % solidus shift from water content prefactor [K/wt^pH2O]
