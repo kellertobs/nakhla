@@ -78,8 +78,6 @@ gamma    =  0.01;                % horizontal drag
 Delta_cnv=  h/2;                 % correlation length for eddy, convection diffusivity (multiple of h, 0.5-1)
 Delta_sgr=  dx0*10;              % correlation length for phase fluctuation diffusivity (multiple of dx0, df0, 10-20)
 etamin   =  1e4;                 % minimum viscosity
-alpha    =  0.50;
-beta     =  0.00;
 
 %*****  RUN NAKHLA MODEL  *************************************************
 run([srcdir,'/main'])

@@ -58,7 +58,7 @@ end
 
 % total rate of change
 dCdt = advn_C + diff_C + bnd_C;                                            
-
+  
 % residual of major component evolution
 res_C = (a1*C-a2*Co-a3*Coo)/dt - (b1*dCdt + b2*dCdto + b3*dCdtoo);
 

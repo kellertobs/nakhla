@@ -28,9 +28,15 @@ cx_oxd_all(:,:,cal.ioxd) = cx_oxd;
  c_oxd_all(:,:,cal.ioxd) = c_oxd;
 
 % update phase densities
-rhom   = reshape(DensityX(reshape(cm_oxd_all,Nz*Nx,9),Tref,Pref./1e8)    ,Nz,Nx) .* (1 - aT.*(T-Tref) + bPm.*(Pt-Pref));
-rhox   = reshape(sum(reshape(cx_mem/100,Nz*Nx,cal.nmem)./cal.rhox0,2).^-1,Nz,Nx) .* (1 - aT.*(T-Tref) + bPx.*(Pt-Pref));
-rhof   = cal.rhof0                                                               .* (1 - aT.*(T-Tref) + bPf.*(Pt-Pref));
+rhom0  = reshape(DensityX(reshape(cm_oxd_all,Nz*Nx,9),Tref,Pref./1e8)    ,Nz,Nx);
+rhox0  = reshape(sum(reshape(cx_mem/100,Nz*Nx,cal.nmem)./cal.rhox0,2).^-1,Nz,Nx);
+rhof0  = cal.rhof0                                                              ;
+
+rhom   = rhom0 .* (1 - aTm.*(T-Tref) + bPm.*(Pt-Pref));
+rhox   = rhox0 .* (1 - aTx.*(T-Tref) + bPx.*(Pt-Pref));
+rhof   = rhof0 .* (1 - aTf.*(T-Tref) + bPf.*(Pt-Pref));
+
+rho    = 1./(m./rhom + x./rhox + f./rhof);
 
 rhofz  = (rho(icz(1:end-1),:)+rho(icz(2:end),:))/2;
 rhofx  = (rho(:,icx(1:end-1))+rho(:,icx(2:end)))/2;
@@ -39,8 +45,6 @@ rhoW = rhofz.*W(:,2:end-1);
 rhoU = rhofx.*U(2:end-1,:);
 
 % convert weight to volume fraction, update bulk density
-rho    = 1./(m./rhom + x./rhox + f./rhof);
-
 chi    = max(0,min(1, x.*rho./rhox ));
 phi    = max(0,min(1, f.*rho./rhof ));
 mu     = max(0,min(1, m.*rho./rhom ));
@@ -112,9 +116,13 @@ if ~calibrt % skip the following if called from calibration script
 % update velocity magnitude
 if Nx==1 && Nz==1; Vel = 0;
 elseif Nx==1
-    drhoz = gradient(rho.*(1-(mu.*bPm+chi.*bPx.*phi.*bPf).*Pt));
-    for i=1:ceil(Nz^2/2e4); drhoz = drhoz + diffus(drhoz,1/8*ones(size(rp)),1,[1,2],BCD); end
-    Vel   = 1e-3.*rho.*10.^(-drhoz./15) .*g0.*Delta_cnv.^2./eta;
+    rhom_nP   = rhom0 .* (1 - aTm.*(Tp-Tref));
+    rhox_nP   = rhox0 .* (1 - aTx.*(Tp-Tref));
+    rhof_nP   = rhof0 .* (1 - aTf.*(Tp-Tref));
+
+    rho_nP = 1./(m./rhom_nP + x./rhox_nP + f./rhof_nP);
+    drhodz = max(0,-gradient(rho_nP)) + 1e-6.*rho;
+    Vel    = drhodz.*g0.*Delta_cnv.^2./eta;
 else
     Vel = sqrt(((W(1:end-1,2:end-1)+W(2:end,2:end-1))/2).^2 ...
              + ((U(2:end-1,1:end-1)+U(2:end-1,2:end))/2).^2);

@@ -152,20 +152,56 @@ else         % closed side boundaries
 end
 
 % initialise solution fields
-switch Tinit
+switch init_mode
     case 'layer'
         Tp  =  T0 + (T1-T0) .* (1+erf((ZZ/D-zlay+rp*h*dlay)/wlay_T))/2 + dTr.*rp + dTg.*gp;  % potential temperature [C]
+        c = zeros(Nz,Nx,cal.ncmp);
+        for i = 1:cal.ncmp
+            c(:,:,i)  =  c0(i) + (c1(i)-c0(i)) .* (1+erf((ZZ/D-zlay+rp*h*dlay)/wlay_c))/2 + dcr(i).*rp + dcg(i).*gp;  % trace elements
+        end
+        trc = zeros(Nz,Nx,cal.ntrc);
+        for i = 1:cal.ntrc
+            trc(:,:,i)  =  trc0(i) + (trc1(i)-trc0(i)) .* (1+erf((ZZ/D-zlay+rp*h*dlay)/wlay_c))/2 + dr_trc(i).*rp + dg_trc(i).*gp;  % trace elements
+        end
     case 'linear'
         Tp  =  T0 + (T1-T0) .* (ZZ/D) + dTr.*rp + dTg.*gp;  % potential temperature [C]
-end
-c = zeros(Nz,Nx,cal.ncmp);
-for i = 1:cal.ncmp
-    c(:,:,i)  =  c0(i) + (c1(i)-c0(i)) .* (1+erf((ZZ/D-zlay+rp*h*dlay)/wlay_c))/2 + dcr(i).*rp + dcg(i).*gp;  % trace elements
-end
+        c = zeros(Nz,Nx,cal.ncmp);
+        for i = 1:cal.ncmp
+            c(:,:,i)  =  c0(i) + (c1(i)-c0(i)) .* (ZZ/D) + dcr(i).*rp + dcg(i).*gp;  % trace elements
+        end
+        trc = zeros(Nz,Nx,cal.ntrc);
+        for i = 1:cal.ntrc
+            trc(:,:,i)  =  trc0(i) + (trc1(i)-trc0(i)) .* (ZZ/D) + dr_trc(i).*rp + dg_trc(i).*gp;  % trace elements
+        end
+    case 'read_1D'
+        initname = [outdir,'/',runID,'/',runID,'_init.mat'];
+        load(initname,'m','Tp','c','trc');
 
-trc = zeros(Nz,Nx,cal.ntrc);
-for i = 1:cal.ntrc
-    trc(:,:,i)  =  trc0(i) + (trc1(i)-trc0(i)) .* (1+erf((ZZ/D-zlay+rp*h*dlay)/wlay_c))/2 + dr_trc(i).*rp + dg_trc(i).*gp;  % trace elements
+        hi  = D./(size(Tp,1));
+        Xci = +hi/2:hi:L-hi/2;
+        Zci = +hi/2:hi:D-hi/2;
+        m   = repmat(interp1(Zci,m,Zc).',1,Nx);
+        indmix = m>0.75;
+
+        Tp  = repmat(interp1(Zci,Tp-273.15,Zc).',1,Nx);
+        Tp(indmix) = mean(Tp(indmix));
+        Tp = Tp + dTr.*rp + dTg.*gp;
+
+        ci = zeros(Nz,Nx,cal.ncmp);
+        for i = 1:cal.ncmp
+            cii  = repmat(interp1(Zci,c(:,:,i),Zc).',1,Nx);
+            cii(indmix) = mean(cii(indmix));
+            ci(:,:,i)   = cii + dcr(i).*rp + dcg(i).*gp;
+        end
+        c = ci;
+
+        trci = zeros(Nz,Nx,cal.ntrc);
+        for i = 1:cal.ntrc
+            trcii   = repmat(interp1(Zci,trc(:,:,i),Zc).',1,Nx);
+            trcii(indmix) = mean(trcii(indmix));
+            trci(:,:,i)   = trcii + dr_trc(i).*rp + dg_trc(i).*gp;
+        end
+        trc = trci;
 end
 
 % apply initial boundary layers
@@ -240,6 +276,58 @@ FMtime  = 0;
 TCtime  = 0;
 UDtime  = 0;
 a1      = 1; a2 = 0; a3 = 0; b1 = 1; b2 = 0; b3 = 0;
+% switch init_mode
+    % case 'read_1D'
+    % 
+    %     load(initname,'x','m','f','T','Pt','cm','cx','cf');
+    %     T  = repmat(interp1(Zci,T,Zc).',1,Nx);
+    %     xq = repmat(interp1(Zci,x,Zc).',1,Nx);
+    %     mq = repmat(interp1(Zci,m,Zc).',1,Nx);
+    %     fq = repmat(interp1(Zci,f,Zc).',1,Nx);
+    %     Pt = repmat(interp1(Zci,Pt,Zc).',1,Nx);
+    % 
+    %     var.c      = reshape(c,Nx*Nz,cal.ncmp);   % component fractions [wt]
+    %     var.T      = reshape(T,Nx*Nz,1)-273.15;   % temperature [C]
+    %     var.P      = reshape(Pt,Nx*Nz,1)/1e9;     % pressure [GPa]
+    %     var.m      = reshape(mq,Nx*Nz,1);         % melt fraction [wt]
+    %     var.f      = reshape(fq,Nx*Nz,1);         % bubble fraction [wt]
+    %     var.H2O    = var.c(:,end);                % water concentration [wt]
+    %     var.X      = reshape(cm_oxd_all,Nz*Nx,9); % melt oxide fractions [wt %]
+    %     cal.H2Osat = fluidsat(var); % water saturation [wt]
+    % 
+    %     [var,cal] = meltmodel(var,cal,'E');
+    % 
+    %     % cmi = zeros(Nz,Nx,cal.ncmp);
+    %     % for i = 1:cal.ncmp
+    %     %     cmi(:,:,i)   = repmat(interp1(cm(:,:,i),1:Nz).',1,Nx) + dcr(i).*rp + dcg(i).*gp;
+    %     % end
+    %     % cm = cmi;
+    %     % cxi = zeros(Nz,Nx,cal.ncmp);
+    %     % for i = 1:cal.ncmp
+    %     %     cxi(:,:,i)   = repmat(interp1(cx(:,:,i),1:Nz).',1,Nx) + dcr(i).*rp + dcg(i).*gp;
+    %     % end
+    %     % cx  = cxi;
+    %     % cfi = ones(Nz,Nx,cal.ncmp);
+    %     % for i = 1:cal.ncmp
+    %     %     cfi(:,:,i)   = repmat(interp1(cf(:,:,i),1:Nz).',1,Nx) + dcr(i).*rp + dcg(i).*gp;
+    %     % end
+    %     % cf = cfi;
+    %     % % T  = (Tp+273.15).*exp(aT./RhoCp.*(Pt-Pref));
+    % 
+    %     mq = reshape(var.m,Nz,Nx);
+    %     fq = reshape(var.f,Nz,Nx);
+    %     xq = reshape(var.x,Nz,Nx);
+    %     x  = xq;  m = mq;  f = fq;
+    % 
+    %     cxq = reshape(var.cx,Nz,Nx,cal.ncmp);
+    %     cfq = reshape(var.cf,Nz,Nx,cal.ncmp);
+    %     cmq = reshape(var.cm,Nz,Nx,cal.ncmp);
+    %     cm  = cmq; cx = cxq;  cf = cfq;
+    % 
+    %     update;
+    % 
+    % otherwise
+
 res  = 1;  tol = 1e-9;  it = 1;
 while res > tol
     Ptii = Pt; Ti = T; xi = xq; fi = fq;
@@ -274,8 +362,9 @@ while res > tol
     x  = xq;  m = mq;  f = fq;
 
     cxq = reshape(var.cx,Nz,Nx,cal.ncmp);
+    cfq = reshape(var.cf,Nz,Nx,cal.ncmp);
     cmq = reshape(var.cm,Nz,Nx,cal.ncmp);
-    cm  = cmq; cx = cxq;
+    cm  = cmq; cx = cxq;  cf = cfq;
 
     eqtime = toc(eqtime);
     EQtime = EQtime + eqtime;
@@ -289,6 +378,7 @@ while res > tol
 
     it = it+1;
 end
+% end
 rhoo = rho;
 dto  = dt; 
 
@@ -385,10 +475,6 @@ adv_TRC = zeros(Nz,Nx,cal.ntrc);
 dff_TRC = zeros(Nz,Nx,cal.ntrc);
 K_trc     = zeros(Nz,Nx,cal.ntrc);
 dTRCdt  = 0.*trc; dTRCdto = dTRCdt;
-% bnd_IR = zeros(Nz,Nx,cal.nir);
-% adv_IR = zeros(Nz,Nx,cal.nir);
-% dff_IR = zeros(Nz,Nx,cal.nir);
-% dIRdt  = 0.*ir; dIRdto = dIRdt;
 upd_S  = 0.*S;
 upd_Tp = 0.*Tp;
 upd_T  = 0.*T;

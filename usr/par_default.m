@@ -23,7 +23,7 @@ dt       =  10;                  % initial time step [s]
 dtmax    =  1e3;                 % maximum time step [s]
 
 % set initial thermo-chemical state
-Tinit    = 'layer';              % T initial condition mode ('layer' or 'linear')
+init_mode= 'layer';              % T initial condition mode ('layer' or 'linear')
 seed     =  24;                  % random perturbation seed
 smth     =  10;                  % regularisation of initial random perturbation
 zlay     =  2.0;                 % layer thickness (relative to domain depth D)
@@ -94,6 +94,7 @@ mod_wall =  1e10;                % wall rock elastic modulus [Pa]
 TINT     =  'bd2im';             % time integration scheme ('be1im','bd2im','cn2si','bd2si')
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
 CFL      =  1.00;                % (physical) time stepping courant number (multiplies stable step) [0,1]
+maxcmp   =  0.01;                % maximum change in phase fraction due to compaction
 rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-8;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its
