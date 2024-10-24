@@ -107,19 +107,19 @@ if level>1
         for iz = 1:spz
             if kk<=noxd
                 subplot(spz,spx,kk-1);
-                scatter(MLT_oxd   (:,1),MLT_oxd   (:,kk),25,Tmp,'o'); colormap('copper'); axis tight; hold on
-                scatter(SOL_oxdp  (:,1),SOL_oxdp  (:,kk),25,Tmp,'s');
-                scatter(SYS_oxdp  (:,1),SYS_oxdp  (:,kk),25,Tmp,'d');
-                scatter(MLT_oxdfit(:,1),MLT_oxdfit(:,kk),25,Tmp,'o','filled');
-                scatter(SOL_oxdfit(:,1),SOL_oxdfit(:,kk),25,Tmp,'s','filled');
-                scatter(SYS_oxdfit(:,1),SYS_oxdfit(:,kk),25,Tmp,'d','filled');
+                scatter(MLT_oxd   (:,ioxd(1)),MLT_oxd   (:,ioxd(kk)),25,Tmp,'o'); colormap('copper'); axis tight; hold on
+                scatter(SOL_oxdp  (:,ioxd(1)),SOL_oxdp  (:,ioxd(kk)),25,Tmp,'s');
+                scatter(SYS_oxdp  (:,ioxd(1)),SYS_oxdp  (:,ioxd(kk)),25,Tmp,'d');
+                scatter(MLT_oxdfit(:,ioxd(1)),MLT_oxdfit(:,ioxd(kk)),25,Tmp,'o','filled');
+                scatter(SOL_oxdfit(:,ioxd(1)),SOL_oxdfit(:,ioxd(kk)),25,Tmp,'s','filled');
+                scatter(SYS_oxdfit(:,ioxd(1)),SYS_oxdfit(:,ioxd(kk)),25,Tmp,'d','filled');
                 for iem = 1:cal.ncmp-1
-                    scatter(cmp_oxd_best(iem,1),cmp_oxd_best(iem,kk),200,'kh','filled');
-                    scatter(cmp_oxd_init(iem,1),cmp_oxd_init(iem,kk),200,'kh');
+                    scatter(cmp_oxd_best(iem,ioxd(1)),cmp_oxd_best(iem,ioxd(kk)),200,'kh','filled');
+                    scatter(cmp_oxd_init(iem,ioxd(1)),cmp_oxd_init(iem,ioxd(kk)),200,'kh');
                 end
                 if kk==noxd; legend([{'proj. mlt'},{'proj. sol'},{'proj. sys'},{'fit sol'},{'fit mlt'},{'fit sys'},{'best cmp'},{'init cmp'}],Fs{:},TX{:},LO{:}); end
-                xlabel(cal.oxdStr(1 ),FS{:},TX{:})
-                ylabel(cal.oxdStr(kk),FS{:},TX{:})
+                xlabel(cal.oxdStr(ioxd(1 )),FS{:},TX{:})
+                ylabel(cal.oxdStr(ioxd(kk)),FS{:},TX{:})
                 set(gca,Fs{:},TL{:});
                 kk = kk+1;
             else
@@ -148,8 +148,8 @@ if level>1
                 scatter(SOL_oxdfit(:,kk),Tmp,25,[0.2,0.1,0.7],'s','filled');
                 scatter(SYS_oxdfit(:,kk),Tmp,25,[0.1,0.1,0.1],'d','filled');
                 for iem = 1:cal.ncmp-1
-                    scatter(cmp_oxd_best(iem,kk),min(1400,T0_best(iem)),200,'kh','filled');
-                    scatter(cmp_oxd_init(iem,kk),min(1400,T0_init(iem)),200,'kh');
+                    scatter(cmp_oxd_best(iem,kk),min(1900,T0_best(iem)),200,'kh','filled');
+                    scatter(cmp_oxd_init(iem,kk),min(1900,T0_init(iem)),200,'kh');
                 end
                 if kk==noxd; legend([{'proj. mlt'},{'proj. sol'},{'proj. sys'},{'fit mlt'},{'fit sol'},{'fit sys'},{'best cmp'},{'init cmp'}],Fs{:},TX{:},LO{:}); end
                 xlabel(cal.oxdStr(kk),FS{:},TX{:})

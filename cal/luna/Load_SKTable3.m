@@ -11,11 +11,11 @@
 
 nphs = 7; olv=1; opx=2; cpx=3; plg=4; spn=5; qtz=6; mlt=7; blk=8;
 ncmp = 11; Si=1; Ti=2; Al=3; Cr=4; Fe=5; Mn=6; Mg=7; Ca=8; Na=9; K=10; P=11;
-nstg = 10;
-Tmp = zeros(nstg,1);
-Prs = zeros(nstg,1);
-phs = zeros(nstg,nphs-1);
-oxd = zeros(nstg,nphs,ncmp);
+% nstg = 10;
+% Tmp = zeros(nstg,1);
+% Prs = zeros(nstg,1);
+% phs = zeros(nstg,nphs-1);
+% oxd = zeros(nstg,nphs,ncmp);
 
 
 Tmp(1) = 1800; Prs(1) = 3.5; fsol(1) = 0.0;
