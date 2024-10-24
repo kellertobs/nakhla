@@ -107,7 +107,7 @@ if level>1
         for iz = 1:spz
             if kk<=noxd
                 subplot(spz,spx,kk-1);
-                scatter(MLT_oxd   (:,ioxd(1)),MLT_oxd   (:,ioxd(kk)),25,Tmp,'o'); colormap('copper'); axis tight; hold on
+                scatter(MLT_oxdp  (:,ioxd(1)),MLT_oxd   (:,ioxd(kk)),25,Tmp,'o'); colormap('copper'); axis tight; hold on
                 scatter(SOL_oxdp  (:,ioxd(1)),SOL_oxdp  (:,ioxd(kk)),25,Tmp,'s');
                 scatter(SYS_oxdp  (:,ioxd(1)),SYS_oxdp  (:,ioxd(kk)),25,Tmp,'d');
                 scatter(MLT_oxdfit(:,ioxd(1)),MLT_oxdfit(:,ioxd(kk)),25,Tmp,'o','filled');
@@ -141,7 +141,7 @@ if level>1
         for iz = 1:spz
             if kk<=noxd
                 subplot(spz,spx,kk);
-                scatter(MLT_oxd   (:,kk),Tmp,25,[0.7,0.7,0.7],'o'); axis tight; hold on
+                scatter(MLT_oxdp  (:,kk),Tmp,25,[0.7,0.7,0.7],'o'); axis tight; hold on
                 scatter(SOL_oxdp  (:,kk),Tmp,25,[0.7,0.7,0.7],'s');
                 scatter(SYS_oxdp  (:,kk),Tmp,25,[0.7,0.7,0.7],'d');
                 scatter(MLT_oxdfit(:,kk),Tmp,25,[0.7,0.1,0.2],'o','filled');

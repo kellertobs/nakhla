@@ -67,7 +67,7 @@ PHS_oxd = PHS_oxd./max(1e-16,sum(PHS_oxd,3))*100;
 npts    = length(Prs);
 
 % load data for solidus and liquidus
-Psl = linspace(0,45,19)';
+Psl  = linspace(0,45,19)';
 Tsol = [1128.3 1166.7 1198.3 1213.3 1235.0 1283.3 1326.7 1366.7 1391.7 1425.0 1453.3 1478.3 1505.0 1526.7 1548.3 1568.3 1585.0 1603.3 1618.3].';
 Tliq = [1720.0 1731.7 1741.7 1753.3 1761.7 1771.7 1776.7 1786.7 1791.7 1798.3 1803.3 1806.7 1810.0 1815.0 1818.3 1821.7 1825.0 1838.3 1850.0].';
 
@@ -77,7 +77,7 @@ hasphs = logical(PHS_frc);
 % detect which oxides are present in which phases
 hasoxd = logical(squeeze(sum(PHS_oxd,1)));
 
-% remove minor oxides from phases (mean<0.18; max<1.8)
+% remove minor oxides from phases (mean<0.50; max<1.0)
 for iph = 1:nphs
     ilim = find(mean(squeeze(PHS_oxd(hasphs(:,iph)==1,iph,:)),1)<0.50 & max(squeeze(PHS_oxd(hasphs(:,iph)==1,iph,:)),[],1)<1.00);
     hasoxd(iph,ilim) = false;
@@ -310,7 +310,7 @@ for ix = 1:spx
                     scatter(EMInt(icp,5),EMInt(icp,ioxd(kk)),200,'kh','filled');
                 end
             end
-            if kk==noxd; legend([{'proj. mlt'},{'proj. sol'},{'proj. sys'},{'fit sol'},{'fit mlt'},{'fit sys'},{'best cmp'},{'init cmp'}],Fs{:},TX{:},LO{:}); end
+            if kk==noxd; legend([{'orig. mlt'},{'orig. sol'},{'orig. sys'},{'proj. sol'},{'proj. mlt'},{'proj. sys'},{'init cmp'}],Fs{:},TX{:},LO{:}); end
             xlabel(cal.oxdStr(ioxd( 1)),FS{:},TX{:})
             ylabel(cal.oxdStr(ioxd(kk)),FS{:},TX{:})
             set(gca,Fs{:},TL{:});
@@ -327,13 +327,13 @@ drawnow
 
 % !!!  Run Section to save calibrated end-members and reduced compositions  !!!
 close all;
-save('MAGEMin_processed');
+save('DATA_processed');
 
 
 %% *****  prepare for pseudo-component calibration  ***********************
 
 % !!!  Run Section to load end-member calibration and prepare for pseudo-component calibration  !!!
-load('MAGEMin_processed');
+load('DATA_processed');
 
 cal_LUNA_upd;  % read calibration file
 
@@ -346,7 +346,7 @@ cal_LUNA_upd;  % read calibration file
 % - phase out mineral systems and their end-members in accordance with
 %   their fading or disappearance in PHS_frc
 
-%                  for fay  ens dps pig  ant alb  ulv qtz wat'
+%                  for fay  ens dps pig  ant alb  ulv qtz wat
 indmem  = logical([ 1   1    0   0   0    0   0    0   0   0
                     1   1    1   0   0    0   0    0   0   0
                     1   1    1   1   0    1   0    0   0   0
@@ -377,9 +377,9 @@ cmp_oxd_best = cmp_oxd_init;
 
 % set initial guess for melting point parameters
 T0_init = [ 1800   1550   1250   1100   1000];  T0_best = T0_init;
-A_init  = [ 7.40   4.80   3.40   2.90  2.60];   A_best =  A_init;
-B_init  = [ 7.40   4.80   3.40   2.90  2.60];   B_best =  B_init;
-r_init  = [26.00  23.00  18.00   7.00  12.00];   r_best =  r_init;
+A_init  = [ 7.40   4.80   3.40   2.90   2.60];   A_best =  A_init;
+B_init  = [ 7.40   4.80   3.40   2.90   2.60];   B_best =  B_init;
+r_init  = [22.00  21.00  18.00   7.00  12.00];   r_best =  r_init;
 dT_init = 1400 * 1200./T0_init;  dT_best = dT_init;
 
 % compose initial parameter guess
@@ -428,8 +428,8 @@ T0_init = T0_best; A_init = A_best; B_init = B_best; r_init = r_best; cmp_mem_in
 m0      = [T0_init.';A_init.';B_init.';r_init.';dT_init.';cmp_mem_init(:).*indmem(:)];
 
 % !!!  set MCMC parameters then Run Section to execute MCMC routine  !!!
-Niter           = 1e5;              % number of samples to take
-anneal.initstep = 1e-4;           % adjust step size to get reasonable acceptance ratio 20-30%
+Niter           = 1e6;              % number of samples to take
+anneal.initstep = 1e-4;             % adjust step size to get reasonable acceptance ratio 20-30%
 anneal.levels   = 1;                % select number of annealing levels
 anneal.burnin   = max(1,Niter/5 );  % set length of initial burn-in sequence
 anneal.refine   = max(1,Niter/10);  % set length of final refinement sequence
@@ -467,7 +467,7 @@ mbnds(5*(cal.ncmp-1)+(1:cal.ncmp*cal.nmem),:) = max(indmem(:)/10,min(99.9,mbnds(
 mbnds(m0==100 ,:) = 100;
 % mbnds(m0==7.0 ,1) = 5.0;
 mbnds(m0==T0_init(1),:) = T0_init(1);
-% mbnds(m0==T0_init(end),:) = T0_init(end);
+mbnds(m0==T0_init(end),:) = T0_init(end);
 anneal.initstep = anneal.initstep * diff(mbnds,1,2);  % resize step according to bounded bracket
 
 % set parameter names according to info from calibration file
