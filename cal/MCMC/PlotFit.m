@@ -64,8 +64,8 @@ if level>0
     kmem = 1;
     figure(figno); clf; figno = figno+1;
 
-    spz = ceil(sqrt(cal.nmsy-1));
-    spx = ceil((cal.nmsy-1)/spz);
+    spz = ceil(sqrt(cal.nmsy));
+    spx = ceil((cal.nmsy)/spz);
 
     kk = 1;
     for ix = 1:spx
