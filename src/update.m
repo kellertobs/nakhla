@@ -116,13 +116,17 @@ if ~calibrt % skip the following if called from calibration script
 % update velocity magnitude
 if Nx==1 && Nz==1; Vel = 0;
 elseif Nx==1
-    rhom_nP   = rhom0 .* (1 - aTm.*(Tp-Tref));
-    rhox_nP   = rhox0 .* (1 - aTx.*(Tp-Tref));
-    rhof_nP   = rhof0 .* (1 - aTf.*(Tp-Tref));
+    rhom_nP = rhom0 .* (1 - aTm.*(Tp-Tref));
+    rhox_nP = rhox0 .* (1 - aTx.*(Tp-Tref));
+    rhof_nP = rhof0 .* (1 - aTf.*(Tp-Tref));
 
-    rho_nP = 1./(m./rhom_nP + x./rhox_nP + f./rhof_nP);
-    drhodz = max(0,-gradient(rho_nP)) + 1e-6.*rho;
-    Vel    = drhodz.*g0.*Delta_cnv.^2./eta;
+    rho_nP  = 1./(m./rhom_nP + x./rhox_nP + f./rhof_nP);
+
+    ip      = icz(max(1,min(Nz+2,(1:Nz)+round(max(Delta_cnv(:))./h/2)+1)));
+    im      = icz(max(1,min(Nz+2,(1:Nz)-round(max(Delta_cnv(:))./h/2)+1)));
+    drhoz   = max(0, -(rho_nP(ip,:)-rho_nP(im,:)) ) + 1e-6.*rho;
+    % drhodz  = max(0,-gradient(rho_nP)) + 1e-9.*rho;
+    Vel     = drhoz.*g0.*Delta_cnv.^2./eta;
 else
     Vel = sqrt(((W(1:end-1,2:end-1)+W(2:end,2:end-1))/2).^2 ...
              + ((U(2:end-1,1:end-1)+U(2:end-1,2:end))/2).^2);

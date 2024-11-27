@@ -53,6 +53,8 @@ Zc        = Zc(2:end-1);
 Nx = length(Xc);
 Nz = length(Zc);
 
+Delta_cnv = min(Delta_cnv,min(ZZ,D-ZZ));
+
 % get smoothed initialisation field
 rng(seed);
 smth = smth*Nx*Nz*1e-4;
