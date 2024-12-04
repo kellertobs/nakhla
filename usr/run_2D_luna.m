@@ -68,12 +68,12 @@ ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fro
 CFL      =  1.00;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 rtol     =  1e-3;                % outer its relative tolerance
 atol     =  1e-8;                % outer its absolute tolerance
-maxit    =  20;                  % maximum outer its
+maxit    =  15;                  % maximum outer its
 gamma    =  0.01;                % horizontal drag
 Delta_cnv=  h;                   % correlation length for eddy, convection diffusivity (multiple of h, 0.5-1)
 Delta_sgr=  dx0*10;              % correlation length for phase fluctuation diffusivity (multiple of dx0, df0, 10-20)
 etamin   =  1e4;                 % minimum viscosity
-
+alpha    =  0.5;
 
 %*****  RUN NAKHLA MODEL  *************************************************
 run([srcdir,'/main'])
