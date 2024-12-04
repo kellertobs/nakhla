@@ -14,7 +14,7 @@ cal.oxdStr = {'SiO$_2$','TiO$_2$','Al$_2$O$_3$','FeO','MgO','CaO','Na$_2$O','H$_
      elStr = {'Si','Ti','Al','Fe','Mg','Ca','Na','H'};
 cal.memStr = {'for','fay','ens','dps','pig','ant','alb','ulv','qtz','wat'};
 cal.msyStr = {'olv','pxn','fsp','oxs','qtz'};
-cal.cmpStr = {'dun','hrz','pxt','gbr','bas','vol'};
+cal.cmpStr = {'dun','opx','web','gbr','bas','vol'};
 
 for i = 1:cal.ncmp; cal.(cal.cmpStr{i}) = i; end
 for i = 1:cal.nmsy; cal.(cal.msyStr{i}) = i; end
@@ -25,7 +25,7 @@ for i = 1:cal.noxd; cal.(elStr{i}) = i; end
 cal.ioxd = [   1   2    3    4   5   6    7       9]; % oxdie indices for viscosity, density functions
 
 % oxide composition of mineral end-members
-%                   SiO2   TiO2   Al2O3     FeO     MgO     CaO    Na2O    H2O
+%                   SiO2        TiO2       Al2O3     FeO     MgO          CaO       Na2O    H2O
 cal.mem_oxd    = [ 41.8500         0         0    1.8300   56.3200         0         0         0   % forsterite (for)
                    34.3900         0         0   45.0000   20.6100         0         0         0   % fayalitic olivine (fay)
 
@@ -52,11 +52,11 @@ cal.msy_mem = [1  1  0  0  0  0  0  0  0  0    % olivine (olv)
 
 % mineral end-member composition of melting model components
 %                  for       fay       ens       dps       pig       ant       alb       ulv       qtz       wat
-cal.cmp_mem = [85.0000   15.0000         0         0         0         0         0         0         0         0
-                1.3000    6.6000   92.1000         0         0         0         0         0         0         0
-                9.4000   17.2000   19.8000   51.0000         0    2.6000         0         0         0         0
-                     0   23.1000         0   36.1000    0.2000   34.3000    6.3000    0.1000         0         0
-                     0         0         0         0   44.9000         0   30.1000   19.9000    5.1000         0
+cal.cmp_mem = [85.0000   15.0000         0         0         0         0         0         0         0         0   % dunite
+                1.3000    6.6000   92.1000         0         0         0         0         0         0         0   % orthopyroxenite
+                9.4000   17.2000   19.8000   51.0000         0    2.6000         0         0         0         0   % olivine websterite
+                     0   23.1000         0   36.1000    0.2000   34.3000    6.3000    0.1000         0         0   % olivine gabbro
+                     0         0         0         0   44.9000         0   30.1000   19.9000    5.1000         0   % basal
                      0         0         0         0         0         0         0         0         0  100.0000];
 cal.cmp_mem = cal.cmp_mem./sum(cal.cmp_mem,2)*100;
 
@@ -86,7 +86,7 @@ cal.B  =  [6.0  5.0  2.7  2.6  2.4];
 cal.r  =  [21.8  20.6  20.1  5.2  14.1];
 
 % initial composition used in calibration
-cal.c0 = [0.387  0.175  0.158  0.220  0.061  0.000];
+cal.c0 = [0.386  0.175  0.158  0.220  0.061  0.000];
 
 % specify melting point dependence on H2O
 cal.dTH2O   = [933  1084  1344  1527  1680];  % solidus shift from water content [K/wt^pH2O]
@@ -103,7 +103,7 @@ cal.Ktrc_mem = [0.01;0.10;1.0;3.00;10.0;1.0].*ones(cal.ntrc,cal.nmem);
 
 % specify density parameters
 %              for  fay  ens  dps  pig  ant  alb   ulv  qtz  wat
-cal.rhox0   = [3270,4390,3270,3250,3450,2690,2570,4850,2650,1000]; % mineral end-member reference densities [kg/m3]
+cal.rhox0   = [3270,4390,3470,3250,3450,2690,2570,4850,2650,1000]; % mineral end-member reference densities [kg/m3]
 cal.rhof0   = 500;                  % fluid reference density [kg/m3]
 
 % specify three-phase coefficient model parameters
@@ -124,5 +124,5 @@ cal.CC  =  [[0.30, 0.30, 0.40]*0.7; ... % permission step widths
             [0.15, 0.25, 0.60]*0.7; ];  % factor increases width of step functions
 
 % convergence tolerance
-cal.tol     = 1e-9;
-cal.alpha   = 0.5;
+cal.tol     = 1e-12;
+cal.alpha   = 0.75;

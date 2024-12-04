@@ -30,7 +30,6 @@ end
 
 Dsx = -cal.Dsx;
 Dsf =  cal.Dsf;
-cal.tol = atol;
 
 % normalise major components to anhydrous unit sum, rescale to hydrous
 c0(1:end-1) = c0(1:end-1)./sum(c0(1:end-1)).*(1-c0(end));
@@ -375,8 +374,8 @@ while res > tol
 
     res  = norm(Pt(:)-Ptii(:),2)./norm(Pt(:),2) ...
          + norm( T(:)-Ti  (:),2)./norm( T(:),2) ...
-         + norm((x(:)-xi  (:)).*(x(:)>eps^0.5),2)./(norm(x(:),2)+eps) ...
-         + norm((f(:)-fi  (:)).*(f(:)>eps^0.5),2)./(norm(f(:),2)+eps);
+         + norm((x(:)-xi  (:)).*(x(:)>eps),2)./(norm(x(:),2)+eps^0.25) ...
+         + norm((f(:)-fi  (:)).*(f(:)>eps),2)./(norm(f(:),2)+eps^0.25);
 
     it = it+1;
 end
