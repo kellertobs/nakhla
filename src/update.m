@@ -113,20 +113,55 @@ Ksgr_f = squeeze(Ksgr(3,:,:)) + eps^2; if Nx==1; Ksgr_f = Ksgr_f.'; end
 
 if ~calibrt % skip the following if called from calibration script
 
+% extract non-P-dependent density
+rhom_nP = rhom0 .* (1 - aTm.*(Tp-Tref));
+rhox_nP = rhox0 .* (1 - aTx.*(Tp-Tref));
+rhof_nP = rhof0 .* (1 - aTf.*(Tp-Tref));
+
+rho_nP  = 1./(m./rhom_nP + x./rhox_nP + f./rhof_nP);
+
+% detect convection layers
+drhoz    = gradient(mean(rho_nP,2));
+[~,zpks] = findpeaks(drhoz,'MinPeakHeight',10,'MinPeakProminence',1);
+nlay = length(zpks)+1;
+zlay = zeros(1,nlay+1);
+
+zt = max(ZZ(eta>=etamax/10 & ZZ<D/2));
+if isempty(zt); zlay(1) = 0; else; zlay(1) = zt; end
+for iz = 1:nlay-1
+    if zpks(iz)>5 && zpks(iz)<Nz-5
+        zlay(iz+1) = zpks(iz)*h+h/2;
+    else
+        zlay(iz+1) = [];
+        nlay = nlay-1;
+    end
+end
+zb = min(ZZ(eta>=etamax/10 & ZZ>zlay(end-1) ));
+if isempty(zb); zlay(end) = D; else; zlay(end) = zb; end
+
+% limit correlation length for convective mixing to distance from layer
+% and domain boundaries
+Delta_cnv =zeros(Nz,1);
+for iz = 1:nlay
+    Delta_cnv = Delta_cnv + max(0,min(Delta_cnv0,min(ZZ-zlay(iz),zlay(iz+1)-ZZ)));
+end
+ind0 = Delta_cnv==0;
+for i=1:10
+    Delta_cnv = Delta_cnv + diffus(Delta_cnv,1/8*ones(size(Delta_cnv)),1,[1,2],BCD);
+    % Delta_cnv(ind0) = 0;
+    Delta_cnv([1 end]) = [h/2,h/2];
+end
+
 % update velocity magnitude
 if Nx==1 && Nz==1; Vel = 0;
 elseif Nx==1
-    rhom_nP = rhom0 .* (1 - aTm.*(Tp-Tref));
-    rhox_nP = rhox0 .* (1 - aTx.*(Tp-Tref));
-    rhof_nP = rhof0 .* (1 - aTf.*(Tp-Tref));
-
-    rho_nP  = 1./(m./rhom_nP + x./rhox_nP + f./rhof_nP);
-
-    ip      = icz(max(1,min(Nz+2,(1:Nz)+round(max(Delta_cnv(:))./h/2)+1)));
-    im      = icz(max(1,min(Nz+2,(1:Nz)-round(max(Delta_cnv(:))./h/2)+1)));
-    drhoz   = max(0, -(rho_nP(ip,:)-rho_nP(im,:)) ) + 1e-6.*rho;
-    % drhodz  = max(0,-gradient(rho_nP)) + 1e-9.*rho;
-    Vel     = drhoz.*g0.*Delta_cnv.^2./eta;
+    ip      = min(Nz,round((1:Nz).'+(Delta_cnv./h-1/2)/2));
+    im      = max( 1,round((1:Nz).'-(Delta_cnv./h-1/2)/2));
+    drhoz   = max(0, -(rho_nP(ip,:)-rho_nP(im,:)) ) + 1e-6.*rho_nP;
+    for i=1:10
+        drhoz = drhoz + diffus(drhoz,1/8*ones(size(drhoz)),1,[1,2],BCD);
+    end
+    Vel     = 2/9*drhoz.*g0.*(Delta_cnv/2).^2./eta;
 else
     Vel = sqrt(((W(1:end-1,2:end-1)+W(2:end,2:end-1))/2).^2 ...
              + ((U(2:end-1,1:end-1)+U(2:end-1,2:end))/2).^2);

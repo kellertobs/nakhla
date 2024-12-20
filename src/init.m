@@ -31,6 +31,8 @@ end
 Dsx = -cal.Dsx;
 Dsf =  cal.Dsf;
 
+Delta_cnv0 = Delta_cnv;
+
 % normalise major components to anhydrous unit sum, rescale to hydrous
 c0(1:end-1) = c0(1:end-1)./sum(c0(1:end-1)).*(1-c0(end));
 c1(1:end-1) = c1(1:end-1)./sum(c1(1:end-1)).*(1-c1(end));
@@ -51,8 +53,6 @@ Zc        = Zc(2:end-1);
 
 Nx = length(Xc);
 Nz = length(Zc);
-
-Delta_cnv = min(Delta_cnv,min(ZZ,D-ZZ));
 
 % get smoothed initialisation field
 rng(seed);
@@ -240,6 +240,7 @@ Div_V  = 0.*Tp;  advn_rho = 0.*Tp;  advn_X = 0.*Tp; advn_M = 0.*Tp; advn_F = 0.*
 exx    = 0.*Tp;  ezz = 0.*Tp;  exz = zeros(Nz-1,Nx-1);  eII = 0.*Tp;  
 txx    = 0.*Tp;  tzz = 0.*Tp;  txz = zeros(Nz-1,Nx-1);  tII = 0.*Tp; 
 eta    = ones(Nz,Nx);
+etamax = min(eta(:)) .* etacntr;
 VolSrc = 0.*Tp; 
 kW     = 0.*Tp;
 Tref   = min(cal.T0)+273.15;
