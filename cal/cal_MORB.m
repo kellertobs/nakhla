@@ -5,15 +5,15 @@ clear cal;
 
 % number of oxides, mineral end-members, mineral systems, model components
 cal.noxd   = 9;
-cal.nmem   = 14;
-cal.nmsy   = 6;
+cal.nmem   = 12;
+cal.nmsy   = 5;
 cal.ncmp   = 7;
 
 % label strings for all compositional representations
 cal.oxdStr = {'SiO$_2$','TiO$_2$','Al$_2$O$_3$','FeO','MgO','CaO','Na$_2$O','K$_2$O','H$_2$O'};
      elStr = {'Si','Ti','Al','Fe','Mg','Ca','Na','K','H'};
-cal.memStr = {'for','fay','ant','alb','san','dps','aug','ulv','mgt','ilm','hyp','fsl','qtz','wat'};
-cal.msyStr = {'olv','fsp','cxp','oxs','opx','qtz'};
+cal.memStr = {'for','fay','ant','alb','san','dps','aug','ulv','mgt','ilm','qtz','wat'};
+cal.msyStr = {'olv','fsp','cxp','oxs','qtz'};
 cal.cmpStr = {'dun','tro','gbr','fbs','tra','rhy','vol'};
 
 for i = 1:cal.ncmp; cal.(cal.cmpStr{i}) = i; end
@@ -26,44 +26,34 @@ cal.ioxd = [   1    2     3   4   5   6    7   8   9]; % oxdie indices for visco
 
 % oxide composition of mineral end-members
 %                SiO2    TiO2   Al2O3     FeO     MgO     CaO    Na2O     K2O     H2O
-cal.mem_oxd = [ 41.28       0       0    8.01   50.71       0       0       0       0   % forsterite (for)
-                31.74       0       0   58.62    9.64       0       0       0       0   % fayalite (fay)
+cal.mem_oxd = [ 41.3700         0         0    7.5700   51.0600         0         0         0         0
+                29.7900         0         0   69.0900    1.1200         0         0         0         0
 
-                44.78       0   35.46       0       0   18.80    0.96       0       0   % anorthite (ant)
-                67.61       0   20.20       0       0    0.89   11.27    0.03       0   % albite (alb)
-                67.58       0   19.46       0       0    0.28    6.27    6.41       0   % sanidine (san)
+                44.4200         0   35.7200         0         0   19.1000    0.7600         0         0
+                68.7800         0   19.3300         0         0         0   11.8300    0.0600         0
+                68.6400         0   18.3100         0         0         0    6.3800    6.6700         0
 
-                53.64       0    2.55    4.73   19.59   19.45    0.04       0       0   % diopside (dps)
-                51.75       0    0.37   24.57    5.10   15.62    2.59       0       0   % augite (aug)
+                53.2900    0.0400    2.7500    5.5100   19.4900   18.9200         0         0         0
+                50.3000    1.1300    0.4500   29.7900    0.7300   14.2800    3.3200         0         0
 
-                    0   38.93    2.61   28.44   30.01       0       0       0       0   % ulvospinel (ulv)
-                    0   12.72    1.02   86.27       0       0       0       0       0   % magnetite (mgt)
-                    0   53.03       0   46.97       0       0       0       0       0   % ilmenite (ilm)
+                      0   38.0000    2.6000   34.4800   24.9200         0         0         0         0
+                      0   10.0100    1.4700   88.5200         0         0         0         0         0
+                      0   52.3700         0   47.5500    0.0800         0         0         0         0
 
-                51.17       0    2.72   23.37   20.13    2.61       0       0       0   % hypersthene (hyp)
-                49.07       0    0.35   39.56   10.07    0.95       0       0       0   % ferrosillite (fsl)
-
-               100.00       0       0       0       0       0       0       0       0   % quartz (qtz)
-                    0       0       0       0       0       0       0       0  100.00]; % water (wat)
+               100.0000         0         0         0         0         0         0         0         0
+                      0         0         0         0         0         0         0         0  100.0000]; % water (wat)
 cal.mem_oxd = cal.mem_oxd./sum(cal.mem_oxd,2)*100; 
 
 % mineral end-members in mineral systems
-cal.msy_mem = [1  1  0  0  0  0  0  0  0  0  0  0  0  0    % olivine (olv)
-               0  0  1  1  1  0  0  0  0  0  0  0  0  0    % feldspar (fsp)
-               0  0  0  0  0  1  1  0  0  0  0  0  0  0    % clinopyroxene (cpx)
-               0  0  0  0  0  0  0  1  1  1  0  0  0  0    % oxides (oxs)
-               0  0  0  0  0  0  0  0  0  0  1  1  0  0    % orthopyroxene (opx)
-               0  0  0  0  0  0  0  0  0  0  0  0  1  0];  % quartz (qtz)
+cal.msy_mem = [1  1  0  0  0  0  0  0  0  0  0  0    % olivine (olv)
+               0  0  1  1  1  0  0  0  0  0  0  0    % feldspar (fsp)
+               0  0  0  0  0  1  1  0  0  0  0  0    % clinopyroxene (cpx)
+               0  0  0  0  0  0  0  1  1  1  0  0    % oxides (oxs)
+               0  0  0  0  0  0  0  0  0  0  1  0];  % quartz (qtz)
 
 % mineral end-member composition of melting model components
 %               for    fay    ant    alb    san    dps    aug    ulv    mgt    ilm    hyp    fsl    qtz    wat
-cal.cmp_mem = [92.4    7.6      0      0      0      0      0      0      0      0      0      0      0      0
-               21.2    4.3   74.6      0      0      0      0      0      0      0      0      0      0      0
-                  0      0   14.4   15.7      0   64.1      0    5.8      0      0      0      0      0      0
-                  0    8.3   20.4   23.2      0   13.5   25.8      0    5.0    0.9    2.9      0      0      0
-                  0      0    5.7   65.9    5.6      0   11.5      0      0    1.0      0   10.4      0      0
-                  0      0    3.1      0   44.9      0      0      0      0      0      0    2.0   50.0      0
-                  0      0      0      0      0      0      0      0      0      0      0      0      0  100.0];
+cal.cmp_mem = zeros(cal.ncmp,cal.nmem);
 cal.cmp_mem = cal.cmp_mem./sum(cal.cmp_mem,2)*100;
 
 % mineral systems composition of melting model components
@@ -92,7 +82,8 @@ cal.B   = [6.5  5.1  4.3  2.7  1.7  1.3];
 cal.r  = [31.0  3.0  3.0  6.8  9.3  6.0];
 
 % set entropy gain of fusion DeltaS [J/K]
-cal.dS  = 350;
+cal.Dsx  = 350;
+cal.Dsf  = 450;
 
 % specify melting point dependence on H2O
 cal.dTH2O = [889  1418  1455  1556  1697  2049];  % solidus shift from water content prefactor [K/wt^pH2O]

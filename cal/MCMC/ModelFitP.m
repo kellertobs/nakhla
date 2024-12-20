@@ -6,7 +6,7 @@ np = length(T);
 % get model parameters from model vector
 cal.T0    = model(               (1:cal.ncmp-1)).';
 cal.A     = model(1*(cal.ncmp-1)+(1:cal.ncmp-1)).';
-cal.B     = model(2*(cal.ncmp-1)+(1:cal.ncmp-1)).';
+cal.B     = cal.A;%model(2*(cal.ncmp-1)+(1:cal.ncmp-1)).';
 cal.r     = model(3*(cal.ncmp-1)+(1:cal.ncmp-1)).';
 cal.dTH2O = 1400 * 1200./cal.T0; %model(4*(cal.ncmp-1)+(1:cal.ncmp-1)).';
 cmp_mem   = reshape(model(5*(cal.ncmp-1)+(1:cal.ncmp*cal.nmem)),cal.ncmp,cal.nmem);
@@ -14,7 +14,8 @@ cmp_oxd   = cmp_mem*cal.mem_oxd./100;
 
 % find system component composition by least-squares
 SYS_cmpfit = lsqregcmp(cmp_oxd(1:end-1,1:end-1).',SYS(:,1:end-1),reg);
-SYS_cmpfit = [SYS_cmpfit,SYS(:,end)];
+SYS_cmpfit = [SYS_cmpfit,SYS(:,end)/100];
+SYS_cmpfit = SYS_cmpfit./sum(SYS_cmpfit,2);
 
 % get fitted phase oxide compositions
 SYS_oxdfit = SYS_cmpfit*cmp_oxd;
