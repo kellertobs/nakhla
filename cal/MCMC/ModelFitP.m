@@ -78,6 +78,6 @@ Tm      = cal.Tm;
 % Tsolfit = [Tsolfit;cal.Tsol];
 % Tliqfit = [Tliqfit;cal.Tliq];
 
-datafit = [MLT_oxdfit(:);SOL_memfit(:);PHS_frcfit(:);Tsolfit(:);Tliqfit(:)];%repmat(PHSfit(:,1),6,1)];
+datafit = [MLT_oxdfit(:);SOL_oxdfit(:);SOL_memfit(:);PHS_frcfit(:);Tsolfit(:);Tliqfit(:)];%repmat(PHSfit(:,1),6,1)];
 
 end

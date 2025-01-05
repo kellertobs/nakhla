@@ -147,10 +147,10 @@ for i=1:Niter
         semilogy(1:i,-P_keep(1:i)); axis tight; box on; hold on; 
         ylimits = ylim;
         plot(anneal.burnin*ones(1,2), ylimits, 'Color', 0.8*[1 1 1]);
-        text(anneal.burnin, mean(ylimits), 'burn in', 'FontSize', 16, 'Rotation', 90, 'VerticalAlignment','bottom','HorizontalAlignment','center');
+        if anneal.burnin>1; text(anneal.burnin, mean(ylimits), 'burn in', 'FontSize', 16, 'Rotation', 90, 'VerticalAlignment','bottom','HorizontalAlignment','center'); end
         plot(anneal.ilvl.*ones(2,1), ylimits.', 'Color', 0.8*[1 1 1]);
         plot((Niter-anneal.refine)*ones(1,2), ylimits, 'Color', 0.8*[1 1 1]);
-        text((Niter-anneal.refine), mean(ylimits), 'refine', 'FontSize', 16, 'Rotation', 90, 'VerticalAlignment','top','HorizontalAlignment','center');
+        if anneal.refine>1; text((Niter-anneal.refine), mean(ylimits), 'refine', 'FontSize', 16, 'Rotation', 90, 'VerticalAlignment','top','HorizontalAlignment','center'); end
         plot(Niter*ones(1,2), ylimits, 'Color', 0.8*[1 1 1]);
         if i>=(anneal.burnin)
             plot(ibest*ones(1,2), ylimits, 'Color', 0.8*[1 0.1 0.2]); 
@@ -167,10 +167,10 @@ for i=1:Niter
         plot(1:i,anneal.hist(1:i)); axis tight; box on; hold on; 
         ylimits = [0,1];
         plot(anneal.burnin*ones(1,2), ylimits, 'Color', 0.8*[1 1 1]);
-        text(anneal.burnin, mean(ylimits), 'burn in', 'FontSize', 16, 'Rotation', 90, 'VerticalAlignment','bottom','HorizontalAlignment','center');
+        if anneal.burnin>1; text(anneal.burnin, mean(ylimits), 'burn in', 'FontSize', 16, 'Rotation', 90, 'VerticalAlignment','bottom','HorizontalAlignment','center'); end
         plot(anneal.ilvl.*ones(2,1), ylimits.', 'Color', 0.8*[1 1 1]);
         plot((Niter-anneal.refine)*ones(1,2), ylimits, 'Color', 0.8*[1 1 1]);
-        text((Niter-anneal.refine), mean(ylimits), 'refine', 'FontSize', 16, 'Rotation', 90, 'VerticalAlignment','top','HorizontalAlignment','center');
+        if anneal.refine>1; text((Niter-anneal.refine), mean(ylimits), 'refine', 'FontSize', 16, 'Rotation', 90, 'VerticalAlignment','top','HorizontalAlignment','center'); end
         plot(Niter*ones(1,2), ylimits, 'Color', 0.8*[1 1 1]);
         hold off;
         xlabel('Iteration number','FontSize', 16); ylabel('Annealing factor', 'FontSize', 16);
