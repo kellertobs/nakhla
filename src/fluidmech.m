@@ -409,14 +409,22 @@ KP(np0,np0) = h^2./geomean(eta(:));
 if bnchm; RP(MapP(nzp,nxp),:) = P_mms(nzp,nxp); end
 
 if bnchm
-    % set U = 0 in fixed point
-    nzu = 1;
+    % fix P = P_mms in middle of domain
+    nzp = round((Nz+2)/2);
+    nxp = round((Nx+2)/2);
+    np0 = MapP(nzp,nxp);
+    DD(MapP(nzp,nxp),:) = 0;
+    KP(MapP(nzp,nxp),:) = 0;
+    KP(MapP(nzp,nxp),MapP(nzp,nxp)) = 1;
+    RP(MapP(nzp,nxp),:) = P_mms(nzp,nxp);
+    
+    % fix U = U_mms in middle of domain
+    nzu = round((Nz+2)/2);
     nxu = round((Nx+2)/2);
     KV(MapU(nzu,nxu),:) = 0;
     GG(MapU(nzu,nxu),:) = 0;
     KV(MapU(nzu,nxu),MapU(nzu  ,nxu)) = 1;
-    KV(MapU(nzu,nxu),MapU(nzu+1,nxu)) = 1;
-    RV(MapU(nzp,nxp),:) = 0;
+    RV(MapU(nzp,nxp),:) = U_mms(nzu,nxu);
 end
 
 %% assemble and scale global coefficient matrix and right-hand side vector
