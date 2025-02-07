@@ -490,9 +490,13 @@ step    = 0;
 time    = 0;
 iter    = 0;
 hist    = [];
+dsumBdt = 0; dsumBdto = 0;
 dsumMdt = 0; dsumMdto = 0;
+dsumXdt = 0; dsumXdto = 0;
+dsumFdt = 0; dsumFdto = 0;
 dsumSdt = 0; dsumSdto = 0;
 dsumCdt = 0; dsumCdto = 0;
+dsumTdt = 0; dsumTdto = 0;
 
 % overwrite fields from file if restarting run
 if restart

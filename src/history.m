@@ -1,8 +1,12 @@
 % record run history
 
-dsumMdtoo = dsumMdto; dsumMdto = dsumMdt;
 dsumSdtoo = dsumSdto; dsumSdto = dsumSdt;
+dsumBdtoo = dsumBdto; dsumBdto = dsumBdt;
+dsumMdtoo = dsumMdto; dsumMdto = dsumMdt;
+dsumXdtoo = dsumXdto; dsumXdto = dsumXdt;
+dsumFdtoo = dsumFdto; dsumFdto = dsumFdt;
 dsumCdtoo = dsumCdto; dsumCdto = dsumCdt;
+dsumTdtoo = dsumTdto; dsumTdto = dsumTdt;
 
 stp = max(1,step);
 
@@ -10,24 +14,34 @@ stp = max(1,step);
 hist.time(stp) = time;
 
 % record total mass, heat, component mass in model (assume hy = 1, unit length in third dimension)
-hist.sumM(stp  ) = sum(rho(:)*h*h*1);  % [kg]
-hist.sumS(stp  ) = sum(  S(:)*h*h*1);  % [J]
-hist.sumC(stp,:) = squeeze(sum(sum(C*h*h*1,1),2))+eps; % [kg]
+hist.sumS(stp  ) = sum(  S(:)*h*h*1)+eps;  % [J/K]
+hist.sumB(stp  ) = sum(rho(:)*h*h*1)+eps;  % [kg]
+hist.sumM(stp  ) = sum(  M(:)*h*h*1)+eps;  % [kg]
+hist.sumX(stp  ) = sum(  X(:)*h*h*1)+eps;  % [kg]
+hist.sumF(stp  ) = sum(  F(:)*h*h*1)+eps;  % [kg]
+hist.sumC(stp,:) = squeeze(sum(sum(C  *h*h*1,1),2))+eps; % [kg]
+hist.sumT(stp,:) = squeeze(sum(sum(TRC*h*h*1,1),2))+eps; % [kg]
 
 % record expected rates of change by volume change and imposed boundaries layers
-dsumMdt = sum(X(1,:).*Wx(1,2:end-1)*h*1) - sum(X(end,:).*Wx(end,2:end-1)*h*1) ...
-        + sum(X(:,1).*Ux(2:end-1,1)*h*1) - sum(X(:,end).*Ux(2:end-1,end)*h*1) ...
-        + sum(F(1,:).*Wf(1,2:end-1)*h*1) - sum(F(end,:).*Wf(end,2:end-1)*h*1) ...
-        + sum(F(:,1).*Uf(2:end-1,1)*h*1) - sum(F(:,end).*Uf(2:end-1,end)*h*1) ...
-        + sum(M(1,:).*Wm(1,2:end-1)*h*1) - sum(M(end,:).*Wm(end,2:end-1)*h*1) ...
-        + sum(M(:,1).*Um(2:end-1,1)*h*1) - sum(M(:,end).*Um(2:end-1,end)*h*1);  % [kg/s]
 dsumSdt = sum(sum(bnd_S*h*h*1)) + sum(sum(diss_h*h*h*1)) ...
         + sum(X(1,:).*sx(1,:).*Wx(1,2:end-1)*h*1) - sum(X(end,:).*sx(end,:).*Wx(end,2:end-1)*h*1) ...
         + sum(X(:,1).*sx(:,1).*Ux(2:end-1,1)*h*1) - sum(X(:,end).*sx(:,end).*Ux(2:end-1,end)*h*1) ...
         + sum(F(1,:).*sf(1,:).*Wf(1,2:end-1)*h*1) - sum(F(end,:).*sf(end,:).*Wf(end,2:end-1)*h*1) ...
         + sum(F(:,1).*sf(:,1).*Uf(2:end-1,1)*h*1) - sum(F(:,end).*sf(:,end).*Uf(2:end-1,end)*h*1) ...
         + sum(M(1,:).*sm(1,:).*Wm(1,2:end-1)*h*1) - sum(M(end,:).*sm(end,:).*Wm(end,2:end-1)*h*1) ...
-        + sum(M(:,1).*sm(:,1).*Um(2:end-1,1)*h*1) - sum(M(:,end).*sm(:,end).*Um(2:end-1,end)*h*1);  % [J /s]
+        + sum(M(:,1).*sm(:,1).*Um(2:end-1,1)*h*1) - sum(M(:,end).*sm(:,end).*Um(2:end-1,end)*h*1);  % [J/K/s]
+dsumBdt = sum(X(1,:).*Wx(1,2:end-1)*h*1) - sum(X(end,:).*Wx(end,2:end-1)*h*1) ...
+        + sum(X(:,1).*Ux(2:end-1,1)*h*1) - sum(X(:,end).*Ux(2:end-1,end)*h*1) ...
+        + sum(F(1,:).*Wf(1,2:end-1)*h*1) - sum(F(end,:).*Wf(end,2:end-1)*h*1) ...
+        + sum(F(:,1).*Uf(2:end-1,1)*h*1) - sum(F(:,end).*Uf(2:end-1,end)*h*1) ...
+        + sum(M(1,:).*Wm(1,2:end-1)*h*1) - sum(M(end,:).*Wm(end,2:end-1)*h*1) ...
+        + sum(M(:,1).*Um(2:end-1,1)*h*1) - sum(M(:,end).*Um(2:end-1,end)*h*1);  % [kg/s]
+dsumMdt = sum(M(1,:).*Wm(1,2:end-1)*h*1) - sum(M(end,:).*Wm(end,2:end-1)*h*1) ...
+        + sum(M(:,1).*Um(2:end-1,1)*h*1) - sum(M(:,end).*Um(2:end-1,end)*h*1);  % [kg/s]
+dsumXdt = sum(X(1,:).*Wx(1,2:end-1)*h*1) - sum(X(end,:).*Wx(end,2:end-1)*h*1) ...
+        + sum(X(:,1).*Ux(2:end-1,1)*h*1) - sum(X(:,end).*Ux(2:end-1,end)*h*1);  % [kg/s]
+dsumFdt = sum(F(1,:).*Wf(1,2:end-1)*h*1) - sum(F(end,:).*Wf(end,2:end-1)*h*1) ...
+        + sum(F(:,1).*Uf(2:end-1,1)*h*1) - sum(F(:,end).*Uf(2:end-1,end)*h*1);  % [kg/s]
 dsumCdt = squeeze(sum(sum(bnd_C*h*h*1,1),2) ...
         + sum(X(1,:).*cx(1,:,:).*Wx(1,2:end-1)*h*1,2) - sum(X(end,:).*cx(end,:,:).*Wx(end,2:end-1)*h*1,2) ...
         + sum(X(:,1).*cx(:,1,:).*Ux(2:end-1,1)*h*1,1) - sum(X(:,end).*cx(:,end,:).*Ux(2:end-1,end)*h*1,1) ...
@@ -35,19 +49,32 @@ dsumCdt = squeeze(sum(sum(bnd_C*h*h*1,1),2) ...
         + sum(F(:,1).*cf(:,1,:).*Uf(2:end-1,1)*h*1,1) - sum(F(:,end).*cf(:,end,:).*Uf(2:end-1,end)*h*1,1) ...
         + sum(M(1,:).*cm(1,:,:).*Wm(1,2:end-1)*h*1,2) - sum(M(end,:).*cm(end,:,:).*Wm(end,2:end-1)*h*1,2) ...
         + sum(M(:,1).*cm(:,1,:).*Um(2:end-1,1)*h*1,1) - sum(M(:,end).*cm(:,end,:).*Um(2:end-1,end)*h*1,1)).';  % [kg/s]
+dsumTdt = squeeze(sum(sum(bnd_TRC*h*h*1,1),2) ...
+        + sum(X(1,:).*trcx(1,:,:).*Wx(1,2:end-1)*h*1,2) - sum(X(end,:).*trcx(end,:,:).*Wx(end,2:end-1)*h*1,2) ...
+        + sum(X(:,1).*trcx(:,1,:).*Ux(2:end-1,1)*h*1,1) - sum(X(:,end).*trcx(:,end,:).*Ux(2:end-1,end)*h*1,1) ...
+        + sum(M(1,:).*trcm(1,:,:).*Wm(1,2:end-1)*h*1,2) - sum(M(end,:).*trcm(end,:,:).*Wm(end,2:end-1)*h*1,2) ...
+        + sum(M(:,1).*trcm(:,1,:).*Um(2:end-1,1)*h*1,1) - sum(M(:,end).*trcm(:,end,:).*Um(2:end-1,end)*h*1,1)).';  % [kg/s]
 
-if step>=2; hist.DM(stp  ) = (a2*hist.DM(max(1,stp-1)  ) + a3*hist.DM(max(1,stp-2)  ) + (b1*dsumMdt + b2*dsumMdto + b3*dsumMdtoo)*dt)/a1; else; hist.DM(stp  ) = 0; end  % [kg]
-if step>=2; hist.DS(stp  ) = (a2*hist.DS(max(1,stp-1)  ) + a3*hist.DS(max(1,stp-2)  ) + (b1*dsumSdt + b2*dsumSdto + b3*dsumSdtoo)*dt)/a1; else; hist.DS(stp  ) = 0; end  % [kg]
-if step>=2; hist.DC(stp,:) = (a2*hist.DC(max(1,stp-1),:) + a3*hist.DC(max(1,stp-2),:) + (b1*dsumCdt + b2*dsumCdto + b3*dsumCdtoo)*dt)/a1; else; hist.DC(stp,:) = zeros(1,cal.ncmp); end  % [kg]
+% if step>=2; hist.DM(stp  ) = (a2*hist.DM(max(1,stp-1)  ) + a3*hist.DM(max(1,stp-2)  ) + (b1*dsumMdt + b2*dsumBdto + b3*dsumBdtoo)*dt)/a1; else; hist.DM(stp  ) = 0; end  % [kg]
+% if step>=2; hist.DS(stp  ) = (a2*hist.DS(max(1,stp-1)  ) + a3*hist.DS(max(1,stp-2)  ) + (b1*dsumSdt + b2*dsumSdto + b3*dsumSdtoo)*dt)/a1; else; hist.DS(stp  ) = 0; end  % [kg]
+% if step>=2; hist.DC(stp,:) = (a2*hist.DC(max(1,stp-1),:) + a3*hist.DC(max(1,stp-2),:) + (b1*dsumCdt + b2*dsumCdto + b3*dsumCdtoo)*dt)/a1; else; hist.DC(stp,:) = zeros(1,cal.ncmp); end  % [kg]
 
-% if stp>=2; hist.DM(stp  ) = hist.DM(max(1,stp-1)  ) + dsumMdt*dt; else; hist.DM(stp  ) = 0; end  % [kg]
-% if stp>=2; hist.DS(stp  ) = hist.DS(max(1,stp-1)  ) + dsumSdt*dt; else; hist.DS(stp  ) = 0; end  % [kg]
-% if stp>=2; hist.DC(stp,:) = hist.DC(max(1,stp-1),:) + dsumCdt*dt; else; hist.DC(stp,:) = zeros(1,cal.ncmp); end  % [kg]
+if stp>=2; hist.DS(stp  ) = hist.DS(max(1,stp-1)  ) + dsumSdt*dt; else; hist.DS(stp  ) = 0; end  % [J/K]
+if stp>=2; hist.DB(stp  ) = hist.DB(max(1,stp-1)  ) + dsumBdt*dt; else; hist.DB(stp  ) = 0; end  % [kg]
+if stp>=2; hist.DM(stp  ) = hist.DM(max(1,stp-1)  ) + dsumMdt*dt; else; hist.DM(stp  ) = 0; end  % [kg]
+if stp>=2; hist.DX(stp  ) = hist.DX(max(1,stp-1)  ) + dsumXdt*dt; else; hist.DX(stp  ) = 0; end  % [kg]
+if stp>=2; hist.DF(stp  ) = hist.DF(max(1,stp-1)  ) + dsumFdt*dt; else; hist.DF(stp  ) = 0; end  % [kg]
+if stp>=2; hist.DC(stp,:) = hist.DC(max(1,stp-1),:) + dsumCdt*dt; else; hist.DC(stp,:) = zeros(1,cal.ncmp); end  % [kg]
+if stp>=2; hist.DT(stp,:) = hist.DT(max(1,stp-1),:) + dsumTdt*dt; else; hist.DT(stp,:) = zeros(1,cal.ntrc); end  % [kg]
 
 % record conservation error of mass M, heat S, components C
-hist.EM(stp  ) = (hist.sumM(stp  ) - hist.DM(stp  ))./hist.sumM(1  ) - 1;  % [kg/kg]
 hist.ES(stp  ) = (hist.sumS(stp  ) - hist.DS(stp  ))./hist.sumS(1  ) - 1;  % [JK/JK]
+hist.EB(stp  ) = (hist.sumB(stp  ) - hist.DB(stp  ))./hist.sumB(1  ) - 1;  % [kg/kg]
+hist.EM(stp  ) = (hist.sumM(stp  ) - hist.DM(stp  ))./hist.sumM(1  ) - 1;  % [kg/kg]
+hist.EX(stp  ) = (hist.sumX(stp  ) - hist.DX(stp  ))./hist.sumX(1  ) - 1;  % [kg/kg]
+hist.EF(stp  ) = (hist.sumF(stp  ) - hist.DF(stp  ))./hist.sumF(1  ) - 1;  % [kg/kg]
 hist.EC(stp,:) = (hist.sumC(stp,:) - hist.DC(stp,:))./hist.sumC(1,:) - 1;  % [kg/kg]
+hist.ET(stp,:) = (hist.sumT(stp,:) - hist.DT(stp,:))./hist.sumT(1,:) - 1;  % [kg/kg]
 
 % if step==2; hist.sumM(1) = hist.sumM(2); end
 

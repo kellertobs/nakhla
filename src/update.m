@@ -123,27 +123,27 @@ rho_nP  = 1./(m./rhom_nP + x./rhox_nP + f./rhof_nP);
 % detect convection layers
 drhoz    = gradient(mean(rho_nP,2));
 [~,zpks] = findpeaks(drhoz,'MinPeakHeight',10,'MinPeakProminence',1);
-nlay = length(zpks)+1;
-zlay = zeros(1,nlay+1);
+ncl = length(zpks)+1;
+zcl = zeros(1,ncl+1);
 
 zt = max(ZZ(eta>=etamax/10 & ZZ<D/2));
-if isempty(zt); zlay(1) = 0; else; zlay(1) = zt; end
-for iz = 1:nlay-1
+if isempty(zt); zcl(1) = 0; else; zcl(1) = zt; end
+for iz = 1:ncl-1
     if zpks(iz)>5 && zpks(iz)<Nz-5
-        zlay(iz+1) = zpks(iz)*h+h/2;
+        zcl(iz+1) = zpks(iz)*h+h/2;
     else
-        zlay(iz+1) = [];
-        nlay = nlay-1;
+        zcl(iz+1) = [];
+        ncl = ncl-1;
     end
 end
-zb = min(ZZ(eta>=etamax/10 & ZZ>zlay(end-1) ));
-if isempty(zb); zlay(end) = D; else; zlay(end) = zb; end
+zb = min(ZZ(eta>=etamax/10 & ZZ>zcl(end-1) ));
+if isempty(zb); zcl(end) = D; else; zcl(end) = zb; end
 
 % limit correlation length for convective mixing to distance from layer
 % and domain boundaries
 Delta_cnv =zeros(Nz,1);
-for iz = 1:nlay
-    Delta_cnv = Delta_cnv + max(0,min(Delta_cnv0,min(ZZ-zlay(iz),zlay(iz+1)-ZZ)));
+for iz = 1:ncl
+    Delta_cnv = Delta_cnv + max(0,min(Delta_cnv0,min(ZZ-zcl(iz),zcl(iz+1)-ZZ)));
 end
 ind0 = Delta_cnv==0;
 for i=1:10
