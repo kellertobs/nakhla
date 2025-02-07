@@ -426,22 +426,18 @@ fprintf('    initial f   : %4.3f \n\n',f0);
 % get bulk enthalpy, silica, volatile content densities
 Tp   = Tp+273.15;  Tn = T;  Tpn = Tp;  To = T;  Tpo = T;
 T    = Tp.*exp(aT./RhoCp.*(Pt-Pref));
-s    = 500 + 0.*Tp;
-% s    = cP.*log(Tp/Tref);
-% S    = RhoCp.*log(T/Tref) + X.*Dsx + F.*Dsf - aT.*(Pt-Pref);
-% S0   = mean(RhoCp(:)).*log(Tref) + mean(X(:)).*Dsx + mean(F(:)).*Dsf - mean(aT(:)).*Pref;
+sm   = cP.*log(Tp/Tref);
 C    = rho.*(m.*cm + x.*cx + f.*cf); Co = C;  res_C = 0.*C;
 X    = rho.*x; Xo = X;  res_X = 0.*X;
 F    = rho.*f; Fo = F;  res_F = 0.*F;
 M    = rho.*m; Mo = M;  res_M = 0.*M;
 RHO  = X+M+F;
-S    = s.*rho + X.*Dsx + F.*Dsf;  So = S;  res_S = 0.*S;
+S    = sm.*rho + X.*Dsx + F.*Dsf;  So = S;  res_S = 0.*S;
 
 % get phase entropies
-s  = (S - X.*Dsx - F.*Dsf)./rho;
-sm = s;
-sx = s + Dsx;
-sf = s + Dsf;
+sm = (S - X.*Dsx - F.*Dsf)./rho;
+sx = sm + Dsx;
+sf = sm + Dsf;
 
 % get trace element phase compositions
 Ktrc = zeros(Nz,Nx,cal.ntrc);

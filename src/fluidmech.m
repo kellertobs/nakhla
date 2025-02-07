@@ -80,17 +80,17 @@ IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL; aa(:)+sds];
 IIR = [IIR; ii(:)]; AAR = [AAR; aa(:)];
 
 % top boundary
-ii  = MapW(1,:); jj = ii;
+ii  = MapW(1,2:end-1); jj = ii;
 aa  = zeros(size(ii));
 IIL = [IIL; ii(:)]; JJL = [JJL; jj(:)];   AAL = [AAL; aa(:)+1];
-aa  = zeros(size(ii)) + WBG(1,:);
+aa  = zeros(size(ii)) + WBG(1,2:end-1);
 IIR = [IIR; ii(:)]; AAR = [AAR; aa(:)];
 
 % bottom boundary
-ii  = MapW(end,:); jj = ii;
+ii  = MapW(end,2:end-1); jj = ii;
 aa  = zeros(size(ii));
 IIL = [IIL; ii(:)]; JJL = [JJL; jj(:)];   AAL = [AAL; aa(:)+1];
-aa  = zeros(size(ii)) + WBG(end,:);
+aa  = zeros(size(ii)) + WBG(end,2:end-1);
 IIR = [IIR; ii(:)]; AAR = [AAR; aa(:)];
 
 
@@ -157,14 +157,14 @@ IIR = [IIR; ii(:)]; AAR = [AAR; aa(:)];
 
 if ~periodic
     % left boundary
-    ii  = MapU(:,1); jj = ii;
+    ii  = MapU(2:end-1,1); jj = ii;
     aa  = zeros(size(ii));
     IIL = [IIL; ii(:)]; JJL = [JJL; jj(:)];   AAL = [AAL; aa(:)+1];
     aa  = zeros(size(ii));
     IIR = [IIR; ii(:)]; AAR = [AAR; aa(:)];
 
     % right boundary
-    ii  = MapU(:,end); jj = ii;
+    ii  = MapU(2:end-1,end); jj = ii;
     aa  = zeros(size(ii));
     IIL = [IIL; ii(:)]; JJL = [JJL; jj(:)];   AAL = [AAL; aa(:)+1];
     aa  = zeros(size(ii));
@@ -392,11 +392,19 @@ RP  = sparse(IIR,ones(size(IIR)),AAR,NP,1);
 nzp = round((Nz+2)/2);
 nxp = round((Nx+2)/2);
 np0 = MapP(nzp,nxp);
-% DD(MapP(nzp,nxp),:) = 0;
-KP(MapP(nzp,nxp),:) = 0;
-KP(MapP(nzp,nxp),MapP(nzp,nxp)) = 1;
-KP(MapP(end,nxp),MapP(nzp,nxp)) = 1;
-% RP(MapP(nzp,nxp),:) = 0;
+KP(np0,np0) = h^2./geomean(eta(:));
+% % DD(MapP(nzp,nxp),:) = 0;
+% KP(MapP(nzp,nxp),:) = 0;
+% KP(MapP(nzp,nxp),MapP(nzp,nxp)) = 1;
+% % KP(MapP(end,nxp),MapP(nzp,nxp)) = 1;
+% % RP(MapP(nzp,nxp),:) = 0;
+% KP = [KP,zeros(NP,1)];
+% KP = [KP;ones(1,NP)];
+% GG = [GG,zeros(NW+NU,1)];
+% DD = [DD;zeros(1,NW+NU)];
+% RP = [RP;0];
+% KP(end,1:end-1) = 1;
+% KP(1:end-1,end) = 1;
 
 if bnchm; RP(MapP(nzp,nxp),:) = P_mms(nzp,nxp); end
 
@@ -421,10 +429,10 @@ RR  = [RV; RP];
 SCL = (abs(diag(LL))).^0.5;
 SCL = diag(sparse( 1./(SCL + sqrt(h^2./geomean(eta(:)))) ));
 
-FF  = LL*[W(:);U(:);P(:)] - RR;
+% FF  = LL*[W(:);U(:);P(:)] - RR;
 
 LL  = SCL*LL*SCL;
-FF  = SCL*FF;
+% FF  = SCL*FF;
 RR  = SCL*RR;
 
 

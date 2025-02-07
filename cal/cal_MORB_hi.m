@@ -13,7 +13,7 @@ cal.ncmp   = 7;
 cal.oxdStr = {'SiO$_2$','TiO$_2$','Al$_2$O$_3$','FeO','MgO','CaO','Na$_2$O','K$_2$O','H$_2$O'};
      elStr = {'Si','Ti','Al','Fe','Mg','Ca','Na','K','H'};
 cal.memStr = {'for','fay','ant','alb','san','dps','aug','pig','ulv','mgt','ilm','qtz','wat'};
-cal.msyStr = {'olv','fsp','cxp','oxs','qtz'};
+cal.msyStr = {'olv','fsp','cpx','oxs','qtz'};
 cal.cmpStr = {'dun','tro','gbr','fbs','tra','rhy','vol'};
 
 for i = 1:cal.ncmp; cal.(cal.cmpStr{i}) = i; end

@@ -49,8 +49,8 @@ chi    = max(0,min(1, x.*rho./rhox ));
 phi    = max(0,min(1, f.*rho./rhof ));
 mu     = max(0,min(1, m.*rho./rhom ));
 
-phix_mem = reshape(reshape(cx_mem/100.*rhox,Nz*Nx,cal.nmem)./cal.rhox0,Nz,Nx,cal.nmem);
-phix_mem = phix_mem./sum(phix_mem,3);
+chi_mem = reshape(reshape(cx_mem/100.*rhox,Nz*Nx,cal.nmem)./cal.rhox0,Nz,Nx,cal.nmem);
+chi_mem = chi_mem./sum(chi_mem,3);
 
 % update thermal parameters
 aT = mu.*aTm + chi.*aTx + phi.*aTf;
@@ -74,7 +74,7 @@ df = df0.*(1-phi).^0.5;
 
 % update pure phase viscosities
 etam   = reshape(Giordano08(reshape(cm_oxd_all,Nz*Nx,9),T(:)-273.15),Nz,Nx);
-etax0  = reshape(prod(cal.etax0(1:end-1).^reshape(phix_mem(:,:,1:end-1)+eps,Nz*Nx,cal.nmem-1),2),Nz,Nx);
+etax0  = reshape(prod(cal.etax0(1:end-1).^reshape(chi_mem(:,:,1:end-1)+eps,Nz*Nx,cal.nmem-1),2),Nz,Nx);
 etax   = etax0 .* ones(size(chi)) .* exp(cal.Eax./(8.3145.*T)-cal.Eax./(8.3145.*(Tref+273.15)));
 etaf   = cal.etaf0 .* ones(size(phi));
 
