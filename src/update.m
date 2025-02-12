@@ -121,6 +121,7 @@ rhof_nP = rhof0 .* (1 - aTf.*(Tp-Tref));
 rho_nP  = 1./(m./rhom_nP + x./rhox_nP + f./rhof_nP);
 
 % detect convection layers
+if Nz>1
 drhoz    = gradient(mean(rho_nP,2));
 [~,zpks] = findpeaks(drhoz,'MinPeakHeight',10,'MinPeakProminence',1);
 ncl = length(zpks)+1;
@@ -150,6 +151,7 @@ for i=1:10
     Delta_cnv = Delta_cnv + diffus(Delta_cnv,1/8*ones(size(Delta_cnv)),1,[1,2],BCD);
     % Delta_cnv(ind0) = 0;
     Delta_cnv([1 end]) = [h/2,h/2];
+end
 end
 
 % update velocity magnitude

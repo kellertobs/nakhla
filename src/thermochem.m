@@ -94,6 +94,10 @@ cal.H2Osat = fluidsat(var);               % water saturation [wt]
 
 [var,cal]  = meltmodel(var,cal,'E');
 
+Tsol   = reshape(cal.Tsol,Nz,Nx);
+Tliq   = reshape(cal.Tliq,Nz,Nx);
+H2Osat = reshape(cal.H2Osat,Nz,Nx);
+
 mq = reshape(var.m,Nz,Nx);
 fq = reshape(var.f,Nz,Nx);
 xq = reshape(var.x,Nz,Nx);

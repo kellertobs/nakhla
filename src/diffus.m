@@ -96,8 +96,6 @@ function [fm, fp] = makestencil (f, dim, BC)
 % |----o----|----o----|----o----|
 % |    fm   |   fcc   |    fp   |
 
-sten7 = (nargout>4) ;
-
 % use these variables to handle arbitrary dim
 shift = circshift([1, 0, 0], [0, dim-1]);
 

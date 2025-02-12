@@ -59,12 +59,14 @@ rng(seed);
 smth = smth*Nx*Nz*1e-4;
 rp   = randn(Nz,Nx);
 for i = 1:round(smth)
-    rp = rp + diffus(rp,1/8*ones(size(rp)),1,[1,2],BCD);
+    rp = rp + diffus(rp,1/8*ones(size(rp)),1,[1,2],{[0,0],BCD(2)});
     rp = rp - mean(mean(rp));
 end
 rp = rp./max(abs(rp(:)));
 
-gp = exp(-(XX-L/2).^2/(max(L,D)/8)^2 - (ZZ-D/2).^2/(max(L,D)/8)^2);
+gp = exp(-(XX-L/2  ).^2/(max(L,D)/8)^2 - (ZZ-D/2).^2/(max(L,D)/8)^2) ...
+   + exp(-(XX-L/2+L).^2/(max(L,D)/8)^2 - (ZZ-D/2).^2/(max(L,D)/8)^2) ...
+   + exp(-(XX-L/2-L).^2/(max(L,D)/8)^2 - (ZZ-D/2).^2/(max(L,D)/8)^2);
 
 % get mapping arrays
 NP = (Nz+2) * (Nx+2);
@@ -264,6 +266,7 @@ rhoUo  = rhofx.*U(2:end-1,:); rhoUoo = rhoUo; advn_mx = 0.*rhoUo;
 fq     = zeros(size(Tp));  mq = ones(size(Tp))/2;  xq = 1-mq-fq; 
 cmq    = c; cxq = c;  cfq = 0.*c;  cfq(:,:,end) = 1;  cf = cfq;
 cm_oxd = reshape(reshape(c,Nz*Nx,cal.ncmp)*cal.cmp_oxd,Nz,Nx,cal.noxd);
+cm_oxd_all = zeros(Nz,Nx,9);
 cm_oxd_all(:,:,cal.ioxd) = cm_oxd;
 aT     = aTm;
 kT     = kTm;
@@ -357,6 +360,10 @@ while res > tol
     cal.H2Osat = fluidsat(var); % water saturation [wt]
 
     [var,cal] = meltmodel(var,cal,'E');
+
+    Tsol   = reshape(cal.Tsol,Nz,Nx);
+    Tliq   = reshape(cal.Tliq,Nz,Nx);
+    H2Osat = reshape(cal.H2Osat,Nz,Nx);
 
     mq = reshape(var.m,Nz,Nx);
     fq = reshape(var.f,Nz,Nx);
@@ -490,11 +497,11 @@ step    = 0;
 time    = 0;
 iter    = 0;
 hist    = [];
+dsumSdt = 0; dsumSdto = 0;
 dsumBdt = 0; dsumBdto = 0;
 dsumMdt = 0; dsumMdto = 0;
 dsumXdt = 0; dsumXdto = 0;
 dsumFdt = 0; dsumFdto = 0;
-dsumSdt = 0; dsumSdto = 0;
 dsumCdt = 0; dsumCdto = 0;
 dsumTdt = 0; dsumTdto = 0;
 

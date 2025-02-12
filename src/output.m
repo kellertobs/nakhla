@@ -609,9 +609,9 @@ if plot_cv
     ylabel('consv. $S$',TX{:},FS{:}); set(gca,TL{:},TS{:},'XTickLabel',[]);
     subplot(4,1,2);
     plot(hist.time/TimeScale,hist.DB./hist.sumB,'k-',LW{:}); hold on; axis tight; box on; hold on
-    % plot(hist.time/TimeScale,hist.DM./hist.sumB,'r-',LW{:}); hold on; axis tight; box on;
-    % plot(hist.time/TimeScale,hist.DX./hist.sumB,'b-',LW{:}); hold on; axis tight; box on;
-    % plot(hist.time/TimeScale,hist.DF./hist.sumB,'c-',LW{:}); hold on; axis tight; box on;
+    plot(hist.time/TimeScale,hist.DM./hist.sumB,'k--',LW{:}); hold on; axis tight; box on;
+    plot(hist.time/TimeScale,hist.DX./hist.sumB,'k-.',LW{:}); hold on; axis tight; box on;
+    plot(hist.time/TimeScale,hist.DF./hist.sumB,'k:',LW{:}); hold on; axis tight; box on;
     ylabel('consv. $\bar{\rho},F^i$',TX{:},FS{:}); set(gca,TL{:},TS{:},'XTickLabel',[]);
     subplot(4,1,3);
     plot(hist.time/TimeScale,hist.DC./hist.sumC,'k-',LW{:}); hold on; axis tight; box on;
@@ -629,9 +629,9 @@ if plot_cv
     ylabel('error $S$',TX{:},FS{:}); set(gca,TL{:},TS{:},'XTickLabel',[]);
     subplot(4,1,2);
     plot(hist.time/TimeScale,hist.EB,'k-',LW{:}); hold on; axis tight; box on; hold on
-    % plot(hist.time/TimeScale,hist.EM,'r-',LW{:}); hold on; axis tight; box on;
-    % plot(hist.time/TimeScale,hist.EX,'b-',LW{:}); hold on; axis tight; box on;
-    % plot(hist.time/TimeScale,hist.EF,'c-',LW{:}); hold on; axis tight; box on;
+    plot(hist.time/TimeScale,hist.EM,'k--',LW{:}); hold on; axis tight; box on;
+    plot(hist.time/TimeScale,hist.EX,'k-.',LW{:}); hold on; axis tight; box on;
+    plot(hist.time/TimeScale,hist.EF,'k:',LW{:}); hold on; axis tight; box on;
     ylabel('error $\bar{\rho},F^i$',TX{:},FS{:}); set(gca,TL{:},TS{:},'XTickLabel',[]);
     subplot(4,1,3);
     plot(hist.time/TimeScale,hist.EC,'k-',LW{:}); hold on; axis tight; box on;
