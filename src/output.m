@@ -41,6 +41,7 @@ elseif max(Vel(:)) >= 1000/hr
 end
 Xsc = Xc./SpaceScale;
 Zsc = Zc./SpaceScale;
+Zsf = Zf./SpaceScale;
 
 if Nx <= 1 && Nz <= 1  % create 0D plots
 
@@ -137,10 +138,10 @@ elseif Nx <= 1  % create 1D plots
     plot(phi*100.*(phi>1e-9),Zsc.',CL{[1,5]},LW{:});
     title('$\mu$, $\chi$, $\phi$ [vol\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,4,4)
-    plot(-(phi([1,1:end],:)+phi([1:end,end],:))/2.*wf(:,2:end-1)/SpeedScale,Zf.',CL{[1,5]},LW{:}); axis ij tight; box on; hold on;
-    plot(-(chi([1,1:end],:)+chi([1:end,end],:))/2.*wx(:,2:end-1)/SpeedScale,Zf.',CL{[1,4]},LW{:});
-    plot(-(mu ([1,1:end],:)+mu ([1:end,end],:))/2.*wm(:,2:end-1)/SpeedScale,Zf.',CL{[1,3]},LW{:});
-    plot(-                                         W (:,2:end-1)/SpeedScale,Zf.',CL{[1,2]},LW{:});
+    plot(-(phi([1,1:end],:)+phi([1:end,end],:))/2.*wf(:,2:end-1)/SpeedScale,Zsf.',CL{[1,5]},LW{:}); axis ij tight; box on; hold on;
+    plot(-(chi([1,1:end],:)+chi([1:end,end],:))/2.*wx(:,2:end-1)/SpeedScale,Zsf.',CL{[1,4]},LW{:});
+    plot(-(mu ([1,1:end],:)+mu ([1:end,end],:))/2.*wm(:,2:end-1)/SpeedScale,Zsf.',CL{[1,3]},LW{:});
+    plot(-                                         W (:,2:end-1)/SpeedScale,Zsf.',CL{[1,2]},LW{:});
     title(['$W$, $w_\Delta^f$, $w_\Delta^x$ [',SpeedUnits,']'],TX{:},FS{:}); set(gca,TL{:},TS{:});
 
     if ~exist('fh2','var'); fh2 = figure(VIS{:});
