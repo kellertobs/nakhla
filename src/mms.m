@@ -26,8 +26,8 @@ fprintf(1,'       . ');
 
 % update strain rates
 DivV_mms(x,z)= (diff(W_mms,z) + diff(U_mms,x));
-exx_mms(x,z) = diff(U_mms,x) - DivV_mms./2;         % x-normal strain rate
-ezz_mms(x,z) = diff(W_mms,z) - DivV_mms./2;         % z-normal strain rate
+exx_mms(x,z) = diff(U_mms,x) - DivV_mms./3;         % x-normal strain rate
+ezz_mms(x,z) = diff(W_mms,z) - DivV_mms./3;         % z-normal strain rate
 exz_mms(x,z) = 1/2.*(diff(U_mms,z)+diff(W_mms,x));  % xz-shear strain rate
 fprintf(1,' . ');
 

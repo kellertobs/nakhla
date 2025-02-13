@@ -33,9 +33,19 @@ res_S = (a1*S-a2*So-a3*Soo)/dt - (b1*dSdt + b2*dSdto + b3*dSdtoo);
 upd_S = - alpha*res_S*dt/a1 + beta*upd_S;
 S     = S + upd_S;
 
-% convert entropy density to temperature
-Tpv     = Tref*exp((S - X.*Dsx - F.*Dsf)./RhoCp);
-Tv      = Tref*exp((S - X.*Dsx - F.*Dsf)./RhoCp + aT./RhoCp.*(Pt-Pref));
+% update phase entropies
+si = sm;
+sm = (S - X.*Dsx - F.*Dsf)./RHO;
+sx = sm + Dsx;
+sf = sm + Dsf;
+upd_s = sm-si;
+
+% update temperature
+upd_Tp = (upd_s.*rho             ) .*T./RhoCp;
+upd_T  = (upd_s.*rho + aT.*upd_Pt) .*T./RhoCp;
+
+Tp     = Tp + upd_Tp;
+T      = T  + upd_T;
 
 
 %***  update major component densities
@@ -84,6 +94,10 @@ cal.H2Osat = fluidsat(var);               % water saturation [wt]
 
 [var,cal]  = meltmodel(var,cal,'E');
 
+Tsol   = reshape(cal.Tsol,Nz,Nx);
+Tliq   = reshape(cal.Tliq,Nz,Nx);
+H2Osat = reshape(cal.H2Osat,Nz,Nx);
+
 mq = reshape(var.m,Nz,Nx);
 fq = reshape(var.f,Nz,Nx);
 xq = reshape(var.x,Nz,Nx);
@@ -104,13 +118,13 @@ advn_M   = - advect(M,Um(2:end-1,:),Wm(:,2:end-1),h,{ADVN,''},[1,2],BCA);
 advn_rho = advn_X+advn_F+advn_M;
 
 % phase mass transfer rates
-Gm  = (Gmo + (mq-m).*RHO/max(tau_r,5*dt))/2;
-Gx  = (Gxo + (xq-x).*RHO/max(tau_r,5*dt))/2; 
-Gf  = (Gfo + (fq-f).*RHO/max(tau_r,5*dt))/2;
+Gm  = (mq-m).*RHO/max(tau_r,10*dt);
+Gx  = (xq-x).*RHO/max(tau_r,10*dt); 
+Gf  = (fq-f).*RHO/max(tau_r,10*dt);
 
-Gmc = (cmq.*mq-cm.*m).*RHO/max(tau_r,5*dt);
-Gxc = (cxq.*xq-cx.*x).*RHO/max(tau_r,5*dt);
-Gfc = (cfq.*fq-cf.*f).*RHO/max(tau_r,5*dt);
+Gmc = (cmq.*mq-cm.*m).*RHO/max(tau_r,10*dt);
+Gxc = (cxq.*xq-cx.*x).*RHO/max(tau_r,10*dt);
+Gfc = (cfq.*fq-cf.*f).*RHO/max(tau_r,10*dt);
 
 % total rates of change
 dXdt   = advn_X + Gx;
@@ -143,21 +157,6 @@ m = M./RHO;
 hasx = x >= eps^0.5;
 hasf = f >= eps^0.5;
 hasm = m >= eps^0.5;
-
-% update phase entropies
-si = sm;
-s  = (S - X.*Dsx - F.*Dsf)./RHO;
-sm = s;
-sx = s + Dsx;
-sf = s + Dsf;
-upd_s = s-si;
-
-% update temperature
-upd_Tp = (upd_s.*rho             ) .*T./RhoCp;
-upd_T  = (upd_s.*rho + aT.*upd_Pt) .*T./RhoCp;
-
-Tp     = Tp + upd_Tp;
-T      = T  + upd_T;
 
 % update major component phase composition
 Kx      = reshape(cal.Kx,Nz,Nx,cal.ncmp);
@@ -200,7 +199,6 @@ end
 % fix subsolidus and superliquidus conditions
 cx(subsolc) = cxq(subsolc); x(subsol) = xq(subsol); f(subsol) = fq(subsol); m(subsol) = 0;
 cm(supliqc) = cmq(supliqc); m(supliq) = mq(supliq); f(supliq) = fq(supliq); x(supliq) = 0;
-
 
 % record timing
 TCtime = TCtime + toc - eqtime;

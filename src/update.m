@@ -49,8 +49,8 @@ chi    = max(0,min(1, x.*rho./rhox ));
 phi    = max(0,min(1, f.*rho./rhof ));
 mu     = max(0,min(1, m.*rho./rhom ));
 
-phix_mem = reshape(reshape(cx_mem/100.*rhox,Nz*Nx,cal.nmem)./cal.rhox0,Nz,Nx,cal.nmem);
-phix_mem = phix_mem./sum(phix_mem,3);
+chi_mem = reshape(reshape(cx_mem/100.*rhox,Nz*Nx,cal.nmem)./cal.rhox0,Nz,Nx,cal.nmem);
+chi_mem = chi_mem./sum(chi_mem,3);
 
 % update thermal parameters
 aT = mu.*aTm + chi.*aTx + phi.*aTf;
@@ -74,7 +74,7 @@ df = df0.*(1-phi).^0.5;
 
 % update pure phase viscosities
 etam   = reshape(Giordano08(reshape(cm_oxd_all,Nz*Nx,9),T(:)-273.15),Nz,Nx);
-etax0  = reshape(prod(cal.etax0(1:end-1).^reshape(phix_mem(:,:,1:end-1)+eps,Nz*Nx,cal.nmem-1),2),Nz,Nx);
+etax0  = reshape(prod(cal.etax0(1:end-1).^reshape(chi_mem(:,:,1:end-1)+eps,Nz*Nx,cal.nmem-1),2),Nz,Nx);
 etax   = etax0 .* ones(size(chi)) .* exp(cal.Eax./(8.3145.*T)-cal.Eax./(8.3145.*(Tref+273.15)));
 etaf   = cal.etaf0 .* ones(size(phi));
 
@@ -121,35 +121,37 @@ rhof_nP = rhof0 .* (1 - aTf.*(Tp-Tref));
 rho_nP  = 1./(m./rhom_nP + x./rhox_nP + f./rhof_nP);
 
 % detect convection layers
+if Nz>1
 drhoz    = gradient(mean(rho_nP,2));
 [~,zpks] = findpeaks(drhoz,'MinPeakHeight',10,'MinPeakProminence',1);
-nlay = length(zpks)+1;
-zlay = zeros(1,nlay+1);
+ncl = length(zpks)+1;
+zcl = zeros(1,ncl+1);
 
 zt = max(ZZ(eta>=etamax/10 & ZZ<D/2));
-if isempty(zt); zlay(1) = 0; else; zlay(1) = zt; end
-for iz = 1:nlay-1
+if isempty(zt); zcl(1) = 0; else; zcl(1) = zt; end
+for iz = 1:ncl-1
     if zpks(iz)>5 && zpks(iz)<Nz-5
-        zlay(iz+1) = zpks(iz)*h+h/2;
+        zcl(iz+1) = zpks(iz)*h+h/2;
     else
-        zlay(iz+1) = [];
-        nlay = nlay-1;
+        zcl(iz+1) = [];
+        ncl = ncl-1;
     end
 end
-zb = min(ZZ(eta>=etamax/10 & ZZ>zlay(end-1) ));
-if isempty(zb); zlay(end) = D; else; zlay(end) = zb; end
+zb = min(ZZ(eta>=etamax/10 & ZZ>zcl(end-1) ));
+if isempty(zb); zcl(end) = D; else; zcl(end) = zb; end
 
 % limit correlation length for convective mixing to distance from layer
 % and domain boundaries
 Delta_cnv =zeros(Nz,1);
-for iz = 1:nlay
-    Delta_cnv = Delta_cnv + max(0,min(Delta_cnv0,min(ZZ-zlay(iz),zlay(iz+1)-ZZ)));
+for iz = 1:ncl
+    Delta_cnv = Delta_cnv + max(0,min(Delta_cnv0,min(ZZ-zcl(iz),zcl(iz+1)-ZZ)));
 end
 ind0 = Delta_cnv==0;
 for i=1:10
     Delta_cnv = Delta_cnv + diffus(Delta_cnv,1/8*ones(size(Delta_cnv)),1,[1,2],BCD);
     % Delta_cnv(ind0) = 0;
     Delta_cnv([1 end]) = [h/2,h/2];
+end
 end
 
 % update velocity magnitude

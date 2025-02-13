@@ -605,29 +605,41 @@ if plot_cv
     if ~exist('fh13','var'); fh13 = figure(VIS{:});
     else; set(0, 'CurrentFigure', fh13); clf;
     end 
-    subplot(3,1,1);
-    plot(hist.time/TimeScale,hist.DM./hist.sumM,'k-',LW{:}); hold on; axis tight; box on;
-    ylabel('consv. $M$',TX{:},FS{:}); set(gca,TL{:},TS{:},'XTickLabel',[]);
-    subplot(3,1,2);
+    subplot(4,1,1);
     plot(hist.time/TimeScale,hist.DS./hist.sumS,'k-',LW{:}); hold on; axis tight; box on;
     ylabel('consv. $S$',TX{:},FS{:}); set(gca,TL{:},TS{:},'XTickLabel',[]);
-    subplot(3,1,3);
+    subplot(4,1,2);
+    plot(hist.time/TimeScale,hist.DB./hist.sumB,'k-',LW{:}); hold on; axis tight; box on; hold on
+    plot(hist.time/TimeScale,hist.DM./hist.sumB,'k--',LW{:}); hold on; axis tight; box on;
+    plot(hist.time/TimeScale,hist.DX./hist.sumB,'k-.',LW{:}); hold on; axis tight; box on;
+    plot(hist.time/TimeScale,hist.DF./hist.sumB,'k:',LW{:}); hold on; axis tight; box on;
+    ylabel('consv. $\bar{\rho},F^i$',TX{:},FS{:}); set(gca,TL{:},TS{:},'XTickLabel',[]);
+    subplot(4,1,3);
     plot(hist.time/TimeScale,hist.DC./hist.sumC,'k-',LW{:}); hold on; axis tight; box on;
-    ylabel('consv. $C$',TX{:},FS{:}); set(gca,TL{:},TS{:},'XTickLabel',[]);
+    ylabel('consv. $C_j$',TX{:},FS{:}); set(gca,TL{:},TS{:},'XTickLabel',[]);
+    subplot(4,1,4);
+    plot(hist.time/TimeScale,hist.DT./hist.sumT,'k-',LW{:}); hold on; axis tight; box on;
+    ylabel('consv. $\Theta_k$',TX{:},FS{:}); set(gca,TL{:},TS{:},'XTickLabel',[]);
     xlabel(['Time [',TimeUnits,']'],TX{:},FS{:});
 
     if ~exist('fh14','var'); fh14 = figure(VIS{:});
     else; set(0, 'CurrentFigure', fh14); clf;
     end 
-    subplot(3,1,1);
-    plot(hist.time/TimeScale,hist.EM,'k-',LW{:}); hold on; axis tight; box on;
-    ylabel('error $M$',TX{:},FS{:}); set(gca,TL{:},TS{:},'XTickLabel',[]);
-    subplot(3,1,2);
+    subplot(4,1,1);
     plot(hist.time/TimeScale,hist.ES,'k-',LW{:}); hold on; axis tight; box on;
     ylabel('error $S$',TX{:},FS{:}); set(gca,TL{:},TS{:},'XTickLabel',[]);
-    subplot(3,1,3);
+    subplot(4,1,2);
+    plot(hist.time/TimeScale,hist.EB,'k-',LW{:}); hold on; axis tight; box on; hold on
+    plot(hist.time/TimeScale,hist.EM,'k--',LW{:}); hold on; axis tight; box on;
+    plot(hist.time/TimeScale,hist.EX,'k-.',LW{:}); hold on; axis tight; box on;
+    plot(hist.time/TimeScale,hist.EF,'k:',LW{:}); hold on; axis tight; box on;
+    ylabel('error $\bar{\rho},F^i$',TX{:},FS{:}); set(gca,TL{:},TS{:},'XTickLabel',[]);
+    subplot(4,1,3);
     plot(hist.time/TimeScale,hist.EC,'k-',LW{:}); hold on; axis tight; box on;
-    ylabel('error $C$',TX{:},FS{:}); set(gca,TL{:},TS{:},'XTickLabel',[]);
+    ylabel('error $C_j$',TX{:},FS{:}); set(gca,TL{:},TS{:},'XTickLabel',[]);
+    subplot(4,1,4);
+    plot(hist.time/TimeScale,hist.ET,'k-',LW{:}); hold on; axis tight; box on;
+    ylabel('error $\Theta_k$',TX{:},FS{:}); set(gca,TL{:},TS{:},'XTickLabel',[]);
     xlabel(['Time [',TimeUnits,']'],TX{:},FS{:});
 end
 

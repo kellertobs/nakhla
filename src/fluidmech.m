@@ -9,7 +9,7 @@ drhodt  = advn_rho;% + (RHO-rho)/dt;
 res_rho = (a1*rho-a2*rhoo-a3*rhooo)/dt - (b1*drhodt + b2*drhodto + b3*drhodtoo);
 
 % volume source and background velocity passed to fluid-mechanics solver
-upd_rho = - res_rho./b1./rho; % + beta*upd_rho;
+upd_rho = - alpha*res_rho./b1./rho; % + beta*upd_rho;
 VolSrc  = VolSrc + upd_rho;  % correct volume source term by scaled residual
 
 UBG     = - 0*mean(VolSrc,'all')./2 .* (L/2-XXu);
@@ -80,17 +80,17 @@ IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL; aa(:)+sds];
 IIR = [IIR; ii(:)]; AAR = [AAR; aa(:)];
 
 % top boundary
-ii  = MapW(1,:); jj = ii;
+ii  = MapW(1,2:end-1); jj = ii;
 aa  = zeros(size(ii));
 IIL = [IIL; ii(:)]; JJL = [JJL; jj(:)];   AAL = [AAL; aa(:)+1];
-aa  = zeros(size(ii)) + WBG(1,:);
+aa  = zeros(size(ii)) + WBG(1,2:end-1);
 IIR = [IIR; ii(:)]; AAR = [AAR; aa(:)];
 
 % bottom boundary
-ii  = MapW(end,:); jj = ii;
+ii  = MapW(end,2:end-1); jj = ii;
 aa  = zeros(size(ii));
 IIL = [IIL; ii(:)]; JJL = [JJL; jj(:)];   AAL = [AAL; aa(:)+1];
-aa  = zeros(size(ii)) + WBG(end,:);
+aa  = zeros(size(ii)) + WBG(end,2:end-1);
 IIR = [IIR; ii(:)]; AAR = [AAR; aa(:)];
 
 
@@ -157,14 +157,14 @@ IIR = [IIR; ii(:)]; AAR = [AAR; aa(:)];
 
 if ~periodic
     % left boundary
-    ii  = MapU(:,1); jj = ii;
+    ii  = MapU(2:end-1,1); jj = ii;
     aa  = zeros(size(ii));
     IIL = [IIL; ii(:)]; JJL = [JJL; jj(:)];   AAL = [AAL; aa(:)+1];
     aa  = zeros(size(ii));
     IIR = [IIR; ii(:)]; AAR = [AAR; aa(:)];
 
     % right boundary
-    ii  = MapU(:,end); jj = ii;
+    ii  = MapU(2:end-1,end); jj = ii;
     aa  = zeros(size(ii));
     IIL = [IIL; ii(:)]; JJL = [JJL; jj(:)];   AAL = [AAL; aa(:)+1];
     aa  = zeros(size(ii));
@@ -392,23 +392,39 @@ RP  = sparse(IIR,ones(size(IIR)),AAR,NP,1);
 nzp = round((Nz+2)/2);
 nxp = round((Nx+2)/2);
 np0 = MapP(nzp,nxp);
-% DD(MapP(nzp,nxp),:) = 0;
-KP(MapP(nzp,nxp),:) = 0;
-KP(MapP(nzp,nxp),MapP(nzp,nxp)) = 1;
-KP(MapP(end,nxp),MapP(nzp,nxp)) = 1;
-% RP(MapP(nzp,nxp),:) = 0;
+KP(np0,np0) = h^2./geomean(eta(:));
+% % DD(MapP(nzp,nxp),:) = 0;
+% KP(MapP(nzp,nxp),:) = 0;
+% KP(MapP(nzp,nxp),MapP(nzp,nxp)) = 1;
+% % KP(MapP(end,nxp),MapP(nzp,nxp)) = 1;
+% % RP(MapP(nzp,nxp),:) = 0;
+% KP = [KP,zeros(NP,1)];
+% KP = [KP;ones(1,NP)];
+% GG = [GG,zeros(NW+NU,1)];
+% DD = [DD;zeros(1,NW+NU)];
+% RP = [RP;0];
+% KP(end,1:end-1) = 1;
+% KP(1:end-1,end) = 1;
 
 if bnchm; RP(MapP(nzp,nxp),:) = P_mms(nzp,nxp); end
 
 if bnchm
-    % set U = 0 in fixed point
-    nzu = 1;
+    % fix P = P_mms in middle of domain
+    nzp = round((Nz+2)/2);
+    nxp = round((Nx+2)/2);
+    np0 = MapP(nzp,nxp);
+    DD(MapP(nzp,nxp),:) = 0;
+    KP(MapP(nzp,nxp),:) = 0;
+    KP(MapP(nzp,nxp),MapP(nzp,nxp)) = 1;
+    RP(MapP(nzp,nxp),:) = P_mms(nzp,nxp);
+    
+    % fix U = U_mms in middle of domain
+    nzu = round((Nz+2)/2);
     nxu = round((Nx+2)/2);
     KV(MapU(nzu,nxu),:) = 0;
     GG(MapU(nzu,nxu),:) = 0;
     KV(MapU(nzu,nxu),MapU(nzu  ,nxu)) = 1;
-    KV(MapU(nzu,nxu),MapU(nzu+1,nxu)) = 1;
-    RV(MapU(nzp,nxp),:) = 0;
+    RV(MapU(nzp,nxp),:) = U_mms(nzu,nxu);
 end
 
 %% assemble and scale global coefficient matrix and right-hand side vector
@@ -421,10 +437,10 @@ RR  = [RV; RP];
 SCL = (abs(diag(LL))).^0.5;
 SCL = diag(sparse( 1./(SCL + sqrt(h^2./geomean(eta(:)))) ));
 
-FF  = LL*[W(:);U(:);P(:)] - RR;
+% FF  = LL*[W(:);U(:);P(:)] - RR;
 
 LL  = SCL*LL*SCL;
-FF  = SCL*FF;
+% FF  = SCL*FF;
 RR  = SCL*RR;
 
 
