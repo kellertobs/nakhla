@@ -18,8 +18,45 @@ fprintf('*****  RUN NAKHLA MODEL | %s  *************\n',datetime('now'));
 fprintf('*************************************************************\n');
 fprintf('\n   run ID: %s \n\n',runID);
 
-load ocean;                  % load custom colormap
 run(['../cal/cal_',calID]);  % load melt model calibration
+
+% load and process custom colormaps
+switch colourmap
+    case 'ocean'
+        load ./colmap/ocean.mat
+        colmap = ocean;   
+    case 'batlow'
+        load ./colmap/batlow.mat 
+        colmap = batlow;
+    case 'batlowW'
+        load ./colmap/batlowW.mat
+        colmap = batlowW;
+    case 'batlowK'
+        load ./colmap/batlowK.mat
+        colmap = batlowK;
+    case 'lipari'
+        load ./colmap/lipari.mat
+        colmap = lipari;  
+    case 'glasgow'
+        load ./colmap/glasgow.mat;
+        colmap = glasgow; 
+    case 'navia'
+        load ./colmap/navia.mat;
+        colmap = navia;  
+    case 'lapaz'
+        load ./colmap/lapaz.mat;
+        colmap = lapaz;  
+    case 'lajolla'
+        load ./colmap/lajolla.mat;
+        colmap = lajolla;  
+end
+nclmp = length(colmap);
+
+colmapcmp = colmap(max(1,min(nclmp,1+round((1:nclmp)/(nclmp/(cal.ncmp-1)))*round(nclmp/(cal.ncmp-1)))),:);
+colmapoxd = colmap(max(1,min(nclmp,1+round((1:nclmp)/(nclmp/(cal.noxd-1)))*round(nclmp/(cal.noxd-1)))),:);
+colmapmem = colmap(max(1,min(nclmp,1+round((1:nclmp)/(nclmp/(cal.nmem-1)))*round(nclmp/(cal.nmem-1)))),:);
+colmapmsy = colmap(max(1,min(nclmp,1+round((1:nclmp)/(nclmp/(cal.nmsy-1)))*round(nclmp/(cal.nmsy-1)))),:);
+
 if periodic % periodic sides
     BCA     =  {'','periodic'};  % boundary condition on advection (top/bot, sides)
     BCD     =  {'','periodic'};  % boundary condition on advection (top/bot, sides)

@@ -153,6 +153,16 @@ for i=1:cal.noxd
     hist.c_oxd(stp,2,i) = mean(mean(c_oxd(:,:,i)));
     hist.c_oxd(stp,3,i) = max(max(c_oxd(:,:,i)));
 end
+for i=1:cal.nmem
+    hist.c_mem(stp,1,i) = min(min(c_mem(:,:,i)));
+    hist.c_mem(stp,2,i) = mean(mean(c_mem(:,:,i)));
+    hist.c_mem(stp,3,i) = max(max(c_mem(:,:,i)));
+end
+for i=1:cal.nmsy
+    hist.c_msy(stp,1,i) = min(min(c_msy(:,:,i)));
+    hist.c_msy(stp,2,i) = mean(mean(c_msy(:,:,i)));
+    hist.c_msy(stp,3,i) = max(max(c_msy(:,:,i)));
+end
 
 for i=1:cal.ncmp
     hist.cx(stp,1,i) = min(min(cx(:,:,i)));
@@ -163,6 +173,11 @@ for i=1:cal.noxd
     hist.cx_oxd(stp,1,i) = min(min(cx_oxd(:,:,i)));
     hist.cx_oxd(stp,2,i) = sum(sum(cx_oxd(:,:,i).*x.*rho))./sum(sum(x.*rho));
     hist.cx_oxd(stp,3,i) = max(max(cx_oxd(:,:,i)));
+end
+for i=1:cal.nmem
+    hist.cx_mem(stp,1,i) = min(min(cx_mem(:,:,i)));
+    hist.cx_mem(stp,2,i) = sum(sum(cx_mem(:,:,i).*x.*rho))./sum(sum(x.*rho));
+    hist.cx_mem(stp,3,i) = max(max(cx_mem(:,:,i)));
 end
 for i=1:cal.nmsy
     hist.cx_msy(stp,1,i) = min(min(cx_msy(:,:,i)));
@@ -183,6 +198,16 @@ for i=1:cal.noxd
     hist.cm_oxd(stp,1,i) = min(min(cm_oxd(:,:,i)));
     hist.cm_oxd(stp,2,i) = sum(sum(cm_oxd(:,:,i).*m.*rho))./sum(sum(m.*rho));
     hist.cm_oxd(stp,3,i) = max(max(cm_oxd(:,:,i)));
+end
+for i=1:cal.nmem
+    hist.cm_mem(stp,1,i) = min(min(cm_mem(:,:,i)));
+    hist.cm_mem(stp,2,i) = sum(sum(cm_mem(:,:,i).*m.*rho))./sum(sum(m.*rho));
+    hist.cm_mem(stp,3,i) = max(max(cm_mem(:,:,i)));
+end
+for i=1:cal.nmsy
+    hist.cm_msy(stp,1,i) = min(min(cm_msy(:,:,i)));
+    hist.cm_msy(stp,2,i) = sum(sum(cm_msy(:,:,i).*m.*rho))./sum(sum(m.*rho));
+    hist.cm_msy(stp,3,i) = max(max(cm_msy(:,:,i)));
 end
 
 hist.rhom(stp,1) = min(min(rhom));

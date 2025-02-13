@@ -15,6 +15,10 @@
 function [x, y] = terncoords(fA, fB, fC)
 if nargin < 3
     fC = 1 - (fA + fB);
+else
+    fA = fA./(fA + fB + fC);
+    fB = fB./(fA + fB + fC);
+    fC = fC./(fA + fB + fC);
 end
 
 y = fB*sin(deg2rad(60));

@@ -13,7 +13,7 @@ cal.ncmp   = 7;
 cal.oxdStr = {'SiO$_2$','TiO$_2$','Al$_2$O$_3$','FeO','MgO','CaO','Na$_2$O','H$_2$O'};
      elStr = {'Si','Ti','Al','Fe','Mg','Ca','Na','H'};
 cal.memStr = {'for','fay','ant','alb','dps','aug','ulv','mgt','qtz','wat'};
-cal.msyStr = {'olv','fsp','cpx','spn','qtz'};
+cal.msyStr = {'olv','plg','cpx','spn','qtz'};
 cal.cmpStr = {'dun','tro','ogb','fbs','tra','rhy','vol'};
 
 for i = 1:cal.ncmp; cal.(cal.cmpStr{i}) = i; end
@@ -45,7 +45,7 @@ cal.mem_oxd = cal.mem_oxd./sum(cal.mem_oxd,2)*100;
 % mineral end-members in mineral systems
 %              for fay ant alb dps aug qtz wat
 cal.msy_mem = [ 1   1   0   0   0   0   0   0   0   0    % olivine (olv) 
-                0   0   1   1   0   0   0   0   0   0    % feldspar (fsp)
+                0   0   1   1   0   0   0   0   0   0    % plagioclase (plg)
                 0   0   0   0   1   1   0   0   0   0    % clinopyroxene (cpx)
                 0   0   0   0   0   0   1   1   0   0    % spinel (spn)
                 0   0   0   0   0   0   0   0   1   0];  % quartz (qtz)
@@ -55,8 +55,8 @@ cal.msy_mem = [ 1   1   0   0   0   0   0   0   0   0    % olivine (olv)
 cal.cmp_mem = [ 95   5    0    0    0    0    0    0    0    0    % dunite (dun)
                  6   4   65   25    0    0    0    0    0    0    % troctolite (tro)
                  2   2   36    7   45    8    0    0    0    0    % olivine-gabbro (ogb)
-                 0  12   18   30    5   27    7    1    0    0    % ferro-basalt (fbs)
-                 0   0    6   85    0    4    2    3    0    0    % trachy-andesite (tra)
+                 1  11   18   30    5   27    7    1    0    0    % ferro-basalt (fbs)
+                 0   0    6   83    1    5    2    3    0    0    % trachy-andesite (tra)
                  0   0    1   48    0    0    0    2   49    0    % rhyolite (rhy)
                  0   0    0    0    0    0    0    0    0  100];  % volatile (vol)
 cal.cmp_mem = cal.cmp_mem./sum(cal.cmp_mem,2)*100;
