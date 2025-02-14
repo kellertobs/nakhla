@@ -5,7 +5,7 @@ clear; close all;
 run('./par_default')
 
 % set run parameters
-runID    =  '0D_DEMO_frcx5';           % run identifier
+runID    =  '0D_DEMO_frcx10';           % run identifier
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  50;                  % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot results
@@ -25,7 +25,7 @@ dt       =  18;                  % initial time step [s]
 dtmax    =  18;                  % maximum time step [s]
  
 % set initial thermo-chemical state
-T0       =  1315;                % temperature top  layer [deg C]
+T0       =  1310;                % temperature top  layer [deg C]
 T1       =  T0;                  % temperature base layer [deg C]
 c0       =  [11  17  36  32  1  3  0.5]/100;  % components (maj comp, H2O) top  layer [wt] (will be normalised to unit sum!)
 c1       =  c0;                  % components (maj comp, H2O) bot layer [wt] (will be normalised to unit sum!)
@@ -35,7 +35,7 @@ dcg      =  [0,0,0,0,0,0,0,0];
 % set thermo-chemical boundary parameters
 fractxtl =  1;                   % fractional crystallisation mode for 0-D (Nz=Nx=1)
 fractmlt =  0;                   % fractional melting mode for 0-D (Nz=Nx=1)
-fractres =  0.05;                 % residual fraction for fractionation mode
+fractres =  0.10;                 % residual fraction for fractionation mode
 dPdT     =  3.00e5;              % decompression rate for 0D models
 bndmode  =  1;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
 bnd_w    =  1e16;                % boundary layer width [m]

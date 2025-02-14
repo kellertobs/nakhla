@@ -61,7 +61,8 @@ if Nx <= 1 && Nz <= 1  % create 0D plots
     title('$\mu$, $\chi$, $\phi$ [vol\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
 
     subplot(3,1,3)
-    plot(hist.time/TimeScale,    hist.Gx(:,2)./hist.rho(:,2)*hr*100.*(hist.chi(:,2)>1e-9),CL{[1,4]},LW{:}); axis xy tight; box on; hold on;
+    plot(hist.time/TimeScale,    hist.Gm(:,2)./hist.rho(:,2)*hr*100.*(hist.mu (:,2)>1e-9),CL{[1,3]},LW{:}); axis xy tight; box on; hold on;
+    plot(hist.time/TimeScale,    hist.Gx(:,2)./hist.rho(:,2)*hr*100.*(hist.chi(:,2)>1e-9),CL{[1,4]},LW{:});
     plot(hist.time/TimeScale,10.*hist.Gf(:,2)./hist.rho(:,2)*hr*100.*(hist.phi(:,2)>1e-9),CL{[1,5]},LW{:});
     title('$10 \times \Gamma_f/\bar{\rho}$, $\Gamma_x/\bar{\rho}$ [wt \%/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     xlabel(['Time [',TimeUnits,']'],TX{:},FS{:});
@@ -143,7 +144,8 @@ elseif Nx <= 1  % create 1D plots
     plot(phi*100.*(phi>1e-9),Zsc.',CL{[1,5]},LW{:});
     title('$\mu$, $\chi$, $\phi$ [vol\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,4,3)
-    plot(    Gx./rho*100*hr.*(chi>1e-9),Zsc.',CL{[1,4]},LW{:}); axis ij tight; box on; hold on;
+    plot(    Gm./rho*100*hr.*(mu >1e-9),Zsc.',CL{[1,3]},LW{:}); axis ij tight; box on; hold on;
+    plot(    Gx./rho*100*hr.*(chi>1e-9),Zsc.',CL{[1,4]},LW{:});
     plot(10.*Gf./rho*100*hr.*(phi>1e-9),Zsc.',CL{[1,5]},LW{:});
     title(['$10 \times \Gamma_f/\bar{\rho}$, $\Gamma_x/\bar{\rho}$ [wt\%/hr]'],TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,4,4)
@@ -178,13 +180,13 @@ elseif Nx <= 1  % create 1D plots
     end 
     sgtitle(['time = ',num2str(time/TimeScale,3),' [',TimeUnits,']'],TX{:},FS{:},'Color','k');
     subplot(1,3,1)
-    imagesc(1:100,Nz,comp_plt(c)); axis ij tight; colormap(colmapcmp); clim([1,cal.ncmp]); cb = colorbar; set(cb,TL{:},TS{:},'Ticklabels',cal.cmpStr);
+    imagesc(1:100,Zsc.',comp_plt(c)); axis ij tight; colormap(colmapcmp); clim([1,cal.ncmp]); cb = colorbar; set(cb,TL{:},TS{:},'Ticklabels',cal.cmpStr);
     title('Bulk CMPs [wt\%]',TX{:},FS{:}); ylabel(['Depth [',SpaceUnits,']'],TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,3,2)
-    imagesc(1:100,Nz,comp_plt(cm)); axis ij tight; colormap(colmapcmp); clim([1,cal.ncmp]); cb = colorbar; set(cb,TL{:},TS{:},'Ticklabels',cal.cmpStr);
+    imagesc(1:100,Zsc.',comp_plt(cm)); axis ij tight; colormap(colmapcmp); clim([1,cal.ncmp]); cb = colorbar; set(cb,TL{:},TS{:},'Ticklabels',cal.cmpStr);
     title('Melt CMPs [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,3,3)
-    imagesc(1:100,Nz,comp_plt(cx)); axis ij tight; colormap(colmapcmp); clim([1,cal.ncmp]); cb = colorbar; set(cb,TL{:},TS{:},'Ticklabels',cal.cmpStr);
+    imagesc(1:100,Zsc.',comp_plt(cx)); axis ij tight; colormap(colmapcmp); clim([1,cal.ncmp]); cb = colorbar; set(cb,TL{:},TS{:},'Ticklabels',cal.cmpStr);
     title('Xtal CMPs [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     
     if ~exist('fh4','var'); fh4 = figure(VIS{:});
@@ -192,13 +194,13 @@ elseif Nx <= 1  % create 1D plots
     end
     sgtitle(['time = ',num2str(time/TimeScale,3),' [',TimeUnits,']'],TX{:},FS{:},'Color','k');
     subplot(1,3,1)
-    imagesc(1:100,Nz,comp_plt(c_oxd/100)); axis ij tight; colormap(colmapoxd); clim([1,cal.noxd]); cb = colorbar; set(cb,TL{:},TS{:},'Ticklabels',cal.oxdStr);
+    imagesc(1:100,Zsc.',comp_plt(c_oxd/100)); axis ij tight; colormap(colmapoxd); clim([1,cal.noxd]); cb = colorbar; set(cb,TL{:},TS{:},'Ticklabels',cal.oxdStr);
     title('Bulk OXDs [wt\%]',TX{:},FS{:}); ylabel(['Depth [',SpaceUnits,']'],TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,3,2)
-    imagesc(1:100,Nz,comp_plt(cm_oxd/100)); axis ij tight; colormap(colmapoxd); clim([1,cal.noxd]); cb = colorbar; set(cb,TL{:},TS{:},'Ticklabels',cal.oxdStr);
+    imagesc(1:100,Zsc.',comp_plt(cm_oxd/100)); axis ij tight; colormap(colmapoxd); clim([1,cal.noxd]); cb = colorbar; set(cb,TL{:},TS{:},'Ticklabels',cal.oxdStr);
     title('Melt OXDs [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,3,3)
-    imagesc(1:100,Nz,comp_plt(cx_oxd/100)); axis ij tight; colormap(colmapoxd); clim([1,cal.noxd]); cb = colorbar; set(cb,TL{:},TS{:},'Ticklabels',cal.oxdStr);
+    imagesc(1:100,Zsc.',comp_plt(cx_oxd/100)); axis ij tight; colormap(colmapoxd); clim([1,cal.noxd]); cb = colorbar; set(cb,TL{:},TS{:},'Ticklabels',cal.oxdStr);
     title('Xtal OXDs [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
 
     if ~exist('fh5','var'); fh5 = figure(VIS{:});
@@ -206,13 +208,13 @@ elseif Nx <= 1  % create 1D plots
     end
     sgtitle(['time = ',num2str(time/TimeScale,3),' [',TimeUnits,']'],TX{:},FS{:},'Color','k');
     subplot(1,3,1)
-    imagesc(1:100,Nz,comp_plt(c_mem/100)); axis ij tight; colormap(colmapmem); clim([1,cal.nmem]); cb = colorbar; set(cb,TL{:},TS{:},'Ticklabels',cal.memStr);
+    imagesc(1:100,Zsc.',comp_plt(c_mem/100)); axis ij tight; colormap(colmapmem); clim([1,cal.nmem]); cb = colorbar; set(cb,TL{:},TS{:},'Ticklabels',cal.memStr);
     title('Bulk MEMs [wt\%]',TX{:},FS{:}); ylabel(['Depth [',SpaceUnits,']'],TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,3,2)
-    imagesc(1:100,Nz,comp_plt(cm_mem/100)); axis ij tight; colormap(colmapmem); clim([1,cal.nmem]); cb = colorbar; set(cb,TL{:},TS{:},'Ticklabels',cal.memStr);
+    imagesc(1:100,Zsc.',comp_plt(cm_mem/100)); axis ij tight; colormap(colmapmem); clim([1,cal.nmem]); cb = colorbar; set(cb,TL{:},TS{:},'Ticklabels',cal.memStr);
     title('Melt MEMs [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,3,3)
-    imagesc(1:100,Nz,comp_plt(cx_mem/100)); axis ij tight; colormap(colmapmem); clim([1,cal.nmem]); cb = colorbar; set(cb,TL{:},TS{:},'Ticklabels',cal.memStr);
+    imagesc(1:100,Zsc.',comp_plt(cx_mem/100)); axis ij tight; colormap(colmapmem); clim([1,cal.nmem]); cb = colorbar; set(cb,TL{:},TS{:},'Ticklabels',cal.memStr);
     title('Xtal MEMs [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
 
 else % create 2D plots
@@ -642,13 +644,13 @@ if ~exist('fh14','var'); fh14 = figure(VIS{:});
 else; set(0, 'CurrentFigure', fh14);
 end
 if Nz>1 || step==0 || frst; clf;
-LBL1 = cal.msyStr(2); LBL2 = cal.msyStr(3); LBL3 = cal.msyStr(end); TRN; axis tight; box on; hold on;
+LBL1 = cal.msyStr(1); LBL2 = cal.msyStr(2); LBL3 = cal.msyStr(end); TRN; axis tight; box on; hold on;
 end
-[A,B] = terncoords(cx_msy(:,:,2)./sum(cx_msy(:,:,[2,3,end]),3),cx_msy(:,:,3)./sum(cx_msy(:,:,[2,3,end]),3),cx_msy(:,:,end)./sum(cx_msy(:,:,[2,3,end]),3));
+[A,B] = terncoords(cx_msy(:,:,1)./sum(cx_msy(:,:,[1,2,end]),3),cx_msy(:,:,2)./sum(cx_msy(:,:,[1,2,end]),3),cx_msy(:,:,end)./sum(cx_msy(:,:,[1,2,end]),3));
 scatter(A(:),B(:),120,T(:)-273.15,'filled','^','MarkerEdgeColor',CL{4},LW{1},1.5); colormap(colmap); cb = colorbar;
-[A,B] = terncoords(cm_msy(:,:,2)./sum(cm_msy(:,:,[2,3,end]),3),cm_msy(:,:,3)./sum(cm_msy(:,:,[2,3,end]),3),cm_msy(:,:,end)./sum(cm_msy(:,:,[2,3,end]),3));
+[A,B] = terncoords(cm_msy(:,:,1)./sum(cm_msy(:,:,[1,2,end]),3),cm_msy(:,:,2)./sum(cm_msy(:,:,[1,2,end]),3),cm_msy(:,:,end)./sum(cm_msy(:,:,[1,2,end]),3));
 scatter(A(:),B(:),120,T(:)-273.15,'filled','o','MarkerEdgeColor',CL{3},LW{1},1.5); colormap(colmap);
-[A,B] = terncoords( c_msy(:,:,2)./sum( c_msy(:,:,[2,3,end]),3), c_msy(:,:,3)./sum( c_msy(:,:,[2,3,end]),3), c_msy(:,:,end)./sum( c_msy(:,:,[2,3,end]),3));
+[A,B] = terncoords( c_msy(:,:,1)./sum( c_msy(:,:,[1,2,end]),3), c_msy(:,:,2)./sum( c_msy(:,:,[1,2,end]),3), c_msy(:,:,end)./sum( c_msy(:,:,[1,2,end]),3));
 scatter(A(:),B(:),120,T(:)-273.15,'filled','s','MarkerEdgeColor',CL{2},LW{1},1.5); colormap(colmap);
 set(cb,TL{:},'FontSize',12); set(gca,TL{:},'FontSize',15); xlabel('SiO$_2$ [wt \%]',TX{:},'FontSize',15); ylabel('Na$_2$O + K$_2$O [wt \%]',TX{:},'FontSize',15);
 
