@@ -24,7 +24,7 @@ tend      =  1*yr;                % end time for simulation [s]
 dt        =  1;                  % initial time step [s]
 
 % set initial thermo-chemical state
-T0        =  1215;                % temperature top  layer [deg C]
+T0        =  1220;                % temperature top  layer [deg C]
 T1        =  T0;                  % temperature base layer [deg C]
 c0        =  [11  17  36  32  1  3  0.5]/100;  % components (maj comp, H2O) top  layer [wt] (will be normalised to unit sum!)
 c1        =  c0;                  % components (maj comp, H2O) base layer [wt] (will be normalised to unit sum!)

@@ -43,6 +43,16 @@ Xsc = Xc./SpaceScale;
 Zsc = Zc./SpaceScale;
 Zsf = Zf./SpaceScale;
 
+% set axis and border dimensions
+if Nx>1
+    axh = 6.00*sqrt(D/L); axw = 6.00*sqrt(L/D)+1.50;
+else
+    axh = 6.0; axw = 6.0;
+end
+ahs = 0.60; avs = 0.80;
+axb = 1.20; axt = 1.50;
+axl = 1.50; axr = 0.50;
+
 if Nx <= 1 && Nz <= 1  % create 0D plots
 
     if ~exist('fh1','var'); fh1 = figure(VIS{:});
@@ -218,12 +228,6 @@ elseif Nx <= 1  % create 1D plots
     title('Xtal MEMs [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
 
 else % create 2D plots
-
-    % set axis and border dimensions
-    axh = 6.00*sqrt(D/L); axw = 6.00*sqrt(L/D)+1.50;
-    ahs = 0.60; avs = 0.80;
-    axb = 1.20; axt = 1.50;
-    axl = 1.50; axr = 0.50;
 
     % initialize figures and axes
     if ~exist('fh1','var'); fh1 = figure(VIS{:});
@@ -622,38 +626,64 @@ scatter(A(:),B(:),120,T(:)-273.15,'filled','o','MarkerEdgeColor',CL{3},LW{1},1.5
                    c_oxd_all(:,:, 4      )./(sum(c_oxd_all(:,:,[5,4,7,8]),3)), ...
                sum(c_oxd_all(:,:,[7,8]),3)./(sum(c_oxd_all(:,:,[5,4,7,8]),3)));
 scatter(A(:),B(:),120,T(:)-273.15,'filled','s','MarkerEdgeColor',CL{2},LW{1},1.5); colormap(colmap);
-set(cb,TL{:},'FontSize',12); set(gca,TL{:},'FontSize',15); xlabel('SiO$_2$ [wt \%]',TX{:},'FontSize',15); ylabel('Na$_2$O + K$_2$O [wt \%]',TX{:},'FontSize',15);
+set(cb,TL{:},'FontSize',12); set(gca,TL{:},'FontSize',15);
 
 
 if ~exist('fh13','var'); fh13 = figure(VIS{:});
+    colormap(colmap);
+    fh = axb + 1.5*axh + 0*avs + axt;
+    fw = 0.5 + 4.5*axw + 2*ahs + 0.5;
+    set(fh13,UN{:},'Position',[15 15 fw fh]);
+    set(fh13,'PaperUnits','Centimeters','PaperPosition',[0 0 fw fh],'PaperSize',[fw fh]);
+    set(fh13,'Color','w','InvertHardcopy','off','Resize','off');
 else; set(0, 'CurrentFigure', fh13);
 end
+
 if Nz>1 || step==0 || frst; clf;
-LBL1 = cal.msyStr(1); LBL2 = cal.msyStr(2); LBL3 = cal.msyStr(3); TRN; axis tight; box on; hold on;
+LBL1 = cal.msyStr(cal.imsy(1)); 
+LBL2 = cal.msyStr(cal.imsy(2)); 
+LBL3 = cal.msyStr(cal.imsy(3));  
+LBL4 = cal.msyStr(cal.imsy(4));
+BTH;
 end
-[A,B] = terncoords(cx_msy(:,:,1)./sum(cx_msy(:,:,[1,2,3]),3),cx_msy(:,:,2)./sum(cx_msy(:,:,[1,2,3]),3),cx_msy(:,:,3)./sum(cx_msy(:,:,[1,2,3]),3));
-scatter(A(:),B(:),120,T(:)-273.15,'filled','^','MarkerEdgeColor',CL{4},LW{1},1.5); colormap(colmap); cb = colorbar;
-[A,B] = terncoords(cm_msy(:,:,1)./sum(cm_msy(:,:,[1,2,3]),3),cm_msy(:,:,2)./sum(cm_msy(:,:,[1,2,3]),3),cm_msy(:,:,3)./sum(cm_msy(:,:,[1,2,3]),3));
-scatter(A(:),B(:),120,T(:)-273.15,'filled','o','MarkerEdgeColor',CL{3},LW{1},1.5); colormap(colmap);
-[A,B] = terncoords( c_msy(:,:,1)./sum( c_msy(:,:,[1,2,3]),3), c_msy(:,:,2)./sum( c_msy(:,:,[1,2,3]),3), c_msy(:,:,3)./sum( c_msy(:,:,[1,2,3]),3));
-scatter(A(:),B(:),120,T(:)-273.15,'filled','s','MarkerEdgeColor',CL{2},LW{1},1.5); colormap(colmap);
-set(cb,TL{:},'FontSize',12); set(gca,TL{:},'FontSize',15); xlabel('SiO$_2$ [wt \%]',TX{:},'FontSize',15); ylabel('Na$_2$O + K$_2$O [wt \%]',TX{:},'FontSize',15);
 
+% middle tetrahedron (olv plg cpx)
+sumABC = sum(cx_msy(:,:,cal.imsy([1,2,3])),3);
+[A,B] = terncoords(cx_msy(:,:,cal.imsy(1))./sumABC,cx_msy(:,:,cal.imsy(2))./sumABC,cx_msy(:,:,cal.imsy(3))./sumABC);
+scatter(A(:),sin60-B(:),120,T(:)-273.15,'filled','^','MarkerEdgeColor',CL{4},LW{1},1.5); colormap(colmap);
+sumABC = sum(cm_msy(:,:,cal.imsy([1,2,3])),3);
+[A,B] = terncoords(cm_msy(:,:,cal.imsy(1))./sumABC,cm_msy(:,:,cal.imsy(2))./sumABC,cm_msy(:,:,cal.imsy(3))./sumABC);
+scatter(A(:),sin60-B(:),120,T(:)-273.15,'filled','o','MarkerEdgeColor',CL{3},LW{1},1.5); colormap(colmap);
+sumABC = sum( c_msy(:,:,cal.imsy([1,2,3])),3);
+[A,B] = terncoords( c_msy(:,:,cal.imsy(1))./sumABC, c_msy(:,:,cal.imsy(2))./sumABC, c_msy(:,:,cal.imsy(3))./sumABC);
+scatter(A(:),sin60-B(:),120,T(:)-273.15,'filled','s','MarkerEdgeColor',CL{2},LW{1},1.5); colormap(colmap);
 
-if ~exist('fh14','var'); fh14 = figure(VIS{:});
-else; set(0, 'CurrentFigure', fh14);
+% left tetrahedron
+sumABC = sum(cx_msy(:,:,cal.imsy([2,3,4])),3);
+[A,B] = terncoords(cx_msy(:,:,cal.imsy(2))./sumABC,cx_msy(:,:,cal.imsy(3))./sumABC,cx_msy(:,:,cal.imsy(4))./sumABC);
+scatter(A(:)-0.65,B(:),120,T(:)-273.15,'filled','^','MarkerEdgeColor',CL{4},LW{1},1.5); colormap(colmap);
+sumABC = sum(cm_msy(:,:,cal.imsy([2,3,4])),3);
+[A,B] = terncoords(cm_msy(:,:,cal.imsy(2))./sumABC,cm_msy(:,:,cal.imsy(3))./sumABC,cm_msy(:,:,cal.imsy(4))./sumABC);
+scatter(A(:)-0.65,B(:),120,T(:)-273.15,'filled','o','MarkerEdgeColor',CL{3},LW{1},1.5); colormap(colmap);
+sumABC = sum( c_msy(:,:,cal.imsy([2,3,4])),3);
+[A,B] = terncoords( c_msy(:,:,cal.imsy(2))./sumABC, c_msy(:,:,cal.imsy(3))./sumABC, c_msy(:,:,cal.imsy(4))./sumABC);
+scatter(A(:)-0.65,B(:),120,T(:)-273.15,'filled','s','MarkerEdgeColor',CL{2},LW{1},1.5); colormap(colmap);
+
+sumABC = sum(cx_msy(:,:,cal.imsy([4,1,2])),3);
+[A,B] = terncoords(cx_msy(:,:,cal.imsy(4))./sumABC,cx_msy(:,:,cal.imsy(1))./sumABC,cx_msy(:,:,cal.imsy(2))./sumABC);
+scatter(A(:)+0.65,B(:),120,T(:)-273.15,'filled','^','MarkerEdgeColor',CL{4},LW{1},1.5); colormap(colmap);
+sumABC = sum(cm_msy(:,:,cal.imsy([4,1,2])),3);
+[A,B] = terncoords(cm_msy(:,:,cal.imsy(4))./sumABC,cm_msy(:,:,cal.imsy(1))./sumABC,cm_msy(:,:,cal.imsy(2))./sumABC);
+scatter(A(:)+0.65,B(:),120,T(:)-273.15,'filled','o','MarkerEdgeColor',CL{3},LW{1},1.5); colormap(colmap);
+sumABC = sum( c_msy(:,:,cal.imsy([4,1,2])),3);
+[A,B] = terncoords( c_msy(:,:,cal.imsy(4))./sumABC, c_msy(:,:,cal.imsy(1))./sumABC, c_msy(:,:,cal.imsy(2))./sumABC);
+scatter(A(:)+0.65,B(:),120,T(:)-273.15,'filled','s','MarkerEdgeColor',CL{2},LW{1},1.5); colormap(colmap); 
+
+if Nz>1 || step==0 || frst
+    cb = colorbar;
+    set(cb,'Location','westoutside',TL{:},'FontSize',12); 
+    text(-0.77,0.88,'T [$^\circ$C]','FontSize',16,TX{:},'HorizontalAlignment','left','VerticalAlignment','bottom');
 end
-if Nz>1 || step==0 || frst; clf;
-LBL1 = cal.msyStr(1); LBL2 = cal.msyStr(2); LBL3 = cal.msyStr(end); TRN; axis tight; box on; hold on;
-end
-[A,B] = terncoords(cx_msy(:,:,1)./sum(cx_msy(:,:,[1,2,end]),3),cx_msy(:,:,2)./sum(cx_msy(:,:,[1,2,end]),3),cx_msy(:,:,end)./sum(cx_msy(:,:,[1,2,end]),3));
-scatter(A(:),B(:),120,T(:)-273.15,'filled','^','MarkerEdgeColor',CL{4},LW{1},1.5); colormap(colmap); cb = colorbar;
-[A,B] = terncoords(cm_msy(:,:,1)./sum(cm_msy(:,:,[1,2,end]),3),cm_msy(:,:,2)./sum(cm_msy(:,:,[1,2,end]),3),cm_msy(:,:,end)./sum(cm_msy(:,:,[1,2,end]),3));
-scatter(A(:),B(:),120,T(:)-273.15,'filled','o','MarkerEdgeColor',CL{3},LW{1},1.5); colormap(colmap);
-[A,B] = terncoords( c_msy(:,:,1)./sum( c_msy(:,:,[1,2,end]),3), c_msy(:,:,2)./sum( c_msy(:,:,[1,2,end]),3), c_msy(:,:,end)./sum( c_msy(:,:,[1,2,end]),3));
-scatter(A(:),B(:),120,T(:)-273.15,'filled','s','MarkerEdgeColor',CL{2},LW{1},1.5); colormap(colmap);
-set(cb,TL{:},'FontSize',12); set(gca,TL{:},'FontSize',15); xlabel('SiO$_2$ [wt \%]',TX{:},'FontSize',15); ylabel('Na$_2$O + K$_2$O [wt \%]',TX{:},'FontSize',15);
-
 
 % plot model history
 if plot_cv
@@ -736,10 +766,8 @@ if save_op && ~restart
     print(fh11,name,'-dpng','-r300','-image');
     name = [outdir,'/',runID,'/',runID,'_AFM',num2str(floor(step/nop))];
     print(fh12,name,'-dpng','-r300','-image');
-    name = [outdir,'/',runID,'/',runID,'_TRN1',num2str(floor(step/nop))];
+    name = [outdir,'/',runID,'/',runID,'_BTH',num2str(floor(step/nop))];
     print(fh13,name,'-dpng','-r300','-image');
-    name = [outdir,'/',runID,'/',runID,'_TRN2',num2str(floor(step/nop))];
-    print(fh14,name,'-dpng','-r300','-image');
 
     name = [outdir,'/',runID,'/',runID,'_',num2str(floor(step/nop))];
     save(name,'U','W','P','Pt','Pchmb','f','x','m','fq','xq','mq','phi','chi','mu','X','F','M','S','C','T','Tp','c','cm','cx','cf','TRC','trc','dSdt','dCdt','dFdt','dXdt','dMdt','drhodt','dTRCdt','Gf','Gx','Gm','rho','eta','eII','tII','dt','time','step','VolSrc','wf','wx','wm','cal');

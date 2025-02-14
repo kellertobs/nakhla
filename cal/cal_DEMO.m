@@ -22,7 +22,10 @@ for i = 1:cal.nmem; cal.(cal.memStr{i}) = i; end
 for i = 1:cal.noxd; cal.(elStr{i}) = i; end
 
 %           SiO2 TiO2 Al2O3 FeO MgO CaO Na2O K2O H2O
-cal.ioxd = [   1   2    3    4   5   6   7        9]; % oxdie indices for viscosity, density functions
+cal.ioxd = [   1   2    3    4   5   6   7        9]; % oxide indices for viscosity, density functions
+
+%           plg  olv  cpx  qtz
+cal.imsy = [ 2    1    3    5];  % mineral system indices for plotting basalt tetrahedron
 
 % oxide composition of mineral end-members
 %                SiO2 TiO2 Al2O3 FeO  MgO  CaO Na2O  H2O
@@ -56,7 +59,7 @@ cal.cmp_mem = [ 95   5    0    0    0    0    0    0    0    0    % dunite (dun)
                  6   4   65   25    0    0    0    0    0    0    % troctolite (tro)
                  2   2   36    7   45    8    0    0    0    0    % olivine-gabbro (ogb)
                  1  11   18   30    5   27    7    1    0    0    % ferro-basalt (fbs)
-                 0   0    6   83    1    5    2    3    0    0    % trachy-andesite (tra)
+                 0   0    6   81    1    5    2    3    2    0    % trachy-andesite (tra)
                  0   0    1   48    0    0    0    2   49    0    % rhyolite (rhy)
                  0   0    0    0    0    0    0    0    0  100];  % volatile (vol)
 cal.cmp_mem = cal.cmp_mem./sum(cal.cmp_mem,2)*100;
@@ -84,7 +87,7 @@ cal.A   = [7.0  5.0  4.0  3.0  2.5  2.0];
 cal.B   = [7.0  5.0  4.0  3.0  2.5  2.0];
 
 % set coeff. for T-dependence of partition coefficients K^i [1/K]
-cal.r   = [40  5  5  9  8  4];
+cal.r   = [40  5  6  9  8  5];
 
 % set entropy gain of fusion and evaporation DeltaS [J/K]
 cal.Dsx  = 350;

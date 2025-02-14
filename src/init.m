@@ -1,5 +1,4 @@
-% set directory paths
-addpath('./ternplot');
+%% *****  MODEL INITIALISATION  *******************************************
 
 % create output directory
 if ~isfolder([outdir,'/',runID])

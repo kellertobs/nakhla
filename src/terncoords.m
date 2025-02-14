@@ -8,17 +8,19 @@
 
 % Author: Carl Sandrock 20050211
 
-% Modifications
-
-% Modifiers
+% Modified: Tobias Keller 20250214
 
 function [x, y] = terncoords(fA, fB, fC)
-if nargin < 3
+
+if nargin < 3 && any(fA+fB>1)
+    error('Invalid data input: normalise end-member fractions to unit sum or provide all three end-members!');
+elseif nargin < 3
     fC = 1 - (fA + fB);
 else
-    fA = fA./(fA + fB + fC);
-    fB = fB./(fA + fB + fC);
-    fC = fC./(fA + fB + fC);
+    sumf = (fA + fB + fC);
+    fA = fA./sumf;
+    fB = fB./sumf;
+    fC = fC./sumf;
 end
 
 y = fB*sin(deg2rad(60));
