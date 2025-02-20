@@ -115,6 +115,18 @@ Ksgr_f = squeeze(Ksgr(3,:,:)) + eps^2; if Nx==1; Ksgr_f = Ksgr_f.'; end
 
 if ~calibrt % skip the following if called from calibration script
 
+% update velocity divergence
+Div_V = ddz(W(:,2:end-1),h) + ddx(U(2:end-1,:),h);                         % get velocity divergence
+
+% update strain rates
+exx = diff(U(2:end-1,:),1,2)./h - Div_V./3;                                % x-normal strain rate
+ezz = diff(W(:,2:end-1),1,1)./h - Div_V./3;                                % z-normal strain rate
+exz = 1/2.*(diff(U,1,1)./h+diff(W,1,2)./h);                                % shear strain rate
+
+eII = (0.5.*(exx.^2 + ezz.^2 ...
+       + 2.*(exz(1:end-1,1:end-1).^2+exz(2:end,1:end-1).^2 ...
+       +     exz(1:end-1,2:end  ).^2+exz(2:end,2:end  ).^2)/4)).^0.5 + eps;
+
 % extract non-P-dependent density
 rhom_nP = rhom0 .* (1 - aTm.*(Tp-Tref));
 rhox_nP = rhox0 .* (1 - aTx.*(Tp-Tref));
@@ -122,39 +134,40 @@ rhof_nP = rhof0 .* (1 - aTf.*(Tp-Tref));
 
 rho_nP  = 1./(m./rhom_nP + x./rhox_nP + f./rhof_nP);
 
-% detect convection layers
-if Nz>1
-drhoz    = gradient(mean(rho_nP,2));
-[~,zpks] = findpeaks(drhoz,'MinPeakHeight',10,'MinPeakProminence',1);
-ncl = length(zpks)+1;
-zcl = zeros(1,ncl+1);
-
-zt = max(ZZ(eta>=etamax/10 & ZZ<D/2));
-if isempty(zt); zcl(1) = 0; else; zcl(1) = zt; end
-for iz = 1:ncl-1
-    if zpks(iz)>5 && zpks(iz)<Nz-5
-        zcl(iz+1) = zpks(iz)*h+h/2;
-    else
-        zcl(iz+1) = [];
-        ncl = ncl-1;
-    end
-end
-zb = min(ZZ(eta>=etamax/10 & ZZ>zcl(end-1) ));
-if isempty(zb); zcl(end) = D; else; zcl(end) = zb; end
-
-% limit correlation length for convective mixing to distance from layer
-% and domain boundaries
-Delta_cnv =zeros(Nz,1);
-for iz = 1:ncl
-    Delta_cnv = Delta_cnv + max(0,min(Delta_cnv0,min(ZZ-zcl(iz),zcl(iz+1)-ZZ)));
-end
-ind0 = Delta_cnv==0;
-for i=1:10
-    Delta_cnv = Delta_cnv + diffus(Delta_cnv,1/8*ones(size(Delta_cnv)),1,[1,2],BCD);
-    % Delta_cnv(ind0) = 0;
-    Delta_cnv([1 end]) = [h/2,h/2];
-end
-end
+% % detect convection layers
+% if Nz>1
+%     drhoz    = gradient(mean(rho_nP,2));
+%     [~,zpks] = findpeaks(drhoz,'MinPeakHeight',2,'MinPeakProminence',1);
+%     islocalmax(drhoz,1,'MinProminence',0.1,'MinSeparation',Delta_cnv0)
+%     ncl = length(zpks)+1;
+%     zcl = zeros(1,ncl+1);
+% 
+%     zt = max(ZZ(eta>=etamax/10 & ZZ<D/2));
+%     if isempty(zt); zcl(1) = 0; else; zcl(1) = zt; end
+%     for iz = 1:ncl-1
+%         if zpks(iz)>5 && zpks(iz)<Nz-5
+%             zcl(iz+1) = zpks(iz)*h+h/2;
+%         else
+%             zcl(iz+1) = [];
+%             ncl = ncl-1;
+%         end
+%     end
+%     zb = min(ZZ(eta>=etamax/10 & ZZ>zcl(end-1) ));
+%     if isempty(zb); zcl(end) = D; else; zcl(end) = zb; end
+% 
+%     % limit correlation length for convective mixing to distance from layer
+%     % and domain boundaries
+%     Delta_cnv =zeros(Nz,1);
+%     for iz = 1:ncl
+%         Delta_cnv = Delta_cnv + max(0,min(Delta_cnv0,min(ZZ-zcl(iz),zcl(iz+1)-ZZ)));
+%     end
+%     % ind0 = Delta_cnv==0;
+%     for i=1:10
+%         Delta_cnv = Delta_cnv + diffus(Delta_cnv,1/8*ones(size(Delta_cnv)),1,[1,2],BCD);
+%         % Delta_cnv(ind0) = 0;
+%         Delta_cnv([1 end],:) = [h/2;h/2].*ones(1,Nx);
+%     end
+% end
 
 % update velocity magnitude
 if Nx==1 && Nz==1; Vel = 0;
@@ -170,18 +183,6 @@ else
     Vel = sqrt(((W(1:end-1,2:end-1)+W(2:end,2:end-1))/2).^2 ...
              + ((U(2:end-1,1:end-1)+U(2:end-1,2:end))/2).^2);
 end
-
-% update velocity divergence
-Div_V = ddz(W(:,2:end-1),h) + ddx(U(2:end-1,:),h);                         % get velocity divergence
-
-% update strain rates
-exx = diff(U(2:end-1,:),1,2)./h - Div_V./3;                                % x-normal strain rate
-ezz = diff(W(:,2:end-1),1,1)./h - Div_V./3;                                % z-normal strain rate
-exz = 1/2.*(diff(U,1,1)./h+diff(W,1,2)./h);                                % shear strain rate
-
-eII = (0.5.*(exx.^2 + ezz.^2 ...
-       + 2.*(exz(1:end-1,1:end-1).^2+exz(2:end,1:end-1).^2 ...
-       +     exz(1:end-1,2:end  ).^2+exz(2:end,2:end  ).^2)/4)).^0.5 + eps;
 
 % update diffusion parameters
 if Nx==1 && Nz==1; kW = 0; Pr = Prt; Sc = Sct;

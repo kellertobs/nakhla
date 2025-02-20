@@ -34,6 +34,7 @@ upd_S = - alpha*res_S*dt/a1 + beta*upd_S;
 S     = S + upd_S;
 
 % update phase entropies
+s  = S./RHO;
 si = sm;
 sm = (S - X.*Dsx - F.*Dsf)./RHO;
 sx = sm + Dsx;
@@ -158,47 +159,41 @@ hasx = x >= eps^0.5;
 hasf = f >= eps^0.5;
 hasm = m >= eps^0.5;
 
-% update major component phase composition
-Kx      = reshape(cal.Kx,Nz,Nx,cal.ncmp);
-Kf      = reshape(cal.Kf,Nz,Nx,cal.ncmp);
+% identify subsolidus and superliquidus regions
 subsol  = m<=1e-9 & T<=reshape(cal.Tsol+273.15,Nz,Nx);
 supliq  = x<=1e-9 & T>=reshape(cal.Tliq+273.15,Nz,Nx);
 subsolc = repmat(subsol,1,1,cal.ncmp);
 supliqc = repmat(supliq,1,1,cal.ncmp);
-rnorm   = 1;  tol  = atol*10;
-it      = 1;  mxit = 100;
-upd_cm  = 0.*cm;  upd_cx = 0.*cx;
+
+% update major component phase composition
+rnorm   = 1;  tol  = sqrt(eps);
+it      = 1;  mxit = 50;
 cm = cmq;  cx = cxq;
 while rnorm>tol && it<mxit
 
     Kx = cx./(cm+eps);
     Kf = cf./(cm+eps);
 
-    cmK = c    ./(m + x.*Kx + f.*Kf + eps);
-    cxK = c.*Kx./(m + x.*Kx + f.*Kf + eps);
+    cm = c    ./(m + x.*Kx + f.*Kf + eps);
+    cx = c.*Kx./(m + x.*Kx + f.*Kf + eps);
 
-    res_cm = cm - cmK./sum(cmK,3);
-    res_cx = cx - cxK./sum(cxK,3);
-
-    upd_cm = - 0.95.*res_cm + 0.25.*upd_cm;
-    upd_cx = - 0.95.*res_cx + 0.25.*upd_cx;
-
-    cm = max(0,cm + upd_cm);
-    cx = max(0,cx + upd_cx);
+    cm = cm./sum(cm,3);
+    cx = cx./sum(cx,3);
 
     r = x.*cx + m.*cm + f.*cf - c;
     r(subsolc) = 0; r(supliqc) = 0;
+
     rnorm = norm(r(:))./norm(c(:));
     it  = it+1;
-end
-
-if (it==mxit && rnorm>tol)
-    disp(['!!! Lever rule adjustment not converged after ',num2str(mxit),' iterations !!!']);
 end
 
 % fix subsolidus and superliquidus conditions
 cx(subsolc) = cxq(subsolc); x(subsol) = xq(subsol); f(subsol) = fq(subsol); m(subsol) = 0;
 cm(supliqc) = cmq(supliqc); m(supliq) = mq(supliq); f(supliq) = fq(supliq); x(supliq) = 0;
+
+% if (it==mxit && rnorm>tol)
+%     disp(['!!! Lever rule adjustment converged to ',num2str(rnorm),' after ',num2str(mxit),' iterations !!!']);
+% end
 
 % record timing
 TCtime = TCtime + toc - eqtime;

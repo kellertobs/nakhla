@@ -9,7 +9,7 @@ drhodt  = advn_rho;% + (RHO-rho)/dt;
 res_rho = (a1*rho-a2*rhoo-a3*rhooo)/dt - (b1*drhodt + b2*drhodto + b3*drhodtoo);
 
 % volume source and background velocity passed to fluid-mechanics solver
-upd_rho = - alpha*res_rho./b1./rho; % + beta*upd_rho;
+upd_rho = - res_rho./b1./rho; % + beta*upd_rho;
 VolSrc  = VolSrc + upd_rho;  % correct volume source term by scaled residual
 
 UBG     = - 0*mean(VolSrc,'all')./2 .* (L/2-XXu);
@@ -260,7 +260,6 @@ if ~exist('GG','var') || bnchm
     JJL = [];       % variable indeces into A
     AAL = [];       % coefficients for A
     
-    
     % coefficients for z-gradient
     ii  = MapW(2:end-1,2:end-1);
     
@@ -270,7 +269,6 @@ if ~exist('GG','var') || bnchm
     aa  = zeros(size(ii));
     IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; aa(:)-1/h];     % one to the top
     IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL; aa(:)+1/h];     % one to the bottom
-    
     
     % coefficients for x-gradient
     if periodic
@@ -288,7 +286,6 @@ if ~exist('GG','var') || bnchm
     aa  = zeros(size(ii));
     IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; aa(:)-1/h];     % one to the left
     IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL; aa(:)+1/h];     % one to the right
-    
     
     % assemble coefficient matrix
     GG  = sparse(IIL,JJL,AAL,NW+NU,NP);
@@ -392,19 +389,9 @@ RP  = sparse(IIR,ones(size(IIR)),AAR,NP,1);
 nzp = round((Nz+2)/2);
 nxp = round((Nx+2)/2);
 np0 = MapP(nzp,nxp);
-KP(np0,np0) = h^2./geomean(eta(:));
-% % DD(MapP(nzp,nxp),:) = 0;
-% KP(MapP(nzp,nxp),:) = 0;
-% KP(MapP(nzp,nxp),MapP(nzp,nxp)) = 1;
-% % KP(MapP(end,nxp),MapP(nzp,nxp)) = 1;
-% % RP(MapP(nzp,nxp),:) = 0;
-% KP = [KP,zeros(NP,1)];
-% KP = [KP;ones(1,NP)];
-% GG = [GG,zeros(NW+NU,1)];
-% DD = [DD;zeros(1,NW+NU)];
-% RP = [RP;0];
-% KP(end,1:end-1) = 1;
-% KP(1:end-1,end) = 1;
+KP(np0,np0) = 1;
+DD(np0,:  ) = 0;
+RP(np0)     = 0;
 
 if bnchm; RP(MapP(nzp,nxp),:) = P_mms(nzp,nxp); end
 
@@ -435,7 +422,7 @@ LL  = [ KV   GG  ; ...
 RR  = [RV; RP];
 
 SCL = (abs(diag(LL))).^0.5;
-SCL = diag(sparse( 1./(SCL + sqrt(h^2./geomean(eta(:)))) ));
+SCL = diag(sparse( 1./(SCL + 1e-3.*sqrt(h^2./geomean(eta(:)))) ));
 
 % FF  = LL*[W(:);U(:);P(:)] - RR;
 

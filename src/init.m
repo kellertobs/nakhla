@@ -57,17 +57,15 @@ colmapmem = colmap(max(1,min(nclmp,1+round((1:nclmp)/(nclmp/(cal.nmem-1)))*round
 colmapmsy = colmap(max(1,min(nclmp,1+round((1:nclmp)/(nclmp/(cal.nmsy-1)))*round(nclmp/(cal.nmsy-1)))),:);
 
 if periodic % periodic sides
-    BCA     =  {'','periodic'};  % boundary condition on advection (top/bot, sides)
-    BCD     =  {'','periodic'};  % boundary condition on advection (top/bot, sides)
+    BCA     =  {'closed','periodic'};  % boundary condition on advection (top/bot, sides)
+    BCD     =  {'closed','periodic'};  % boundary condition on advection (top/bot, sides)
 else % closed sides
-    BCA     =  {'',''};  % boundary condition on advection (top/bot, sides)
-    BCD     =  {'',''};  % boundary condition on advection (top/bot, sides) 
+    BCA     =  {'closed','closed'};  % boundary condition on advection (top/bot, sides)
+    BCD     =  {'closed','closed'};  % boundary condition on advection (top/bot, sides) 
 end
 
 Dsx = -cal.Dsx;
 Dsf =  cal.Dsf;
-
-Delta_cnv0 = Delta_cnv;
 
 % normalise major components to anhydrous unit sum, rescale to hydrous
 c0(1:end-1) = c0(1:end-1)./sum(c0(1:end-1)).*(1-c0(end));
@@ -95,7 +93,7 @@ rng(seed);
 smth = smth*Nx*Nz*1e-4;
 rp   = randn(Nz,Nx);
 for i = 1:round(smth)
-    rp = rp + diffus(rp,1/8*ones(size(rp)),1,[1,2],{[0,0],BCD(2)});
+    rp = rp + diffus(rp,1/8*ones(size(rp)),1,[1,2],{[0,0],BCD{2}});
     rp = rp - mean(mean(rp));
 end
 rp = rp./max(abs(rp(:)));
@@ -146,20 +144,20 @@ if ~any(bnd_h)
     switch bndmode
         case 0  % none
         case 1  % top only
-            topshape = exp( ( -ZZ)/bnd_w);
+            topshape = exp( ( -ZZ)/max(h,bnd_w));
         case 2  % bot only
-            botshape = exp(-(D-ZZ)/bnd_w);
+            botshape = exp(-(D-ZZ)/max(h,bnd_w));
         case 3  % top/bot only
-            topshape = exp( ( -ZZ)/bnd_w);
-            botshape = exp(-(D-ZZ)/bnd_w);
+            topshape = exp( ( -ZZ)/max(h,bnd_w));
+            botshape = exp(-(D-ZZ)/max(h,bnd_w));
         case 4 % all walls
-            topshape = exp( ( -ZZ)/bnd_w);
-            botshape = exp(-(D-ZZ)/bnd_w);
-            sdsshape = exp( ( -XX)/bnd_w) ...
-                     + exp(-(L-XX)/bnd_w);
+            topshape = exp( ( -ZZ)/max(h,bnd_w));
+            botshape = exp(-(D-ZZ)/max(h,bnd_w));
+            sdsshape = exp( ( -XX)/max(h,bnd_w)) ...
+                     + exp(-(L-XX)/max(h,bnd_w));
         case 5 % only walls
-            sdsshape = exp( ( -XX)/bnd_w) ...
-                     + exp(-(L-XX)/bnd_w);
+            sdsshape = exp( ( -XX)/max(h,bnd_w)) ...
+                     + exp(-(L-XX)/max(h,bnd_w));
     end
     sdsshape = max(0,sdsshape - topshape - botshape);
 end
@@ -426,6 +424,10 @@ end
 % end
 rhoo = rho;
 dto  = dt; 
+
+% initialise correlation length for convective/turbulent regularisation
+Delta_cnv0 = Delta_cnv;
+corrl;
 
 m0  = mean(m(:)); 
 x0  = mean(x(:)); 

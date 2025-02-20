@@ -2,8 +2,9 @@
 init;
 
 % physical time stepping loop
-while time <= tend && step <= Nt &&  any(mq(:)>eps^0.5) ...
-                                 && ~any(cal.Tliq(:)-cal.Tsol(:)<=3) && any(T(:)-273.15-cal.Tsol(:)>=3)
+while time <= tend && step <= Nt &&  any(mq(:)>sqrt(eps))        ...
+                                 && ~any(Tliq(:)    -Tsol(:)<=3) ...
+                                 &&  any(T(:)-273.15-Tsol(:)>=3)
     
     % time step info
     timing;
@@ -38,9 +39,11 @@ while time <= tend && step <= Nt &&  any(mq(:)>eps^0.5) ...
         iter = iter+1;
     end
 
-    % % renormalise sum of phase, component densities to bulk density
-    % X = X./RHO.*rho;  M = M./RHO.*rho;  F = F./RHO.*rho;  RHO = X+M+F;
-    % C = C./sum(C,3).*rho;
+    % update correlation length for convective/turbulent regularisation
+    corrl;
+
+    % renormalise sum of phase densities to bulk density
+    X = x.*rho;  M = m.*rho;  F = f.*rho;  RHO = X+M+F;
 
     % fractionation mode for 0D-models
     if Nx==1 && Nz==1
@@ -56,7 +59,7 @@ while time <= tend && step <= Nt &&  any(mq(:)>eps^0.5) ...
 
     % plot model results
     if ~mod(step,nop); output; end
-    
+
     % increment time/step
     time = time+dt;
     step = step+1;
