@@ -340,20 +340,17 @@ else % create 2D plots
     else; set(0, 'CurrentFigure', fh8); clf;
     end 
     colormap(colmap);
-    fh = axb + 3*axh + 2*avs + axt;
+    fh = axb + 2*axh + 1*avs + axt;
     fw = axl + 3*axw + 2*ahs + axr;
     set(fh8,UN{:},'Position',[11 11 fw fh]);
     set(fh8,'PaperUnits','Centimeters','PaperPosition',[0 0 fw fh],'PaperSize',[fw fh]);
     set(fh8,'Color','w','InvertHardcopy','off','Resize','off');
-    ax(81) = axes(UN{:},'position',[axl+0*axw+0*ahs axb+2*axh+2*avs axw axh]);
-    ax(82) = axes(UN{:},'position',[axl+1*axw+1*ahs axb+2*axh+2*avs axw axh]);
-    ax(83) = axes(UN{:},'position',[axl+2*axw+2*ahs axb+2*axh+2*avs axw axh]);
-    ax(84) = axes(UN{:},'position',[axl+0*axw+0*ahs axb+1*axh+1*avs axw axh]);
-    ax(85) = axes(UN{:},'position',[axl+1*axw+1*ahs axb+1*axh+1*avs axw axh]);
-    ax(86) = axes(UN{:},'position',[axl+2*axw+2*ahs axb+1*axh+1*avs axw axh]);
-    ax(87) = axes(UN{:},'position',[axl+0*axw+0*ahs axb+0*axh+0*avs axw axh]);
-    ax(88) = axes(UN{:},'position',[axl+1*axw+1*ahs axb+0*axh+0*avs axw axh]);
-    ax(89) = axes(UN{:},'position',[axl+2*axw+2*ahs axb+0*axh+0*avs axw axh]);
+    ax(81) = axes(UN{:},'position',[axl+0*axw+0*ahs axb+1*axh+1*avs axw axh]);
+    ax(82) = axes(UN{:},'position',[axl+1*axw+1*ahs axb+1*axh+1*avs axw axh]);
+    ax(83) = axes(UN{:},'position',[axl+2*axw+2*ahs axb+1*axh+1*avs axw axh]);
+    ax(84) = axes(UN{:},'position',[axl+0*axw+0*ahs axb+0*axh+0*avs axw axh]);
+    ax(85) = axes(UN{:},'position',[axl+1*axw+1*ahs axb+0*axh+0*avs axw axh]);
+    ax(86) = axes(UN{:},'position',[axl+2*axw+2*ahs axb+0*axh+0*avs axw axh]);
 
     % plot velocity-pressure solution in Fig. 1
     set(0,'CurrentFigure',fh1)
@@ -504,7 +501,7 @@ else % create 2D plots
     set(fh7,'CurrentAxes',ax(76));
     set(gca,'YTickLabel',[]);
 
-    % plot geochemical variables in Fig. 7
+    % plot geochemical variables in Fig. 8
     set(0,'CurrentFigure',fh8)
     for i = 1:cal.ntrc
         set(fh8,'CurrentAxes',ax(80+i));
@@ -519,15 +516,9 @@ else % create 2D plots
     set(fh8,'CurrentAxes',ax(83));
     set(gca,'XTickLabel',[],'YTickLabel',[]);
     set(fh8,'CurrentAxes',ax(84));
-    set(gca,'XTickLabel',[]); ylabel(['Depth [',SpaceUnits,']'],TX{:},FS{:});
     set(fh8,'CurrentAxes',ax(85));
-    set(gca,'XTickLabel',[],'YTickLabel',[]); 
-    set(fh8,'CurrentAxes',ax(86));
-    set(gca,'XTickLabel',[],'YTickLabel',[]);
-    set(fh8,'CurrentAxes',ax(87));
-    set(fh8,'CurrentAxes',ax(88));
     set(gca,'YTickLabel',[]); xlabel(['Width [',SpaceUnits,']'],TX{:},FS{:});
-    set(fh8,'CurrentAxes',ax(89));
+    set(fh8,'CurrentAxes',ax(86));
     set(gca,'YTickLabel',[]);
 
 end
@@ -631,8 +622,8 @@ set(cb,TL{:},'FontSize',12); set(gca,TL{:},'FontSize',15);
 
 if ~exist('fh13','var'); fh13 = figure(VIS{:});
     colormap(colmap);
-    fh = axb + 1.5*axh + 0*avs + axt;
-    fw = 0.5 + 4.5*axw + 2*ahs + 0.5;
+    fh = 18;
+    fw = 22;
     set(fh13,UN{:},'Position',[15 15 fw fh]);
     set(fh13,'PaperUnits','Centimeters','PaperPosition',[0 0 fw fh],'PaperSize',[fw fh]);
     set(fh13,'Color','w','InvertHardcopy','off','Resize','off');
@@ -647,47 +638,59 @@ LBL4 = cal.msyStr(cal.imsy(4));
 BTH;
 end
 
-% middle tetrahedron (olv plg cpx)
+% middle ternary (plg olv cpx)
 sumABC = sum(cx_msy(:,:,cal.imsy([1,2,3])),3);
 [A,B] = terncoords(cx_msy(:,:,cal.imsy(1))./sumABC,cx_msy(:,:,cal.imsy(2))./sumABC,cx_msy(:,:,cal.imsy(3))./sumABC);
-scatter(A(:),sin60-B(:),120,T(:)-273.15,'filled','^','MarkerEdgeColor',CL{4},LW{1},1.5); colormap(colmap);
+scatter(A(:),sin60-B(:)+zshiftm,120,T(:)-273.15,'filled','^','MarkerEdgeColor',CL{4},LW{1},1.5); colormap(colmap);
 sumABC = sum(cm_msy(:,:,cal.imsy([1,2,3])),3);
 [A,B] = terncoords(cm_msy(:,:,cal.imsy(1))./sumABC,cm_msy(:,:,cal.imsy(2))./sumABC,cm_msy(:,:,cal.imsy(3))./sumABC);
-scatter(A(:),sin60-B(:),120,T(:)-273.15,'filled','o','MarkerEdgeColor',CL{3},LW{1},1.5); colormap(colmap);
+scatter(A(:),sin60-B(:)+zshiftm,120,T(:)-273.15,'filled','o','MarkerEdgeColor',CL{3},LW{1},1.5); colormap(colmap);
 sumABC = sum( c_msy(:,:,cal.imsy([1,2,3])),3);
 [A,B] = terncoords( c_msy(:,:,cal.imsy(1))./sumABC, c_msy(:,:,cal.imsy(2))./sumABC, c_msy(:,:,cal.imsy(3))./sumABC);
-scatter(A(:),sin60-B(:),120,T(:)-273.15,'filled','s','MarkerEdgeColor',CL{2},LW{1},1.5); colormap(colmap);
+scatter(A(:),sin60-B(:)+zshiftm,120,T(:)-273.15,'filled','s','MarkerEdgeColor',CL{2},LW{1},1.5); colormap(colmap);
 
-% left tetrahedron
+% upper ternary (plg cpx qtz)
+sumABC = sum(cx_msy(:,:,cal.imsy([1,4,3])),3);
+[A,B] = terncoords(cx_msy(:,:,cal.imsy(1))./sumABC,cx_msy(:,:,cal.imsy(4))./sumABC,cx_msy(:,:,cal.imsy(3))./sumABC);
+scatter(A(:),B(:)+zshift,120,T(:)-273.15,'filled','^','MarkerEdgeColor',CL{4},LW{1},1.5); colormap(colmap);
+sumABC = sum(cm_msy(:,:,cal.imsy([1,2,3])),3);
+[A,B] = terncoords(cm_msy(:,:,cal.imsy(1))./sumABC,cm_msy(:,:,cal.imsy(4))./sumABC,cm_msy(:,:,cal.imsy(3))./sumABC);
+scatter(A(:),B(:)+zshift,120,T(:)-273.15,'filled','o','MarkerEdgeColor',CL{3},LW{1},1.5); colormap(colmap);
+sumABC = sum( c_msy(:,:,cal.imsy([1,2,3])),3);
+[A,B] = terncoords( c_msy(:,:,cal.imsy(1))./sumABC, c_msy(:,:,cal.imsy(4))./sumABC, c_msy(:,:,cal.imsy(3))./sumABC);
+scatter(A(:),B(:)+zshift,120,T(:)-273.15,'filled','s','MarkerEdgeColor',CL{2},LW{1},1.5); colormap(colmap);
+
+% left ternary (olv cpx qtz)
 sumABC = sum(cx_msy(:,:,cal.imsy([2,3,4])),3);
 [A,B] = terncoords(cx_msy(:,:,cal.imsy(2))./sumABC,cx_msy(:,:,cal.imsy(3))./sumABC,cx_msy(:,:,cal.imsy(4))./sumABC);
-scatter(A(:)-0.65,B(:),120,T(:)-273.15,'filled','^','MarkerEdgeColor',CL{4},LW{1},1.5); colormap(colmap);
+scatter(A(:)-0.55,B(:),120,T(:)-273.15,'filled','^','MarkerEdgeColor',CL{4},LW{1},1.5); colormap(colmap);
 sumABC = sum(cm_msy(:,:,cal.imsy([2,3,4])),3);
 [A,B] = terncoords(cm_msy(:,:,cal.imsy(2))./sumABC,cm_msy(:,:,cal.imsy(3))./sumABC,cm_msy(:,:,cal.imsy(4))./sumABC);
-scatter(A(:)-0.65,B(:),120,T(:)-273.15,'filled','o','MarkerEdgeColor',CL{3},LW{1},1.5); colormap(colmap);
+scatter(A(:)-0.55,B(:),120,T(:)-273.15,'filled','o','MarkerEdgeColor',CL{3},LW{1},1.5); colormap(colmap);
 sumABC = sum( c_msy(:,:,cal.imsy([2,3,4])),3);
 [A,B] = terncoords( c_msy(:,:,cal.imsy(2))./sumABC, c_msy(:,:,cal.imsy(3))./sumABC, c_msy(:,:,cal.imsy(4))./sumABC);
-scatter(A(:)-0.65,B(:),120,T(:)-273.15,'filled','s','MarkerEdgeColor',CL{2},LW{1},1.5); colormap(colmap);
+scatter(A(:)-0.55,B(:),120,T(:)-273.15,'filled','s','MarkerEdgeColor',CL{2},LW{1},1.5); colormap(colmap);
 
+% right ternary (qtz plg olv)
 sumABC = sum(cx_msy(:,:,cal.imsy([4,1,2])),3);
 [A,B] = terncoords(cx_msy(:,:,cal.imsy(4))./sumABC,cx_msy(:,:,cal.imsy(1))./sumABC,cx_msy(:,:,cal.imsy(2))./sumABC);
-scatter(A(:)+0.65,B(:),120,T(:)-273.15,'filled','^','MarkerEdgeColor',CL{4},LW{1},1.5); colormap(colmap);
+scatter(A(:)+0.55,B(:),120,T(:)-273.15,'filled','^','MarkerEdgeColor',CL{4},LW{1},1.5); colormap(colmap);
 sumABC = sum(cm_msy(:,:,cal.imsy([4,1,2])),3);
 [A,B] = terncoords(cm_msy(:,:,cal.imsy(4))./sumABC,cm_msy(:,:,cal.imsy(1))./sumABC,cm_msy(:,:,cal.imsy(2))./sumABC);
-scatter(A(:)+0.65,B(:),120,T(:)-273.15,'filled','o','MarkerEdgeColor',CL{3},LW{1},1.5); colormap(colmap);
+scatter(A(:)+0.55,B(:),120,T(:)-273.15,'filled','o','MarkerEdgeColor',CL{3},LW{1},1.5); colormap(colmap);
 sumABC = sum( c_msy(:,:,cal.imsy([4,1,2])),3);
 [A,B] = terncoords( c_msy(:,:,cal.imsy(4))./sumABC, c_msy(:,:,cal.imsy(1))./sumABC, c_msy(:,:,cal.imsy(2))./sumABC);
-scatter(A(:)+0.65,B(:),120,T(:)-273.15,'filled','s','MarkerEdgeColor',CL{2},LW{1},1.5); colormap(colmap); 
+scatter(A(:)+0.55,B(:),120,T(:)-273.15,'filled','s','MarkerEdgeColor',CL{2},LW{1},1.5); colormap(colmap); 
 
 if Nz>1 || step==0 || frst
     cb = colorbar;
-    set(cb,'Location','westoutside',TL{:},'FontSize',12); 
-    text(-0.77,0.88,'T [$^\circ$C]','FontSize',16,TX{:},'HorizontalAlignment','left','VerticalAlignment','bottom');
+    set(cb,'Position',[0.85,0.45,0.03,0.5],TL{:},'FontSize',12); 
+    text(1.48,0.65,'T [$^\circ$C]','FontSize',16,TX{:},'HorizontalAlignment','center','VerticalAlignment','bottom');
 end
 
 % plot model history
 if plot_cv
-    if ~exist('fh13','var'); fh13 = figure(VIS{:});
+    if ~exist('fh14','var'); fh13 = figure(VIS{:});
     else; set(0, 'CurrentFigure', fh13); clf;
     end 
     subplot(4,1,1);
@@ -707,7 +710,7 @@ if plot_cv
     ylabel('consv. $\Theta_k$',TX{:},FS{:}); set(gca,TL{:},TS{:},'XTickLabel',[]);
     xlabel(['Time [',TimeUnits,']'],TX{:},FS{:});
 
-    if ~exist('fh14','var'); fh14 = figure(VIS{:});
+    if ~exist('fh15','var'); fh14 = figure(VIS{:});
     else; set(0, 'CurrentFigure', fh14); clf;
     end 
     subplot(4,1,1);
