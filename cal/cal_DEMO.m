@@ -78,7 +78,7 @@ for i=1:cal.ncmp
 end
 
 % set pure component melting points T_m^i at P=0
-cal.T0  = [1850  1225  1175  1075  975  850];
+cal.T0  = [1850  1225  1175  1070  965  850];
 
 % set first coeff. for P-dependence of T_m^i [GPa]
 cal.A   = [7.0  5.0  4.0  3.0  2.5  2.0];
@@ -87,14 +87,14 @@ cal.A   = [7.0  5.0  4.0  3.0  2.5  2.0];
 cal.B   = [7.0  5.0  4.0  3.0  2.5  2.0];
 
 % set coeff. for T-dependence of partition coefficients K^i [1/K]
-cal.r   = [40  5  6  9  8  5];
+cal.r   = [40  6  5  9  8  5];
 
 % set entropy gain of fusion and evaporation DeltaS [J/K]
 cal.Dsx  = 350;
 cal.Dsf  = 450;
 
 % specify melting point dependence on H2O
-cal.dTH2O = [900  1400  1450  1575  1700  2025];  % solidus shift from water content prefactor [K/wt^pH2O]
+cal.dTH2O = [910  1370  1430  1570  1740  1980];  % solidus shift from water content prefactor [K/wt^pH2O]
 cal.pH2O  = 0.75;               % solidus shift from water content exponent
 
 % specify geochemical model parameters
