@@ -21,7 +21,7 @@ hr       =  3600;                % conversion seconds to hours
 yr       =  24*365.25*hr;        % conversion seconds to years
 tend     =  1*yr;                % end time for simulation [s]
 dt       =  10;                  % initial time step [s]
-dtmax    =  1e3;                 % maximum time step [s]
+dtmax    =  1e32;                % maximum time step [s]
 
 % set initial thermo-chemical state
 init_mode= 'layer';              % T initial condition mode ('layer' or 'linear')

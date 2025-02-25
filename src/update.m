@@ -40,11 +40,22 @@ rhof   = rhof0 .* (1 - aTf.*(T-Tref) + bPf.*(Pt-Pref));
 
 rho    = 1./(m./rhom + x./rhox + f./rhof);
 
-rhofz  = (rho(icz(1:end-1),:)+rho(icz(2:end),:))/2;
-rhofx  = (rho(:,icx(1:end-1))+rho(:,icx(2:end)))/2;
+rhomw  = (rhom(icz(1:end-1),:)+rhom(icz(2:end),:))/2;
+rhoxw  = (rhox(icz(1:end-1),:)+rhox(icz(2:end),:))/2;
+rhofw  = (rhof(icz(1:end-1),:)+rhof(icz(2:end),:))/2;
 
-rhoW = rhofz.*W(:,2:end-1);
-rhoU = rhofx.*U(2:end-1,:);
+rhow   = (rho(icz(1:end-1),:)+rho(icz(2:end),:))/2;
+rhou   = (rho(:,icx(1:end-1))+rho(:,icx(2:end)))/2;
+
+rhoref = mean(rhow,2);
+
+Drhom  = rhomw - rhoref;
+Drhox  = rhoxw - rhoref;
+Drhof  = rhofw - rhoref;
+Drho   = rhow  - rhoref;
+
+rhoW   = rhow.*W(:,2:end-1);
+rhoU   = rhou.*U(2:end-1,:);
 
 % convert weight to volume fraction, update bulk density
 chi    = max(0,min(1, x.*rho./rhox ));
@@ -62,10 +73,10 @@ RhoCp = mu.*rhom.*cPm + chi.*rhox.*cPx + phi.*rhof.*cPf;
 
 % update lithostatic pressure
 Pti = Pt;
-if Nz==1; Pt    = max(1e7,(1-alpha).*Pt + alpha.*(Ptop.*ones(size(Tp)) + Pcouple*(Pchmb + P(2:end-1,2:end-1)))); else
-    Pl(1,:)     = repmat(mean(rhofz(1,:),2).*g0.*h/2,1,Nx) + Ptop;
-    Pl(2:end,:) = Pl(1,:) + repmat(cumsum(mean(rhofz(2:end-1,:),2).*g0.*h),1,Nx);
-    Pt          = max(1e7,(1-1).*Pt + 1.*(Pl + Pcouple*(Pchmb + P(2:end-1,2:end-1))));
+if Nz==1; Pt    = max(1e7,(1-alpha)*Pt + alpha*Ptop.*ones(size(Pt)) + Pcouple*(Pchmb + P(2:end-1,2:end-1))); else
+    Pl(1,:)     = repmat(rhoref(1).*g0.*h/2,1,Nx) + Ptop;
+    Pl(2:end,:) = Pl(1,:) + repmat(cumsum(rhoref(2:end-1).*g0.*h),1,Nx);
+    Pt          = max(1e7,(1-alpha)*Pt + alpha*(Pl + Pcouple*(Pchmb + P(2:end-1,2:end-1))));
 end
 upd_Pt = Pt-Pti;
 
@@ -133,41 +144,6 @@ rhox_nP = rhox0 .* (1 - aTx.*(Tp-Tref));
 rhof_nP = rhof0 .* (1 - aTf.*(Tp-Tref));
 
 rho_nP  = 1./(m./rhom_nP + x./rhox_nP + f./rhof_nP);
-
-% % detect convection layers
-% if Nz>1
-%     drhoz    = gradient(mean(rho_nP,2));
-%     [~,zpks] = findpeaks(drhoz,'MinPeakHeight',2,'MinPeakProminence',1);
-%     islocalmax(drhoz,1,'MinProminence',0.1,'MinSeparation',Delta_cnv0)
-%     ncl = length(zpks)+1;
-%     zcl = zeros(1,ncl+1);
-% 
-%     zt = max(ZZ(eta>=etamax/10 & ZZ<D/2));
-%     if isempty(zt); zcl(1) = 0; else; zcl(1) = zt; end
-%     for iz = 1:ncl-1
-%         if zpks(iz)>5 && zpks(iz)<Nz-5
-%             zcl(iz+1) = zpks(iz)*h+h/2;
-%         else
-%             zcl(iz+1) = [];
-%             ncl = ncl-1;
-%         end
-%     end
-%     zb = min(ZZ(eta>=etamax/10 & ZZ>zcl(end-1) ));
-%     if isempty(zb); zcl(end) = D; else; zcl(end) = zb; end
-% 
-%     % limit correlation length for convective mixing to distance from layer
-%     % and domain boundaries
-%     Delta_cnv =zeros(Nz,1);
-%     for iz = 1:ncl
-%         Delta_cnv = Delta_cnv + max(0,min(Delta_cnv0,min(ZZ-zcl(iz),zcl(iz+1)-ZZ)));
-%     end
-%     % ind0 = Delta_cnv==0;
-%     for i=1:10
-%         Delta_cnv = Delta_cnv + diffus(Delta_cnv,1/8*ones(size(Delta_cnv)),1,[1,2],BCD);
-%         % Delta_cnv(ind0) = 0;
-%         Delta_cnv([1 end],:) = [h/2;h/2].*ones(1,Nx);
-%     end
-% end
 
 % update velocity magnitude
 if Nx==1 && Nz==1; Vel = 0;

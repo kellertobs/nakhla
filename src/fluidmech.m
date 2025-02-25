@@ -3,22 +3,24 @@ tic;
 if ~bnchm && step>0 && ~restart
 
 %***  update mixture mass density
-drhodt  = advn_rho;% + (RHO-rho)/dt;
+drhodt  = advn_rho;
 
 % residual of mixture mass evolution
 res_rho = (a1*rho-a2*rhoo-a3*rhooo)/dt - (b1*drhodt + b2*drhodto + b3*drhodtoo);
 
 % volume source and background velocity passed to fluid-mechanics solver
-upd_rho = - res_rho./b1./rho; % + beta*upd_rho;
-VolSrc  = VolSrc + upd_rho;  % correct volume source term by scaled residual
+upd_rho = - alpha*res_rho./b1./rho;
+dV      = dV + upd_rho;  % correct volume source term by scaled residual
 
-UBG     = - 0*mean(VolSrc,'all')./2 .* (L/2-XXu);
-WBG     = - 2*mean(VolSrc,'all')./2 .* (D/2-ZZw);
+dVmean  = mean(dV,'all');
 
-dPchmbdt  = mod_wall*mean(VolSrc,'all') - mod_wall/eta_wall*Pchmb;
+UBG     = - 0*dVmean./2 .* (L/2-XXu);
+WBG     = - 2*dVmean./2 .* (D/2-ZZw);
+
+dPchmbdt  = mod_wall*dVmean - mod_wall/eta_wall*Pchmb;
 res_Pchmb = (a1*Pchmb-a2*Pchmbo-a3*Pchmboo)/dt - (b1*dPchmbdt + b2*dPchmbdto + b3*dPchmbdtoo);
 
-upd_Pchmb = - alpha*res_Pchmb*dt/a1/3 + beta*upd_Pchmb;
+upd_Pchmb = - alpha*res_Pchmb*dt/a1/3;
 Pchmb     = Pchmb + upd_Pchmb;
 
 end
@@ -33,7 +35,7 @@ else
 
 if Nx==1
     % update 1D velocity
-    W(:,2) = -flipud(cumsum(flipud([VolSrc*h;-WBG(end)])));
+    W(:,2) = -flipud(cumsum(flipud([dV*h;-WBG(end)])));
 
     % update 1D pressure
     Div_tz = ddz(tzz(icz,:),h);           % z-stress divergence
@@ -131,7 +133,7 @@ IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL;-(1/2*EtaC2(:)-1/3*EtaP2(:
 
 % z-RHS vector
 advn_mz = advect(rhofz(2:end-1,:).*W(2:end-1,2:end-1),(U(2:end-2,:)+U(3:end-1,:))/2,(W(1:end-1,2:end-1)+W(2:end,2:end-1))/2,h,{ADVN,''},[1,2],BCA);
-rr  = + (rhofz(2:end-1,:) - mean(rhofz(2:end-1,:),2)) .* g0 ...
+rr  = + Drho(2:end-1,:) .* g0 ...
       + (a2.*rhoWo(2:end-1,:)+a3.*rhoWoo(2:end-1,:))/dt ...
       - advn_mz;
 if bnchm; rr = rr + src_W_mms(2:end-1,2:end-1); end
@@ -377,7 +379,7 @@ AAR = [];       % forcing entries for R
 
 ii  = MapP(2:end-1,2:end-1);
 
-rr  = VolSrc;
+rr  = dV;       % add volume source term
 if bnchm; rr = rr + src_P_mms(2:end-1,2:end-1); end
 
 IIR = [IIR; ii(:)]; AAR = [AAR; rr(:)];
@@ -424,29 +426,29 @@ RR  = [RV; RP];
 SCL = (abs(diag(LL))).^0.5;
 SCL = diag(sparse( 1./(SCL + 1e-3.*sqrt(h^2./geomean(eta(:)))) ));
 
-% FF  = LL*[W(:);U(:);P(:)] - RR;
+FF  = LL*[W(:);U(:);P(:)] - RR;
 
 LL  = SCL*LL*SCL;
-% FF  = SCL*FF;
+FF  = SCL*FF;
 RR  = SCL*RR;
 
 
 %% Solve linear system of equations for vx, vz, P
 
-SOL = SCL*(LL\RR);  % update solution
+SOL = SCL*(LL\FF);  % update solution
 
 % map solution vector to 2D arrays
-W = full(reshape(SOL(MapW(:))        ,Nz+1,Nx+2));  % matrix z-velocity
-U = full(reshape(SOL(MapU(:))        ,Nz+2,Nx+1));  % matrix x-velocity
-P = full(reshape(SOL(MapP(:)+(NW+NU)),Nz+2,Nx+2));  % matrix dynamic pressure
+% W = full(reshape(SOL(MapW(:))        ,Nz+1,Nx+2));  % matrix z-velocity
+% U = full(reshape(SOL(MapU(:))        ,Nz+2,Nx+1));  % matrix x-velocity
+% P = full(reshape(SOL(MapP(:)+(NW+NU)),Nz+2,Nx+2));  % matrix dynamic pressure
 
-% upd_W = - alpha*full(reshape(SOL(MapW(:))        ,Nz+1,Nx+2)) + beta*upd_W;  % matrix z-velocity
-% upd_U = - alpha*full(reshape(SOL(MapU(:))        ,Nz+2,Nx+1)) + beta*upd_U;  % matrix x-velocity
-% upd_P = - alpha*full(reshape(SOL(MapP(:)+(NW+NU)),Nz+2,Nx+2)) + beta*upd_P;  % matrix dynamic pressure
-% 
-% W = W + upd_W;
-% U = U + upd_U;
-% P = P + upd_P;
+upd_W = - alpha*full(reshape(SOL(MapW(:))        ,Nz+1,Nx+2));  % matrix z-velocity
+upd_U = - alpha*full(reshape(SOL(MapU(:))        ,Nz+2,Nx+1));  % matrix x-velocity
+upd_P = - alpha*full(reshape(SOL(MapP(:)+(NW+NU)),Nz+2,Nx+2));  % matrix dynamic pressure
+
+W = W + upd_W;
+U = U + upd_U;
+P = P + upd_P;
 
 end
 
@@ -454,7 +456,7 @@ end
 if ~bnchm
 
     % phase segregation speeds
-    wm(2:end-1,2:end-1) = ((rhom(1:end-1,:)+rhom(2:end,:))/2-mean(rhofz(2:end-1,:),2)).*g0.*(Ksgr_m(1:end-1,:).*Ksgr_m(2:end,:)).^0.5; % melt segregation speed
+    wm(2:end-1,2:end-1) = Drhom(2:end-1,:).*g0.*(Ksgr_m(1:end-1,:).*Ksgr_m(2:end,:)).^0.5; % melt segregation speed
     wm([1,end],:) = min(1,1-[top;bot]).*wm([2,end-1],:);
     if periodic
         wm(:,[1 end]) = wm(:,[end-1 2]);
@@ -462,7 +464,7 @@ if ~bnchm
         wm(:,[1 end]) = wm(:,[2 end-1]);
     end
 
-    wx(2:end-1,2:end-1) = ((rhox(1:end-1,:)+rhox(2:end,:))/2-mean(rhofz(2:end-1,:),2)).*g0.*(Ksgr_x(1:end-1,:).*Ksgr_x(2:end,:)).^0.5; % solid segregation speed
+    wx(2:end-1,2:end-1) = Drhox(2:end-1,:).*g0.*(Ksgr_x(1:end-1,:).*Ksgr_x(2:end,:)).^0.5; % solid segregation speed
     wx([1,end],:) = min(1,1-[top;bot]).*wx([2,end-1],:);
     if periodic
         wx(:,[1 end]) = wx(:,[end-1 2]);
@@ -470,7 +472,7 @@ if ~bnchm
         wx(:,[1 end]) = wx(:,[2 end-1]);
     end
 
-    wf(2:end-1,2:end-1) = ((rhof(1:end-1,:)+rhof(2:end,:))/2-mean(rhofz(2:end-1,:),2)).*g0.*(Ksgr_f(1:end-1,:).*Ksgr_f(2:end,:)).^0.5; % fluid segregation speed
+    wf(2:end-1,2:end-1) = Drhof(2:end-1,:).*g0.*(Ksgr_f(1:end-1,:).*Ksgr_f(2:end,:)).^0.5; % fluid segregation speed
     wf([1,end],:) = min(1,1-[top-fout;bot-fin]).*wf([2,end-1],:);
     if periodic
         wf(:,[1 end]) = wf(:,[end-1 2]);

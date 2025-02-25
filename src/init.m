@@ -277,7 +277,7 @@ exx    = 0.*Tp;  ezz = 0.*Tp;  exz = zeros(Nz-1,Nx-1);  eII = 0.*Tp;
 txx    = 0.*Tp;  tzz = 0.*Tp;  txz = zeros(Nz-1,Nx-1);  tII = 0.*Tp; 
 eta    = ones(Nz,Nx);
 etamax = min(eta(:)) .* etacntr;
-VolSrc = 0.*Tp; 
+dV = 0.*Tp; 
 kW     = 0.*Tp;
 Tref   = min(cal.T0)+273.15;
 Pref   = 1e5;
@@ -305,8 +305,7 @@ cm_oxd_all(:,:,cal.ioxd) = cm_oxd;
 aT     = aTm;
 kT     = kTm;
 cP     = cPm; RhoCp = rho.*cP;
-rhoref = mean(rho(:));
-T      =  (Tp+273.15).*exp(aT./RhoCp.*(Pt-Pref));
+T      = (Tp+273.15).*exp(aT./RhoCp.*(Pt-Pref));
 
 % get volume fractions and bulk density
 step    = 0;
@@ -315,57 +314,6 @@ FMtime  = 0;
 TCtime  = 0;
 UDtime  = 0;
 a1      = 1; a2 = 0; a3 = 0; b1 = 1; b2 = 0; b3 = 0;
-% switch init_mode
-    % case 'read_1D'
-    % 
-    %     load(initname,'x','m','f','T','Pt','cm','cx','cf');
-    %     T  = repmat(interp1(Zci,T,Zc).',1,Nx);
-    %     xq = repmat(interp1(Zci,x,Zc).',1,Nx);
-    %     mq = repmat(interp1(Zci,m,Zc).',1,Nx);
-    %     fq = repmat(interp1(Zci,f,Zc).',1,Nx);
-    %     Pt = repmat(interp1(Zci,Pt,Zc).',1,Nx);
-    % 
-    %     var.c      = reshape(c,Nx*Nz,cal.ncmp);   % component fractions [wt]
-    %     var.T      = reshape(T,Nx*Nz,1)-273.15;   % temperature [C]
-    %     var.P      = reshape(Pt,Nx*Nz,1)/1e9;     % pressure [GPa]
-    %     var.m      = reshape(mq,Nx*Nz,1);         % melt fraction [wt]
-    %     var.f      = reshape(fq,Nx*Nz,1);         % bubble fraction [wt]
-    %     var.H2O    = var.c(:,end);                % water concentration [wt]
-    %     var.X      = reshape(cm_oxd_all,Nz*Nx,9); % melt oxide fractions [wt %]
-    %     cal.H2Osat = fluidsat(var); % water saturation [wt]
-    % 
-    %     [var,cal] = meltmodel(var,cal,'E');
-    % 
-    %     % cmi = zeros(Nz,Nx,cal.ncmp);
-    %     % for i = 1:cal.ncmp
-    %     %     cmi(:,:,i)   = repmat(interp1(cm(:,:,i),1:Nz).',1,Nx) + dcr(i).*rp + dcg(i).*gp;
-    %     % end
-    %     % cm = cmi;
-    %     % cxi = zeros(Nz,Nx,cal.ncmp);
-    %     % for i = 1:cal.ncmp
-    %     %     cxi(:,:,i)   = repmat(interp1(cx(:,:,i),1:Nz).',1,Nx) + dcr(i).*rp + dcg(i).*gp;
-    %     % end
-    %     % cx  = cxi;
-    %     % cfi = ones(Nz,Nx,cal.ncmp);
-    %     % for i = 1:cal.ncmp
-    %     %     cfi(:,:,i)   = repmat(interp1(cf(:,:,i),1:Nz).',1,Nx) + dcr(i).*rp + dcg(i).*gp;
-    %     % end
-    %     % cf = cfi;
-    %     % % T  = (Tp+273.15).*exp(aT./RhoCp.*(Pt-Pref));
-    % 
-    %     mq = reshape(var.m,Nz,Nx);
-    %     fq = reshape(var.f,Nz,Nx);
-    %     xq = reshape(var.x,Nz,Nx);
-    %     x  = xq;  m = mq;  f = fq;
-    % 
-    %     cxq = reshape(var.cx,Nz,Nx,cal.ncmp);
-    %     cfq = reshape(var.cf,Nz,Nx,cal.ncmp);
-    %     cmq = reshape(var.cm,Nz,Nx,cal.ncmp);
-    %     cm  = cmq; cx = cxq;  cf = cfq;
-    % 
-    %     update;
-    % 
-    % otherwise
 
 res  = 1;  tol = 1e-9;  it = 1;
 while res > tol
@@ -379,7 +327,6 @@ while res > tol
         Pt          = Pl + Pchmb;
     end
     
-    rhoref = mean(rho(:));
     T  = (Tp+273.15).*exp(aT./RhoCp.*(Pt-Pref));
 
     eqtime = tic;
@@ -552,7 +499,7 @@ if restart
     end
     if exist(name,'file')
         fprintf('\n   restart from %s \n\n',name);
-        load(name,'U','W','P','Pt','Pchmb','f','x','m','fq','xq','mq','phi','chi','mu','X','F','M','S','C','T','Tp','c','cm','cx','cf','TRC','trc','dSdt','dCdt','dFdt','dXdt','dMdt','drhodt','dTRCdt','Gf','Gx','Gm','rho','eta','eII','tII','dt','time','step','VolSrc','wf','wx','wm','cal');
+        load(name,'U','W','P','Pt','Pchmb','f','x','m','fq','xq','mq','phi','chi','mu','X','F','M','S','C','T','Tp','c','cm','cx','cf','TRC','trc','dSdt','dCdt','dFdt','dXdt','dMdt','drhodt','dTRCdt','Gf','Gx','Gm','rho','eta','eII','tII','dt','time','step','dV','wf','wx','wm','cal');
         name = [outdir,'/',runID,'/',runID,'_hist'];
         load(name,'hist');
 

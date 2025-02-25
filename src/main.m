@@ -43,7 +43,7 @@ while time <= tend && step <= Nt &&  any(mq(:)>sqrt(eps))        ...
     corrl;
 
     % renormalise sum of phase densities to bulk density
-    X = x.*rho;  M = m.*rho;  F = f.*rho;  RHO = X+M+F;
+    % X = x.*rho;  M = m.*rho;  F = f.*rho;  RHO = X+M+F;
 
     % fractionation mode for 0D-models
     if Nx==1 && Nz==1

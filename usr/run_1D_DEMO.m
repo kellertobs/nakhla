@@ -5,16 +5,16 @@ clear; close all;
 run('./par_default')
 
 % set run parameters
-runID    =  '1D_DEMO';           % run identifier
+runID    =  '1D_DEMO_D100';           % run identifier
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
-nop      =  200;                 % output frame plotted/saved every 'nop' time steps
+nop      =  100;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot results
 save_op  =  1;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
 
 % set model domain parameters
-D        =  10;                  % chamber depth [m]
-N        =  400;                 % number of grid points in z-direction
+D        =  100;                  % chamber depth [m]
+N        =  200;                 % number of grid points in z-direction
 h        =  D/N;                 % grid spacing (equal in both dimensions, do not set) [m]
 L        =  h;                   % chamber width (equal to h for 1-D mode) [m]
 
@@ -26,7 +26,7 @@ dt       =  36;                  % initial time step [s]
 % set initial thermo-chemical state
 T0       =  1225;                % temperature top  layer [deg C]
 T1       =  T0;                  % temperature base layer [deg C]
-c0       =  [11  17  36  32  1  3  0.5]/100;  % components (maj comp, H2O) top  layer [wt] (will be normalised to unit sum!)
+c0       =  [11  17  35  31  3  3  0.5]/100;  % components (maj comp, H2O) top  layer [wt] (will be normalised to unit sum!)
 c1       =  c0;                  % components (maj comp, H2O) base layer [wt] (will be normalised to unit sum!)
 dcr      =  [0,0,0,0,0,0,0];
 dcg      =  [0,0,0,0,0,0,0];
@@ -48,13 +48,12 @@ calID    =  'DEMO';              % phase diagram calibration
 % set numerical model parameters
 TINT     =  'bd2im';             % time integration scheme ('be1im','bd2im','cn2si','bd2si')
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
-CFL      =  1.00;                % (physical) time stepping courant number (multiplies stable step) [0,1]
+CFL      =  0.75;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-8;                % outer its absolute tolerance
-maxit    =  50;                  % maximum outer its
-Delta_cnv=  D/20;                % correlation length for eddy, convection diffusivity (multiple of h, 0.5-1)
+maxit    =  20;                  % maximum outer its
+Delta_cnv=  D/100;                % correlation length for eddy, convection diffusivity (multiple of h, 0.5-1)
 Delta_sgr=  dx0*10;              % correlation length for phase fluctuation diffusivity (multiple of dx0, df0, 10-20)
-
 
 %*****  RUN NAKHLA MODEL  *************************************************
 run('../src/main')
