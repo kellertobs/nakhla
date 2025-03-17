@@ -15,8 +15,8 @@ save_op  =  0;
 
 % set model domain parameters
 D        =  10;                  % chamber depth [m]
-L        =  10;                   % chamber width [m]
-N        =  100;                 % number of grid points in z-direction (incl. 2 ghosts)
+L        =  10;                  % chamber width [m]
+N        =  50;                  % number of grid points in z-direction (incl. 2 ghosts)
 h        =  D/N;                 % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
@@ -27,10 +27,10 @@ dt       =  1;                   % set initial time step
 smth     =  15;
 T0       =  1150;                % temperature top  layer [deg C]
 T1       =  T0;                  % temperature base layer [deg C]
-c0       =  [0.10 0.26 0.54 0.10 0.05];  % components (maj comp, H2O) top  layer [wt] (will be normalised to unit sum!)
+c0       =  [11  17  35  31  3  3  5]/100;  % components (maj comp, H2O) top  layer [wt] (will be normalised to unit sum!)
 c1       =  c0;                  % components (maj comp, H2O) base layer [wt] (will be normalised to unit sum!)
-dcr      =  [1,1,-1,-1,0]*0e-3;  % amplitude of random noise [wt]
-dcg      =  [-1,-1,1,1,0]*1e-2;  % amplitude of centred gaussian [wt]
+dcr      =  [1,1,1,-1,-1,-1,0]*0e-3;  % amplitude of random noise [wt]
+dcg      =  [-1,-1,-1,1,1,1,0]*1e-2;  % amplitude of centred gaussian [wt]
 dTg      =  5;
 dTr      =  0.0;
 dr_trc   =  [1,1,1,-1,-1,-1].*0e-3;
@@ -49,12 +49,10 @@ calID    =  'DEMO';              % phase diagram calibration
 TINT     =  'bd2im';             % time integration scheme ('be1im','bd2im','cn2si','bd2si')
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
 CFL      =  1;                   % (physical) time stepping courant number (multiplies stable step) [0,1]
-atol     =  1e-12;                % outer its absolute tolerance
+atol     =  1e-12;               % outer its absolute tolerance
 rtol     =  atol/1e6;            % outer its absolute tolerance
 maxit    =  100;                 % maximum outer its
-alpha    =  0.50;                % iterative step size parameter
-beta     =  0.00;                % iterative damping parameter
-gamma    =  0;
+alpha    =  0.75;                % iterative step size parameter
 
 % create output directory
 if ~isfolder([opdir,'/',runID])

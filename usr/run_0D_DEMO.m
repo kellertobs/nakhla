@@ -5,29 +5,29 @@ clear; close all;
 run('./par_default')
 
 % set run parameters
-runID    =  '0D_DEMO_frcx20';      % run identifier
+runID    =  '0D_DEMO_frcx5';     % run identifier
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
-nop      =  50;                  % output frame plotted/saved every 'nop' time steps
+nop      =  100;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot results
 save_op  =  1;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
 
 % set model domain parameters
-D        =  0.1;                 % chamber depth [m]
+D        =  1;                   % chamber depth [m]
 L        =  D;                   % chamber width [m]
 N        =  1;                   % number of grid points in z-direction
 h        =  D/N;                 % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
 Nt       =  1e4;                 % number of time steps to take
-tend     =  10*hr;               % end time for simulation [s]
-dt       =  18;                  % initial time step [s]
-dtmax    =  18;                  % maximum time step [s]
+tend     =  1e4*hr;              % end time for simulation [s]
+dt       =  hr/3;                % initial time step [s]
+dtmax    =  hr/3;                % maximum time step [s]
  
 % set initial thermo-chemical state
 T0       =  1310;                % temperature top  layer [deg C]
 T1       =  T0;                  % temperature base layer [deg C]
-c0       =  [11  17  35  31  3  3  0.5]/100;  % components (maj comp, H2O) top  layer [wt] (will be normalised to unit sum!)
+c0       =  [11  18  35  30  3  3  0.5]/100;  % components (maj comp, H2O) top  layer [wt] (will be normalised to unit sum!)
 c1       =  c0;                  % components (maj comp, H2O) bot layer [wt] (will be normalised to unit sum!)
 dcr      =  [0,0,0,0,0,0,0,0];
 dcg      =  [0,0,0,0,0,0,0,0];
@@ -35,7 +35,7 @@ dcg      =  [0,0,0,0,0,0,0,0];
 % set thermo-chemical boundary parameters
 fractxtl =  1;                   % fractional crystallisation mode for 0-D (Nz=Nx=1)
 fractmlt =  0;                   % fractional melting mode for 0-D (Nz=Nx=1)
-fractres =  0.20;                 % residual fraction for fractionation mode
+fractres =  0.05;                % residual fraction for fractionation mode
 dPdT     =  3.00e5;              % decompression rate for 0D models
 bndmode  =  1;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot only; 4 = all walls; 5 = only sides)
 bnd_w    =  1e16;                % boundary layer width [m]
@@ -56,7 +56,7 @@ CFL      =  1.00;                % (physical) time stepping courant number (mult
 rtol     =  1e-6;                % outer its relative tolerance
 atol     =  1e-8;                % outer its absolute tolerance
 maxit    =  50;                  % maximum outer its
-Pcouple  =  0;                   % coupling phase equilibria and material properties to dynamic pressure
+Pcouple  =  1;                   % coupling phase equilibria and material properties to dynamic pressure
 
 
 %*****  RUN NAKHLA MODEL  *************************************************

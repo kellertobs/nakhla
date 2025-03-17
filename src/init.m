@@ -93,7 +93,7 @@ rng(seed);
 smth = smth*Nx*Nz*1e-4;
 rp   = randn(Nz,Nx);
 for i = 1:round(smth)
-    rp = rp + diffus(rp,1/8*ones(size(rp)),1,[1,2],{[0,0],BCD{2}});
+    rp = rp + diffus(rp,1/8*ones(size(rp)),1,[1,2],BCD);
     rp = rp - mean(mean(rp));
 end
 rp = rp./max(abs(rp(:)));
@@ -281,31 +281,36 @@ dV = 0.*Tp;
 kW     = 0.*Tp;
 Tref   = min(cal.T0)+273.15;
 Pref   = 1e5;
+sref   = 0e3;
 c0_oxd = c0*cal.cmp_oxd;
 c0_oxd_all = zeros(size(c0,1),9);
 c0_oxd_all(:,cal.ioxd) = c0_oxd;
-rhom   = mean(cal.rhox0-500).*ones(size(Tp)); 
-rhox   = mean(cal.rhox0).*ones(size(Tp));
-rhof   = cal.rhof0.*ones(size(Tp));
+rhom0  = mean(cal.rhox0-500).*ones(size(Tp)); 
+rhox0  = mean(cal.rhox0).*ones(size(Tp));
+rhof0  = cal.rhof0.*ones(size(Tp));
 Pchmb  = Pchmb0;  Pchmbo = Pchmb;  Pchmboo = Pchmbo;  dPchmbdt = Pchmb;  dPchmbdto = dPchmbdt; dPchmbdtoo = dPchmbdto;  upd_Pchmb = dPchmbdt;
-Pt     = Ptop + Pchmb + mean(rhom,'all').*g0.*ZZ;  Pl = Pt;
-rhof   = rhof.*(1+bPf.*(Pt-Pref));
-rhox   = rhox.*(1+bPx.*(Pt-Pref));
-rhom   = rhom.*(1+bPm.*(Pt-Pref));
+Pt     = Ptop + Pchmb + mean(rhom0,'all').*g0.*ZZ;  Pl = Pt;  Pto = Pt; Ptoo = Pt; dPtdt = 0*Pt; dPtdto = dPtdt; dPtdtoo = dPtdto;
+rhof   = rhof0.*(1+bPf.*(Pt-Pref));
+rhox   = rhox0.*(1+bPx.*(Pt-Pref));
+rhom   = rhom0.*(1+bPm.*(Pt-Pref));
 rho    = rhom;
-rhofz  = (rho(icz(1:end-1),:)+rho(icz(2:end),:))/2;
-rhofx  = (rho(:,icx(1:end-1))+rho(:,icx(2:end)))/2;
-rhoWo  = rhofz.*W(:,2:end-1); rhoWoo = rhoWo; advn_mz = 0.*rhoWo(2:end-1,:);
-rhoUo  = rhofx.*U(2:end-1,:); rhoUoo = rhoUo; advn_mx = 0.*rhoUo;
+rhow   = (rho(icz(1:end-1),:)+rho(icz(2:end),:))/2;
+rhou   = (rho(:,icx(1:end-1))+rho(:,icx(2:end)))/2;
+rhoWo  = rhow.*W(:,2:end-1); rhoWoo = rhoWo; advn_mz = 0.*rhoWo(2:end-1,:);
+rhoUo  = rhou.*U(2:end-1,:); rhoUoo = rhoUo; advn_mx = 0.*rhoUo;
 fq     = zeros(size(Tp));  mq = ones(size(Tp))/2;  xq = 1-mq-fq; 
 cmq    = c; cxq = c;  cfq = 0.*c;  cfq(:,:,end) = 1;  cf = cfq;
 cm_oxd = reshape(reshape(c,Nz*Nx,cal.ncmp)*cal.cmp_oxd,Nz,Nx,cal.noxd);
 cm_oxd_all = zeros(Nz,Nx,9);
 cm_oxd_all(:,:,cal.ioxd) = cm_oxd;
-aT     = aTm;
-kT     = kTm;
-cP     = cPm; RhoCp = rho.*cP;
-T      = (Tp+273.15).*exp(aT./RhoCp.*(Pt-Pref));
+aT   = aTm;
+kT   = kTm;
+cP   = cPm; RhoCp = rho.*cP;
+Adbt = aT./RhoCp;
+Tp   = (Tp+273.15); %T = Tp;
+T    = Tp.*exp(Adbt.*(Pt-Pref));
+sm   = cPm.*log(Tp./Tref);  sx = cPx.*log(Tp./Tref) + Dsx;  sf = cPf.*log(Tp./Tref) + Dsf;
+x    = xq;  m = mq;  f = fq; mu = m; chi = x; phi = f;
 
 % get volume fractions and bulk density
 step    = 0;
@@ -318,16 +323,6 @@ a1      = 1; a2 = 0; a3 = 0; b1 = 1; b2 = 0; b3 = 0;
 res  = 1;  tol = 1e-9;  it = 1;
 while res > tol
     Ptii = Pt; Ti = T; xi = xq; fi = fq;
-    
-    rhofz  = (rho(icz(1:end-1),:)+rho(icz(2:end),:))/2;
-    rhofx  = (rho(:,icx(1:end-1))+rho(:,icx(2:end)))/2;
-    if Nz==1; Pt = Ptop.*ones(size(Tp)) + Pchmb; else
-        Pl(1,:)     = repmat(mean(rhofz(1,:),2).*g0.*h/2,1,Nx) + Ptop;
-        Pl(2:end,:) = Pl(1,:) + repmat(cumsum(mean(rhofz(2:end-1,:),2).*g0.*h),1,Nx);
-        Pt          = Pl + Pchmb;
-    end
-    
-    T  = (Tp+273.15).*exp(aT./RhoCp.*(Pt-Pref));
 
     eqtime = tic;
 
@@ -361,14 +356,36 @@ while res > tol
 
     update;
 
+    % T  = Tp.*exp(Adbt.*(Pt-Pref));
+    % sm = cPm.*log(Tp./T0);  sx = sm+Dsx;  sf = sx+Dsf;
+
+    X    = rho.*x; Xo = X;  res_X = 0.*X;
+    F    = rho.*f; Fo = F;  res_F = 0.*F;
+    M    = rho.*m; Mo = M;  res_M = 0.*M;
+    RHO  = X+M+F;
+    C    = M.*cm + X.*cx + F.*cf;
+
+    sm = cPm.*log(Tp./Tref);  sx = cPx.*log(Tp./Tref) + Dsx;  sf = cPf.*log(Tp./Tref) + Dsf;
+    S  = M.*sm + X.*sx + F.*sf;
+
+    [Tp,~ ] = StoT(Tp,S./rho,Pref+0*Pt,cat(3,m,x,f),[cPm;cPx;cPf],[aTm;aTx;aTf],[bPm;bPx;bPf],cat(3,rhom0,rhox0,rhof0),[sref;sref+Dsx;sref+Dsf],Tref,Pref);
+    [T ,si] = StoT(T ,S./rho,       Pt,cat(3,m,x,f),[cPm;cPx;cPf],[aTm;aTx;aTf],[bPm;bPx;bPf],cat(3,rhom0,rhox0,rhof0),[sref;sref+Dsx;sref+Dsf],Tref,Pref);
+    sm = si(:,:,1); sx = si(:,:,2); sf = si(:,:,3);
+
+
     res  = norm(Pt(:)-Ptii(:),2)./norm(Pt(:),2) ...
-         + norm( T(:)-Ti  (:),2)./norm( T(:),2) ...
-         + norm((x(:)-xi  (:)).*(x(:)>eps),2)./(norm(x(:),2)+eps^0.25) ...
-         + norm((f(:)-fi  (:)).*(f(:)>eps),2)./(norm(f(:),2)+eps^0.25);
+         + norm( T(:)-Ti  (:),2)./norm( T(:),2);
 
     it = it+1;
 end
 % end
+To   = T;  
+Tpo  = Tp;
+So   = S;  
+Mo   = M;
+Co   = C;
+Xo   = X;
+Fo   = F;
 rhoo = rho;
 dto  = dt; 
 
@@ -414,23 +431,6 @@ fprintf('    initial H2O : %4.3f \n'  ,c0_oxd(end));
 fprintf('    initial x   : %4.3f \n'  ,x0);
 fprintf('    initial f   : %4.3f \n\n',f0);
 
-
-% get bulk enthalpy, silica, volatile content densities
-Tp   = Tp+273.15;  Tn = T;  Tpn = Tp;  To = T;  Tpo = T;
-T    = Tp.*exp(aT./RhoCp.*(Pt-Pref));
-sm   = cP.*log(Tp/Tref);
-C    = rho.*(m.*cm + x.*cx + f.*cf); Co = C;  res_C = 0.*C;
-X    = rho.*x; Xo = X;  res_X = 0.*X;
-F    = rho.*f; Fo = F;  res_F = 0.*F;
-M    = rho.*m; Mo = M;  res_M = 0.*M;
-RHO  = X+M+F;
-S    = sm.*rho + X.*Dsx + F.*Dsf;  So = S;  res_S = 0.*S;
-
-% get phase entropies
-sm = (S - X.*Dsx - F.*Dsf)./rho;
-sx = sm + Dsx;
-sf = sm + Dsf;
-
 % get trace element phase compositions
 Ktrc = zeros(Nz,Nx,cal.ntrc);
 trcm = zeros(Nz,Nx,cal.ntrc);
@@ -474,7 +474,7 @@ upd_F  = 0.*F;
 upd_M  = 0.*M;
 upd_rho= 0.*rho;
 upd_TRC = 0.*TRC;
-% upd_IR = 0.*IR;
+upd_eta = 0.*eta;
 
 % initialise timing and iterative parameters
 frst    = 1;

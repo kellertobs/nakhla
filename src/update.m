@@ -32,13 +32,14 @@ cx_oxd_all(:,:,cal.ioxd) = cx_oxd;
 % update phase densities
 rhom0  = reshape(DensityX(reshape(cm_oxd_all,Nz*Nx,9),Tref,Pref./1e8)    ,Nz,Nx);
 rhox0  = reshape(sum(reshape(cx_mem/100,Nz*Nx,cal.nmem)./cal.rhox0,2).^-1,Nz,Nx);
-rhof0  = cal.rhof0                                                              ;
+rhof0  = cal.rhof0.*ones(size(T))                                               ;
 
 rhom   = rhom0 .* (1 - aTm.*(T-Tref) + bPm.*(Pt-Pref));
 rhox   = rhox0 .* (1 - aTx.*(T-Tref) + bPx.*(Pt-Pref));
 rhof   = rhof0 .* (1 - aTf.*(T-Tref) + bPf.*(Pt-Pref));
 
-rho    = 1./(m./rhom + x./rhox + f./rhof);
+rho0   = 1./(m./rhom0 + x./rhox0 + f./rhof0);
+rho    = 1./(m./rhom  + x./rhox  + f./rhof );
 
 rhomw  = (rhom(icz(1:end-1),:)+rhom(icz(2:end),:))/2;
 rhoxw  = (rhox(icz(1:end-1),:)+rhox(icz(2:end),:))/2;
@@ -67,18 +68,23 @@ chi_mem = chi_mem./sum(chi_mem,3);
 
 % update thermal parameters
 aT = mu.*aTm + chi.*aTx + phi.*aTf;
+bP = mu.*bPm + chi.*bPx + phi.*bPf;
 kT = mu.*kTm + chi.*kTx + phi.*kTf;
 cP = mu.*cPm + chi.*cPx + phi.*cPf;
 RhoCp = mu.*rhom.*cPm + chi.*rhox.*cPx + phi.*rhof.*cPf;
+Adbt  = mu.*aTm./rhom./cPm + chi.*aTx./rhox./cPx + phi.*aTf./rhof./cPf;
 
 % update lithostatic pressure
 Pti = Pt;
-if Nz==1; Pt    = max(1e7,(1-alpha)*Pt + alpha*Ptop.*ones(size(Pt)) + Pcouple*(Pchmb + P(2:end-1,2:end-1))); else
+if Nz==1; Pt    = max(1e6,Ptop.*ones(size(Pt)) + Pcouple*(Pchmb + P(2:end-1,2:end-1))); else
     Pl(1,:)     = repmat(rhoref(1).*g0.*h/2,1,Nx) + Ptop;
     Pl(2:end,:) = Pl(1,:) + repmat(cumsum(rhoref(2:end-1).*g0.*h),1,Nx);
-    Pt          = max(1e7,(1-alpha)*Pt + alpha*(Pl + Pcouple*(Pchmb + P(2:end-1,2:end-1))));
+    Pt          = max(1e6,Pl + Pcouple*(Pchmb + P(2:end-1,2:end-1)));
 end
+Pt = alpha.*Pt + (1-alpha).*Pti;
 upd_Pt = Pt-Pti;
+% dPtdt  = (Pt - Pto)/dt;
+% dPtdt = ((a1*Pt-a2*Pto-a3*Ptoo)/dt - (b2*dPtdto + b3*dPtdtoo))/b1;
 
 % update effective constituent sizes
 dm = dm0.*(1-mu ).^0.5;
@@ -130,9 +136,9 @@ if ~calibrt % skip the following if called from calibration script
 Div_V = ddz(W(:,2:end-1),h) + ddx(U(2:end-1,:),h);                         % get velocity divergence
 
 % update strain rates
-exx = diff(U(2:end-1,:),1,2)./h - Div_V./3;                                % x-normal strain rate
-ezz = diff(W(:,2:end-1),1,1)./h - Div_V./3;                                % z-normal strain rate
-exz = 1/2.*(diff(U,1,1)./h+diff(W,1,2)./h);                                % shear strain rate
+exx = diff(U(2:end-1,:),1,2)./h - Div_V/3;                                 % x-normal strain rate
+ezz = diff(W(:,2:end-1),1,1)./h - Div_V/3;                                 % z-normal strain rate
+exz = (diff(U,1,1)./h+diff(W,1,2)./h)/2;                                   % shear strain rate
 
 eII = (0.5.*(exx.^2 + ezz.^2 ...
        + 2.*(exz(1:end-1,1:end-1).^2+exz(2:end,1:end-1).^2 ...
@@ -163,7 +169,7 @@ end
 % update diffusion parameters
 if Nx==1 && Nz==1; kW = 0; Pr = Prt; Sc = Sct;
 elseif Nx==1
-    kW  = Vel.*Delta_cnv;                                                  % convective mixing diffusivity
+    kW  = (kW + Vel.*Delta_cnv)/2;                                         % convective mixing diffusivity
     Pr  = Prt;
     Sc  = Sct;
 else
@@ -171,15 +177,16 @@ else
     Pr  = Prt ./ (1-exp(-Re./10)+eps);
     Sc  = Sct ./ (1-exp(-Re./10)+eps);
 end
-kwm = abs(rhom-rho).*g0.*Ksgr_m.*Delta_sgr + kmin;                         % segregation diffusivity
-kwx = abs(rhox-rho).*g0.*Ksgr_x.*Delta_sgr + kmin;                         % segregation diffusivity
-kwf = abs(rhof-rho).*g0.*Ksgr_f.*Delta_sgr + kmin;                         % segregation diffusivity
+kW = 1./(1./kmax + 1./kW) + kmin;
+kwm = abs(rhom-rho).*g0.*Ksgr_m.*Delta_sgr;                                % segregation diffusivity
+kwx = abs(rhox-rho).*g0.*Ksgr_x.*Delta_sgr;                                % segregation diffusivity
+kwf = abs(rhof-rho).*g0.*Ksgr_f.*Delta_sgr;                                % segregation diffusivity
 km  = (kwm+kW).*mu ;                                                       % regularised melt  fraction diffusion 
 kx  = (kwx+kW).*chi;                                                       % regularised solid fraction diffusion 
 kf  = (kwf+kW).*phi;                                                       % regularised fluid fraction diffusion 
 ks  = (kW./Pr + kmin).*rho.*cP./T;                                         % regularised heat diffusion
 kc  =  kW./Sc + kmin;                                                      % regularised component diffusion
-eta = (kW.*rho + eta0)/2 + eta/2;                                          % regularised momentum diffusion
+eta =  kW.*rho + eta0;                                                     % regularised momentum diffusion
 
 etamax = etacntr.*max(min(eta(:)),etamin);
 eta    = 1./(1./etamax + 1./eta) + etamin;

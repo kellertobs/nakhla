@@ -28,15 +28,15 @@ for atol = ATOL
 
     % set initial thermo-chemical state
     smth     =  15;
-    T0       =  1150;                % temperature top  layer [deg C]
+    T0       =  1200;                % temperature top  layer [deg C]
     T1       =  T0;                  % temperature base layer [deg C]
-    c0       =  [0.10 0.26 0.54 0.10 0.05];  % components (maj comp, H2O) top  layer [wt] (will be normalised to unit sum!)
+    c0       =  [11  17  35  31  3  3  5]/100;  % components (maj comp, H2O) top  layer [wt] (will be normalised to unit sum!)
     c1       =  c0;                  % components (maj comp, H2O) base layer [wt] (will be normalised to unit sum!)
-    dcr      =  [1,1,-1,-1,0]*0e-3;  % amplitude of random noise [wt]
-    dcg      =  [-1,-1,1,1,0]*1e-2;  % amplitude of centred gaussian [wt]
+    dcr      =  [1,1,1,-1,-1,-1,0]*1e-3;  % amplitude of random noise [wt]
+    dcg      =  [-1,-1,-1,1,1,1,0]*1e-2;  % amplitude of centred gaussian [wt]
     dTg      =  5;
-    dTr      =  0.0;
-    dr_trc   =  [1,1,1,-1,-1,-1].*0e-3;
+    dTr      =  0.01;
+    dr_trc   =  [1,1,1,-1,-1,-1].*1e-3;
     dg_trc   =  [-1,-1,-1,1,1,1].*1e-2;
 
     % closed boundaries for gas flux
@@ -58,8 +58,7 @@ for atol = ATOL
     rtol     =  atol/1e6;            % outer its absolute tolerance
     maxit    =  100;                 % maximum outer its
     alpha    =  0.50;                % iterative step size parameter
-    beta     =  0.00;                % iterative damping parameter
-    gamma    =  0;
+    Pcouple  =  1;
 
     % create output directory
     if ~isfolder([outdir,'/',runID])
@@ -89,7 +88,7 @@ for atol = ATOL
     semilogy((hist.time(Nt/2:Nt-1)+hist.time(Nt/2+1:Nt))/2,abs(diff(hist.EM(Nt/2:Nt)))./diff(hist.time(Nt/2:Nt)),'-',LW{:}); hold on; axis tight; box on;
     semilogy((hist.time(Nt/2:Nt-1)+hist.time(Nt/2+1:Nt))/2,abs(diff(hist.EX(Nt/2:Nt)))./diff(hist.time(Nt/2:Nt)),'-',LW{:}); hold on; axis tight; box on;
     semilogy((hist.time(Nt/2:Nt-1)+hist.time(Nt/2+1:Nt))/2,abs(diff(hist.EF(Nt/2:Nt)))./diff(hist.time(Nt/2:Nt)),'-',LW{:}); hold on; axis tight; box on;
-    ylabel('$\Delta E_{\bar{\rho}}, E_{F^i}$',TX{:},FS{:}); set(gca,TL{:},TS{:},'XTickLabel',[]);
+    ylabel('$\Delta E_{\bar{\rho}}, \Delta E_{F^i}$',TX{:},FS{:}); set(gca,TL{:},TS{:},'XTickLabel',[]);
     subplot(4,1,3);
     semilogy((hist.time(Nt/2:Nt-1)+hist.time(Nt/2+1:Nt))/2,abs(diff(hist.EC(Nt/2:Nt,:)))./repmat(diff(hist.time(Nt/2:Nt)),cal.ncmp,1).','-',LW{:}); hold on; axis tight; box on;
     ylabel('$\Delta E_{C_j}$',TX{:},FS{:}); set(gca,TL{:},TS{:},'XTickLabel',[]);

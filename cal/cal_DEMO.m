@@ -58,9 +58,9 @@ cal.msy_mem = [ 1   1   0   0   0   0   0   0   0   0    % olivine (olv)
 cal.cmp_mem = [ 95   5    0    0    0    0    0    0    0    0    % dunite (dun)
                  6   4   65   25    0    0    0    0    0    0    % troctolite (tro)
                  2   2   36    7   45    8    0    0    0    0    % olivine-gabbro (ogb)
-                 1  11   18   30    5   27    7    1    0    0    % ferro-basalt (fbs)
-                 0   0    6   81    1    5    2    3    2    0    % trachy-andesite (tra)
-                 0   0    1   48    0    0    0    2   49    0    % rhyolite (rhy)
+                 1  12   18   25    8   27    8    1    0    0    % ferro-basalt (fbs)
+                 0   0    6   80    1    6    2    3    2    0    % trachy-andesite (tra)
+                 0   0    1   48    0    1    0    2   48    0    % rhyolite (rhy)
                  0   0    0    0    0    0    0    0    0  100];  % volatile (vol)
 cal.cmp_mem = cal.cmp_mem./sum(cal.cmp_mem,2)*100;
 
@@ -87,7 +87,7 @@ cal.A   = [7.0  5.0  4.0  3.0  2.5  2.0];
 cal.B   = [7.0  5.0  4.0  3.0  2.5  2.0];
 
 % set coeff. for T-dependence of partition coefficients K^i [1/K]
-cal.r   = [40  6  5  9  8  5];
+cal.r   = [40  5  6  9  8  5];
 
 % set entropy gain of fusion and evaporation DeltaS [J/K]
 cal.Dsx  = 350;

@@ -89,22 +89,22 @@ g0       =  10.;                 % gravity [m/s2]
 % set chamber pressure parameters
 Pchmb0   =  0;                   % initial chamber pressure [Pa]
 eta_wall =  1e15;                % wall rock viscosity [Pas]
-mod_wall =  1e10;                % wall rock elastic modulus [Pa]
+mod_wall =  0e10;                % wall rock elastic modulus [Pa]
 
 % set numerical model parameters
 TINT     =  'bd2im';             % time integration scheme ('be1im','bd2im','cn2si','bd2si')
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
-CFL      =  1.00;                % (physical) time stepping courant number (multiplies stable step) [0,1]
+CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 maxcmp   =  0.01;                % maximum change in phase fraction due to compaction
 rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-8;                % outer its absolute tolerance
-maxit    =  20;                  % maximum outer its
-alpha    =  0.75;                % iterative step size parameter
+maxit    =  50;                  % maximum outer its
+alpha    =  0.50;                % iterative step size parameter
 beta     =  0.00;                % iterative damping parameter
-gamma    =  1e-3;                % artificial horizontal inertia parameter (only applies if periodic)
+gamma    =  0e-3;                % artificial horizontal inertia parameter (only applies if periodic)
 lambda1  =  0e-7;                % pressure regularisation parameter
 lambda2  =  0e-7;                % pressure regularisation parameter
-etacntr  =  1e+8;                % maximum viscosity contrast
+etacntr  =  1e+9;                % maximum viscosity contrast
 Delta_cnv=  h/2;                 % correlation length for eddy diffusivity (multiple of h, 0.5-1)
 Delta_sgr=  dx0*10;              % correlation length for phase fluctuation diffusivity (multiple of dx0, df0, 10-20)
 Prt      =  3;                   % turbulent Prandtl number (ratio of momentum to heat diffusivity)

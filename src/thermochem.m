@@ -33,20 +33,10 @@ res_S = (a1*S-a2*So-a3*Soo)/dt - (b1*dSdt + b2*dSdto + b3*dSdtoo);
 upd_S = - alpha*res_S*dt/a1 + beta*upd_S;
 S     = S + upd_S;
 
-% update phase entropies
-s  = S./RHO;
-si = sm;
-sm = (S - X.*Dsx - F.*Dsf)./RHO;
-sx = sm + Dsx;
-sf = sm + Dsf;
-upd_s = sm-si;
-
-% update temperature
-upd_Tp = (upd_s.*rho             ) .*T./RhoCp;
-upd_T  = (upd_s.*rho + aT.*upd_Pt) .*T./RhoCp;
-
-Tp     = Tp + upd_Tp;
-T      = T  + upd_T;
+% convert entropy S to natural temperature T and potential temperature Tp
+[Tp,~ ] = StoT(Tp,S./rho,Pref+0*Pt,cat(3,m,x,f),[cPm;cPx;cPf],[aTm;aTx;aTf],[bPm;bPx;bPf],cat(3,rhom0,rhox0,rhof0),[sref;sref+Dsx;sref+Dsf],Tref,Pref);
+[T ,si] = StoT(T ,S./rho,       Pt,cat(3,m,x,f),[cPm;cPx;cPf],[aTm;aTx;aTf],[bPm;bPx;bPf],cat(3,rhom0,rhox0,rhof0),[sref;sref+Dsx;sref+Dsf],Tref,Pref);
+sm = si(:,:,1); sx = si(:,:,2); sf = si(:,:,3);  % read out phase entropies
 
 
 %***  update major component densities
