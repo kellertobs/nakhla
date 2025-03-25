@@ -89,9 +89,12 @@ Tsol   = reshape(cal.Tsol,Nz,Nx);
 Tliq   = reshape(cal.Tliq,Nz,Nx);
 H2Osat = reshape(cal.H2Osat,Nz,Nx);
 
-mq = reshape(var.m,Nz,Nx);
-fq = reshape(var.f,Nz,Nx);
-xq = reshape(var.x,Nz,Nx);
+mq = reshape(var.m.*(var.m>eps^0.5),Nz,Nx);
+fq = reshape(var.f.*(var.f>eps^0.5),Nz,Nx);
+xq = reshape(var.x.*(var.x>eps^0.5),Nz,Nx);
+mq = mq./(mq+xq+fq);
+xq = xq./(mq+xq+fq);
+fq = fq./(mq+xq+fq);
 
 cxq = reshape(var.cx,Nz,Nx,cal.ncmp);
 cmq = reshape(var.cm,Nz,Nx,cal.ncmp);
@@ -109,9 +112,9 @@ advn_M   = - advect(M,Um(2:end-1,:),Wm(:,2:end-1),h,{ADVN,''},[1,2],BCA);
 advn_rho = advn_X+advn_F+advn_M;
 
 % phase mass transfer rates
-Gm  = (mq-m).*RHO/max(tau_r,10*dt);
-Gx  = (xq-x).*RHO/max(tau_r,10*dt); 
-Gf  = (fq-f).*RHO/max(tau_r,10*dt);
+Gm  = (Gm + (mq-m).*RHO/max(tau_r,10*dt))/2;
+Gx  = (Gx + (xq-x).*RHO/max(tau_r,10*dt))/2; 
+Gf  = (Gf + (fq-f).*RHO/max(tau_r,10*dt))/2;
 
 Gmc = (cmq.*mq-cm.*m).*RHO/max(tau_r,10*dt);
 Gxc = (cxq.*xq-cx.*x).*RHO/max(tau_r,10*dt);
@@ -128,9 +131,10 @@ res_F = (a1*F-a2*Fo-a3*Foo)/dt - (b1*dFdt + b2*dFdto + b3*dFdtoo);
 res_M = (a1*M-a2*Mo-a3*Moo)/dt - (b1*dMdt + b2*dMdto + b3*dMdtoo);
 
 % semi-implicit update of phase fraction densities
-upd_X = max(-X, - alpha*res_X*dt/a1 + beta*upd_X );
-upd_F = max(-F, - alpha*res_F*dt/a1 + beta*upd_F );
-upd_M = max(-M, - alpha*res_M*dt/a1 + beta*upd_M );
+upd_X = max(-X/2, - alpha*res_X*dt/a1 + beta*upd_X );
+upd_F = max(-F/2, - alpha*res_F*dt/a1 + beta*upd_F );
+upd_M = max(-M/2, - alpha*res_M*dt/a1 + beta*upd_M );
+
 X     = X + upd_X;
 F     = F + upd_F;
 M     = M + upd_M;
@@ -144,10 +148,6 @@ RHO = X+F+M;
 x = X./RHO; 
 f = F./RHO; 
 m = M./RHO;
-
-hasx = x >= eps^0.5;
-hasf = f >= eps^0.5;
-hasm = m >= eps^0.5;
 
 % identify subsolidus and superliquidus regions
 subsol  = m<=1e-9 & T<=reshape(cal.Tsol+273.15,Nz,Nx);

@@ -1,6 +1,11 @@
 %%*****  UPDATE PARAMETERS & AUXILIARY FIELDS  ****************************
 tic;
 
+% update phase indicators
+hasx = x >= eps^0.5;
+hasf = f >= eps^0.5;
+hasm = m >= eps^0.5;
+
 % update phase oxide compositions
 c_oxd  = reshape(reshape(c ,Nz*Nx,cal.ncmp)*cal.cmp_oxd,Nz,Nx,cal.noxd);
 cm_oxd = reshape(reshape(cm,Nz*Nx,cal.ncmp)*cal.cmp_oxd,Nz,Nx,cal.noxd);
@@ -23,11 +28,17 @@ for j = 1:cal.nmsy
 end
 
 cm_oxd_all = zeros(size(c,1),size(c,2),9);
-cm_oxd_all(:,:,cal.ioxd) = cm_oxd;
 cx_oxd_all = zeros(size(c,1),size(c,2),9);
-cx_oxd_all(:,:,cal.ioxd) = cx_oxd;
  c_oxd_all = zeros(size(c,1),size(c,2),9);
- c_oxd_all(:,:,cal.ioxd) = c_oxd;
+if cal.noxd>9
+    cm_oxd_all = cm_oxd(:,:,cal.ioxd);
+    cx_oxd_all = cx_oxd(:,:,cal.ioxd);
+     c_oxd_all =  c_oxd(:,:,cal.ioxd);
+else
+    cm_oxd_all(:,:,cal.ioxd) = cm_oxd;
+    cx_oxd_all(:,:,cal.ioxd) = cx_oxd;
+     c_oxd_all(:,:,cal.ioxd) = c_oxd;
+end
 
 % update phase densities
 rhom0  = reshape(DensityX(reshape(cm_oxd_all,Nz*Nx,9),Tref,Pref./1e8)    ,Nz,Nx);
@@ -50,9 +61,9 @@ rhou   = (rho(:,icx(1:end-1))+rho(:,icx(2:end)))/2;
 
 rhoref = mean(rhow,2);
 
-Drhom  = rhomw - rhoref;
-Drhox  = rhoxw - rhoref;
-Drhof  = rhofw - rhoref;
+Drhom  = rhomw - rhow;
+Drhox  = rhoxw - rhow;
+Drhof  = rhofw - rhow;
 Drho   = rhow  - rhoref;
 
 rhoW   = rhow.*W(:,2:end-1);
@@ -76,10 +87,10 @@ Adbt  = mu.*aTm./rhom./cPm + chi.*aTx./rhox./cPx + phi.*aTf./rhof./cPf;
 
 % update lithostatic pressure
 Pti = Pt;
-if Nz==1; Pt    = max(1e6,Ptop.*ones(size(Pt)) + Pcouple*(Pchmb + P(2:end-1,2:end-1))); else
+if Nz==1; Pt    = max(Ptop/10,Ptop.*ones(size(Pt)) + Pcouple*(Pchmb + P(2:end-1,2:end-1))); else
     Pl(1,:)     = repmat(rhoref(1).*g0.*h/2,1,Nx) + Ptop;
     Pl(2:end,:) = Pl(1,:) + repmat(cumsum(rhoref(2:end-1).*g0.*h),1,Nx);
-    Pt          = max(1e6,Pl + Pcouple*(Pchmb + P(2:end-1,2:end-1)));
+    Pt          = max(Ptop/10,Pl + Pcouple*(Pchmb + P(2:end-1,2:end-1)));
 end
 Pt = alpha.*Pt + (1-alpha).*Pti;
 upd_Pt = Pt-Pti;
@@ -104,8 +115,8 @@ Mv = permute(repmat(kv,1,1,1,3),[4,1,2,3])./permute(repmat(kv,1,1,1,3),[1,4,2,3]
 % Mf = permute(repmat(kf,1,1,1,3),[4,1,2,3])./permute(repmat(kf,1,1,1,3),[1,4,2,3]);
 
 % get permission weights
-dd = max(1e-6,min(1-1e-6,permute(cat(3,dx ,dm ,df ),[3,1,2])));
-ff = max(1e-6,min(1-1e-6,permute(cat(3,chi,mu ,phi),[3,1,2])));
+dd = max(eps^0.5,min(1-eps^0.5,permute(cat(3,dx ,dm ,df ),[3,1,2])));
+ff = max(eps^0.5,min(1-eps^0.5,permute(cat(3,chi,mu ,phi),[3,1,2])));
 FF = permute(repmat(ff,1,1,1,3),[4,1,2,3]);
 Sf = (FF./cal.BB).^(1./cal.CC);  Sf = Sf./sum(Sf,2);
 Xf = sum(cal.AA.*Sf,2).*FF + (1-sum(cal.AA.*Sf,2)).*Sf;
@@ -173,14 +184,14 @@ elseif Nx==1
     Pr  = Prt;
     Sc  = Sct;
 else
-    kW  = eII.*Delta_cnv.^2;                                               % turbulent eddy diffusivity
+    kW  = (kW + eII.*Delta_cnv.^2)/2;                                               % turbulent eddy diffusivity
     Pr  = Prt ./ (1-exp(-Re./10)+eps);
     Sc  = Sct ./ (1-exp(-Re./10)+eps);
 end
 kW = 1./(1./kmax + 1./kW) + kmin;
-kwm = abs(rhom-rho).*g0.*Ksgr_m.*Delta_sgr;                                % segregation diffusivity
-kwx = abs(rhox-rho).*g0.*Ksgr_x.*Delta_sgr;                                % segregation diffusivity
-kwf = abs(rhof-rho).*g0.*Ksgr_f.*Delta_sgr;                                % segregation diffusivity
+kwm = abs(rhom-rho).*g0.*Ksgr_m.*Delta_sgr.*hasm;                          % segregation diffusivity
+kwx = abs(rhox-rho).*g0.*Ksgr_x.*Delta_sgr.*hasx;                          % segregation diffusivity
+kwf = abs(rhof-rho).*g0.*Ksgr_f.*Delta_sgr.*hasf;                          % segregation diffusivity
 km  = (kwm+kW).*mu ;                                                       % regularised melt  fraction diffusion 
 kx  = (kwx+kW).*chi;                                                       % regularised solid fraction diffusion 
 kf  = (kwf+kW).*phi;                                                       % regularised fluid fraction diffusion 

@@ -284,7 +284,11 @@ Pref   = 1e5;
 sref   = 0e3;
 c0_oxd = c0*cal.cmp_oxd;
 c0_oxd_all = zeros(size(c0,1),9);
-c0_oxd_all(:,cal.ioxd) = c0_oxd;
+if cal.noxd>9
+    c0_oxd_all = c0_oxd(:,cal.ioxd);
+else
+    c0_oxd_all(:,cal.ioxd) = c0_oxd;
+end
 rhom0  = mean(cal.rhox0-500).*ones(size(Tp)); 
 rhox0  = mean(cal.rhox0).*ones(size(Tp));
 rhof0  = cal.rhof0.*ones(size(Tp));
@@ -302,7 +306,11 @@ fq     = zeros(size(Tp));  mq = ones(size(Tp))/2;  xq = 1-mq-fq;
 cmq    = c; cxq = c;  cfq = 0.*c;  cfq(:,:,end) = 1;  cf = cfq;
 cm_oxd = reshape(reshape(c,Nz*Nx,cal.ncmp)*cal.cmp_oxd,Nz,Nx,cal.noxd);
 cm_oxd_all = zeros(Nz,Nx,9);
-cm_oxd_all(:,:,cal.ioxd) = cm_oxd;
+if cal.noxd>9
+    cm_oxd_all = cm_oxd(:,:,cal.ioxd);
+else
+    cm_oxd_all(:,:,cal.ioxd) = cm_oxd;
+end
 aT   = aTm;
 kT   = kTm;
 cP   = cPm; RhoCp = rho.*cP;
@@ -320,7 +328,7 @@ TCtime  = 0;
 UDtime  = 0;
 a1      = 1; a2 = 0; a3 = 0; b1 = 1; b2 = 0; b3 = 0;
 
-res  = 1;  tol = 1e-9;  it = 1;
+res  = 1;  tol = 1e-12;  it = 1;
 while res > tol
     Ptii = Pt; Ti = T; xi = xq; fi = fq;
 
@@ -341,9 +349,12 @@ while res > tol
     Tliq   = reshape(cal.Tliq,Nz,Nx);
     H2Osat = reshape(cal.H2Osat,Nz,Nx);
 
-    mq = reshape(var.m,Nz,Nx);
-    fq = reshape(var.f,Nz,Nx);
-    xq = reshape(var.x,Nz,Nx);
+    mq = reshape(var.m.*(var.m>eps^0.5),Nz,Nx);
+    fq = reshape(var.f.*(var.f>eps^0.5),Nz,Nx);
+    xq = reshape(var.x.*(var.x>eps^0.5),Nz,Nx);
+    mq = mq./(mq+xq+fq);
+    xq = xq./(mq+xq+fq);
+    fq = fq./(mq+xq+fq);
     x  = xq;  m = mq;  f = fq;
 
     cxq = reshape(var.cx,Nz,Nx,cal.ncmp);
@@ -411,7 +422,11 @@ rhof0 = cal.rhof0;
 rhox0 = mean(rhox(:));
 
 cm0_oxd_all = zeros(1,9);
-cm0_oxd_all(:,cal.ioxd) = cm0_oxd;
+if cal.noxd>9
+    cm0_oxd_all = cm0_oxd(:,cal.ioxd);
+else
+    cm0_oxd_all(:,cal.ioxd) = cm0_oxd;
+end
 etam0 = Giordano08(cm0_oxd_all,T0);
 rhom0 = DensityX(cm0_oxd_all,T0,Ptop);
 
@@ -419,9 +434,14 @@ cm1_oxd = (0.99.*cm0_mem(1,:) + 0.01.*cal.cmp_mem(end-1,:))*cal.mem_oxd/100;
 cm2_oxd = (0.99.*cm0_mem(1,:) - 0.01.*cal.cmp_mem(end-1,:))*cal.mem_oxd/100;
 
 cm1_oxd_all = zeros(1,9);
-cm1_oxd_all(:,cal.ioxd) = cm1_oxd;
 cm2_oxd_all = zeros(1,9);
-cm2_oxd_all(:,cal.ioxd) = cm2_oxd;
+if cal.noxd>9
+    cm1_oxd_all = cm1_oxd(:,cal.ioxd);
+    cm2_oxd_all = cm2_oxd(:,cal.ioxd);
+else
+    cm1_oxd_all(:,cal.ioxd) = cm1_oxd;
+    cm2_oxd_all(:,cal.ioxd) = cm2_oxd;
+end
 
 rho0 = (x0./rhox0 + m0./rhom0).^-1;
 
@@ -499,16 +519,12 @@ if restart
     end
     if exist(name,'file')
         fprintf('\n   restart from %s \n\n',name);
-        load(name,'U','W','P','Pt','Pchmb','f','x','m','fq','xq','mq','phi','chi','mu','X','F','M','S','C','T','Tp','c','cm','cx','cf','TRC','trc','dSdt','dCdt','dFdt','dXdt','dMdt','drhodt','dTRCdt','Gf','Gx','Gm','rho','eta','eII','tII','dt','time','step','dV','wf','wx','wm','cal');
+        load(name,'U','W','P','Pt','Pchmb','f','x','m','fq','xq','mq','phi','chi','mu','X','F','M','S','C','T','Tp','c','cm','cx','cf','sm','sx','sf','TRC','trc','dSdt','dCdt','dFdt','dXdt','dMdt','drhodt','dTRCdt','Gf','Gx','Gm','rho','eta','eII','tII','dt','time','step','dV','wf','wx','wm','cal');
         name = [outdir,'/',runID,'/',runID,'_hist'];
         load(name,'hist');
 
         SOL = [W(:);U(:);P(:)];
         RHO = X+M+F;
-        s  = (S - X.*Dsx - F.*Dsf)./RHO;
-        sm = s;
-        sx = s + Dsx;
-        sf = s + Dsf;
 
         update; 
         

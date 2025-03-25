@@ -9,7 +9,7 @@ drhodt  = advn_rho;
 res_rho = (a1*rho-a2*rhoo-a3*rhooo)/dt - (b1*drhodt + b2*drhodto + b3*drhodtoo);
 
 % volume source and background velocity passed to fluid-mechanics solver
-upd_rho = - res_rho./b1./rho;
+upd_rho = - alpha*res_rho./b1./rho;
 dV      = dV + upd_rho;  % correct volume source term by scaled residual
 
 dVmean  = mean(dV,'all');
@@ -321,7 +321,7 @@ end
 
 %% assemble coefficients for matrix pressure diagonal and right-hand side
 
-if ~exist('KP','var') || bnchm || lambda1+lambda2>0
+% if ~exist('KP','var') || bnchm || lambda1+lambda2>0
     IIL = [];       % equation indeces into A
     JJL = [];       % variable indeces into A
     AAL = [];       % coefficients for A
@@ -347,6 +347,8 @@ if ~exist('KP','var') || bnchm || lambda1+lambda2>0
     IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; aa(:)+1];
     IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL; aa(:)-1];
     
+if ~exist('KP','var') || bnchm || lambda1+lambda2>0
+
     % internal points
     ii  = MapP(2:end-1,2:end-1);
     jj1 = MapP(1:end-2,2:end-1);
@@ -369,9 +371,10 @@ if ~exist('KP','var') || bnchm || lambda1+lambda2>0
     IIL = [IIL; ii(:)]; JJL = [JJL; jj3(:)];   AAL = [AAL; kP3(:)/h^2];      % P one above
     IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL; kP4(:)/h^2];      % P one below
     
-    % assemble coefficient matrix
-    KP  = sparse(IIL,JJL,AAL,NP,NP);
 end
+
+% assemble coefficient matrix
+KP  = sparse(IIL,JJL,AAL,NP,NP);
 
 % RHS
 IIR = [];       % equation indeces into R
@@ -388,18 +391,21 @@ IIR = [IIR; ii(:)]; AAR = [AAR; rr(:)];
 RP  = sparse(IIR,ones(size(IIR)),AAR,NP,1);
 
 % set P = 0 in fixed point
-nzp = round((Nz+2)/2);
+nzp = 2; %round((Nz+2)/2);
 nxp = round((Nx+2)/2);
 np0 = MapP(nzp,nxp);
-KP(np0,np0) = 1;
-DD(np0,:  ) = 0;
-RP(np0)     = 0;
+% nxp = 2:Nx-1;
+% np0 = MapP(nzp,nxp);
+% KP(np0,:  ) = 0;
+KP(np0,np0) = KP(np0,np0) + 1e-6.*h^2./geomean(eta(:));
+% DD(np0,:  ) = 0;
+% RP(np0    ) = 0;
 
 if bnchm; RP(MapP(nzp,nxp),:) = P_mms(nzp,nxp); end
 
 if bnchm
     % fix P = P_mms in middle of domain
-    nzp = round((Nz+2)/2);
+    nzp = 1;%round((Nz+2)/2);
     nxp = round((Nx+2)/2);
     np0 = MapP(nzp,nxp);
     DD(MapP(nzp,nxp),:) = 0;
@@ -424,7 +430,7 @@ LL  = [ KV   GG  ; ...
 RR  = [RV; RP];
 
 SCL = (abs(diag(LL))).^0.5;
-SCL = diag(sparse( 1./(SCL + 1e-3.*sqrt(h^2./geomean(eta(:)))) ));
+SCL = diag(sparse( 1./(SCL + 1e-6.*sqrt(h^2./geomean(eta(:)))) ));
 
 % FF  = LL*[W(:);U(:);P(:)] - RR;
 % FF  = SCL*FF;
@@ -441,7 +447,7 @@ SOL = SCL*(LL\RR);  % update solution
 W = full(reshape(SOL(MapW(:))        ,Nz+1,Nx+2));  % matrix z-velocity
 U = full(reshape(SOL(MapU(:))        ,Nz+2,Nx+1));  % matrix x-velocity
 P = full(reshape(SOL(MapP(:)+(NW+NU)),Nz+2,Nx+2));  % matrix dynamic pressure
-P = P - mean(P(:));                                 % reduce pressure by mean
+P = P - mean(mean(P(2:end-1,2:end-1)));             % reduce pressure by mean
 
 % % get VP-solution updates
 % upd_W = - full(reshape(SOL(MapW(:))        ,Nz+1,Nx+2));  % matrix z-velocity
@@ -541,12 +547,10 @@ if ~bnchm
 
     
     %% update time step
-    dtk = (h/2)^2/max([kW(:);kc(:);kwm(:);kwx(:);kwf(:);(kT(:)+ks(:).*T(:))./rho(:)./cP(:)]); % diffusive time step size  
-    dta =  h/2   /max(abs([Um(:).* mux(:);Wm(:).* muz(:); ...  % advective time step size
-                           Ux(:).*chix(:);Wx(:).*chiz(:); ...
-                           Uf(:).*phix(:);Wf(:).*phiz(:)]+eps));
+    dtk = (h/2)^2/max([kW(:);kc(:);km(:);kx(:);kf(:);(kT(:)+ks(:).*T(:))./rho(:)./cP(:)]); % diffusive time step size  
+    dta =  h/2   /max(abs([Um(:);Wm(:);Ux(:);Wx(:);Uf(:);Wf(:)]+eps)); % advective time step size
     dtc = maxcmp./max(abs([advn_X(:)./rho(:);advn_M(:)./rho(:);advn_F(:)./rho(:)]));
-    dt  = min([1.1*dto,min(CFL*[dtk,dta,dtc]),dtmax,tau_T/10]);                         % time step size
+    dt  = (dt + min([1.1*dto,min(CFL*[dtk,dta,dtc]),dtmax,tau_T/10]))/2;                         % time step size
 end
 
 end

@@ -102,8 +102,12 @@ hist.U(stp,2) = mean(mean(abs(U(2:end-1,:))));
 hist.U(stp,3) = max(max(U(2:end-1,:)));
 
 hist.P(stp,1) = min(min(P(2:end-1,2:end-1)));
-hist.P(stp,2) = mean(mean(abs(P(2:end-1,2:end-1))));
+hist.P(stp,2) = mean(mean(P(2:end-1,2:end-1)));
 hist.P(stp,3) = max(max(P(2:end-1,2:end-1)));
+
+hist.Pt(stp,1) = min(min(Pt));
+hist.Pt(stp,2) = mean(mean(abs(Pt)));
+hist.Pt(stp,3) = max(max(Pt));
 
 hist.Pchmb(stp,1) = Pchmb;
 
@@ -142,6 +146,10 @@ hist.Tsol(stp,3) = max(max(cal.Tsol));
 hist.Tliq(stp,1) = min(min(cal.Tliq));
 hist.Tliq(stp,2) = mean(mean(cal.Tliq));
 hist.Tliq(stp,3) = max(max(cal.Tliq));
+
+if Nz==1 && dPdT
+    hist.Tm(stp,:) = cal.Tm;
+end
 
 for i=1:cal.ncmp
     hist.c(stp,1,i) = min(min(c(:,:,i)));

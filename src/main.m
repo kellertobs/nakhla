@@ -3,8 +3,8 @@ init;
 
 % physical time stepping loop
 while time <= tend && step <= Nt &&  any(mq(:)>sqrt(eps))        ...
-                                 && ~any(Tliq(:)    -Tsol(:)<=3) ...
-                                 &&  any(T(:)-273.15-Tsol(:)>=3)
+                                 && ~any(Tliq(:)    -Tsol(:)<=5) ...
+                                 &&  any(T(:)-273.15-Tsol(:)>=5)
     
     % time step info
     timing;
