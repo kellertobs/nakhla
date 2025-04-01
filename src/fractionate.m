@@ -4,6 +4,9 @@ if ~exist('CML','var'); CML.M = 0; end
 
 if fractxtl && Nx==1 && Nz==1
 
+    % update P,T-path
+    Ptop = Ptop + (T-To).*dPdT;
+
     % record cumulate mass increments
     CML.r     (step)   = x-min(x,fractres);
     CML.M     (step)   = CML.r(step) .* (hist.sumB(1) - sum(CML.M(:)));
@@ -36,6 +39,9 @@ if fractxtl && Nx==1 && Nz==1
 % fractional melting  
 
 elseif fractmlt && Nx==1 && Nz==1
+
+    % update P,T-path
+    Ptop = Ptop + (T-To).*dPdT;
 
     % record cumulate mass increments
     CML.r     (step)   = m-min(m,fractres);

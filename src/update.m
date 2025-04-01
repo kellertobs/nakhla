@@ -87,10 +87,10 @@ Adbt  = mu.*aTm./rhom./cPm + chi.*aTx./rhox./cPx + phi.*aTf./rhof./cPf;
 
 % update lithostatic pressure
 Pti = Pt;
-if Nz==1; Pt    = max(Ptop/10,Ptop.*ones(size(Pt)) + Pcouple*(Pchmb + P(2:end-1,2:end-1))); else
+if Nz==1; Pt    = max(Ptop/100,Ptop.*ones(size(Pt)) + Pcouple*(Pchmb + P(2:end-1,2:end-1))); else
     Pl(1,:)     = repmat(rhoref(1).*g0.*h/2,1,Nx) + Ptop;
     Pl(2:end,:) = Pl(1,:) + repmat(cumsum(rhoref(2:end-1).*g0.*h),1,Nx);
-    Pt          = max(Ptop/10,Pl + Pcouple*(Pchmb + P(2:end-1,2:end-1)));
+    Pt          = max(Ptop/100,Pl + Pcouple*(Pchmb + P(2:end-1,2:end-1)));
 end
 Pt = alpha.*Pt + (1-alpha).*Pti;
 upd_Pt = Pt-Pti;

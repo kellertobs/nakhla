@@ -396,10 +396,10 @@ nxp = round((Nx+2)/2);
 np0 = MapP(nzp,nxp);
 % nxp = 2:Nx-1;
 % np0 = MapP(nzp,nxp);
-% KP(np0,:  ) = 0;
-KP(np0,np0) = KP(np0,np0) + 1e-6.*h^2./geomean(eta(:));
-% DD(np0,:  ) = 0;
-% RP(np0    ) = 0;
+KP(np0,:  ) = 0;
+KP(np0,np0) = 1;%KP(np0,np0) + 1e-6.*h^2./geomean(eta(:));
+DD(np0,:  ) = 0;
+RP(np0    ) = 0;
 
 if bnchm; RP(MapP(nzp,nxp),:) = P_mms(nzp,nxp); end
 
@@ -430,7 +430,7 @@ LL  = [ KV   GG  ; ...
 RR  = [RV; RP];
 
 SCL = (abs(diag(LL))).^0.5;
-SCL = diag(sparse( 1./(SCL + 1e-6.*sqrt(h^2./geomean(eta(:)))) ));
+SCL = diag(sparse( 1./(SCL + sqrt(eps.*h^2./geomean(eta(:)))) ));
 
 % FF  = LL*[W(:);U(:);P(:)] - RR;
 % FF  = SCL*FF;

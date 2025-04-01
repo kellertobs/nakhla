@@ -343,7 +343,7 @@ while res > tol
     var.X      = reshape(cm_oxd_all,Nz*Nx,9); % melt oxide fractions [wt %]
     cal.H2Osat = fluidsat(var); % water saturation [wt]
 
-    [var,cal] = meltmodel(var,cal,'E');
+    [var,cal] = leappart(var,cal,'E');
 
     Tsol   = reshape(cal.Tsol,Nz,Nx);
     Tliq   = reshape(cal.Tliq,Nz,Nx);
@@ -527,34 +527,7 @@ if restart
         RHO = X+M+F;
 
         update; 
-        
-        So = S;
-        Co = C;
-        Xo = X;
-        Fo = F;
-        Mo = M;
-        rhoo = rho;
-        TRCo = TRC;
-        dSdto = dSdt;
-        dCdto = dCdt;
-        dXdto = dXdt;
-        dFdto = dFdt;
-        dMdto = dMdt;
-        drhodto = drhodt;
-        dTRCdto = dTRCdt;
-        rhoWo   = rhoW;
-        rhoUo   = rhoU;
-        Pchmbo  = Pchmb;
-        dPchmbdto = dPchmbdt;
-        Pto     = Pt;
-        To      = T;
-        Tpo     = Tp;
-        so      = s;
-        dto     = dt;
-        Gmo     = Gm;
-        Gxo     = Gx;
-        Gfo     = Gf;
-
+        store;
         fluidmech;
         update;
         output;
@@ -564,6 +537,7 @@ if restart
 
     else % continuation file does not exist, start from scratch
         fprintf('\n   !!! restart file does not exist !!! \n   => starting run from scratch %s \n\n',runID);
+        store;
         fluidmech;
         update;
         history;
@@ -571,6 +545,7 @@ if restart
     end
 else
     % complete, plot, and save initial condition
+    store;
     fluidmech;
     update;
     history;

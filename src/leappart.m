@@ -1,4 +1,6 @@
-function  [var,cal,flag]  =  meltmodel(var,cal,type)
+%*****  Local Equilibrium Approximation using Pseudo-component PARTitioning
+
+function  [var,cal,flag]  =  leappart(var,cal,type)
 
 %*****  compute partition coefficients at P,T *****************************
 
@@ -33,7 +35,7 @@ ii  =  sum(var.c,2)<=1+1e-15;
 
 %***  get T,P-,H2O-dependent partition coefficients Kxi
 var.H2Om  = cal.H2Osat .* (var.H2O>0);
-[var,cal] = meltmodel(var,cal,'K');
+[var,cal] = leappart(var,cal,'K');
 
 %***  set starting guess for Tsol
 if ~isfield(cal,'Tsol')
@@ -44,7 +46,7 @@ end
 
 %***  get T,P-,H2O-dependent partition coefficients Kxi
 var.T      = Tsol;
-[var,cal]  = meltmodel(var,cal,'K');
+[var,cal]  = leappart(var,cal,'K');
 
 %***  get fluid fraction and composition
 f  = var.H2O;
@@ -58,7 +60,7 @@ while rnorm > cal.tol  % iterate down to full accuracy
 
     %***  get partition coefficients Kxi
     var.T      = Tsol;
-    [var,cal]  = meltmodel(var,cal,'K');
+    [var,cal]  = leappart(var,cal,'K');
     TK   = Tsol+273.15;
     TmK  = cal.Tm+273.15;
 
@@ -97,7 +99,7 @@ ii  =  sum(var.c,2)<=1+1e-15;
 
 %***  get T,P-,H2O-dependent partition coefficients Kxi
 var.H2Om   = min(var.H2O,cal.H2Osat);
-[var,cal]  = meltmodel(var,cal,'K');
+[var,cal]  = leappart(var,cal,'K');
 
 %***  set starting guess for Tliq
 if ~isfield(cal,'Tliq')
@@ -108,7 +110,7 @@ end
 
 %***  get T,P-,H2O-dependent partition coefficients Kxi
 var.T      = Tliq;
-[var,cal]  = meltmodel(var,cal,'K');
+[var,cal]  = leappart(var,cal,'K');
 
 %***  get fluid fraction
 f  = (var.H2O-var.H2Om)./(1-var.H2Om);
@@ -122,7 +124,7 @@ while rnorm > cal.tol  % iterate down to full accuracy
 
     %***  get partition coefficients Kxi
     var.T      = Tliq;
-    [var,cal]  = meltmodel(var,cal,'K');
+    [var,cal]  = leappart(var,cal,'K');
     TK   = Tliq+273.15;
     TmK  = cal.Tm+273.15;
 
@@ -159,7 +161,7 @@ function  [cal,var,flag]  =  equilibrium(var,cal)
 
 %***  get Tsol, Tliq at c
 var.H2Om        = max(0,min(cal.H2Osat, var.H2O./(var.m+1e-16) ));
-[var,cal,flag]  = meltmodel(var,cal,'T');
+[var,cal,flag]  = leappart(var,cal,'T');
 
 if isfield(cal,'Tsol')
     var.T = max(cal.Tsol,min(cal.Tliq,var.T));
@@ -180,7 +182,7 @@ eps       = 1e-9;
 while rnorm > cal.tol     % Newton iteration
 
     %***  get residual of unity sum of components
-    [var,cal]   = meltmodel(var,cal,'K');
+    [var,cal]   = leappart(var,cal,'K');
     r           = sum( (var.c.*(1-cal.Kx)   )./(cal.Kx + (1-cal.Kx).*var.m + (cal.Kf-cal.Kx).*var.f + 1e-32)   ,2);
 
     % %***  get analytical derivative of residual dr/dm
@@ -191,14 +193,14 @@ while rnorm > cal.tol     % Newton iteration
     varp.m      = var.m+eps;
     varp.H2Om   = max(0,min(cal.H2Osat, varp.H2O./(varp.m+1e-32) ));
     varp.f      = max(0,min(varp.H2O, varp.H2O - varp.m.*cal.H2Osat));
-    [varp,calp] = meltmodel(varp,cal,'K');
+    [varp,calp] = leappart(varp,cal,'K');
     rp          = sum( (varp.c.*(1-calp.Kx)   )./(calp.Kx + (1-calp.Kx).*varp.m + (calp.Kf-calp.Kx).*varp.f + 1e-32)   ,2);
 
     varm        = var;
     varm.m      = var.m-eps;
     varm.H2Om   = max(0,min(cal.H2Osat, varm.H2O./(varm.m+1e-32) ));
     varm.f      = max(0,min(varm.H2O, varm.H2O - varm.m.*cal.H2Osat));
-    [varm,calm] = meltmodel(varm,cal,'K');
+    [varm,calm] = leappart(varm,cal,'K');
     rm          = sum( (varm.c.*(1-calm.Kx)   )./(calm.Kx + (1-calm.Kx).*varm.m + (calm.Kf-calm.Kx).*varm.f + 1e-32)   ,2);
 
     drdm_n      = (rp-rm)./2/eps;
@@ -235,7 +237,7 @@ end
 function [r,var,cal] = resm(m,var,cal)
 
 var.H2Om  = max(0,min(cal.H2Osat, var.H2O./(m+1e-16) ));
-[var,cal] = meltmodel(var,cal,'K');
+[var,cal] = leappart(var,cal,'K');
 f         = max(0,min(var.H2O, var.H2O - m.*var.H2Om ));
 x         = 1-m-f;
 var.cm    = var.c        ./(m + x.*cal.Kx + f.*cal.Kf + 1e-16);

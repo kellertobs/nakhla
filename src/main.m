@@ -1,73 +1,74 @@
-% initialise model run
+%*****  initialise model run  *********************************************
 init;
 
-% physical time stepping loop
+%*****  physical time stepping loop  **************************************
 while time <= tend && step <= Nt &&  any(mq(:)>sqrt(eps))        ...
                                  && ~any(Tliq(:)    -Tsol(:)<=5) ...
                                  &&  any(T(:)-273.15-Tsol(:)>=5)
     
-    % time step info
+    %***  time step info
     timing;
 
-    % store previous solution
+    %***  store previous solution
     store;
     
-    % reset residuals and iteration count
+    %***  reset residuals and iteration count
     resnorm  = 1;
     resnorm0 = resnorm;
     iter     = 1;
     if frst; alpha = alpha/2; beta = beta/2; end
 
-    % non-linear iteration loop
+    %***  non-linear iteration loop
     while resnorm/resnorm0 >= rtol/(1 + frst*10) && resnorm >= atol/(1 + frst*10) && iter <= maxit*(1 + frst)
         
-        % solve thermo-chemical equations
+        %***  solve thermo-chemical equations
         thermochem;
 
-        % solve fluid-mechanics equations
+        %***  solve fluid-mechanics equations
         fluidmech;
 
-        % update non-linear parameters and auxiliary variables
+        %***  update non-linear parameters and auxiliary variables
         update;
 
-        % update geochemical evolution
+        %***  update geochemical evolution
         geochem;
 
-        % report convergence
+        %***  report convergence
         report;
 
-        iter = iter+1;
-    end
+        iter = iter+1;  % increment iteration count
 
-    % update correlation length for convective/turbulent regularisation
+    end % end non-linear iterations
+
+    %*** update phase equilibrium
+    phseql;
+
+    %***  update correlation length for convective/turbulent regularisation
     corrl;
 
     % renormalise sum of phase densities to bulk density
     % X = x.*rho;  M = m.*rho;  F = f.*rho;  RHO = X+M+F;
 
-    % fractionation mode for 0D-models
-    if Nx==1 && Nz==1
-        Ptop = Ptop + (T-To).*dPdT;
-        fractionate; 
-    end
+    %***  fractionation mode for 0D-models
+    fractionate;
 
-    % record model history
+    %***  record model history
     history;
 
-    % print model diagnostics
+    %***  print model diagnostics
     diagnose;
 
-    % plot model results
+    %***  plot model results
     if ~mod(step,nop); output; end
 
-    % increment time/step
+    %***  increment time/step
     time = time+dt;
     step = step+1;
     if frst; alpha = alpha*2; beta = beta*2; frst=0; end
     
-end
+end % end time stepping
 
-% save final state of model
+%***  save final state of model
 output;
 
 diary off
