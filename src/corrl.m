@@ -2,7 +2,7 @@
 laybnd = zeros(Nz+1,Nx);
 laybnd(2:end-1,:) = sqrt(eta(1:end-1,:).*eta(2:end,:))>etamax/10;
 laybnd([1 end],:) = 1;
-laybnd(2:end-1,:) = min(1,laybnd(2:end-1,:) + islocalmax(diff(rho_nP,1,1),1,'MinProminence',2,'MinSeparation',10));
+laybnd(2:end-1,:) = min(1,laybnd(2:end-1,:) + islocalmax(diff(rho_nP,1,1),1,'MinProminence',5,'MinSeparation',10));
 
 % Create a matrix of row indices matching A.
 rowind = repmat((1:(Nz+1))', [1, Nx]);
@@ -34,7 +34,7 @@ dist = min(d_lower, d_upper);
 Delta_cnv = min(h * dist, Delta_cnv0);
 
 % smooth correlation length to avoid sharp contrasts in regularisation
-for i=1:5
+for i=1:10
     Delta_cnv = Delta_cnv + diffus(Delta_cnv,1/8*ones(size(Delta_cnv)),1,[1,2],BCD);
     Delta_cnv([1 end],:) = h/2;
 end

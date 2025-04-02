@@ -190,6 +190,16 @@ end
 
 % initialise solution fields
 switch init_mode
+    case {'constant' , 'liquidus'}
+        Tp  =  T0 + dTr.*rp + dTg.*gp;  % potential temperature [C]
+        c = zeros(Nz,Nx,cal.ncmp);
+        for i = 1:cal.ncmp
+            c(:,:,i)  =  c0(i) + dcr(i).*rp + dcg(i).*gp;  % trace elements
+        end
+        trc = zeros(Nz,Nx,cal.ntrc);
+        for i = 1:cal.ntrc
+            trc(:,:,i)  =  trc0(i) + dr_trc(i).*rp + dg_trc(i).*gp;  % trace elements
+        end
     case 'layer'
         Tp  =  T0 + (T1-T0) .* (1+erf((ZZ/D-zlay+rp*h*dlay)/wlay_T))/2 + dTr.*rp + dTg.*gp;  % potential temperature [C]
         c = zeros(Nz,Nx,cal.ncmp);
@@ -278,7 +288,7 @@ txx    = 0.*Tp;  tzz = 0.*Tp;  txz = zeros(Nz-1,Nx-1);  tII = 0.*Tp;
 eta    = ones(Nz,Nx);
 etamax = min(eta(:)) .* etacntr;
 dV = 0.*Tp; 
-kW     = 0.*Tp;
+ke     = 0.*Tp;
 Tref   = min(cal.T0)+273.15;
 Pref   = 1e5;
 sref   = 0e3;
@@ -376,13 +386,30 @@ while res > tol
     RHO  = X+M+F;
     C    = M.*cm + X.*cx + F.*cf;
 
-    sm = cPm.*log(Tp./Tref);  sx = cPx.*log(Tp./Tref) + Dsx;  sf = cPf.*log(Tp./Tref) + Dsf;
-    S  = M.*sm + X.*sx + F.*sf;
+    switch init_mode
+        case 'liquidus'
+            T  = Tliq+273.15;
+            a  = aTm.*(T -Tref);
+            b  = bPm.*(Pt-Pref);
+            sm = sref     + cPm.*log(T/Tref) - (aTm./(bPm.*rhom0)) .* log((1-a+b)./(1-a));
+            a  = aTx.*(T -Tref);
+            b  = bPx.*(Pt-Pref);
+            sx = sref+Dsx + cPx.*log(T/Tref) - (aTx./(bPx.*rhox0)) .* log((1-a+b)./(1-a));
+            a  = aTf.*(T -Tref);
+            b  = bPf.*(Pt-Pref);
+            sf = sref+Dsf + cPf.*log(T/Tref) - (aTf./(bPf.*rhof0)) .* log((1-a+b)./(1-a));
+            S  = M.*sm + X.*sx + F.*sf;
+            [Tp,~ ] = StoT(Tp,S./rho,Pref+0*Pt,cat(3,m,x,f),[cPm;cPx;cPf],[aTm;aTx;aTf],[bPm;bPx;bPf],cat(3,rhom0,rhox0,rhof0),[sref;sref+Dsx;sref+Dsf],Tref,Pref);
+            [T ,si] = StoT(T ,S./rho,       Pt,cat(3,m,x,f),[cPm;cPx;cPf],[aTm;aTx;aTf],[bPm;bPx;bPf],cat(3,rhom0,rhox0,rhof0),[sref;sref+Dsx;sref+Dsf],Tref,Pref);
+            sm = si(:,:,1); sx = si(:,:,2); sf = si(:,:,3);
+        otherwise
+            sm = cPm.*log(Tp./Tref);  sx = cPx.*log(Tp./Tref) + Dsx;  sf = cPf.*log(Tp./Tref) + Dsf;
+            S  = M.*sm + X.*sx + F.*sf;
 
-    [Tp,~ ] = StoT(Tp,S./rho,Pref+0*Pt,cat(3,m,x,f),[cPm;cPx;cPf],[aTm;aTx;aTf],[bPm;bPx;bPf],cat(3,rhom0,rhox0,rhof0),[sref;sref+Dsx;sref+Dsf],Tref,Pref);
-    [T ,si] = StoT(T ,S./rho,       Pt,cat(3,m,x,f),[cPm;cPx;cPf],[aTm;aTx;aTf],[bPm;bPx;bPf],cat(3,rhom0,rhox0,rhof0),[sref;sref+Dsx;sref+Dsf],Tref,Pref);
-    sm = si(:,:,1); sx = si(:,:,2); sf = si(:,:,3);
-
+            [Tp,~ ] = StoT(Tp,S./rho,Pref+0*Pt,cat(3,m,x,f),[cPm;cPx;cPf],[aTm;aTx;aTf],[bPm;bPx;bPf],cat(3,rhom0,rhox0,rhof0),[sref;sref+Dsx;sref+Dsf],Tref,Pref);
+            [T ,si] = StoT(T ,S./rho,       Pt,cat(3,m,x,f),[cPm;cPx;cPf],[aTm;aTx;aTf],[bPm;bPx;bPf],cat(3,rhom0,rhox0,rhof0),[sref;sref+Dsx;sref+Dsf],Tref,Pref);
+            sm = si(:,:,1); sx = si(:,:,2); sf = si(:,:,3);
+    end
 
     res  = norm(Pt(:)-Ptii(:),2)./norm(Pt(:),2) ...
          + norm( T(:)-Ti  (:),2)./norm( T(:),2);

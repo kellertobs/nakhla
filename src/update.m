@@ -165,9 +165,16 @@ rho_nP  = 1./(m./rhom_nP + x./rhox_nP + f./rhof_nP);
 % update velocity magnitude
 if Nx==1 && Nz==1; Vel = 0;
 elseif Nx==1
-    ip      = min(Nz,round((1:Nz).'+(Delta_cnv./h-1/2)/2));
-    im      = max( 1,round((1:Nz).'-(Delta_cnv./h-1/2)/2));
-    drhoz   = max(0, -(rho_nP(ip,:)-rho_nP(im,:)) ) + 1e-6.*rho_nP;
+    idz = (1:Nz)';  % grid indices
+    half_steps = max(1,floor(Delta_cnv ./ (2 * h)));  % half mixing length in grid steps
+    
+    ip = idz + half_steps;  % upper indices
+    im = idz - half_steps;  % lower indices
+    
+    ip = min(ip, Nz);  % clamp indices to valid range [1, Nz]
+    im = max(im, 1 );  % clamp indices to valid range [1, Nz]
+    
+    drhoz   = max(0, -(rho_nP(ip,:)-rho_nP(im,:)) ) + 1e-6.*rho_nP; % central density contrast across mixing length
     for i=1:10
         drhoz = drhoz + diffus(drhoz,1/8*ones(size(drhoz)),1,[1,2],BCD);
     end
@@ -178,26 +185,28 @@ else
 end
 
 % update diffusion parameters
-if Nx==1 && Nz==1; kW = 0; Pr = Prt; Sc = Sct;
+if Nx==1 && Nz==1; ke = 0;
 elseif Nx==1
-    kW  = (kW + Vel.*Delta_cnv)/2;                                         % convective mixing diffusivity
-    Pr  = Prt;
-    Sc  = Sct;
+    ke  = (ke + Vel.*Delta_cnv)/2;                                         % convective mixing diffusivity
+    fRe1   = 1;
+    fRe100 = 1;
 else
-    kW  = (kW + eII.*Delta_cnv.^2)/2;                                               % turbulent eddy diffusivity
-    Pr  = Prt ./ (1-exp(-Re./10)+eps);
-    Sc  = Sct ./ (1-exp(-Re./10)+eps);
+    eII0   = eta0./rho./(3*h)^2;
+    eIIe   = eII .* (1-exp(-eII./eII0)+eps);
+    ke     = (ke + eIIe.*Delta_cnv.^2)/2;                                               % turbulent eddy diffusivity
+    fRe1   = (1-exp(-Re./1  )+eps);
+    fRe100 = (1-exp(-Re./100)+eps);
 end
-kW = 1./(1./kmax + 1./kW) + kmin;
+ke = 1./(1./kmax + 1./ke) + kmin;
 kwm = abs(rhom-rho).*g0.*Ksgr_m.*Delta_sgr.*hasm;                          % segregation diffusivity
 kwx = abs(rhox-rho).*g0.*Ksgr_x.*Delta_sgr.*hasx;                          % segregation diffusivity
 kwf = abs(rhof-rho).*g0.*Ksgr_f.*Delta_sgr.*hasf;                          % segregation diffusivity
-km  = (kwm+kW).*mu ;                                                       % regularised melt  fraction diffusion 
-kx  = (kwx+kW).*chi;                                                       % regularised solid fraction diffusion 
-kf  = (kwf+kW).*phi;                                                       % regularised fluid fraction diffusion 
-ks  = (kW./Pr + kmin).*rho.*cP./T;                                         % regularised heat diffusion
-kc  =  kW./Sc + kmin;                                                      % regularised component diffusion
-eta =  kW.*rho + eta0;                                                     % regularised momentum diffusion
+km  = (kwm+ke.*fRe1).*mu ;                                                 % regularised melt  fraction diffusion 
+kx  = (kwx+ke.*fRe1).*chi;                                                 % regularised solid fraction diffusion 
+kf  = (kwf+ke.*fRe1).*phi;                                                 % regularised fluid fraction diffusion 
+ks  = (ke./Prt.*fRe100 + kmin).*rho.*cP./T;                                % regularised heat diffusion
+kc  =  ke./Sct.*fRe100 + kmin;                                             % regularised component diffusion
+eta =  ke.*rho.*fRe1 + eta0;                                               % regularised momentum diffusion
 
 etamax = etacntr.*max(min(eta(:)),etamin);
 eta    = 1./(1./etamax + 1./eta) + etamin;
@@ -206,13 +215,13 @@ etaco  = (eta(icz(1:end-1),icx(1:end-1)).*eta(icz(2:end),icx(1:end-1)) ...
        .* eta(icz(1:end-1),icx(2:end  )).*eta(icz(2:end),icx(2:end  ))).^0.25;
 
 % update dimensionless numbers
-Ra     = Vel.*D/10./((kT+ks.*T)./rho./cP);
-Re     = Vel.*D/10./( eta       ./rho    );
+Ra     = Vel.*Delta_cnv./((kT+ks.*T)./rho./cP);
+Re     = Vel.*Delta_cnv./( eta      ./rho    );
 Rum    = abs(wm(1:end-1,2:end-1)+wm(2:end,2:end-1))/2./Vel;
 Rux    = abs(wx(1:end-1,2:end-1)+wx(2:end,2:end-1))/2./Vel;
 Ruf    = abs(wf(1:end-1,2:end-1)+wf(2:end,2:end-1))/2./Vel;
 Pr     = (eta./rho)./((kT+ks.*T)./rho./cP);
-Sc     = (eta./rho)./( kc                 );
+Sc     = (eta./rho)./( kc                );
 deltam = sqrt(mu .*Ksgr_m.*eta./(1-chi));
 deltaf = sqrt(phi.*Ksgr_f.*eta./(1-chi));
 

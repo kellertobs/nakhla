@@ -53,7 +53,7 @@ while time <= tend && step <= Nt &&  any(mq(:)>sqrt(eps))        ...
     fractionate;
 
     %***  record model history
-    history;
+    if ~mod(step,nrh); history; end
 
     %***  print model diagnostics
     diagnose;

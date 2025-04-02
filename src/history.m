@@ -8,7 +8,7 @@ dsumFdtoo = dsumFdto; dsumFdto = dsumFdt;
 dsumCdtoo = dsumCdto; dsumCdto = dsumCdt;
 dsumTdtoo = dsumTdto; dsumTdto = dsumTdt;
 
-stp = max(1,step);
+stp = max(1,step/nrh);
 
 % record model time
 hist.time(stp) = time;
