@@ -388,7 +388,7 @@ while res > tol
 
     switch init_mode
         case 'liquidus'
-            T  = Tliq+273.15;
+            T  = Tliq+273.15+1;
             a  = aTm.*(T -Tref);
             b  = bPm.*(Pt-Pref);
             sm = sref     + cPm.*log(T/Tref) - (aTm./(bPm.*rhom0)) .* log((1-a+b)./(1-a));

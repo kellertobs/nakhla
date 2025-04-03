@@ -71,7 +71,7 @@ C     = C + upd_C;
 c = C./sum(C,3);
 
 %*** update phase equilibrium
-% phseql;
+if Rcouple; phseql; end
 
 %***  update phase fraction densities
 
