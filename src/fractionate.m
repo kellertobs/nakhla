@@ -8,9 +8,9 @@ if fractxtl && Nx==1 && Nz==1
     Ptop = Ptop + (T-To).*dPdT;
 
     % record cumulate mass increments
-    CML.r     (step)   = x-min(x,fractres);
-    CML.M     (step)   = CML.r(step) .* (hist.sumB(1) - sum(CML.M(:)));
-    CML.f     (step)   = CML.M(step)./hist.sumB(1);
+    CML.r    (step)    = x-min(x,fractres);
+    CML.M    (step)    = CML.r(step) .* (hist.sumB(1) - sum(CML.M(:)));
+    CML.f    (step)    = CML.M(step)./hist.sumB(1);
 
     % record cumulate compositions
     CML.c    (step,:)  = cx;
@@ -44,9 +44,9 @@ elseif fractmlt && Nx==1 && Nz==1
     Ptop = Ptop + (T-To).*dPdT;
 
     % record cumulate mass increments
-    CML.r     (step)   = m-min(m,fractres);
-    CML.M     (step)   = CML.r(step) .* (hist.sumB(1) - sum(CML.M(:)));
-    CML.f     (step)   = CML.M(step)./hist.sumB(1);
+    CML.r    (step)    = m-min(m,fractres);
+    CML.M    (step)    = CML.r(step) .* (hist.sumB(1) - sum(CML.M(:)));
+    CML.f    (step)    = CML.M(step)./hist.sumB(1);
 
     % record cumulate compositions
     CML.c    (step,:)  = cm;

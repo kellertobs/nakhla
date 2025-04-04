@@ -10,12 +10,13 @@ restart   =  0;                   % restart from file (0: new run; <1: restart f
 nop       =  100;                 % output frame plotted/saved every 'nop' time steps
 plot_op   =  1;                   % switch on to live plot results
 save_op   =  1;                   % switch on to save output to file
+colourmap = 'lipari';              % choose colourmap ('ocean','lipari','lajolla','lapaz','navia','batlow(W/K)','glasgow')
 
 % set model domain parameters
 D         =  10;                  % chamber depth [m]
 N         =  100;                 % number of grid points in z-direction
 h         =  D/N;                 % grid spacing (equal in both dimensions, do not set) [m]
-L         =  D/2;                 % chamber width (equal to h for 1-D mode) [m]
+L         =  D;                   % chamber width (equal to h for 1-D mode) [m]
 
 % set model timing parameters
 Nt        =  5e5;                 % number of time steps to take
@@ -24,10 +25,10 @@ dt        =  1;                   % initial time step [s]
 
 % set initial thermo-chemical state
 init_mode =  'liquidus';
-T0        =  1250;                % initial temperature [deg C]
-c0        =  [11  18  35  30  3  3  0.5]/100;  % components (maj comp, H2O) top  layer [wt] (will be normalised to unit sum!)
-dcr       =  [1,1,1,-1,-1,-1,0]*1e-4;
-dr_trc    =  [1,1,1,-1,-1,-1  ]*1e-4; % trace elements random noise
+T0        =  -5;                % initial temperature [deg C]
+c0        =  [10  19  32  30  5  4  0.5]/100;  % components (maj comp, H2O) top  layer [wt] (will be normalised to unit sum!)
+dcr       =  [1,1,1,-1,-1,-1,0]*1e-3;
+dr_trc    =  [1,1,1,-1,-1,-1  ]*1e-3; % trace elements random noise
 
 % set thermo-chemical boundary parameters
 periodic  =  1;                   % periodic side boundaries

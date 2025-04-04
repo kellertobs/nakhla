@@ -191,7 +191,7 @@ end
 % initialise solution fields
 switch init_mode
     case {'constant' , 'liquidus'}
-        Tp  =  T0 + dTr.*rp + dTg.*gp;  % potential temperature [C]
+        Tp  =  max(cal.T0) + 0.*rp;  % potential temperature [C]
         c = zeros(Nz,Nx,cal.ncmp);
         for i = 1:cal.ncmp
             c(:,:,i)  =  c0(i) + dcr(i).*rp + dcg(i).*gp;  % trace elements
@@ -388,7 +388,7 @@ while res > tol
 
     switch init_mode
         case 'liquidus'
-            T  = Tliq+273.15+1;
+            T  = Tliq+273.15+T0;
             a  = aTm.*(T -Tref);
             b  = bPm.*(Pt-Pref);
             sm = sref     + cPm.*log(T/Tref) - (aTm./(bPm.*rhom0)) .* log((1-a+b)./(1-a));

@@ -547,7 +547,7 @@ if ~bnchm
 
     
     %% update time step
-    dtk = (h/2)^2/max([ke(:);kc(:);km(:);kx(:);kf(:);(kT(:)+ks(:).*T(:))./rho(:)./cP(:)]); % diffusive time step size  
+    dtk = (h/2)^2/max([kc(:);km(:);kx(:);kf(:);(kT(:)+ks(:).*T(:))./rho(:)./cP(:)]); % diffusive time step size  
     dta =  h/2   /max(abs([Um(:);Wm(:);Ux(:);Wx(:);Uf(:);Wf(:)]+eps)); % advective time step size
     dtc = maxcmp./max(abs([advn_X(:)./rho(:);advn_M(:)./rho(:);advn_F(:)./rho(:)]));
     dt  = (dt + min([1.1*dto,min(CFL*[dtk,dta,dtc]),dtmax,tau_T/10]))/2;                         % time step size

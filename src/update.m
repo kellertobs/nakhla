@@ -155,12 +155,12 @@ eII = (0.5.*(exx.^2 + ezz.^2 ...
        + 2.*(exz(1:end-1,1:end-1).^2+exz(2:end,1:end-1).^2 ...
        +     exz(1:end-1,2:end  ).^2+exz(2:end,2:end  ).^2)/4)).^0.5 + eps;
 
-% extract non-P-dependent density
-rhom_nP = rhom0 .* (1 - aTm.*(Tp-Tref));
-rhox_nP = rhox0 .* (1 - aTx.*(Tp-Tref));
-rhof_nP = rhof0 .* (1 - aTf.*(Tp-Tref));
+% extract potential densities
+rhomp = rhom0 .* (1 - aTm.*(Tp-Tref));
+rhoxp = rhox0 .* (1 - aTx.*(Tp-Tref));
+rhofp = rhof0 .* (1 - aTf.*(Tp-Tref));
 
-rho_nP  = 1./(m./rhom_nP + x./rhox_nP + f./rhof_nP);
+rhop  = 1./(m./rhomp + x./rhoxp + f./rhofp);
 
 % update velocity magnitude
 if Nx==1 && Nz==1; Vel = 0;
@@ -174,7 +174,7 @@ elseif Nx==1
     ip = min(ip, Nz);  % clamp indices to valid range [1, Nz]
     im = max(im, 1 );  % clamp indices to valid range [1, Nz]
     
-    drhoz   = max(0, -(rho_nP(ip,:)-rho_nP(im,:)) ) + 1e-6.*rho_nP; % central density contrast across mixing length
+    drhoz   = max(0, -(rhop(ip,:)-rhop(im,:)) ) + 1e-6.*rhop; % central density contrast across mixing length
     for i=1:10
         drhoz = drhoz + diffus(drhoz,1/8*ones(size(drhoz)),1,[1,2],BCD);
     end
@@ -185,9 +185,9 @@ else
 end
 
 % update diffusion parameters
-if Nx==1 && Nz==1; ke = 0;
+if Nx==1 && Nz==1; ke = 0; fRe1 = 1; fRe100 = 1;
 elseif Nx==1
-    ke  = (ke + Vel.*Delta_cnv)/2;                                         % convective mixing diffusivity
+    ke     = (ke + Vel.*Delta_cnv)/2;                                      % convective mixing diffusivity
     fRe1   = 1;
     fRe100 = 1;
 else

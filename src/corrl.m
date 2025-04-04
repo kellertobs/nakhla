@@ -2,7 +2,7 @@
 laybnd = zeros(Nz+1,Nx);
 laybnd(2:end-1,:) = sqrt(eta(1:end-1,:).*eta(2:end,:))>etamax/10;
 laybnd([1 end],:) = 1;
-laybnd(2:end-1,:) = min(1,laybnd(2:end-1,:) + islocalmax(diff(rho_nP,1,1),1,'MinProminence',5,'MinSeparation',10));
+laybnd(2:end-1,:) = min(1,laybnd(2:end-1,:) + islocalmax(diff(rhop,1,1),1,'MinProminence',5,'MinSeparation',10));
 
 % Create a matrix of row indices matching A.
 rowind = repmat((1:(Nz+1))', [1, Nx]);

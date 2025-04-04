@@ -66,15 +66,15 @@ if Nx <= 1 && Nz <= 1  % create 0D plots
     title('$T [^\circ$C]',TX{:},FS{:}); set(gca,TL{:},TS{:});
 
     subplot(3,1,2)
-    plot(hist.time/tau_T,hist.mu (:,2)*100.*(hist.mu (:,2)>1e-9),CL{[1,3]},LW{:}); axis xy tight; box on; hold on;
-    plot(hist.time/tau_T,hist.chi(:,2)*100.*(hist.chi(:,2)>1e-9),CL{[1,4]},LW{:});
-    plot(hist.time/tau_T,hist.phi(:,2)*100.*(hist.phi(:,2)>1e-9),CL{[1,5]},LW{:});
+    plot(hist.time/tau_T,hist.mu (:,2)*100.*(hist.mu (:,2)>eps^0.5),CL{[1,3]},LW{:}); axis xy tight; box on; hold on;
+    plot(hist.time/tau_T,hist.chi(:,2)*100.*(hist.chi(:,2)>eps^0.5),CL{[1,4]},LW{:});
+    plot(hist.time/tau_T,hist.phi(:,2)*100.*(hist.phi(:,2)>eps^0.5),CL{[1,5]},LW{:});
     title('$\mu$, $\chi$, $\phi$ [vol\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
 
     subplot(3,1,3)
-    plot(hist.time/tau_T,    hist.Gm(:,2)./hist.rho(:,2)*hr*100.*(hist.mu (:,2)>1e-9),CL{[1,3]},LW{:}); axis xy tight; box on; hold on;
-    plot(hist.time/tau_T,    hist.Gx(:,2)./hist.rho(:,2)*hr*100.*(hist.chi(:,2)>1e-9),CL{[1,4]},LW{:});
-    plot(hist.time/tau_T,10.*hist.Gf(:,2)./hist.rho(:,2)*hr*100.*(hist.phi(:,2)>1e-9),CL{[1,5]},LW{:});
+    plot(hist.time/tau_T,    hist.Gm(:,2)./hist.rho(:,2)*hr*100.*(hist.mu (:,2)>eps^0.5),CL{[1,3]},LW{:}); axis xy tight; box on; hold on;
+    plot(hist.time/tau_T,    hist.Gx(:,2)./hist.rho(:,2)*hr*100.*(hist.chi(:,2)>eps^0.5),CL{[1,4]},LW{:});
+    plot(hist.time/tau_T,10.*hist.Gf(:,2)./hist.rho(:,2)*hr*100.*(hist.phi(:,2)>eps^0.5),CL{[1,5]},LW{:});
     title('$10 \times \Gamma_f/\bar{\rho}$, $\Gamma_x/\bar{\rho}$ [wt \%/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     xlabel(['Time [$\tau_T$]'],TX{:},FS{:});
 
@@ -179,11 +179,14 @@ if Nx <= 1 && Nz <= 1  % create 0D plots
             if ~exist('fh8','var'); fh8 = figure(VIS{:});
             else; set(0, 'CurrentFigure', fh8); clf;
             end
-            plot(hist.Tm,hist.Pt(:,2)/1e8,'k-'); axis ij tight; box on; hold on
+            for i=1:cal.ncmp-1
+                plot(hist.Tm(:,i),hist.Pt(:,2)/1e8,'k','Color',[1 1 1].*i./cal.ncmp,LW{1},1.5); axis ij tight; box on; hold on
+            end
             plot(hist.T(:,2)-273.15,hist.Pt(:,2)/1e8,CL{[1,2]},LW{:});
             plot(hist.Tliq(:,2),hist.Pt(:,2)/1e8,CL{[1,3]},LW{:});
             plot(hist.Tsol(:,2),hist.Pt(:,2)/1e8,CL{[1,4]},LW{:});
             set(gca,TL{:},TS{:});
+            legend([cal.cmpStr(1:end-1),'$P,T$-path','$T_\mathrm{liq}$','$T_\mathrm{sol}$'],TX{:},FS{:})
             ylabel(['Pressure [kbar]'],TX{:},'FontSize',15);
             xlabel(['Temperature [$^\circ$C]'],TX{:},'FontSize',15);
         end
@@ -201,14 +204,14 @@ elseif Nx <= 1  % create 1D plots
     plot(cal.Tsol,Zsc.',CL{[1,4]},LW{:});
     title('$T [^\circ$C]',TX{:},FS{:}); ylabel(['Depth [',SpaceUnits,']'],TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,4,2)
-    plot(mu *100.*(mu >1e-9),Zsc.',CL{[1,3]},LW{:}); axis ij tight; box on; hold on;
-    plot(chi*100.*(chi>1e-9),Zsc.',CL{[1,4]},LW{:});
-    plot(phi*100.*(phi>1e-9),Zsc.',CL{[1,5]},LW{:});
+    plot(mu *100.*(mu >eps^0.5),Zsc.',CL{[1,3]},LW{:}); axis ij tight; box on; hold on;
+    plot(chi*100.*(chi>eps^0.5),Zsc.',CL{[1,4]},LW{:});
+    plot(phi*100.*(phi>eps^0.5),Zsc.',CL{[1,5]},LW{:});
     title('$\mu$, $\chi$, $\phi$ [vol\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,4,3)
-    plot(    Gm./rho*100*hr.*(mu >1e-9),Zsc.',CL{[1,3]},LW{:}); axis ij tight; box on; hold on;
-    plot(    Gx./rho*100*hr.*(chi>1e-9),Zsc.',CL{[1,4]},LW{:});
-    plot(10.*Gf./rho*100*hr.*(phi>1e-9),Zsc.',CL{[1,5]},LW{:});
+    plot(    Gm./rho*100*hr.*(mu >eps^0.5),Zsc.',CL{[1,3]},LW{:}); axis ij tight; box on; hold on;
+    plot(    Gx./rho*100*hr.*(chi>eps^0.5),Zsc.',CL{[1,4]},LW{:});
+    plot(10.*Gf./rho*100*hr.*(phi>eps^0.5),Zsc.',CL{[1,5]},LW{:});
     title(['$10 \times \Gamma_f/\bar{\rho}$, $\Gamma_x/\bar{\rho}$ [wt\%/hr]'],TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,4,4)
     plot(-(phi([1,1:end],:)+phi([1:end,end],:))/2.*wf(:,2:end-1)/SpeedScale,Zsf.',CL{[1,5]},LW{:}); axis ij tight; box on; hold on;
@@ -442,17 +445,17 @@ else % create 2D plots
     % plot phase fractions and reaction rates in Fig. 3
     set(0,'CurrentFigure',fh3)
     set(fh3,'CurrentAxes',ax(31));
-    imagesc(Xsc,Zsc,chi.*100.*(chi>1e-9) ); axis ij equal tight; box on; cb = colorbar;
+    imagesc(Xsc,Zsc,chi.*100.*(chi>eps^0.5) ); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\chi$ [vol\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel(['Depth [',SpaceUnits,']'],TX{:},FS{:}); 
     set(fh3,'CurrentAxes',ax(32));
-    imagesc(Xsc,Zsc,phi.*100.*(phi>1e-9)); axis ij equal tight; box on; cb = colorbar;
+    imagesc(Xsc,Zsc,phi.*100.*(phi>eps^0.5)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\phi$ [vol\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
     text(-0.1,1.1,['time = ',num2str(time/TimeScale,3),' [',TimeUnits,']'],TX{:},FS{:},'Color','k','HorizontalAlignment','center','Units','normalized');
     set(fh3,'CurrentAxes',ax(33));
-    imagesc(Xsc,Zsc,Gx./rho*hr*100.*(chi>1e-9)); axis ij equal tight; box on; cb = colorbar;
+    imagesc(Xsc,Zsc,Gx./rho*hr*100.*(chi>eps^0.5)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\Gamma_x/\bar{\rho}$ [wt\%/hr]'],TX{:},FS{:}); ylabel(['Depth [',SpaceUnits,']'],TX{:},FS{:}); xlabel(['Width [',SpaceUnits,']'],TX{:},FS{:});
     set(fh3,'CurrentAxes',ax(34));
-    imagesc(Xsc,Zsc,Gf./rho*hr*100.*(phi>1e-9)); axis ij equal tight; box on; cb = colorbar;
+    imagesc(Xsc,Zsc,Gf./rho*hr*100.*(phi>eps^0.5)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\Gamma_f/\bar{\rho}$ [wt\%/hr]'],TX{:},FS{:}); xlabel(['Width [',SpaceUnits,']'],TX{:},FS{:}); set(gca,'YTickLabel',[]);
 
     % plot density, rheology, and segregation speeds in Fig. 4
@@ -468,11 +471,11 @@ else % create 2D plots
     imagesc(Xsc,Zsc,-(chi([1,1:end],:)+chi([1:end,end],:))/2.*wx(:,2:end-1).*1e3/SpeedScale); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$w_\Delta^x$ [m',SpeedUnits,']'],TX{:},FS{:}); ylabel(['Depth [',SpaceUnits,']'],TX{:},FS{:}); xlabel(['Width [',SpaceUnits,']'],TX{:},FS{:});
     set(fh4,'CurrentAxes',ax(44));
-    if any(phi(:)>1e-9)
-        imagesc(Xsc,Zsc,-(phi([1,1:end],:)+phi([1:end,end],:))/2.*wf(:,2:end-1).*1e3/SpeedScale.*(any(phi>1e-9))); axis ij equal tight; box on; cb = colorbar;
+    if any(phi(:)>eps^0.5)
+        imagesc(Xsc,Zsc,-(phi([1,1:end],:)+phi([1:end,end],:))/2.*wf(:,2:end-1).*1e3/SpeedScale.*(any(phi>eps^0.5))); axis ij equal tight; box on; cb = colorbar;
         set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$w_\Delta^f$ [m',SpeedUnits,']'],TX{:},FS{:}); xlabel(['Width [',SpaceUnits,']'],TX{:},FS{:}); set(gca,'YTickLabel',[]);
     else
-        imagesc(Xsc,Zsc,-(mu ([1,1:end],:)+mu ([1:end,end],:))/2.*wm(:,2:end-1).*1e3/SpeedScale.*(any(mu>1e-9))); axis ij equal tight; box on; cb = colorbar;
+        imagesc(Xsc,Zsc,-(mu ([1,1:end],:)+mu ([1:end,end],:))/2.*wm(:,2:end-1).*1e3/SpeedScale.*(any(mu>eps^0.5))); axis ij equal tight; box on; cb = colorbar;
         set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$w_\Delta^m$ [m',SpeedUnits,']'],TX{:},FS{:}); xlabel(['Width [',SpaceUnits,']'],TX{:},FS{:}); set(gca,'YTickLabel',[]);
     end
 
