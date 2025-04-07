@@ -429,8 +429,9 @@ LL  = [ KV   GG  ; ...
 
 RR  = [RV; RP];
 
+etagh = ones(size(P));  etagh(2:end-1,2:end-1) = eta;
 SCL = (abs(diag(LL))).^0.5;
-SCL = diag(sparse( 1./(SCL + sqrt(eps.*h^2./geomean(eta(:)))) ));
+SCL = diag(sparse( 1./(SCL + sqrt([zeros(NU+NW,1); h./etagh(:)])) ));
 
 % FF  = LL*[W(:);U(:);P(:)] - RR;
 % FF  = SCL*FF;
