@@ -119,4 +119,4 @@ Rcouple   =  0;                   % coupling phase equilibria into nonlinear ite
 % set various options
 calibrt   =  0;                   % not in calibrate mode
 bnchm     =  0;                   % not a benchmark run
-
+postprc   =  0;                   % not postprocessing mode

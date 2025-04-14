@@ -40,6 +40,17 @@ else
      c_oxd_all(:,:,cal.ioxd) = c_oxd;
 end
 
+% get trace element phase compositions
+Ktrc = zeros(Nz,Nx,cal.ntrc);
+trcm = zeros(Nz,Nx,cal.ntrc);
+trcx = zeros(Nz,Nx,cal.ntrc);
+for i = 1:cal.ntrc
+    for j=1:cal.nmem; Ktrc(:,:,i) = Ktrc(:,:,i) + cal.Ktrc_mem(i,j) .* c_mem(:,:,j)./100; end
+
+    trcm(:,:,i)  = trc(:,:,i)./(m + x.*Ktrc(:,:,i));
+    trcx(:,:,i)  = trc(:,:,i)./(m./Ktrc(:,:,i) + x);
+end
+
 % update phase densities
 rhom0  = reshape(DensityX(reshape(cm_oxd_all,Nz*Nx,9),Tref,Pref./1e8)    ,Nz,Nx);
 rhox0  = reshape(sum(reshape(cx_mem/100,Nz*Nx,cal.nmem)./cal.rhox0,2).^-1,Nz,Nx);

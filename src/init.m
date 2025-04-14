@@ -1,5 +1,6 @@
 %% *****  MODEL INITIALISATION  *******************************************
 
+if ~postprc
 % create output directory
 if ~isfolder([outdir,'/',runID])
     mkdir([outdir,'/',runID]);
@@ -16,6 +17,7 @@ fprintf('*************************************************************\n');
 fprintf('*****  RUN NAKHLA MODEL | %s  *************\n',datetime('now'));
 fprintf('*************************************************************\n');
 fprintf('\n   run ID: %s \n\n',runID);
+end
 
 run(['../cal/cal_',calID]);  % load melt model calibration
 
@@ -338,6 +340,7 @@ TCtime  = 0;
 UDtime  = 0;
 a1      = 1; a2 = 0; a3 = 0; b1 = 1; b2 = 0; b3 = 0;
 
+if ~postprc
 res  = 1;  tol = 1e-12;  it = 1;
 while res > tol
     Ptii = Pt; Ti = T; xi = xq; fi = fq;
@@ -578,6 +581,13 @@ else
     history;
     output;
     step = step+1;
+end
+else
+    % M   = m.*rho;
+    % X   = x.*rho;
+    % F   = f.*rho;
+    Delta_cnv0 = Delta_cnv;
+    RHO = rho;
 end
 
 restart = 0;
