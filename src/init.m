@@ -556,7 +556,10 @@ if restart
         SOL = [W(:);U(:);P(:)];
         RHO = X+M+F;
 
-        update; 
+        update;
+        phseql;
+        corrl;
+        update;
         store;
         fluidmech;
         update;
