@@ -567,14 +567,17 @@ if restart
 
         time    = time+dt;
         step    = step+1;
+        restart = 0;
 
     else % continuation file does not exist, start from scratch
         fprintf('\n   !!! restart file does not exist !!! \n   => starting run from scratch %s \n\n',runID);
+        restart = 0;
         store;
         fluidmech;
         update;
         history;
         output;
+        step = step+1;
     end
 else
     % complete, plot, and save initial condition
@@ -593,4 +596,3 @@ else
     RHO = rho;
 end
 
-restart = 0;
