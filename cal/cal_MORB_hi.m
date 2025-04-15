@@ -24,6 +24,9 @@ for i = 1:cal.noxd; cal.(elStr{i}) = i; end
 %           SiO2 TiO2 Al2O3 FeO MgO CaO Na2O K2O H2O
 cal.ioxd = [   1    2     3   4   5   6    7   8   9]; % oxdie indices for viscosity, density functions
 
+%           plg  olv  cpx  qtz
+cal.imsy = [ 2    1    3    5];  % mineral system indices for plotting basalt tetrahedron
+
 % oxide composition of mineral end-members
 %                SiO2    TiO2   Al2O3     FeO     MgO     CaO    Na2O     K2O     H2O
 cal.mem_oxd = [ 41.37       0       0    7.57   51.06       0       0       0       0   % forsterite (for)

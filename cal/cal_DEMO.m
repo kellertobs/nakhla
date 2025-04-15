@@ -28,7 +28,7 @@ cal.ioxd = [   1   2    3    4   5   6   7    8   9]; % oxide indices for viscos
 cal.imsy = [ 2    1    3    5];  % mineral system indices for plotting basalt tetrahedron
 
 % oxide composition of mineral end-members
-%                SiO2 TiO2 Al2O3 FeO  MgO  CaO Na2O  H2O
+%                SiO2 TiO2 Al2O3 FeO  MgO  CaO Na2O  K2O  H2O
 cal.mem_oxd    = [ 43    0    0    0   57    0    0    0    0      % forsterite (ant) 
                    30    0    0   70    0    0    0    0    0      % fayalite (ant) 
 
@@ -47,7 +47,7 @@ cal.mem_oxd    = [ 43    0    0    0   57    0    0    0    0      % forsterite 
 cal.mem_oxd = cal.mem_oxd./sum(cal.mem_oxd,2)*100;
 
 % mineral end-members in mineral systems
-%              for fay ant alb dps aug qtz wat
+%              for fay ant alb san dps aug ulv mgt qtz wat
 cal.msy_mem = [ 1   1   0   0   0   0   0   0   0   0   0    % olivine (olv) 
                 0   0   1   1   1   0   0   0   0   0   0    % feldspar (fsp)
                 0   0   0   0   0   1   1   0   0   0   0    % clinopyroxene (cpx)
