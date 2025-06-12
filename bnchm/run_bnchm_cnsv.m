@@ -11,7 +11,7 @@ for atol = ATOL
 
     % set run parameters
     runID    =  'bnchm_cnsv';        % run identifier
-    nop      =  20;                  % output frame plotted/saved every 'nop' time steps
+    nop      =  4;                  % output frame plotted/saved every 'nop' time steps
     plot_op  =  1;                   % switch on to live plot of results
     plot_cv  =  0;                   % switch on to live plot iterative convergence
     save_op  =  0;
@@ -59,6 +59,7 @@ for atol = ATOL
     maxit    =  100;                 % maximum outer its
     alpha    =  0.50;                % iterative step size parameter
     Pcouple  =  1;
+    Rcouple  =  1;
 
     % create output directory
     if ~isfolder([outdir,'/',runID])

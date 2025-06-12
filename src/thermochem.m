@@ -84,21 +84,21 @@ advn_rho = advn_X+advn_F+advn_M;
 % total rates of change
 dXdt   = advn_X + Gx;
 dFdt   = advn_F + Gf;
-dMdt   = advn_M + Gm;
+% dMdt   = advn_M + Gm;
 
 % residual of phase density evolution
 res_X = (a1*X-a2*Xo-a3*Xoo)/dt - (b1*dXdt + b2*dXdto + b3*dXdtoo);
 res_F = (a1*F-a2*Fo-a3*Foo)/dt - (b1*dFdt + b2*dFdto + b3*dFdtoo);
-res_M = (a1*M-a2*Mo-a3*Moo)/dt - (b1*dMdt + b2*dMdto + b3*dMdtoo);
+% res_M = (a1*M-a2*Mo-a3*Moo)/dt - (b1*dMdt + b2*dMdto + b3*dMdtoo);
 
 % semi-implicit update of phase fraction densities
 upd_X = max(-X/2, - alpha*res_X*dt/a1 + beta*upd_X );
 upd_F = max(-F/2, - alpha*res_F*dt/a1 + beta*upd_F );
-upd_M = max(-M/2, - alpha*res_M*dt/a1 + beta*upd_M );
+% upd_M = max(-M/2, - alpha*res_M*dt/a1 + beta*upd_M );
 
 X     = X + upd_X;
 F     = F + upd_F;
-M     = M + upd_M;
+M     = rho-X-F;
 
 % get dynamically evolving mixture density 
 RHO = X+F+M;

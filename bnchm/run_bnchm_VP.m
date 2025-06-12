@@ -4,7 +4,7 @@ clear; close all;
 run('../usr/par_default')
 
  % test decreasing grid step
-NN = 25.*[1,2,4]; 
+NN = 50.*[1,2,4]; 
 
 for nn = NN
 

@@ -390,37 +390,36 @@ IIR = [IIR; ii(:)]; AAR = [AAR; rr(:)];
 % assemble right-hand side vector
 RP  = sparse(IIR,ones(size(IIR)),AAR,NP,1);
 
-% set P = 0 in fixed point
-nzp = 2; %round((Nz+2)/2);
-nxp = round((Nx+2)/2);
-np0 = MapP(nzp,nxp);
-% nxp = 2:Nx-1;
-% np0 = MapP(nzp,nxp);
-KP(np0,:  ) = 0;
-KP(np0,np0) = 1;%KP(np0,np0) + 1e-6.*h^2./geomean(eta(:));
-DD(np0,:  ) = 0;
-RP(np0    ) = 0;
-
-if bnchm; RP(MapP(nzp,nxp),:) = P_mms(nzp,nxp); end
-
 if bnchm
     % fix P = P_mms in middle of domain
-    nzp = 1;%round((Nz+2)/2);
+    nzp = round((Nz+2)/2);
     nxp = round((Nx+2)/2);
     np0 = MapP(nzp,nxp);
-    DD(MapP(nzp,nxp),:) = 0;
-    KP(MapP(nzp,nxp),:) = 0;
-    KP(MapP(nzp,nxp),MapP(nzp,nxp)) = 1;
-    RP(MapP(nzp,nxp),:) = P_mms(nzp,nxp);
+    KP(np0,:  ) = 0;
+    KP(np0,np0) = 1;
+    DD(np0,:  ) = 0;
+    RP(np0    ) = P_mms(nzp,nxp);
     
     % fix U = U_mms in middle of domain
     nzu = round((Nz+2)/2);
     nxu = round((Nx+2)/2);
-    KV(MapU(nzu,nxu),:) = 0;
-    GG(MapU(nzu,nxu),:) = 0;
-    KV(MapU(nzu,nxu),MapU(nzu  ,nxu)) = 1;
-    RV(MapU(nzp,nxp),:) = U_mms(nzu,nxu);
+    nu0 = MapU(nzu,nxu);
+    KV(nu0,:)   = 0;
+    KV(nu0,nu0) = 1;
+    GG(nu0,:)   = 0;
+    RV(nu0,:)   = U_mms(nzu,nxu);
+else
+    % set P = 0 in fixed point
+    nzp = 2; 
+    nxp = round((Nx+2)/2);
+    np0 = MapP(nzp,nxp);
+    KP(np0,:  ) = 0;
+    KP(np0,np0) = 1;
+    DD(np0,:  ) = 0;
+    RP(np0    ) = 0;
 end
+
+
 
 %% assemble and scale global coefficient matrix and right-hand side vector
 
@@ -429,7 +428,7 @@ LL  = [ KV   GG  ; ...
 
 RR  = [RV; RP];
 
-etagh = ones(size(P));  etagh(2:end-1,2:end-1) = eta;
+etagh = ones(Nz+2,Nx+2);  etagh(2:end-1,2:end-1) = eta;
 SCL = (abs(diag(LL))).^0.5;
 SCL = diag(sparse( 1./(SCL + sqrt([zeros(NU+NW,1); h./etagh(:)])) ));
 

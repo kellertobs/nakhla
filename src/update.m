@@ -219,7 +219,19 @@ ks  = (ke./Prt.*fRe100 + kmin).*rho.*cP./T;                                % reg
 kc  =  ke./Sct.*fRe100 + kmin;                                             % regularised component diffusion
 eta =  ke.*rho.*fRe1 + eta0;                                               % regularised momentum diffusion
 
-etamax = etacntr.*max(min(eta(:)),etamin);
+limcntr = max(eta(:))./min(eta(:))/etacntr;
+switch etalim
+    case 'lower'
+        etamax  = max(eta(:)) * 10;
+        etamin  = min(eta(:)) * limcntr;
+    case 'upper'
+        etamax  = max(eta(:)) / limcntr;
+        etamin  = min(eta(:)) / 10;
+    case 'centred'
+        etamax  = max(eta(:)) / sqrt(limcntr);
+        etamin  = min(eta(:)) * sqrt(limcntr);
+end
+
 eta    = 1./(1./etamax + 1./eta) + etamin;
 
 etaco  = (eta(icz(1:end-1),icx(1:end-1)).*eta(icz(2:end),icx(1:end-1)) ...

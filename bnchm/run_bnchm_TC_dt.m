@@ -16,7 +16,7 @@ save_op  =  0;
 % set model domain parameters
 D        =  10;                  % chamber depth [m]
 L        =  10;                  % chamber width [m]
-N        =  50;                  % number of grid points in z-direction (incl. 2 ghosts)
+N        =  100;                 % number of grid points in z-direction (incl. 2 ghosts)
 h        =  D/N;                 % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
@@ -25,9 +25,9 @@ dt       =  1;                   % set initial time step
 
 % set initial thermo-chemical state
 smth     =  15;
-T0       =  1150;                % temperature top  layer [deg C]
+T0       =  1100;                % temperature top  layer [deg C]
 T1       =  T0;                  % temperature base layer [deg C]
-c0       =  [11  17  35  31  3  3  5]/100;  % components (maj comp, H2O) top  layer [wt] (will be normalised to unit sum!)
+c0       =  [10  19  32  30  5  4  6]/100;  % components (maj comp, H2O) top  layer [wt] (will be normalised to unit sum!)
 c1       =  c0;                  % components (maj comp, H2O) base layer [wt] (will be normalised to unit sum!)
 dcr      =  [1,1,1,-1,-1,-1,0]*0e-3;  % amplitude of random noise [wt]
 dcg      =  [-1,-1,-1,1,1,1,0]*1e-2;  % amplitude of centred gaussian [wt]
@@ -46,13 +46,13 @@ tau_r    =  1e32;
 calID    =  'DEMO';              % phase diagram calibration
 
 % set numerical model parameters
-TINT     =  'bd2im';             % time integration scheme ('be1im','bd2im','cn2si','bd2si')
+TINT     =  'be1im';             % time integration scheme ('be1im','bd2im','cn2si','bd2si')
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
 CFL      =  1;                   % (physical) time stepping courant number (multiplies stable step) [0,1]
 atol     =  1e-12;               % outer its absolute tolerance
 rtol     =  atol/1e6;            % outer its absolute tolerance
 maxit    =  100;                 % maximum outer its
-alpha    =  0.75;                % iterative step size parameter
+alpha    =  0.50;                % iterative step size parameter
 
 % create output directory
 if ~isfolder([opdir,'/',runID])
@@ -159,7 +159,7 @@ for dti = DT
 
     % plot convergence
     ES = norm(S-Sout,'fro')./norm(Sout,'fro');
-    EB = norm(rho-rhoout,'fro')./norm(rhoout,'fro');
+    EB = norm(RHO-rhoout,'fro')./norm(rhoout,'fro');
     EM = norm(M-Mout,'fro')./norm(Mout,'fro');
     EX = norm(X-Xout,'fro')./norm(Xout,'fro');
     EF = norm(F-Fout,'fro')./norm(Fout,'fro');
@@ -170,7 +170,7 @@ for dti = DT
 
     fh15 = figure(15);
     p1 = loglog(dt,ES,'+','Color',clist(1,:),'MarkerSize',10,'LineWidth',2); hold on; box on;
-    % p2 = loglog(dt,EB,'s','Color',clist(2,:),'MarkerSize',10,'LineWidth',2);
+    p2 = loglog(dt,EB,'s','Color',clist(2,:),'MarkerSize',10,'LineWidth',2);
     p3 = loglog(dt,EM,'o','Color',clist(3,:),'MarkerSize',10,'LineWidth',2);
     p4 = loglog(dt,EX,'d','Color',clist(4,:),'MarkerSize',10,'LineWidth',2);
     p5 = loglog(dt,EF,'*','Color',clist(5,:),'MarkerSize',10,'LineWidth',2);
@@ -181,11 +181,11 @@ for dti = DT
     title('Numerical convergence in time','Interpreter','latex','FontSize',20)
 
     if dt == DT(1)
-        p8 = loglog(DT,geomean([ES,EM,EX,EF,EC,ET]).*(DT./DT(1)).^1,'k--','LineWidth',2);  % plot trend for comparison
-        p9 = loglog(DT,geomean([ES,EM,EX,EF,EC,ET]).*(DT./DT(1)).^2,'k-' ,'LineWidth',2);
+        p8 = loglog(DT,geomean([ES,EB,EM,EX,EF,EC,ET]).*(DT./DT(1)).^1,'k--','LineWidth',2);  % plot trend for comparison
+        p9 = loglog(DT,geomean([ES,EB,EM,EX,EF,EC,ET]).*(DT./DT(1)).^2,'k-' ,'LineWidth',2);
     end
     if dt == DT(end)
-        legend({'error $S$','error $M$','error $X$','error $F$','error $C_j$','error $\Theta_k$','linear','quadratic'},'Interpreter','latex','box','on','location','southeast')
+        legend({'error $S$','error $\bar{\rho}$','error $M$','error $X$','error $F$','error $C_j$','error $\Theta_k$','linear','quadratic'},'Interpreter','latex','box','on','location','southeast')
     end
     drawnow;
 
