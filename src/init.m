@@ -288,7 +288,6 @@ Div_V  = 0.*Tp;  advn_rho = 0.*Tp;  advn_X = 0.*Tp; advn_M = 0.*Tp; advn_F = 0.*
 exx    = 0.*Tp;  ezz = 0.*Tp;  exz = zeros(Nz-1,Nx-1);  eII = 0.*Tp;  
 txx    = 0.*Tp;  tzz = 0.*Tp;  txz = zeros(Nz-1,Nx-1);  tII = 0.*Tp; 
 eta    = ones(Nz,Nx);
-etamax = min(eta(:)) .* etacntr;
 dV = 0.*Tp; 
 ke     = 0.*Tp;
 Tref   = min(cal.T0)+273.15;

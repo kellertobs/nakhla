@@ -218,21 +218,23 @@ kf  = (kwf+ke.*fRe1).*phi;                                                 % reg
 ks  = (ke./Prt.*fRe100 + kmin).*rho.*cP./T;                                % regularised heat diffusion
 kc  =  ke./Sct.*fRe100 + kmin;                                             % regularised component diffusion
 eta =  ke.*rho.*fRe1 + eta0;                                               % regularised momentum diffusion
+eta = 1./(1./etamax + 1./eta) + etamin;
+ 
 
 limcntr = max(eta(:))./min(eta(:))/etacntr;
 switch etalim
     case 'lower'
-        etamax  = max(eta(:)) * 10;
-        etamin  = min(eta(:)) * limcntr;
+        maxeta  = max(eta(:)) * 1e16;
+        mineta  = min(eta(:)) * limcntr;
     case 'upper'
-        etamax  = max(eta(:)) / limcntr;
-        etamin  = min(eta(:)) / 10;
-    case 'centred'
-        etamax  = max(eta(:)) / sqrt(limcntr);
-        etamin  = min(eta(:)) * sqrt(limcntr);
+        maxeta  = max(eta(:)) / limcntr;
+        mineta  = min(eta(:)) / 1e16;
+    case 'centr'
+        maxeta  = max(eta(:)) / sqrt(limcntr);
+        mineta  = min(eta(:)) * sqrt(limcntr);
 end
 
-eta    = 1./(1./etamax + 1./eta) + etamin;
+eta    = 1./(1./maxeta + 1./eta) + mineta;
 
 etaco  = (eta(icz(1:end-1),icx(1:end-1)).*eta(icz(2:end),icx(1:end-1)) ...
        .* eta(icz(1:end-1),icx(2:end  )).*eta(icz(2:end),icx(2:end  ))).^0.25;
