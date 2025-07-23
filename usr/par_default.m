@@ -6,7 +6,7 @@ restart   =  0;                   % restart from file (0: new run; <1: restart f
 nrh       =  1;                   % record diagnostic history every 'nrh' time steps
 nop       =  100;                 % output frame plotted/saved every 'nop' time steps
 plot_op   =  1;                   % switch on to live plot results
-save_op   =  1;                   % switch on to save output to file
+save_op   =  0;                   % switch on to save output to file
 plot_cv   =  0;                   % switch on to live plot iterative convergence
 colourmap = 'ocean';              % choose colourmap ('ocean','lipari','lajolla','lapaz','navia','batlow(W/K)','glasgow')
 

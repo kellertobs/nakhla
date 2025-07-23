@@ -7,7 +7,7 @@ if ~isfolder([outdir,'/',runID])
 end
 
 % save input parameters and runtime options (unless restarting)
-if restart == 0 && save_op == 1
+if restart == 0 && save_op == 1 && ~postprc
     parfile = [outdir,'/',runID,'/',runID,'_par'];
     save(parfile);
 end
