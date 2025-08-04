@@ -100,14 +100,6 @@ for iph = 1:nphs
     PHS_oxd(hasphs(:,iph)==1,iph,:) = PHS_oxd(hasphs(:,iph)==1,iph,:)./(sum(PHS_oxd(hasphs(:,iph)==1,iph,:),3)+eps)*100;
 end
 
-% combine Na2O and K2O
-PHS_oxd(:,:,Na) = PHS_oxd(:,:,Na) + PHS_oxd(:,:,K);
-PHS_oxd(:,:,K)  = [];
-Si = 1; Ti = 2; Al = 3; Fe = 4; Mg = 5; Ca = 6; Na = 7; H = 8;      % set shortcut oxide indices
-% set oxide list in preferred sequence
-oxd  = ["SiO2";"TiO2";"Al2O3";"FeO";"MgO";"CaO";"Na2O + K2O";"H2O"];       % set major oxides
-noxd = length(oxd);  
-
 % % lump in rutile with quartz
 % PHS_oxd(:,spn,:) = (PHS_frc(:,spn).*PHS_oxd(:,spn,:) + PHS_frc(:,ilm).*PHS_oxd(:,ilm,:)) ./ (PHS_frc(:,spn) + PHS_frc(:,ilm) + eps);
 % PHS_oxd(:,ilm,:) = [];
@@ -121,14 +113,14 @@ noxd = length(oxd);
 % nphs             = nphs-1;
 
 % lump in ilmenite with spinel
-% PHS_oxd(:,spn,:) = (PHS_frc(:,spn).*PHS_oxd(:,spn,:) + PHS_frc(:,ilm).*PHS_oxd(:,ilm,:)) ./ (PHS_frc(:,spn) + PHS_frc(:,ilm) + eps);
+PHS_oxd(:,spn,:) = (PHS_frc(:,spn).*PHS_oxd(:,spn,:) + PHS_frc(:,ilm).*PHS_oxd(:,ilm,:)) ./ (PHS_frc(:,spn) + PHS_frc(:,ilm) + eps);
 PHS_oxd(:,ilm,:) = [];
-% RHO(:,spn)       = (PHS_frc(:,spn)+PHS_frc(:,ilm))./(PHS_frc(:,spn)./(RHO(:,spn)+eps) + PHS_frc(:,ilm)./(RHO(:,ilm)+eps) + eps);
+RHO(:,spn)       = (PHS_frc(:,spn)+PHS_frc(:,ilm))./(PHS_frc(:,spn)./(RHO(:,spn)+eps) + PHS_frc(:,ilm)./(RHO(:,ilm)+eps) + eps);
 RHO(:,ilm)       = [];
 PHS_frc(:,spn)   =  PHS_frc(:,spn) + PHS_frc(:,ilm); 
 PHS_frc(:,ilm)   = [];
 phs(ilm)         = [];
-% hasphs(:,spn)    = max(hasphs(:,spn),hasphs(:,ilm));
+hasphs(:,spn)    = max(hasphs(:,spn),hasphs(:,ilm));
 hasphs(:,ilm)    = [];
 nphs             = nphs-1;
 
@@ -246,16 +238,19 @@ formattedDisplayText(MEM_oxd,'NumericFormat','short')
 
 % !!! update calibration file name on following line, then Run Section  !!!
 % cal_MORB;  % read cal.mem_oxd from calibration file
-MEM_oxd = [41.3700         0         0    7.5700   51.0600         0         0         0
-           29.7900         0         0   69.0900    1.1200         0         0         0
-           46.5900         0   34.4300         0         0   17.5300    1.4500         0
-           68.9400         0   18.6800         0         0         0   12.3800         0
-           53.3000    0.0300    2.7400    5.5400   19.4700   18.9200         0         0
-           50.0000    1.1800    0.3400   30.8200         0   14.0100    3.6500         0
-                 0   40.2200    2.6000   31.6000   25.5800         0         0         0
-                 0   14.5700    1.2200   84.2100         0         0         0         0
-          100.0000         0         0         0         0         0         0         0
-                 0         0         0         0         0         0         0  100.0000];
+MEM_oxd = [41.3700         0         0    7.5700   51.0600         0         0         0         0
+           29.7900         0         0   69.0900    1.1200         0         0         0         0
+           44.4200         0   35.7200         0         0   19.1000    0.7600         0         0
+           68.7800         0   19.3300         0         0         0   11.8300    0.0600         0
+           68.6400         0   18.3100         0         0         0    6.3800    6.6700         0
+           53.3800    0.4900    3.1200    2.8500   21.1700   18.9900         0         0         0
+           51.0400         0    0.5500   26.0400    4.3100   15.7900    2.2700         0         0
+           49.9000    2.3900    0.7300   29.6300    0.0700   13.4000    3.8800         0         0
+                 0   38.8000    2.8200   30.5000   27.8800         0         0         0         0
+                 0    5.8200    1.4700   92.7100         0         0         0         0         0
+                 0   54.8300         0   45.1700         0         0         0         0         0
+           100.000         0         0         0         0         0         0         0         0
+                 0         0         0         0         0         0         0         0  100.0000];
 
 % extract melt phase end-member composition and project back to 
 % reduced oxide composition
@@ -513,7 +508,7 @@ T0_init = T0_best; A_init = A_best; B_init = B_best; r_init = r_best; dT_init = 
 m0      = [T0_init.';A_init.';B_init.';r_init.';dT_init.';cmp_mem_init(:).*indmem(:)];
 
 % !!!  set MCMC parameters then Run Section to execute MCMC routine  !!!
-Niter           = 1e6;              % number of samples to take
+Niter           = 1e3;              % number of samples to take
 anneal.initstep = 1e-4;           % adjust step size to get reasonable acceptance ratio 20-30%
 anneal.levels   = 1;                % select number of annealing levels
 anneal.burnin   = 1;%max(1,Niter/5);  % set length of initial burn-in sequence
