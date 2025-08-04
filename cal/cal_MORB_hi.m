@@ -13,7 +13,7 @@ cal.ncmp   = 7;
 cal.oxdStr = {'SiO$_2$','TiO$_2$','Al$_2$O$_3$','FeO','MgO','CaO','Na$_2$O','K$_2$O','H$_2$O'};
      elStr = {'Si','Ti','Al','Fe','Mg','Ca','Na','K','H'};
 cal.memStr = {'for','fay','ant','alb','san','dps','aug','pig','ulv','mgt','ilm','qtz','wat'};
-cal.msyStr = {'olv','fsp','cxp','oxs','qtz'};
+cal.msyStr = {'olv','fsp','cpx','oxs','qtz'};
 cal.cmpStr = {'dun','tro','gbr','fbs','tra','rhy','vol'};
 
 for i = 1:cal.ncmp; cal.(cal.cmpStr{i}) = i; end
@@ -23,6 +23,9 @@ for i = 1:cal.noxd; cal.(elStr{i}) = i; end
 
 %           SiO2 TiO2 Al2O3 FeO MgO CaO Na2O K2O H2O
 cal.ioxd = [   1    2     3   4   5   6    7   8   9]; % oxdie indices for viscosity, density functions
+
+%           plg  olv  cpx  qtz
+cal.imsy = [ 2    1    3    5];  % mineral system indices for plotting basalt tetrahedron
 
 % oxide composition of mineral end-members
 %                SiO2    TiO2   Al2O3     FeO     MgO     CaO    Na2O     K2O     H2O

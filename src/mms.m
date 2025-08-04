@@ -1,5 +1,5 @@
 % create manufactured solution
-load ocean.mat
+load ./colmap/ocean.mat
 clear x z
 TINY = 1e-16;
 syms U_mms(x,z) W_mms(x,z) P_mms(x,z) eta_mms(x,z) rho_mms(x,z) src_mms(x,z)
@@ -26,8 +26,8 @@ fprintf(1,'       . ');
 
 % update strain rates
 DivV_mms(x,z)= (diff(W_mms,z) + diff(U_mms,x));
-exx_mms(x,z) = diff(U_mms,x) - DivV_mms./2;         % x-normal strain rate
-ezz_mms(x,z) = diff(W_mms,z) - DivV_mms./2;         % z-normal strain rate
+exx_mms(x,z) = diff(U_mms,x) - DivV_mms./3;         % x-normal strain rate
+ezz_mms(x,z) = diff(W_mms,z) - DivV_mms./3;         % z-normal strain rate
 exz_mms(x,z) = 1/2.*(diff(U_mms,z)+diff(W_mms,x));  % xz-shear strain rate
 fprintf(1,' . ');
 
@@ -87,25 +87,26 @@ drawnow;
 % evaluate analytical solution on appropriate coordinate grids
 [x,z]  = meshgrid(x_mms,zw_mms);
 W_mms  = double(subs(W_mms)); fprintf(1,' . ');
-rhofz  = double(subs(rho_mms)); fprintf(1,' . ');
-rhofz  = rhofz(:,2:end-1);
+rhow   = double(subs(rho_mms)); fprintf(1,' . ');
+rhow   = rhow(:,2:end-1);
 [x,z]  = meshgrid(xu_mms,z_mms);
 U_mms  = double(subs(U_mms)); fprintf(1,' . ');
-rhofx  = double(subs(rho_mms)); fprintf(1,' . ');
-rhofx  = rhofx(2:end-1,:);
+rhou   = double(subs(rho_mms)); fprintf(1,' . ');
+rhou   = rhou(2:end-1,:);
 [x,z]  = meshgrid(x_mms,z_mms);
 P_mms  = double(subs(P_mms)); fprintf(1,' . ');
 eta    = double(subs(eta_mms)); fprintf(1,' . ');
 eta    = eta(2:end-1,2:end-1);
-VolSrc = double(subs(src_mms)); fprintf(1,' . ');
-VolSrc = VolSrc(2:end-1,2:end-1);
+dV     = double(subs(src_mms)); fprintf(1,' . ');
+dV     = dV(2:end-1,2:end-1);
 [x,z]  = meshgrid(xu_mms,zw_mms);
 etaco  = double(subs(eta_mms)); fprintf(1,' . ');
 
-rhoWo  = zeros(size(rhofz));
-rhoWoo = zeros(size(rhofz));
-rhoUo  = zeros(size(rhofx));
-rhoUoo = zeros(size(rhofx));
+Drho   = rhow-mean(rhow,2);
+rhoWo  = zeros(size(rhow));
+rhoWoo = zeros(size(rhow));
+rhoUo  = zeros(size(rhou));
+rhoUoo = zeros(size(rhou));
 WBG    = 0.*W_mms;  W = WBG;
 UBG    = 0.*U_mms;  U = UBG;
 SOL    = [W_mms(:);U_mms(:);P_mms(:)];

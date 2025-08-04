@@ -289,14 +289,14 @@ p1 = 0.5*(  fc + fp);
 p2 = 0.5*(3*fc - fm);
 
 % smoothness measure
-b1 = (p1 - fc).^2;
-b2 = (p2 - fc).^2;
+b1 = (fp - fc).^2;
+b2 = (fc - fm).^2;
 
 % weights
 g   = [1/3, 2/3];
-eps = 1e-16;    %stabiliser
-wp1 = g(1)./(b1.^2 + eps);
-wp2 = g(2)./(b2.^2 + eps);
+eps = 1e-6;
+wp1 = g(1)./(b1 + eps);
+wp2 = g(2)./(b2 + eps);
 
 fface = ( wp1.*p1 + wp2.*p2 ) ./ (wp1 + wp2);
 
@@ -333,10 +333,10 @@ b3 = 13/12*(fc  - 2*fp + fpp).^2 + 1/4*(3*fc  - 4*fp +   fpp).^2;
 
 % weights
 g   = [1/10, 6/10, 3/10];
-eps = 1e-16;    %stabiliser
-wp1 = g(1)./(b1.^2 + eps);
-wp2 = g(2)./(b2.^2 + eps);
-wp3 = g(3)./(b3.^2 + eps);
+
+wp1 = g(1)./(b1 + eps).^2;
+wp2 = g(2)./(b2 + eps).^2;
+wp3 = g(3)./(b3 + eps).^2;
 
 % get flux (normalize weights at the same time)
 fface = (wp1.*p1 + wp2.*p2 + wp3.*p3) ./ (wp1 + wp2 + wp3) ;

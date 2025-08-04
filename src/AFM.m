@@ -28,10 +28,10 @@ end
 text(x3(2:end)+0.02,y3(2:end)-0.02,labels,'FontSize',16,'Interpreter','latex','HorizontalAlignment','left','VerticalAlignment','bottom');
 text(x2(2:end)-0.00,y2(2:end)-0.02,labels,'FontSize',16,'Interpreter','latex','HorizontalAlignment','center','VerticalAlignment','top');
 text(x1(2:end)-0.02,y1(2:end)-0.02,labels,'FontSize',16,'Interpreter','latex','HorizontalAlignment','right','VerticalAlignment','bottom');
-text( 0.99,-0.04,'MgO','FontSize',16,'Interpreter','latex','HorizontalAlignment','left','VerticalAlignment','middle');
-text(0.08,-0.04,'Na$_2$O+K$_2$O','FontSize',16,'Interpreter','latex','HorizontalAlignment','right','VerticalAlignment','middle');
-text(0.450,0.87,'FeO$_\mathrm{tot}$','FontSize',16,'Interpreter','latex','HorizontalAlignment','left','VerticalAlignment','bottom');
-text(1.02,0.87,'T [$^\circ$C]','FontSize',16,'Interpreter','latex','HorizontalAlignment','left','VerticalAlignment','bottom');
+text( 0.99,-0.04,'MgO','FontSize',18,'Interpreter','latex','HorizontalAlignment','left','VerticalAlignment','middle');
+text(0.450,0.87,'FeO$_\mathrm{tot}$','FontSize',18,'Interpreter','latex','HorizontalAlignment','left','VerticalAlignment','bottom');
+text(0.11,-0.04,'Na$_2$O+K$_2$O','FontSize',18,'Interpreter','latex','HorizontalAlignment','right','VerticalAlignment','middle');
+text(1.0,0.87,'T [$^\circ$C]','FontSize',16,'Interpreter','latex','HorizontalAlignment','left','VerticalAlignment','bottom');
 text(0.50,0.60,'tholeiitic','Color',[60 5 15]/100,'FontSize',16,'Interpreter','latex','HorizontalAlignment','center','VerticalAlignment','middle');
 text(0.45,0.20,'calc-alcaline','Color',[60 5 15]/100,'FontSize',16,'Interpreter','latex','HorizontalAlignment','center','VerticalAlignment','middle');
 [A,B] = terncoords([0.5,0.34,0.24,0.19,0.11,0.05],[0.36,0.49,0.56,0.56,0.46,0.35]);

@@ -10,6 +10,8 @@
 [Pchmboo, Pchmbo] = deal(Pchmbo, Pchmb);
 [rhoWoo , rhoWo ] = deal(rhoWo , rhoW );
 [rhoUoo , rhoUo ] = deal(rhoUo , rhoU );
+% [smoo   , smo   ] = deal(smo   , sm   );
+% [Ptoo   , Pto   ] = deal(Pto   , Pt   );
 
 [dSdtoo    , dSdto    ] = deal(dSdto    , dSdt    );
 [dCdtoo    , dCdto    ] = deal(dCdto    , dCdt    );
@@ -21,8 +23,10 @@
 [dTpdtoo   , dTpdto   ] = deal(dTpdto   , dTpdt   );
 [dTdtoo    , dTdto    ] = deal(dTdto    , dTdt    );
 [dPchmbdtoo, dPchmbdto] = deal(dPchmbdto, dPchmbdt);
+% [dsmdtoo   , dsmdto   ] = deal(dsmdto   , dsmdt   );
+% [dPtdtoo   , dPtdto   ] = deal(dPtdto   , dPtdt   );
 
 [Gmo,Gxo,Gfo] = deal(Gm,Gx,Gf);
 
-so  = s;
 dto = dt;
+Pto = Pt;

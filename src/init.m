@@ -1,13 +1,13 @@
-% set directory paths
-addpath('./ternplot');
+%% *****  MODEL INITIALISATION  *******************************************
 
+if ~postprc
 % create output directory
 if ~isfolder([outdir,'/',runID])
     mkdir([outdir,'/',runID]);
 end
 
 % save input parameters and runtime options (unless restarting)
-if restart == 0 && save_op == 1
+if restart == 0 && save_op == 1 && ~postprc
     parfile = [outdir,'/',runID,'/',runID,'_par'];
     save(parfile);
 end
@@ -17,21 +17,57 @@ fprintf('*************************************************************\n');
 fprintf('*****  RUN NAKHLA MODEL | %s  *************\n',datetime('now'));
 fprintf('*************************************************************\n');
 fprintf('\n   run ID: %s \n\n',runID);
+end
 
-load ocean;                  % load custom colormap
 run(['../cal/cal_',calID]);  % load melt model calibration
+
+% load and process custom colormaps
+switch colourmap
+    case 'ocean'
+        load ./colmap/ocean.mat
+        colmap = ocean;   
+    case 'batlow'
+        load ./colmap/batlow.mat 
+        colmap = batlow;
+    case 'batlowW'
+        load ./colmap/batlowW.mat
+        colmap = batlowW;
+    case 'batlowK'
+        load ./colmap/batlowK.mat
+        colmap = batlowK;
+    case 'lipari'
+        load ./colmap/lipari.mat
+        colmap = lipari;  
+    case 'glasgow'
+        load ./colmap/glasgow.mat;
+        colmap = glasgow; 
+    case 'navia'
+        load ./colmap/navia.mat;
+        colmap = navia;  
+    case 'lapaz'
+        load ./colmap/lapaz.mat;
+        colmap = lapaz;  
+    case 'lajolla'
+        load ./colmap/lajolla.mat;
+        colmap = lajolla;  
+end
+nclmp = length(colmap);
+
+colmapcmp = colmap(max(1,min(nclmp,1+round((1:nclmp)/(nclmp/(cal.ncmp-1)))*round(nclmp/(cal.ncmp-1)))),:);
+colmapoxd = colmap(max(1,min(nclmp,1+round((1:nclmp)/(nclmp/(cal.noxd-1)))*round(nclmp/(cal.noxd-1)))),:);
+colmapmem = colmap(max(1,min(nclmp,1+round((1:nclmp)/(nclmp/(cal.nmem-1)))*round(nclmp/(cal.nmem-1)))),:);
+colmapmsy = colmap(max(1,min(nclmp,1+round((1:nclmp)/(nclmp/(cal.nmsy-1)))*round(nclmp/(cal.nmsy-1)))),:);
+
 if periodic % periodic sides
-    BCA     =  {'','periodic'};  % boundary condition on advection (top/bot, sides)
-    BCD     =  {'','periodic'};  % boundary condition on advection (top/bot, sides)
+    BCA     =  {'closed','periodic'};  % boundary condition on advection (top/bot, sides)
+    BCD     =  {'closed','periodic'};  % boundary condition on advection (top/bot, sides)
 else % closed sides
-    BCA     =  {'',''};  % boundary condition on advection (top/bot, sides)
-    BCD     =  {'',''};  % boundary condition on advection (top/bot, sides) 
+    BCA     =  {'closed','closed'};  % boundary condition on advection (top/bot, sides)
+    BCD     =  {'closed','closed'};  % boundary condition on advection (top/bot, sides) 
 end
 
 Dsx = -cal.Dsx;
 Dsf =  cal.Dsf;
-
-Delta_cnv0 = Delta_cnv;
 
 % normalise major components to anhydrous unit sum, rescale to hydrous
 c0(1:end-1) = c0(1:end-1)./sum(c0(1:end-1)).*(1-c0(end));
@@ -64,7 +100,9 @@ for i = 1:round(smth)
 end
 rp = rp./max(abs(rp(:)));
 
-gp = exp(-(XX-L/2).^2/(max(L,D)/8)^2 - (ZZ-D/2).^2/(max(L,D)/8)^2);
+gp = exp(-(XX-L/2  ).^2/(max(L,D)/8)^2 - (ZZ-D/2).^2/(max(L,D)/8)^2) ...
+   + exp(-(XX-L/2+L).^2/(max(L,D)/8)^2 - (ZZ-D/2).^2/(max(L,D)/8)^2) ...
+   + exp(-(XX-L/2-L).^2/(max(L,D)/8)^2 - (ZZ-D/2).^2/(max(L,D)/8)^2);
 
 % get mapping arrays
 NP = (Nz+2) * (Nx+2);
@@ -108,20 +146,20 @@ if ~any(bnd_h)
     switch bndmode
         case 0  % none
         case 1  % top only
-            topshape = exp( ( -ZZ)/bnd_w);
+            topshape = exp( ( -ZZ)/max(h,bnd_w));
         case 2  % bot only
-            botshape = exp(-(D-ZZ)/bnd_w);
+            botshape = exp(-(D-ZZ)/max(h,bnd_w));
         case 3  % top/bot only
-            topshape = exp( ( -ZZ)/bnd_w);
-            botshape = exp(-(D-ZZ)/bnd_w);
+            topshape = exp( ( -ZZ)/max(h,bnd_w));
+            botshape = exp(-(D-ZZ)/max(h,bnd_w));
         case 4 % all walls
-            topshape = exp( ( -ZZ)/bnd_w);
-            botshape = exp(-(D-ZZ)/bnd_w);
-            sdsshape = exp( ( -XX)/bnd_w) ...
-                     + exp(-(L-XX)/bnd_w);
+            topshape = exp( ( -ZZ)/max(h,bnd_w));
+            botshape = exp(-(D-ZZ)/max(h,bnd_w));
+            sdsshape = exp( ( -XX)/max(h,bnd_w)) ...
+                     + exp(-(L-XX)/max(h,bnd_w));
         case 5 % only walls
-            sdsshape = exp( ( -XX)/bnd_w) ...
-                     + exp(-(L-XX)/bnd_w);
+            sdsshape = exp( ( -XX)/max(h,bnd_w)) ...
+                     + exp(-(L-XX)/max(h,bnd_w));
     end
     sdsshape = max(0,sdsshape - topshape - botshape);
 end
@@ -154,15 +192,25 @@ end
 
 % initialise solution fields
 switch init_mode
-    case 'layer'
-        Tp  =  T0 + (T1-T0) .* (1+erf((ZZ/D-zlay+rp*h*dlay)/wlay_T))/2 + dTr.*rp + dTg.*gp;  % potential temperature [C]
+    case {'constant' , 'liquidus'}
+        Tp  =  max(cal.T0) + 0.*rp;  % potential temperature [C]
         c = zeros(Nz,Nx,cal.ncmp);
         for i = 1:cal.ncmp
-            c(:,:,i)  =  c0(i) + (c1(i)-c0(i)) .* (1+erf((ZZ/D-zlay+rp*h*dlay)/wlay_c))/2 + dcr(i).*rp + dcg(i).*gp;  % trace elements
+            c(:,:,i)  =  c0(i) + dcr(i).*rp + dcg(i).*gp;  % trace elements
         end
         trc = zeros(Nz,Nx,cal.ntrc);
         for i = 1:cal.ntrc
-            trc(:,:,i)  =  trc0(i) + (trc1(i)-trc0(i)) .* (1+erf((ZZ/D-zlay+rp*h*dlay)/wlay_c))/2 + dr_trc(i).*rp + dg_trc(i).*gp;  % trace elements
+            trc(:,:,i)  =  trc0(i) + dr_trc(i).*rp + dg_trc(i).*gp;  % trace elements
+        end
+    case 'layer'
+        Tp  =  T0 + (T1-T0) .* (1+erf((ZZ/D-zlay+rp*dlay)/wlay_T))/2 + dTr.*rp + dTg.*gp;  % potential temperature [C]
+        c = zeros(Nz,Nx,cal.ncmp);
+        for i = 1:cal.ncmp
+            c(:,:,i)  =  c0(i) + (c1(i)-c0(i)) .* (1+erf((ZZ/D-zlay+rp*dlay)/wlay_c))/2 + dcr(i).*rp + dcg(i).*gp;  % trace elements
+        end
+        trc = zeros(Nz,Nx,cal.ntrc);
+        for i = 1:cal.ntrc
+            trc(:,:,i)  =  trc0(i) + (trc1(i)-trc0(i)) .* (1+erf((ZZ/D-zlay+rp*dlay)/wlay_c))/2 + dr_trc(i).*rp + dg_trc(i).*gp;  % trace elements
         end
     case 'linear'
         Tp  =  T0 + (T1-T0) .* (ZZ/D) + dTr.*rp + dTg.*gp;  % potential temperature [C]
@@ -240,36 +288,48 @@ Div_V  = 0.*Tp;  advn_rho = 0.*Tp;  advn_X = 0.*Tp; advn_M = 0.*Tp; advn_F = 0.*
 exx    = 0.*Tp;  ezz = 0.*Tp;  exz = zeros(Nz-1,Nx-1);  eII = 0.*Tp;  
 txx    = 0.*Tp;  tzz = 0.*Tp;  txz = zeros(Nz-1,Nx-1);  tII = 0.*Tp; 
 eta    = ones(Nz,Nx);
-etamax = min(eta(:)) .* etacntr;
-VolSrc = 0.*Tp; 
-kW     = 0.*Tp;
+dV = 0.*Tp; 
+ke     = 0.*Tp;
 Tref   = min(cal.T0)+273.15;
 Pref   = 1e5;
+sref   = 0e3;
 c0_oxd = c0*cal.cmp_oxd;
 c0_oxd_all = zeros(size(c0,1),9);
-c0_oxd_all(:,cal.ioxd) = c0_oxd;
-rhom   = mean(cal.rhox0-500).*ones(size(Tp)); 
-rhox   = mean(cal.rhox0).*ones(size(Tp));
-rhof   = cal.rhof0.*ones(size(Tp));
+if cal.noxd>9
+    c0_oxd_all = c0_oxd(:,cal.ioxd);
+else
+    c0_oxd_all(:,cal.ioxd) = c0_oxd;
+end
+rhom0  = mean(cal.rhox0-500).*ones(size(Tp)); 
+rhox0  = mean(cal.rhox0).*ones(size(Tp));
+rhof0  = cal.rhof0.*ones(size(Tp));
 Pchmb  = Pchmb0;  Pchmbo = Pchmb;  Pchmboo = Pchmbo;  dPchmbdt = Pchmb;  dPchmbdto = dPchmbdt; dPchmbdtoo = dPchmbdto;  upd_Pchmb = dPchmbdt;
-Pt     = Ptop + Pchmb + mean(rhom,'all').*g0.*ZZ;  Pl = Pt;
-rhof   = rhof.*(1+bPf.*(Pt-Pref));
-rhox   = rhox.*(1+bPx.*(Pt-Pref));
-rhom   = rhom.*(1+bPm.*(Pt-Pref));
+Pt     = Ptop + Pchmb + mean(rhom0,'all').*g0.*ZZ;  Pl = Pt;  Pto = Pt; Ptoo = Pt; dPtdt = 0*Pt; dPtdto = dPtdt; dPtdtoo = dPtdto;
+rhof   = rhof0.*(1+bPf.*(Pt-Pref));
+rhox   = rhox0.*(1+bPx.*(Pt-Pref));
+rhom   = rhom0.*(1+bPm.*(Pt-Pref));
 rho    = rhom;
-rhofz  = (rho(icz(1:end-1),:)+rho(icz(2:end),:))/2;
-rhofx  = (rho(:,icx(1:end-1))+rho(:,icx(2:end)))/2;
-rhoWo  = rhofz.*W(:,2:end-1); rhoWoo = rhoWo; advn_mz = 0.*rhoWo(2:end-1,:);
-rhoUo  = rhofx.*U(2:end-1,:); rhoUoo = rhoUo; advn_mx = 0.*rhoUo;
+rhow   = (rho(icz(1:end-1),:)+rho(icz(2:end),:))/2;
+rhou   = (rho(:,icx(1:end-1))+rho(:,icx(2:end)))/2;
+rhoWo  = rhow.*W(:,2:end-1); rhoWoo = rhoWo; advn_mz = 0.*rhoWo(2:end-1,:);
+rhoUo  = rhou.*U(2:end-1,:); rhoUoo = rhoUo; advn_mx = 0.*rhoUo;
 fq     = zeros(size(Tp));  mq = ones(size(Tp))/2;  xq = 1-mq-fq; 
 cmq    = c; cxq = c;  cfq = 0.*c;  cfq(:,:,end) = 1;  cf = cfq;
 cm_oxd = reshape(reshape(c,Nz*Nx,cal.ncmp)*cal.cmp_oxd,Nz,Nx,cal.noxd);
-cm_oxd_all(:,:,cal.ioxd) = cm_oxd;
-aT     = aTm;
-kT     = kTm;
-cP     = cPm; RhoCp = rho.*cP;
-rhoref = mean(rho(:));
-T      =  (Tp+273.15).*exp(aT./RhoCp.*(Pt-Pref));
+cm_oxd_all = zeros(Nz,Nx,9);
+if cal.noxd>9
+    cm_oxd_all = cm_oxd(:,:,cal.ioxd);
+else
+    cm_oxd_all(:,:,cal.ioxd) = cm_oxd;
+end
+aT   = aTm;
+kT   = kTm;
+cP   = cPm; RhoCp = rho.*cP;
+Adbt = aT./RhoCp;
+Tp   = (Tp+273.15); %T = Tp;
+T    = Tp.*exp(Adbt.*(Pt-Pref));
+sm   = cPm.*log(Tp./Tref);  sx = cPx.*log(Tp./Tref) + Dsx;  sf = cPf.*log(Tp./Tref) + Dsf;
+x    = xq;  m = mq;  f = fq; mu = m; chi = x; phi = f;
 
 % get volume fractions and bulk density
 step    = 0;
@@ -278,72 +338,11 @@ FMtime  = 0;
 TCtime  = 0;
 UDtime  = 0;
 a1      = 1; a2 = 0; a3 = 0; b1 = 1; b2 = 0; b3 = 0;
-% switch init_mode
-    % case 'read_1D'
-    % 
-    %     load(initname,'x','m','f','T','Pt','cm','cx','cf');
-    %     T  = repmat(interp1(Zci,T,Zc).',1,Nx);
-    %     xq = repmat(interp1(Zci,x,Zc).',1,Nx);
-    %     mq = repmat(interp1(Zci,m,Zc).',1,Nx);
-    %     fq = repmat(interp1(Zci,f,Zc).',1,Nx);
-    %     Pt = repmat(interp1(Zci,Pt,Zc).',1,Nx);
-    % 
-    %     var.c      = reshape(c,Nx*Nz,cal.ncmp);   % component fractions [wt]
-    %     var.T      = reshape(T,Nx*Nz,1)-273.15;   % temperature [C]
-    %     var.P      = reshape(Pt,Nx*Nz,1)/1e9;     % pressure [GPa]
-    %     var.m      = reshape(mq,Nx*Nz,1);         % melt fraction [wt]
-    %     var.f      = reshape(fq,Nx*Nz,1);         % bubble fraction [wt]
-    %     var.H2O    = var.c(:,end);                % water concentration [wt]
-    %     var.X      = reshape(cm_oxd_all,Nz*Nx,9); % melt oxide fractions [wt %]
-    %     cal.H2Osat = fluidsat(var); % water saturation [wt]
-    % 
-    %     [var,cal] = meltmodel(var,cal,'E');
-    % 
-    %     % cmi = zeros(Nz,Nx,cal.ncmp);
-    %     % for i = 1:cal.ncmp
-    %     %     cmi(:,:,i)   = repmat(interp1(cm(:,:,i),1:Nz).',1,Nx) + dcr(i).*rp + dcg(i).*gp;
-    %     % end
-    %     % cm = cmi;
-    %     % cxi = zeros(Nz,Nx,cal.ncmp);
-    %     % for i = 1:cal.ncmp
-    %     %     cxi(:,:,i)   = repmat(interp1(cx(:,:,i),1:Nz).',1,Nx) + dcr(i).*rp + dcg(i).*gp;
-    %     % end
-    %     % cx  = cxi;
-    %     % cfi = ones(Nz,Nx,cal.ncmp);
-    %     % for i = 1:cal.ncmp
-    %     %     cfi(:,:,i)   = repmat(interp1(cf(:,:,i),1:Nz).',1,Nx) + dcr(i).*rp + dcg(i).*gp;
-    %     % end
-    %     % cf = cfi;
-    %     % % T  = (Tp+273.15).*exp(aT./RhoCp.*(Pt-Pref));
-    % 
-    %     mq = reshape(var.m,Nz,Nx);
-    %     fq = reshape(var.f,Nz,Nx);
-    %     xq = reshape(var.x,Nz,Nx);
-    %     x  = xq;  m = mq;  f = fq;
-    % 
-    %     cxq = reshape(var.cx,Nz,Nx,cal.ncmp);
-    %     cfq = reshape(var.cf,Nz,Nx,cal.ncmp);
-    %     cmq = reshape(var.cm,Nz,Nx,cal.ncmp);
-    %     cm  = cmq; cx = cxq;  cf = cfq;
-    % 
-    %     update;
-    % 
-    % otherwise
 
-res  = 1;  tol = 1e-9;  it = 1;
+if ~postprc
+res  = 1;  tol = 1e-12;  it = 1;
 while res > tol
     Ptii = Pt; Ti = T; xi = xq; fi = fq;
-    
-    rhofz  = (rho(icz(1:end-1),:)+rho(icz(2:end),:))/2;
-    rhofx  = (rho(:,icx(1:end-1))+rho(:,icx(2:end)))/2;
-    if Nz==1; Pt = Ptop.*ones(size(Tp)) + Pchmb; else
-        Pl(1,:)     = repmat(mean(rhofz(1,:),2).*g0.*h/2,1,Nx) + Ptop;
-        Pl(2:end,:) = Pl(1,:) + repmat(cumsum(mean(rhofz(2:end-1,:),2).*g0.*h),1,Nx);
-        Pt          = Pl + Pchmb;
-    end
-    
-    rhoref = mean(rho(:));
-    T  = (Tp+273.15).*exp(aT./RhoCp.*(Pt-Pref));
 
     eqtime = tic;
 
@@ -356,11 +355,18 @@ while res > tol
     var.X      = reshape(cm_oxd_all,Nz*Nx,9); % melt oxide fractions [wt %]
     cal.H2Osat = fluidsat(var); % water saturation [wt]
 
-    [var,cal] = meltmodel(var,cal,'E');
+    [var,cal] = leappart(var,cal,'E');
 
-    mq = reshape(var.m,Nz,Nx);
-    fq = reshape(var.f,Nz,Nx);
-    xq = reshape(var.x,Nz,Nx);
+    Tsol   = reshape(cal.Tsol,Nz,Nx);
+    Tliq   = reshape(cal.Tliq,Nz,Nx);
+    H2Osat = reshape(cal.H2Osat,Nz,Nx);
+
+    mq = reshape(var.m.*(var.m>eps^0.5),Nz,Nx);
+    fq = reshape(var.f.*(var.f>eps^0.5),Nz,Nx);
+    xq = reshape(var.x.*(var.x>eps^0.5),Nz,Nx);
+    mq = mq./(mq+xq+fq);
+    xq = xq./(mq+xq+fq);
+    fq = fq./(mq+xq+fq);
     x  = xq;  m = mq;  f = fq;
 
     cxq = reshape(var.cx,Nz,Nx,cal.ncmp);
@@ -373,16 +379,59 @@ while res > tol
 
     update;
 
+    % T  = Tp.*exp(Adbt.*(Pt-Pref));
+    % sm = cPm.*log(Tp./T0);  sx = sm+Dsx;  sf = sx+Dsf;
+
+    X    = rho.*x; Xo = X;  res_X = 0.*X;
+    F    = rho.*f; Fo = F;  res_F = 0.*F;
+    M    = rho.*m; Mo = M;  res_M = 0.*M;
+    RHO  = X+M+F;
+    C    = M.*cm + X.*cx + F.*cf;
+
+    switch init_mode
+        case 'liquidus'
+            T  = Tliq+273.15+T0;
+            a  = aTm.*(T -Tref);
+            b  = bPm.*(Pt-Pref);
+            sm = sref     + cPm.*log(T/Tref) - (aTm./(bPm.*rhom0)) .* log((1-a+b)./(1-a));
+            a  = aTx.*(T -Tref);
+            b  = bPx.*(Pt-Pref);
+            sx = sref+Dsx + cPx.*log(T/Tref) - (aTx./(bPx.*rhox0)) .* log((1-a+b)./(1-a));
+            a  = aTf.*(T -Tref);
+            b  = bPf.*(Pt-Pref);
+            sf = sref+Dsf + cPf.*log(T/Tref) - (aTf./(bPf.*rhof0)) .* log((1-a+b)./(1-a));
+            S  = M.*sm + X.*sx + F.*sf;
+            [Tp,~ ] = StoT(Tp,S./rho,Pref+0*Pt,cat(3,m,x,f),[cPm;cPx;cPf],[aTm;aTx;aTf],[bPm;bPx;bPf],cat(3,rhom0,rhox0,rhof0),[sref;sref+Dsx;sref+Dsf],Tref,Pref);
+            [T ,si] = StoT(T ,S./rho,       Pt,cat(3,m,x,f),[cPm;cPx;cPf],[aTm;aTx;aTf],[bPm;bPx;bPf],cat(3,rhom0,rhox0,rhof0),[sref;sref+Dsx;sref+Dsf],Tref,Pref);
+            sm = si(:,:,1); sx = si(:,:,2); sf = si(:,:,3);
+        otherwise
+            sm = cPm.*log(Tp./Tref);  sx = cPx.*log(Tp./Tref) + Dsx;  sf = cPf.*log(Tp./Tref) + Dsf;
+            S  = M.*sm + X.*sx + F.*sf;
+
+            [Tp,~ ] = StoT(Tp,S./rho,Pref+0*Pt,cat(3,m,x,f),[cPm;cPx;cPf],[aTm;aTx;aTf],[bPm;bPx;bPf],cat(3,rhom0,rhox0,rhof0),[sref;sref+Dsx;sref+Dsf],Tref,Pref);
+            [T ,si] = StoT(T ,S./rho,       Pt,cat(3,m,x,f),[cPm;cPx;cPf],[aTm;aTx;aTf],[bPm;bPx;bPf],cat(3,rhom0,rhox0,rhof0),[sref;sref+Dsx;sref+Dsf],Tref,Pref);
+            sm = si(:,:,1); sx = si(:,:,2); sf = si(:,:,3);
+    end
+
     res  = norm(Pt(:)-Ptii(:),2)./norm(Pt(:),2) ...
-         + norm( T(:)-Ti  (:),2)./norm( T(:),2) ...
-         + norm((x(:)-xi  (:)).*(x(:)>eps),2)./(norm(x(:),2)+eps^0.25) ...
-         + norm((f(:)-fi  (:)).*(f(:)>eps),2)./(norm(f(:),2)+eps^0.25);
+         + norm( T(:)-Ti  (:),2)./norm( T(:),2);
 
     it = it+1;
 end
 % end
+To   = T;  
+Tpo  = Tp;
+So   = S;  
+Mo   = M;
+Co   = C;
+Xo   = X;
+Fo   = F;
 rhoo = rho;
 dto  = dt; 
+
+% initialise correlation length for convective/turbulent regularisation
+Delta_cnv0 = Delta_cnv;
+corrl;
 
 m0  = mean(m(:)); 
 x0  = mean(x(:)); 
@@ -402,7 +451,11 @@ rhof0 = cal.rhof0;
 rhox0 = mean(rhox(:));
 
 cm0_oxd_all = zeros(1,9);
-cm0_oxd_all(:,cal.ioxd) = cm0_oxd;
+if cal.noxd>9
+    cm0_oxd_all = cm0_oxd(:,cal.ioxd);
+else
+    cm0_oxd_all(:,cal.ioxd) = cm0_oxd;
+end
 etam0 = Giordano08(cm0_oxd_all,T0);
 rhom0 = DensityX(cm0_oxd_all,T0,Ptop);
 
@@ -410,9 +463,14 @@ cm1_oxd = (0.99.*cm0_mem(1,:) + 0.01.*cal.cmp_mem(end-1,:))*cal.mem_oxd/100;
 cm2_oxd = (0.99.*cm0_mem(1,:) - 0.01.*cal.cmp_mem(end-1,:))*cal.mem_oxd/100;
 
 cm1_oxd_all = zeros(1,9);
-cm1_oxd_all(:,cal.ioxd) = cm1_oxd;
 cm2_oxd_all = zeros(1,9);
-cm2_oxd_all(:,cal.ioxd) = cm2_oxd;
+if cal.noxd>9
+    cm1_oxd_all = cm1_oxd(:,cal.ioxd);
+    cm2_oxd_all = cm2_oxd(:,cal.ioxd);
+else
+    cm1_oxd_all(:,cal.ioxd) = cm1_oxd;
+    cm2_oxd_all(:,cal.ioxd) = cm2_oxd;
+end
 
 rho0 = (x0./rhox0 + m0./rhom0).^-1;
 
@@ -421,27 +479,6 @@ fprintf('    initial SiO2: %4.3f \n'  ,c0_oxd(1)./sum(c0_oxd(1:end-1)).*100);
 fprintf('    initial H2O : %4.3f \n'  ,c0_oxd(end));
 fprintf('    initial x   : %4.3f \n'  ,x0);
 fprintf('    initial f   : %4.3f \n\n',f0);
-
-
-% get bulk enthalpy, silica, volatile content densities
-Tp   = Tp+273.15;  Tn = T;  Tpn = Tp;  To = T;  Tpo = T;
-T    = Tp.*exp(aT./RhoCp.*(Pt-Pref));
-s    = 500 + 0.*Tp;
-% s    = cP.*log(Tp/Tref);
-% S    = RhoCp.*log(T/Tref) + X.*Dsx + F.*Dsf - aT.*(Pt-Pref);
-% S0   = mean(RhoCp(:)).*log(Tref) + mean(X(:)).*Dsx + mean(F(:)).*Dsf - mean(aT(:)).*Pref;
-C    = rho.*(m.*cm + x.*cx + f.*cf); Co = C;  res_C = 0.*C;
-X    = rho.*x; Xo = X;  res_X = 0.*X;
-F    = rho.*f; Fo = F;  res_F = 0.*F;
-M    = rho.*m; Mo = M;  res_M = 0.*M;
-RHO  = X+M+F;
-S    = s.*rho + X.*Dsx + F.*Dsf;  So = S;  res_S = 0.*S;
-
-% get phase entropies
-s  = (S - X.*Dsx - F.*Dsf)./rho;
-sm = s;
-sx = s + Dsx;
-sf = s + Dsf;
 
 % get trace element phase compositions
 Ktrc = zeros(Nz,Nx,cal.ntrc);
@@ -486,7 +523,7 @@ upd_F  = 0.*F;
 upd_M  = 0.*M;
 upd_rho= 0.*rho;
 upd_TRC = 0.*TRC;
-% upd_IR = 0.*IR;
+upd_eta = 0.*eta;
 
 % initialise timing and iterative parameters
 frst    = 1;
@@ -494,9 +531,13 @@ step    = 0;
 time    = 0;
 iter    = 0;
 hist    = [];
-dsumMdt = 0; dsumMdto = 0;
 dsumSdt = 0; dsumSdto = 0;
+dsumBdt = 0; dsumBdto = 0;
+dsumMdt = 0; dsumMdto = 0;
+dsumXdt = 0; dsumXdto = 0;
+dsumFdt = 0; dsumFdto = 0;
 dsumCdt = 0; dsumCdto = 0;
+dsumTdt = 0; dsumTdto = 0;
 
 % overwrite fields from file if restarting run
 if restart
@@ -507,67 +548,50 @@ if restart
     end
     if exist(name,'file')
         fprintf('\n   restart from %s \n\n',name);
-        load(name,'U','W','P','Pt','Pchmb','f','x','m','fq','xq','mq','phi','chi','mu','X','F','M','S','C','T','Tp','c','cm','cx','cf','TRC','trc','dSdt','dCdt','dFdt','dXdt','dMdt','drhodt','dTRCdt','Gf','Gx','Gm','rho','eta','eII','tII','dt','time','step','VolSrc','wf','wx','wm','cal');
+        load(name,'U','W','P','Pt','Pchmb','f','x','m','fq','xq','mq','phi','chi','mu','X','F','M','S','C','T','Tp','c','cm','cx','cf','sm','sx','sf','TRC','trc','dSdt','dCdt','dFdt','dXdt','dMdt','drhodt','dTRCdt','Gf','Gx','Gm','rho','eta','eII','tII','dt','time','step','dV','wf','wx','wm','cal');
         name = [outdir,'/',runID,'/',runID,'_hist'];
         load(name,'hist');
 
         SOL = [W(:);U(:);P(:)];
         RHO = X+M+F;
-        s  = (S - X.*Dsx - F.*Dsf)./RHO;
-        sm = s;
-        sx = s + Dsx;
-        sf = s + Dsf;
 
-        update; 
-        
-        So = S;
-        Co = C;
-        Xo = X;
-        Fo = F;
-        Mo = M;
-        rhoo = rho;
-        TRCo = TRC;
-        dSdto = dSdt;
-        dCdto = dCdt;
-        dXdto = dXdt;
-        dFdto = dFdt;
-        dMdto = dMdt;
-        drhodto = drhodt;
-        dTRCdto = dTRCdt;
-        rhoWo   = rhoW;
-        rhoUo   = rhoU;
-        Pchmbo  = Pchmb;
-        dPchmbdto = dPchmbdt;
-        Pto     = Pt;
-        To      = T;
-        Tpo     = Tp;
-        so      = s;
-        dto     = dt;
-        Gmo     = Gm;
-        Gxo     = Gx;
-        Gfo     = Gf;
-
+        update;
+        phseql;
+        corrl;
+        update;
+        store;
         fluidmech;
         update;
         output;
 
         time    = time+dt;
         step    = step+1;
+        restart = 0;
 
     else % continuation file does not exist, start from scratch
         fprintf('\n   !!! restart file does not exist !!! \n   => starting run from scratch %s \n\n',runID);
+        restart = 0;
+        store;
         fluidmech;
         update;
         history;
         output;
+        step = step+1;
     end
 else
     % complete, plot, and save initial condition
+    store;
     fluidmech;
     update;
     history;
     output;
     step = step+1;
 end
+else
+    % M   = m.*rho;
+    % X   = x.*rho;
+    % F   = f.*rho;
+    Delta_cnv0 = Delta_cnv;
+    RHO = rho;
+end
 
-restart = 0;
