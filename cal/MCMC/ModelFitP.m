@@ -28,7 +28,7 @@ var.T      = T;             % temperature [C]
 var.P      = P/10;         % pressure [GPa]
 var.H2O    = SYS_cmpfit(:,end); % water concentration [wt]
 cal.H2Osat = var.H2O./(PHS(:,1)/100);%fluidsat(var);
-[var,cal]  = meltmodel(var,cal,'E');
+[var,cal]  = leappart(var,cal,'E');
 
 % get fitted phase oxide compositions
 MLT_cmpfit = var.cm;
@@ -59,7 +59,7 @@ var.P      = Psl/10;                     % pressure [GPa]
 var.T      = 1000+Psl(:)*5e-8;           % temperature [C]
 var.H2O    = Psl(:)*0;                   % water concentration [wt]
 cal.H2Osat = Psl(:)*0;
-[~,cal]    = meltmodel(var,cal,'T');
+[~,cal]    = leappart(var,cal,'T');
 
 Tsolfit = cal.Tsol;
 Tliqfit = cal.Tliq;
@@ -73,7 +73,7 @@ Tm      = cal.Tm;
 % var.T      = 1000+Psl(:)*5e-8;           % temperature [C]
 % var.H2O    = Psl(:)*0;                   % water concentration [wt]
 % cal.H2Osat = Psl(:)*0;
-% [~,cal]    = meltmodel(var,cal,'T');
+% [~,cal]    = leappart(var,cal,'T');
 % 
 % Tsolfit = [Tsolfit;cal.Tsol];
 % Tliqfit = [Tliqfit;cal.Tliq];

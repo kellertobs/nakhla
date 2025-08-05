@@ -487,7 +487,7 @@ var.P      = PP/10;
 var.T      = 1000+PP*5e-8;
 var.H2O    = zeros(size(PP));
 cal.H2Osat = var.H2O+0.01;
-[~,cal]    = meltmodel(var,cal,'T');
+[~,cal]    = leappart(var,cal,'T');
 Tm         = cal.Tm;
 
 % rescale mineral phase fractions
@@ -508,11 +508,11 @@ T0_init = T0_best; A_init = A_best; B_init = B_best; r_init = r_best; dT_init = 
 m0      = [T0_init.';A_init.';B_init.';r_init.';dT_init.';cmp_mem_init(:).*indmem(:)];
 
 % !!!  set MCMC parameters then Run Section to execute MCMC routine  !!!
-Niter           = 1e3;              % number of samples to take
+Niter           = 2e4;              % number of samples to take
 anneal.initstep = 1e-4;           % adjust step size to get reasonable acceptance ratio 20-30%
-anneal.levels   = 1;                % select number of annealing levels
-anneal.burnin   = 1;%max(1,Niter/5);  % set length of initial burn-in sequence
-anneal.refine   = 1;%max(1,Niter/10);  % set length of final refinement sequence
+anneal.levels   = 3;                % select number of annealing levels
+anneal.burnin   = max(1,Niter/5);  % set length of initial burn-in sequence
+anneal.refine   = max(1,Niter/10);  % set length of final refinement sequence
 
 % !!!  set data uncertainties to weight likelihood function  !!!
 MLT_scl   = max(0.01,(MLT_oxdp(:)-min(MLT_oxdp(:)))./(max(MLT_oxdp(:))-min(MLT_oxdp(:))));
@@ -626,7 +626,7 @@ var.P      = PP/10;
 var.T      = 1000+PP*5e-8;
 var.H2O    = zeros(size(PP));
 cal.H2Osat = var.H2O+0.001;
-[~,cal]    = meltmodel(var,cal,'T');
+[~,cal]    = leappart(var,cal,'T');
 Tm         = cal.Tm;
 
 % uncomment following line to retrieve probability distributions (slow!)
